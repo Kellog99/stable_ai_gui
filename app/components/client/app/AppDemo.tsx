@@ -1,7 +1,21 @@
+'use client'
+
 import { AppShell, Image, Title, Flex} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import classes from './Home.page.module.css';
-import Search from '@/components/Search';
+import classes from './AppDemo.module.css';
+import { TextInput } from '@mantine/core';
+
+function Search() {
+  return (
+    <TextInput
+      radius="xl"
+      placeholder="Search datasets..."
+    />
+  );
+}
+
+export default Search;
+
 
 export function HomePage() {
   const [opened, { toggle }] = useDisclosure();
@@ -46,11 +60,6 @@ export function HomePage() {
           <Search/>
         </div>
         
-
-
-
-
-
       </AppShell.Main>
     </AppShell>
   );
