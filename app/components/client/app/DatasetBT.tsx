@@ -1,42 +1,82 @@
 import React from "react";
-import { Card, Image, Text, Badge, Button, Group, Grid } from '@mantine/core';
+import { Card, Image, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
 import classes from './DatasetBT.module.css';
+import ClickableComponent from "./ClickableComponent";
+
+
+interface FeatureDTO{
+    type: string;
+    name: string;
+    datas?: string[];
+    is_logic?: boolean
+}
+
+/*
+
+interface Dataset{
+    prototype: string,
+    name: string,
+    n_classes: number,
+    samples_per_class: number,
+    n_samples: number,
+    task: string,
+    features: string[]
+}
+*/
+
 
 interface Dataset {
-    prototype: any;
     name: string;
-    n_classes: number;
-    samples_per_class: number;
     n_samples: number;
     task: string;
-    features: string[];
+    features: {
+        type: string;
+        name: string;
+        datas: string[];
+        is_logic: boolean
+      };
+    prototype: {
+        type: string;
+        name: string;
+        datas: string[];
+        is_logic: boolean
+      };  
+    n_classes: number;
+    samples_per_class?: number;
+    label_dict?: any;
   }
+
   
   interface DatasetBTProps {
     data: Dataset[];
   }
 
 function DatasetBT(props : DatasetBTProps) {
-
+    /*
     function clicked(name : string){
         console.log( `clicked on ${name}! `)
     }
+    */
+
     return (
         <div className={classes.dataset_buttons}>
             <Grid
             columns={4}
             >
-            {props.data.map((dataset, index) => (
-                <Grid.Col span={1} key={index}>
+
+            {props.data.length > 0 ? (props.data.map((dataset, index) => (
+                
+                <GridCol span={1} key={index}>
                     <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
-                    <Card.Section>
-                        <Image
-                            src={dataset.prototype}
-                            height={300}
-                            alt={dataset.name}
-                            onClick={() => clicked(dataset.name)}
-                        />
-                    </Card.Section>
+                    <CardSection>
+                        <ClickableComponent name={dataset.name}>
+                            <Image
+                                src={dataset.prototype.datas}
+                                height={300}
+                                alt={dataset.name}
+                            />
+                        </ClickableComponent>
+                    </CardSection>
                 
                     <Group justify="space-between" mt="md" mb="xs">
                         <Text fw={700} size="lg">{dataset.name}</Text>
@@ -46,11 +86,26 @@ function DatasetBT(props : DatasetBTProps) {
                         {dataset.n_samples} samples
                     </Text>
                     </Card>
-            </Grid.Col>
-            ))}
+            </GridCol>
+            ))
+        ) : (
+            <p>Loading data...</p>
+        )}
             </Grid>
         </div>
     );
+    
 }
 
-export default React.memo(DatasetBT);
+export default DatasetBT;
+
+
+
+/* 
+<Image
+    src={dataset.prototype.datas}
+    height={300}
+    alt={dataset.name}
+    //onClick={() => clicked(dataset.name)}
+/>
+*/

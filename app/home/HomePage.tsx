@@ -1,6 +1,6 @@
-'use client'
 
-import { AppShell, Image, Title, Flex} from '@mantine/core';
+
+import { AppShell, AppShellHeader, AppShellNavbar, AppShellMain, Image, Title, Flex} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import classes from './AppDemo.module.css';
 import { TextInput } from '@mantine/core';
@@ -8,10 +8,17 @@ import { useState } from 'react';
 import DatasetBT from '../components/client/app/DatasetBT';
 import Filters from '../components/client/app/Filters';
 
-export function HomePage() {
-  const [opened, { toggle }] = useDisclosure();
+export async function HomePage() {
+  
+  /*const [opened, { toggle }] = useDisclosure();*/
   
   
+  const datasetsResponse = await fetch("http://localhost:8000");
+
+  const datasets = await datasetsResponse.json();
+
+  /*
+
   const datasets = [
     {
       prototype: "/0a37838e99.jpg",
@@ -51,11 +58,14 @@ export function HomePage() {
     }
       ];
   
-    const [searchDataset, setSearchDataset] = useState("");
+*/
+
+    
+    /*const [searchDataset, setSearchDataset] = useState("");
     
     const filteredDatasets = datasets.filter((dataset) =>
       dataset.name.toLowerCase().includes(searchDataset.toLowerCase())
-    );
+    ); */
 
   return (
     <AppShell
@@ -63,11 +73,11 @@ export function HomePage() {
       navbar={{
         width: 300,
         breakpoint: 'sm',
-        collapsed: { mobile: !opened },
+        //collapsed: { mobile: !opened },
       }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShellHeader>
         <Flex
           mih={150}
           bg="#f0f0f0"
@@ -83,33 +93,35 @@ export function HomePage() {
           />
           <Title className={classes.title} >Data Quality Framework</Title>
         </Flex>
-      </AppShell.Header>
+      </AppShellHeader>
 
-      <AppShell.Navbar 
+      <AppShellNavbar 
         p="md"
         bg="#f0f0f0"
         >
         <Filters/>
 
-      </AppShell.Navbar>
+      </AppShellNavbar>
 
-      <AppShell.Main>
+      <AppShellMain>
         <div >
           <TextInput
             className={classes.search}
             radius="xl"
             placeholder="Search datasets..."
-            value={searchDataset}
-            onChange={(e) => setSearchDataset(e.target.value)}
+            /*value={searchDataset}
+            onChange={(e) => setSearchDataset(e.target.value)}*/
           />
         </div>
-          {filteredDatasets.length > 0 ? (
+        <DatasetBT data={datasets} />
+      </AppShellMain>
+    </AppShell>
+  );
+}
+
+/* {filteredDatasets.length > 0 ? (
             <DatasetBT data={filteredDatasets} />
           ) : searchDataset === "" ? (
             <DatasetBT data={datasets} />
           ) : null
-          }
-      </AppShell.Main>
-    </AppShell>
-  );
-}
+          }*/

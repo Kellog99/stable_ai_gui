@@ -10,10 +10,13 @@ export default async function Page() {
   return (
     <main>
       <h1>Next.js Server and Client Components Demo</h1>
-      <ClientComponent>
-        {/* ServerComponent is rendered on the server and passed to ClientComponent */}
-        <ServerComponent endPointApi={endPointApi} />
-      </ClientComponent>
+      <HomePage/>
     </main>
   );
 }
+
+/* 
+<ClientComponent>
+        
+        <ServerComponent endPointApi={endPointApi} />
+      </ClientComponent> */
