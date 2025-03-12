@@ -1,0 +1,12 @@
+.dataset_buttons{
+    margin-left: 100px;
+    margin-right: 250px;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+.card:hover {
+transform: scale(1.05);
+}
