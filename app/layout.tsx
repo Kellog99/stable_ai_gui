@@ -18,10 +18,12 @@ export default function RootLayout({ children }: { children: any }) {
       <head>
         <ColorSchemeScript />
         <link rel="shortcut icon" href="/favicon.svg" />
+        <title/>
         <meta
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
         />
+        <title>Data Quality Framework</title>
       </head>
       <body>
         <MantineProvider theme={theme}>{children}</MantineProvider>
