@@ -1,70 +1,22 @@
+"use client";
 import React from "react";
 import { Card, Image, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
 import classes from './DatasetBT.module.css';
 import ClickableComponent from "../client/ClickableComponent";
+import {useSearch} from "../context/SearchBarContext";
 
 
-interface FeatureDTO{
-    type: string;
-    name: string;
-    datas?: string[];
-    is_logic?: boolean
-}
-
-/*
-
-interface Dataset{
-    prototype: string,
-    name: string,
-    n_classes: number,
-    samples_per_class: number,
-    n_samples: number,
-    task: string,
-    features: string[]
-}
-*/
-
-
-interface Dataset {
-    name: string;
-    n_samples: number;
-    task: string;
-    features: {
-        type: string;
-        name: string;
-        datas: string[];
-        is_logic: boolean
-      };
-    prototype: {
-        type: string;
-        name: string;
-        datas: string[];
-        is_logic: boolean
-      };  
-    n_classes: number;
-    samples_per_class?: number;
-    label_dict?: any;
-  }
-
+function DatasetBT() {
   
-  interface DatasetBTProps {
-    data: Dataset[];
-  }
-
-function DatasetBT(props : DatasetBTProps) {
-    /*
-    function clicked(name : string){
-        console.log( `clicked on ${name}! `)
-    }
-    */
-
+    const { filteredDatasets } = useSearch();    
+    
     return (
         <div className={classes.dataset_buttons}>
             <Grid
             columns={4}
             >
 
-            {props.data.length > 0 ? (props.data.map((dataset, index) => (
+            {filteredDatasets.length > 0 ? (filteredDatasets.map((dataset, index) => (
                 
                 <GridCol span={1} key={index}>
                     <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
@@ -89,7 +41,7 @@ function DatasetBT(props : DatasetBTProps) {
             </GridCol>
             ))
         ) : (
-            <p>Loading data...</p>
+            <p>No result found</p>
         )}
             </Grid>
         </div>
@@ -98,14 +50,3 @@ function DatasetBT(props : DatasetBTProps) {
 }
 
 export default DatasetBT;
-
-
-
-/* 
-<Image
-    src={dataset.prototype.datas}
-    height={300}
-    alt={dataset.name}
-    //onClick={() => clicked(dataset.name)}
-/>
-*/

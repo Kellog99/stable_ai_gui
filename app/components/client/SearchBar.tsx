@@ -1,24 +1,13 @@
 'use client';
 import React from "react";
-import { useState } from "react";
+import { useState, createContext } from "react";
 import { TextInput } from "@mantine/core";
 import classes from './SearchBar.module.css';
 import DatasetBT from "../server/DatasetBT";
+import { useSearch } from "../context/SearchBarContext";
 
-
-interface SearchBarProps {
-  datasets: any[];
-}
-
-export default function SearchBar({ 
-  datasets
-}: React.PropsWithChildren<SearchBarProps>) {
-
-    const [searchDataset, setSearchDataset] = useState("");
-    
-    const filteredDatasets = datasets.filter((dataset) =>
-      dataset.name.toLowerCase().includes(searchDataset.toLowerCase())
-    ); 
+export default function SearchBar() {
+    const {searchQuery, setSearchQuery} = useSearch();
 
     return(
         <div >
@@ -26,15 +15,17 @@ export default function SearchBar({
             className={classes.search}
             radius="xl"
             placeholder="Search datasets..."
-            value={searchDataset}
-            onChange={(e) => setSearchDataset(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {filteredDatasets.length > 0 ? (
+        </div>
+    )
+}
+
+
+/*{filteredDatasets.length > 0 ? (
             <DatasetBT data={filteredDatasets} />
           ) : searchDataset === "" ? (
             <DatasetBT data={datasets} />
           ) : null
-          }
-        </div>
-    )
-}
+          }*/

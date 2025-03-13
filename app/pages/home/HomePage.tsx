@@ -8,6 +8,7 @@ import { useState } from 'react';
 import DatasetBT from '../../components/server/DatasetBT';
 import Filters from '../../components/client/Filters';
 import SearchBar from '../../components/client/SearchBar';
+import { SearchProvider } from '../../components/context/SearchBarContext';
 
 export async function HomePage() {
   
@@ -16,13 +17,9 @@ export async function HomePage() {
   
   const datasetsResponse = await fetch("http://localhost:8000");
 
-  const datasets = await datasetsResponse.json();
+  const datasets = await datasetsResponse.json(); 
   
-    /*const [searchDataset, setSearchDataset] = useState("");
-    
-    const filteredDatasets = datasets.filter((dataset) =>
-      dataset.name.toLowerCase().includes(searchDataset.toLowerCase())
-    ); */ 
+  
 
   return (
     <AppShell
@@ -61,15 +58,12 @@ export async function HomePage() {
       </AppShellNavbar>
 
       <AppShellMain>
-        <SearchBar  datasets={datasets}/>
+      <SearchProvider datasets={datasets}>
+        <SearchBar/>
+        <DatasetBT/>
+      </SearchProvider>
+
       </AppShellMain>
     </AppShell>
   );
 }
-
-/* {filteredDatasets.length > 0 ? (
-            <DatasetBT data={filteredDatasets} />
-          ) : searchDataset === "" ? (
-            <DatasetBT data={datasets} />
-          ) : null
-          }*/
