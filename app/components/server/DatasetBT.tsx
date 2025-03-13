@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Image, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
 import classes from './DatasetBT.module.css';
-import ClickableComponent from "./ClickableComponent";
+import ClickableComponent from "../client/ClickableComponent";
 
 
 interface FeatureDTO{
