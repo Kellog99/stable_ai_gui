@@ -1,15 +1,63 @@
-"use client";
 import React from "react";
 import { Card, Image, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
 import classes from './DatasetBT.module.css';
 import ClickableComponent from "../client/ClickableComponent";
-import {useSearch} from "../context/SearchBarContext";
 
 
-function DatasetBT() {
+interface Dataset {
+    name: string;
+    n_samples: number;
+    task: string;
+    features: {
+        type: string;
+        name: string;
+        datas: string[];
+        is_logic: boolean
+      };
+    prototype: {
+        type: string;
+        name: string;
+        datas: string[];
+        is_logic: boolean
+      };  
+    n_classes: number;
+    samples_per_class?: number;
+    label_dict?: any;
+  }
+/*
+    interface Dataset {
+        id: string;
+        name: string;
+    }
+*/
   
-    const { filteredDatasets } = useSearch();    
-    
+  interface DatasetBTProps {
+    query?: string;
+    datasets: Dataset[];
+  }
+  
+  
+  export default function DatasetBT({ query, datasets }: DatasetBTProps) {
+
+      const filteredDatasets = query
+    ? datasets.filter(dataset => 
+        dataset.name.toLowerCase().includes(query.toLowerCase())
+      )
+    : datasets;
+/*
+    return (
+        <div className="grid gap-4">
+          {filteredDatasets.map(dataset => (
+            <div key={dataset.id} className="p-4 border rounded">
+              <h3 className="font-semibold">{dataset.name}</h3>
+            </div>
+          ))}
+        </div>
+      );
+    }
+*/
+  
+
     return (
         <div className={classes.dataset_buttons}>
             <Grid
@@ -48,5 +96,3 @@ function DatasetBT() {
     );
     
 }
-
-export default DatasetBT;

@@ -8,9 +8,21 @@ import { useState } from 'react';
 import DatasetBT from '../../components/server/DatasetBT';
 import Filters from '../../components/client/Filters';
 import SearchBar from '../../components/client/SearchBar';
-import { SearchProvider } from '../../components/context/SearchBarContext';
 
-export async function HomePage() {
+
+interface HomePageProps {
+  searchParams: {
+    query?: string;
+  };
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  
+
+  const {query} = searchParams;
+  
+  //const datasetQuery = (await Promise.resolve(searchParams?.query)) || '';
+  
   
   /*const [opened, { toggle }] = useDisclosure();*/
   
@@ -18,7 +30,6 @@ export async function HomePage() {
   const datasetsResponse = await fetch("http://localhost:8000");
 
   const datasets = await datasetsResponse.json(); 
-  
   
 
   return (
@@ -44,6 +55,7 @@ export async function HomePage() {
           <Image
               className={classes.logo}
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Logo_Leonardo.svg/2560px-Logo_Leonardo.svg.png"
+              alt="logo"
           />
           <Title className={classes.title} >Data Quality Framework</Title>
         </Flex>
@@ -58,12 +70,10 @@ export async function HomePage() {
       </AppShellNavbar>
 
       <AppShellMain>
-      <SearchProvider datasets={datasets}>
-        <SearchBar/>
-        <DatasetBT/>
-      </SearchProvider>
-
+        <SearchBar />
+        <DatasetBT query={query} datasets={datasets}/>
       </AppShellMain>
     </AppShell>
   );
 }
+// <DatasetBT query={datasetQuery} datasets={datasets}/>
