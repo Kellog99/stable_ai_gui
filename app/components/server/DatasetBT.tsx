@@ -69,7 +69,7 @@ interface Dataset {
                 <GridCol span={1} key={index}>
                     <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
                     <CardSection>
-                        <ClickableComponent name={dataset.name}>
+                        <ClickableComponent name={dataset.name} dataset={dataset}>
                             <Image
                                 src={dataset.prototype.datas}
                                 height={300}

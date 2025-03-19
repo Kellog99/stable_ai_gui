@@ -8,6 +8,7 @@ import classes from './page.module.css';
 import DatasetBT from '../app/components/server/DatasetBT';
 import Filters from '../app/components/client/Filters';
 import SearchBar from '../app/components/client/SearchBar';
+import DatasetsLoader from './functionalities/DatasetsLoader';
 
 
 //export default async function HomePage({ searchParams }: { searchParams: { query?: string } }) {
@@ -17,9 +18,25 @@ export default async function HomePage(props: {searchParams: Promise<{ query: st
 
   const { query } = await searchParams;
  
-  console.log("Dataset query:", query);
+  //console.log("Dataset query:", query);
   
   /*const [opened, { toggle }] = useDisclosure();*/
+  /*
+  const response = await POST();
+  
+  const data = await response.json();
+  
+  if ("message" in data) {
+    console.log("post:", data.message);
+  } else {
+    console.error("Error:", data.error);
+  }
+*/
+
+  //const datasets = await DatasetsLoader()
+  
+  //console.log("Server Response:",datasets)
+   
   
   
   const datasetsResponse = await fetch("http://localhost:8000", {
@@ -27,6 +44,7 @@ export default async function HomePage(props: {searchParams: Promise<{ query: st
   });
 
   const datasets = await datasetsResponse.json(); 
+  
 
   
 
