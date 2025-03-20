@@ -1,33 +1,22 @@
-import "@mantine/core/styles.css";
-import React from "react";
-import {
-  MantineProvider,
-  ColorSchemeScript,
-  mantineHtmlProps,
-} from "@mantine/core";
-import { theme } from "../theme";
+// app/layout.tsx
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 
-export const metadata = {
-  title: "Mantine Next.js template",
-  description: "I am using Mantine with Next.js!",
+const inter = Inter({ subsets: ['latin'] });
+
+export const metadata: Metadata = {
+  title: '3D Interactive Scatter Plot',
+  description: 'Interactive 3D scatter plot visualization built with Next.js 15',
 };
 
-export default function RootLayout({ children }: { children: any }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" {...mantineHtmlProps}>
-      <head>
-        <ColorSchemeScript />
-        <link rel="shortcut icon" href="/favicon.svg" />
-        <title/>
-        <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
-        />
-        <title>Data Quality Framework</title>
-      </head>
-      <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
-      </body>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
