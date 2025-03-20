@@ -1,29 +1,12 @@
 import React from "react";
-import { Card, Image, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
+import { Card, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
 import classes from './DatasetBT.module.css';
-import ClickableComponent from "../client/ClickableComponent";
+import Dataset from "../../interfaces/DatasetInterface"
+import ImageDisplayer from "./ImageDisplayer";
+import TextDisplayer from "./TextDisplayer";
+import { image_type, text_type } from "../../properties/types";
+import RouterButton from "../client/buttons/RouterButton";
 
-
-interface Dataset {
-    name: string;
-    n_samples: number;
-    task: string;
-    features: {
-        type: string;
-        name: string;
-        datas: string[];
-        is_logic: boolean
-      };
-    prototype: {
-        type: string;
-        name: string;
-        datas: string[];
-        is_logic: boolean
-      };  
-    n_classes: number;
-    samples_per_class?: number;
-    label_dict?: any;
-  }
 /*
     interface Dataset {
         id: string;
@@ -56,8 +39,6 @@ interface Dataset {
       );
     }
 */
-  
-
     return (
         <div className={classes.dataset_buttons}>
             <Grid
@@ -69,13 +50,13 @@ interface Dataset {
                 <GridCol span={1} key={index}>
                     <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
                     <CardSection>
-                        <ClickableComponent name={dataset.name} dataset={dataset}>
-                            <Image
-                                src={dataset.prototype.datas}
-                                height={300}
-                                alt={dataset.name}
-                            />
-                        </ClickableComponent>
+                        <RouterButton name={dataset.name} route="/pages/prova">
+                          {dataset.prototype.type === image_type ? (
+                            <ImageDisplayer data={dataset.prototype.datas[0]} alt={dataset.name} />
+                          ) : dataset.prototype.type === text_type ? (
+                            <TextDisplayer data={dataset.prototype.datas[0]} />
+                          ) : null}
+                        </RouterButton>
                     </CardSection>
                 
                     <Group justify="space-between" mt="md" mb="xs">
@@ -96,3 +77,11 @@ interface Dataset {
     );
     
 }
+
+/*
+<Image
+    src={dataset.prototype.datas[0]}
+    height={300}
+    alt={dataset.name}
+/>
+*/

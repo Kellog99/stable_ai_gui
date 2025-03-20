@@ -1,6 +1,6 @@
 function Filters() {
     return (
-        <h2>Filtersssssssssssss</h2>
+        <h2>Filters</h2>
     )
 }
 

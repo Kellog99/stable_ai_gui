@@ -33,20 +33,18 @@ export default async function HomePage(props: {searchParams: Promise<{ query: st
   }
 */
 
-  //const datasets = await DatasetsLoader()
+  const datasets = await DatasetsLoader()
   
-  //console.log("Server Response:",datasets)
+  console.log("Server Response:",datasets)
    
   
-  
+  /*
   const datasetsResponse = await fetch("http://localhost:8000", {
     cache: 'force-cache',
   });
 
   const datasets = await datasetsResponse.json(); 
-  
-
-  
+  */
 
   return (
     <AppShell

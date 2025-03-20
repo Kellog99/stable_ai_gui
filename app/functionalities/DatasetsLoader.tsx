@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { dataset_post } from '../properties/urls';
 
 function readPublicFolder(directory: string): string[] {
     let arrowFiles: string[] = [];
@@ -12,7 +13,7 @@ function readPublicFolder(directory: string): string[] {
 
         if (entry.isDirectory()) {
         arrowFiles = arrowFiles.concat(readPublicFolder(fullPath));
-        } else if (entry.isFile() && entry.name.endsWith('original.arrow')) {
+        } else if (entry.isFile() && entry.name.endsWith('.arrow')) {
         arrowFiles.push(fullPath);
         }
     }
@@ -60,7 +61,7 @@ export default async function DatasetsLoader() {
 
         const blob = new Blob(files, { type: 'application/octet-stream' });
         
-        const response = await fetch('http://localhost:8000/process-files', {
+        const response = await fetch(dataset_post, {
             method: 'POST',
             headers: { 'Content-Type': 'application/octet-stream' }, // binary content type
             body: blob,
