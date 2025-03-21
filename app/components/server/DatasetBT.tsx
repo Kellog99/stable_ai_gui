@@ -50,7 +50,7 @@ import RouterButton from "../client/buttons/RouterButton";
                 <GridCol span={1} key={index}>
                     <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
                     <CardSection>
-                        <RouterButton name={dataset.name} route="/pages/prova">
+                        <RouterButton name={dataset.name} route="/pages/embeddings">
                           {dataset.prototype.type === image_type ? (
                             <ImageDisplayer data={dataset.prototype.datas[0]} alt={dataset.name} />
                           ) : dataset.prototype.type === text_type ? (

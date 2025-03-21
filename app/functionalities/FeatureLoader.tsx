@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { dataset_post } from '../properties/urls';
+import { feature_post } from '../properties/urls';
 
 function readPublicFolder(directory: string): string[] {
     let arrowFiles: string[] = [];
@@ -41,7 +41,7 @@ export async function getArrowFileNames() {
       }
 
 
-export default async function DatasetsLoader() {
+export default async function FeatureLoader(indexes,name) {
     try {
         const request = await getArrowFileNames();
         const data = await request.json();
@@ -61,7 +61,7 @@ export default async function DatasetsLoader() {
 
         const blob = new Blob(files, { type: 'application/octet-stream' });
         
-        const response = await fetch(dataset_post, {
+        const response = await fetch(`${feature_post}?featureName=${encodeURIComponent(name)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/octet-stream' }, // binary content type
             body: blob,
@@ -69,10 +69,24 @@ export default async function DatasetsLoader() {
 
         if (!response.ok) throw new Error('Failed to send files to backend');
 
-        const datasets = await response.json();
-        console.log('Server Response:', datasets); // Handle the JSON response
+        const feature = await response.json();
+        console.log('Server Response:', feature); // Handle the JSON response
         
-        return datasets;
+        const decodedString = decodeURIComponent(indexes);
+        console.log(decodedString)
+        // Split the string into an array of strings using comma as the delimiter
+        const indexesArray = decodedString.split(',');
+
+        // Convert each element into an integer
+        const numericIndexes = indexesArray.map(index => parseInt(index, 10));
+        console.log(feature.datas[0])
+        let filteredArr = [];
+        numericIndexes.forEach(index => {
+        filteredArr.push(feature.datas[index]);
+        });
+        const out = numericIndexes.map(index => feature.datas[index]);
+        console.log("AHAH",filteredArr)
+        return filteredArr
     } catch (error) {
         console.error('Error:', error);
     }
