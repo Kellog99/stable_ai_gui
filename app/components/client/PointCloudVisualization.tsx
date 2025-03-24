@@ -1,29 +1,34 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, Suspense} from 'react';
 import DeckGL from '@deck.gl/react';
 import { PointCloudLayer } from '@deck.gl/layers';
 import { OrbitView } from '@deck.gl/core';
 import IndexHandler from './IndexHandler';
+import getData from '../../functionalities/Utils';
 
-interface Point {
-  position: [number, number, number];
-  color: [number, number, number];
+
+export async function getDataPoints(){
+  const points = await getData()
+  return points;
 }
 
-interface PointCloudVisualizationProps {
-  data: Point[];
-}
-
-export function PointCloudVisualization({ data }: PointCloudVisualizationProps) {
+export function PointCloudVisualization() {
   const deckRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    // Simulating a data fetch
+    getData().then(fetchedData => {
+      setData(fetchedData); // Safe to call state update here
+    });
+  }, []); 
   const [viewState, setViewState] = useState({
     target: [0, 0, 0],
     rotationX: 0,
     rotationOrbit: 0,
     zoom: 0,
+    
   });
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
@@ -131,7 +136,8 @@ export function PointCloudVisualization({ data }: PointCloudVisualizationProps) 
   
   return (
     <>
-      <div ref={containerRef} className="relative w-full h-full">
+      <Suspense fallback={<div>UANMMMMMMMMMMMMMMMMMMMMMMMMMMMMM</div>}>
+      <div id="deckgl-container" style={{width: '600px', height: '400px', position: 'relative'}}>
         <DeckGL
           ref={deckRef}
           views={new OrbitView({ fov: 50 })}
@@ -161,7 +167,6 @@ export function PointCloudVisualization({ data }: PointCloudVisualizationProps) 
           onDrag={handleDrag}
           onDragEnd={handleDragEnd}
         />
-
         {/* Lasso rectangle visualization */}
         {lassoMode && dragStart && dragCurrent && (
           <div style={lassoStyle} />
@@ -182,6 +187,7 @@ export function PointCloudVisualization({ data }: PointCloudVisualizationProps) 
           <p className="text-xs opacity-80">Scroll to zoom (when not in lasso mode)</p>
         </div>
       </div>
+      </Suspense>
 
       <IndexHandler  selectedPoints={selectedPoints}/>
 

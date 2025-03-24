@@ -1,6 +1,7 @@
 'use client';
 import React from "react";
 import { useRouter } from "next/navigation";
+import Link from 'next/link'
 
 interface ClickableImageProps {
   name: string;
@@ -13,15 +14,15 @@ export default function RouterButton({
   children
 }: React.PropsWithChildren<ClickableImageProps>) {
   
-  const router = useRouter();
-
-  function clicked(name: string, route: string) {
-    router.push(`${route}?name=${name.toString()}`);
-  }
   
   return (
-    <div onClick={() => clicked(name, route)}>
+    <Link
+      href={{
+        pathname: route,
+        query: { name: name},
+      }}
+    >
       {children}
-    </div>
-  );
+    </Link>
+  )
 }
