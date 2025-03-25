@@ -1,3 +1,5 @@
+"use server";
+
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
@@ -7,7 +9,6 @@ function readPublicFolder(directory: string): string[] {
     let arrowFiles: string[] = [];
 
     const entries = fs.readdirSync(directory, { withFileTypes: true });
-
     for (const entry of entries) {
         const fullPath = path.join(directory, entry.name);
 
@@ -20,9 +21,9 @@ function readPublicFolder(directory: string): string[] {
     return arrowFiles;
     }
 
-export async function getArrowFileNames() {
+export async function getArrowFileNames(datasetName) {
     try {
-        const datasetsDir = path.join(process.cwd(), 'public', 'datasets');
+        const datasetsDir = path.join(process.cwd(), 'public', 'datasets', datasetName);
         const arrowFiles = readPublicFolder(datasetsDir);
         console.log('Matching files:', arrowFiles);
         const response = {
@@ -41,15 +42,12 @@ export async function getArrowFileNames() {
       }
 
 
-export default async function FeatureLoader(indexes,name) {
+export default async function featureLoader(datasetName, featureName) {
     try {
-        const request = await getArrowFileNames();
+        const request = await getArrowFileNames(datasetName);
         const data = await request.json();
-        
         const fileNames: string[] = data.files;
-        
         const fs = require('fs').promises;
-
         const files = await Promise.all(fileNames.map(async (fileName) => {
         try {
             const data = await fs.readFile(fileName);
@@ -60,33 +58,17 @@ export default async function FeatureLoader(indexes,name) {
         }));
 
         const blob = new Blob(files, { type: 'application/octet-stream' });
-        
-        const response = await fetch(`${feature_post}?featureName=${encodeURIComponent(name)}`, {
+        const response = await fetch(`${feature_post}?featureName=${encodeURIComponent(featureName)}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/octet-stream' }, // binary content type
+            headers: { 'Content-Type': 'application/octet-stream' },
             body: blob,
         });
 
         if (!response.ok) throw new Error('Failed to send files to backend');
 
         const feature = await response.json();
-        console.log('Server Response:', feature); // Handle the JSON response
-        
-        const decodedString = decodeURIComponent(indexes);
-        console.log(decodedString)
-        // Split the string into an array of strings using comma as the delimiter
-        const indexesArray = decodedString.split(',');
+        return feature
 
-        // Convert each element into an integer
-        const numericIndexes = indexesArray.map(index => parseInt(index, 10));
-        console.log(feature.datas[0])
-        let filteredArr = [];
-        numericIndexes.forEach(index => {
-        filteredArr.push(feature.datas[index]);
-        });
-        const out = numericIndexes.map(index => feature.datas[index]);
-        console.log("AHAH",filteredArr)
-        return filteredArr
     } catch (error) {
         console.error('Error:', error);
     }

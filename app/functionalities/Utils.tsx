@@ -3,6 +3,21 @@
 import { data_get } from '../properties/urls';
 
 
+export async function postIndexes(url : string, indexes : number[]){
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, // binary content type
+    body: indexes,
+  });
+
+}
+
+export async function getIndexes(url : string, indexes : number[]){
+
+  const response = await fetch(url);
+
+}
 
 
 async function getData() {

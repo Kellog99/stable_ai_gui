@@ -6,31 +6,21 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 
 const IndexHandler = ({ selectedPoints } : {selectedPoints : number[]}) => {
-const searchParams = useSearchParams()
-const pathname = usePathname();
-const { replace } = useRouter();
-  // Function to build the query string
-  const buildQueryString = () => {
-    const indexes = selectedPoints.join(','); // Join selected point indexes with commas
-    return indexes ? `?indexes=${indexes}` : '';
-  };
+
+  const searchParams = useSearchParams()
+  const pathname = usePathname();
+  const { replace } = useRouter();
 
   const handleSearch = useDebouncedCallback((selectedPoints: number[]) => {
     const params = new URLSearchParams(searchParams);
     const indexes = selectedPoints.join(',');
     indexes ? params.set('indexes', indexes) : params.delete('indexes');
     replace(`${pathname}?${params.toString()}`);
-  }, 0.0000000001);
+  },300);
 
   // Example of sending the query string when the selected points change
   useEffect(() => {
     handleSearch(selectedPoints)
-    // You can make a request here, for example using fetch or axios:
-    // fetch(url)
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     console.log('Server response:', data);
-    //   });
   }, [selectedPoints]); // Update when selectedPoints change
   
   return (

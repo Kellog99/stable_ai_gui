@@ -6,6 +6,8 @@ import { PointCloudLayer } from '@deck.gl/layers';
 import { OrbitView } from '@deck.gl/core';
 import IndexHandler from './IndexHandler';
 import getData from '../../functionalities/Utils';
+import  useStore  from "../../store/dsStore";
+
 
 
 export async function getDataPoints(){
@@ -17,12 +19,13 @@ export function PointCloudVisualization() {
   const deckRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState(null);
+
   useEffect(() => {
-    // Simulating a data fetch
     getData().then(fetchedData => {
-      setData(fetchedData); // Safe to call state update here
+      setData(fetchedData); 
     });
   }, []); 
+
   const [viewState, setViewState] = useState({
     target: [0, 0, 0],
     rotationX: 0,
@@ -34,9 +37,22 @@ export function PointCloudVisualization() {
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
   const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>(null);
   const [lassoMode, setLassoMode] = useState<boolean>(false);
-
-  // Ref to track if a drag is active
   const isDraggingRef = useRef(false);
+
+  const setSelectedIndexes = useStore((state) => state.setSelectedIndexes)
+
+  const handlePointClick = (info) => {
+    if (info.index !== -1 && !lassoMode) {
+      // Filter points outside of the setSelectedPoints function
+      const filteredPoints = selectedPoints.includes(info.index)
+        ? selectedPoints.filter((i) => i !== info.index)
+        : [...selectedPoints, info.index];
+      
+      // Pass the filtered points to setSelectedPoints
+      setSelectedPoints(filteredPoints);
+      setSelectedIndexes(filteredPoints)
+    }
+  };
 
   const layer = new PointCloudLayer({
     id: 'point-cloud-layer',
@@ -45,15 +61,7 @@ export function PointCloudVisualization() {
     pointSize: 2,
     getPosition: (d: Point) => d.position,
     getColor: (d: Point) => d.color,
-    onClick: (info) => {
-      if (info.index !== -1 && !lassoMode) {
-        setSelectedPoints((prev) =>
-          prev.includes(info.index)
-            ? prev.filter((i) => i !== info.index)
-            : [...prev, info.index]
-        );
-      }
-    },
+    onClick: (info) => {handlePointClick(info)},
   });
 
   const handleDragStart = (info: any, event: any) => {
@@ -103,6 +111,7 @@ export function PointCloudVisualization() {
     });
 
     setSelectedPoints(selected);
+    setSelectedIndexes(selected)
     // Reset drag state
     setDragStart(null);
     setDragCurrent(null);
@@ -133,11 +142,18 @@ export function PointCloudVisualization() {
     };
     
   }
+
   
+  //const setter = useStore().setSelectedIndexes
+  //setter(selectedPoints)
+  //const indexes = useStore((state) => state.indexes)
+  //console.log(indexes)
+  //setSelectedIndexes(selectedPoints)
+
   return (
     <>
-      <Suspense fallback={<div>UANMMMMMMMMMMMMMMMMMMMMMMMMMMMMM</div>}>
-      <div id="deckgl-container" style={{width: '600px', height: '400px', position: 'relative'}}>
+      <Suspense fallback={<div>TEST SUSPENSE</div>}>
+      <div id="deckgl-container" style={{width: '800px', height: '800px', position: 'relative', border: '2px solid black'  }}>
         <DeckGL
           ref={deckRef}
           views={new OrbitView({ fov: 50 })}
@@ -172,24 +188,8 @@ export function PointCloudVisualization() {
           <div style={lassoStyle} />
         )}
 
-        <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg z-50">
-          <p className="text-sm font-medium">
-            {selectedPoints.length} point{selectedPoints.length !== 1 ? 's' : ''} selected
-          </p>
-          <p className="text-xs opacity-80 mt-1">Click points to select/deselect</p>
-          <p className="text-xs opacity-80">Hold Shift + drag to select multiple points</p>
-          <p className="text-xs opacity-80">
-            Left click + drag to rotate (when not in lasso mode)
-          </p>
-          <p className="text-xs opacity-80">
-            Right click + drag to pan (when not in lasso mode)
-          </p>
-          <p className="text-xs opacity-80">Scroll to zoom (when not in lasso mode)</p>
-        </div>
       </div>
       </Suspense>
-
-      <IndexHandler  selectedPoints={selectedPoints}/>
 
       {/* Toggle button placed outside the DeckGL container */}
       <button
