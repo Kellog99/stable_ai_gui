@@ -23,6 +23,8 @@ export default function Home() {
   const [featureData, setFeatureData] = useState([])
   const [featureType, setFeatureType] = useState("")
   const [featureName, setFeatureName] = useState("")
+  const [displayedFeatureData, setDisplayedFeatureData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const datasetName = searchParams.get("name")
   
@@ -70,10 +72,50 @@ export default function Home() {
 
 
 
-  console.log(featureData);
-  console.log(featureType)
+  const RENDER_BATCH_SIZE = 8; // Number of items to render in each batch
 
-  
+  // Gradual rendering effect
+  useEffect(() => {
+    if (featureData && featureData.length > 0) {
+      setIsLoading(true);
+      
+      // Start with the first batch
+      const initialBatch = featureData.slice(0, RENDER_BATCH_SIZE);
+      setDisplayedFeatureData(initialBatch);
+
+      // If there are more items, start a gradual rendering process
+      if (featureData.length > RENDER_BATCH_SIZE) {
+        let currentBatchIndex = RENDER_BATCH_SIZE;
+
+        const renderNextBatch = () => {
+          if (currentBatchIndex < featureData.length) {
+            const nextBatch = featureData.slice(
+              currentBatchIndex, 
+              currentBatchIndex + RENDER_BATCH_SIZE
+            );
+
+            setDisplayedFeatureData(prev => [
+              ...prev, 
+              ...nextBatch
+            ]);
+
+            currentBatchIndex += RENDER_BATCH_SIZE;
+
+            // Schedule next batch render with a small delay
+            setTimeout(renderNextBatch, 100); // 100ms between batches
+          } else {
+            setIsLoading(false);
+          }
+        };
+
+        // Start the gradual rendering
+        setTimeout(renderNextBatch, 100);
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [featureData]);
+
   return (
     <div className="w-full h-screen">
       <div>
@@ -82,68 +124,81 @@ export default function Home() {
       </div>
       
       <label htmlFor="feature" className="font-bold">Feature</label>
-      <div id="autocomplete-container" style={{width: '300px', position: 'relative', marginBottom: '20px'}}>
-        <Autocomplete
-          id="feature"
-          radius="md"
-          placeholder="Choose feature to visualize"
-          data={['image']}
-          value={featureName}
-          onChange={(value) => setFeatureName(value)}
+      <div 
+        id="autocomplete-container" 
+        style={{
+          width: '300px', 
+          position: 'relative', 
+          marginBottom: '20px'
+        }}
+      >
+        <Autocomplete 
+          id="feature" 
+          radius="md" 
+          placeholder="Choose feature to visualize" 
+          data={['image']} 
+          value={featureName} 
+          onChange={(value) => setFeatureName(value)} 
         />
       </div>
-      
+
       {featureName !== "" ? (
         <>
-        <Flex
-            mih={150}
-            justify="center"
-            align="center"
-            direction="column"
+          <Flex 
+            mih={150} 
+            justify="center" 
+            align="center" 
+            direction="column" 
             wrap="wrap"
-            >
-          <Suspense>
-            
-            <PointCloudVisualization />
-            
-          </Suspense>
+          >
+            <Suspense>
+              <PointCloudVisualization />
+            </Suspense>
+
             <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg z-50">
               <p className="text-sm font-medium">
-              {indexes.length} point{indexes.length !== 1 ? 's' : ''} selected
+                {indexes.length} point{indexes.length !== 1 ? 's' : ''} selected
               </p>
             </div>
-          <ScrollArea h={600}>
-          <div className="grid grid-cols-4 gap-4">
-          <Grid columns={4} className="gap-4">
-            {featureData && featureData.length > 0 && (
-              featureData.map((data, index) => (
-                <GridCol span={1} key={index}>
-                  <Card className="shadow-sm p-4 rounded-md border border-gray-200">
-                    <div className="mb-4">
-                      {featureType === image_type ? (
-                        <ImageDisplayer data={data} alt="" />
-                      ) : featureType === text_type ? (
-                        <TextDisplayer data={data} alt="" />
-                      ) : null}
-                    </div>
-                    
-                    <Group className="flex justify-between items-center mb-2">
-                      <Text className="font-bold text-lg">INFO</Text>
-                      <Badge className="bg-[#ec777e] text-white px-2 py-1 rounded">
-                        INFO
-                      </Badge>
-                    </Group>
-                    
-                    <Text className="text-sm text-gray-600">
-                      INFO
-                    </Text>
-                  </Card>
-                </GridCol>
-              ))
-            )}
-            </Grid>
-          </div>
-          </ScrollArea>
+
+            <ScrollArea h={600}>
+              <div className="grid grid-cols-4 gap-4">
+                <Grid columns={4} className="gap-4">
+                  {displayedFeatureData && displayedFeatureData.length > 0 && (
+                    displayedFeatureData.map((data, index) => (
+                      <GridCol span={1} key={index}>
+                        <Card className="shadow-sm p-4 rounded-md border border-gray-200">
+                          <div className="mb-4">
+                            {featureType === image_type ? (
+                              <ImageDisplayer data={data} alt="" />
+                            ) : featureType === text_type ? (
+                              <TextDisplayer data={data} alt="" />
+                            ) : null}
+                          </div>
+                          
+                          <Group className="flex justify-between items-center mb-2">
+                            <Text className="font-bold text-lg">INFO</Text>
+                            <Badge className="bg-[#ec777e] text-white px-2 py-1 rounded">
+                              INFO
+                            </Badge>
+                          </Group>
+                          
+                          <Text className="text-sm text-gray-600">
+                            INFO
+                          </Text>
+                        </Card>
+                      </GridCol>
+                    ))
+                  )}
+                </Grid>
+                
+                {isLoading && (
+                  <div className="w-full text-center py-4">
+                    <Text>Loading more items...</Text>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </Flex>
         </>
       ) : (
@@ -151,4 +206,4 @@ export default function Home() {
       )}
     </div>
   );
-};
+}
