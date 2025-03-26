@@ -2,7 +2,7 @@
 
 import { PointCloudVisualization } from '../../components/client/PointCloudVisualization';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { cache, Suspense, useState, useEffect} from 'react'; 
+import { cache, Suspense, useState, useEffect, useRef} from 'react'; 
 import FeatureLoader from '../../functionalities/FeatureLoader';
 import ImageDisplayer from '../../components/server/ImageDisplayer';
 import getData from '../../functionalities/Utils';
@@ -14,6 +14,8 @@ import { image_type, text_type } from "../../properties/types";
 import classes from "./page.module.css"
 import featureLoader from '../../functionalities/FeatureLoader';
 import useStore from '../../store/dsStore';
+import style from 'styled-jsx/style';
+import { useIntersection } from '@mantine/hooks';
 
 interface Feature{
   
@@ -34,6 +36,13 @@ function Home() {
   const [datasetName, setDatasetName] = useState<string | null>("")
   const [displayedFeatureData, setDisplayedFeatureData] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<any>(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { ref, entry } = useIntersection({
+    root: containerRef.current,
+    threshold: 0.1,
+  });
+  
 
   //setDatasetName(searchParams.get("name"))
   //const datasetName = "Animals"
@@ -88,49 +97,7 @@ function Home() {
 
 
 
-  const RENDER_BATCH_SIZE = 8; // Number of items to render in each batch
-
-  // Gradual rendering effect
-  useEffect(() => {
-    if (featureData && featureData.length > 0) {
-      setIsLoading(true);
-      
-      // Start with the first batch
-      const initialBatch = featureData.slice(0, RENDER_BATCH_SIZE);
-      setDisplayedFeatureData(initialBatch);
-
-      // If there are more items, start a gradual rendering process
-      if (featureData.length > RENDER_BATCH_SIZE) {
-        let currentBatchIndex = RENDER_BATCH_SIZE;
-
-        const renderNextBatch = () => {
-          if (currentBatchIndex < featureData.length) {
-            const nextBatch = featureData.slice(
-              currentBatchIndex, 
-              currentBatchIndex + RENDER_BATCH_SIZE
-            );
-
-            setDisplayedFeatureData(prev => [
-              ...prev, 
-              ...nextBatch
-            ]);
-
-            currentBatchIndex += RENDER_BATCH_SIZE;
-
-            // Schedule next batch render with a small delay
-            setTimeout(renderNextBatch, 100); // 100ms between batches
-          } else {
-            setIsLoading(false);
-          }
-        };
-
-        // Start the gradual rendering
-        setTimeout(renderNextBatch, 100);
-      } else {
-        setIsLoading(false);
-      }
-    }
-  }, [featureData]);
+  
 
   return (
     <div className="w-full h-screen">
@@ -140,14 +107,7 @@ function Home() {
       </div>
       
       <label htmlFor="feature" className="font-bold">Feature</label>
-      <div 
-        id="autocomplete-container" 
-        style={{
-          width: '300px', 
-          position: 'relative', 
-          marginBottom: '20px'
-        }}
-      >
+      <div id="autocomplete-container" style={{width: '300px', position: 'relative', marginBottom: '20px'}}>
         <Autocomplete 
           id="feature" 
           radius="md" 
@@ -177,19 +137,23 @@ function Home() {
               </p>
             </div>
 
-            <ScrollArea h={600}>
+            <ScrollArea h={600} ref={containerRef}>
               <div className="grid grid-cols-4 gap-4">
-                <Grid columns={4} className="gap-4">
-                  {displayedFeatureData && displayedFeatureData.length > 0 && (
-                    displayedFeatureData.map((data, index) => (
+                <Grid columns={4} className="gap-4" ref={ref}>
+                  {featureData && featureData.length > 0 && (
+                    featureData.map((data, index) => (
                       <GridCol span={1} key={index}>
                         <Card className="shadow-sm p-4 rounded-md border border-gray-200">
-                          <div className="mb-4">
-                            {featureType === image_type ? (
-                              <ImageDisplayer data={data} alt="" />
-                            ) : featureType === text_type ? (
-                              <TextDisplayer data={data}  />
-                            ) : null}
+                        <div className="mb-4">
+                            {entry?.isIntersecting ? (
+                              featureType === 'image_type' ? (
+                                <ImageDisplayer data={data} alt="" />
+                              ) : featureType === 'text_type' ? (
+                                <TextDisplayer data={data} />
+                              ) : null
+                            ) : (
+                              <p>Not Visible Yet</p>
+                            )}
                           </div>
                           
                           <Group className="flex justify-between items-center mb-2">
@@ -207,12 +171,7 @@ function Home() {
                     ))
                   )}
                 </Grid>
-                
-                {isLoading && (
-                  <div className="w-full text-center py-4">
-                    <Text>Loading more items...</Text>
-                  </div>
-                )}
+              
               </div>
             </ScrollArea>
           </Flex>
