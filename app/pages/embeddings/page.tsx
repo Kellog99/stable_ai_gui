@@ -15,7 +15,7 @@ import classes from "./page.module.css"
 import featureLoader from '../../functionalities/FeatureLoader';
 import useStore from '../../store/dsStore';
 import style from 'styled-jsx/style';
-import { useIntersection } from '@mantine/hooks';
+import { useIntersection, useInViewport } from '@mantine/hooks';
 
 interface Feature{
   
@@ -26,6 +26,35 @@ interface Feature{
   
 }
 
+function FeatureCard({ data, featureType }: {data: string, featureType : string}) {
+  const { ref, inViewport } = useInViewport();
+  return (
+    <Card ref={ref} className="shadow-sm p-4 rounded-md border border-gray-200">
+      <div className="mb-4">
+        {inViewport ? (
+          featureType === image_type ? (
+            <ImageDisplayer data={data} alt="" />
+          ) : featureType === text_type ? (
+            <TextDisplayer data={data} />
+          ) : null
+        ) : (
+          <p>Not Visible Yet</p>
+        )}
+      </div>
+      
+      <Group className="flex justify-between items-center mb-2">
+        <Text className="font-bold text-lg">INFO</Text>
+        <Badge className="bg-[#ec777e] text-white px-2 py-1 rounded">
+          INFO
+        </Badge>
+      </Group>
+      
+      <Text className="text-sm text-gray-600">
+        INFO
+      </Text>
+    </Card>
+  );
+}
 
 function Home() {
 
@@ -39,11 +68,7 @@ function Home() {
   const [isLoading, setIsLoading] = useState<any>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const { ref, entry } = useIntersection({
-    root: containerRef.current,
-    threshold: 0.1,
-  });
-  
+
 
   //setDatasetName(searchParams.get("name"))
   //const datasetName = "Animals"
@@ -137,64 +162,23 @@ function Home() {
                 {indexes.length} point{indexes.length !== 1 ? 's' : ''} selected
               </p>
             </div>
-        
-            <ScrollArea h={600} viewportRef={setParentElement}>
-            <div
-              style={{
-                height: `${virtualizer.getTotalSize()}px`,
-                width: '100%',
-                position: 'relative',
-              }}>
-              
-              {virtualizer.getVirtualItems().map((virtualRow) => {
-                  const firstItemIndex = virtualRow.index * ITEMS_PER_ROW;
-                  const rowItems = featureData.slice(
-                    firstItemIndex,
-                    firstItemIndex + ITEMS_PER_ROW
-                  );
 
-            <ScrollArea h={600} ref={containerRef}>
-              <div className="grid grid-cols-4 gap-4">
-                <Grid columns={4} className="gap-4" ref={ref}>
-                  {featureData && featureData.length > 0 && (
-                    featureData.map((data, index) => (
-                      <GridCol span={1} key={index}>
-                        <Card className="shadow-sm p-4 rounded-md border border-gray-200">
-                        <div className="mb-4">
-                            {entry?.isIntersecting ? (
-                              featureType === 'image_type' ? (
-                                <ImageDisplayer data={data} alt="" />
-                              ) : featureType === 'text_type' ? (
-                                <TextDisplayer data={data} />
-                              ) : null
-                            ) : (
-                              <p>Not Visible Yet</p>
-                            )}
-                          </div>
-                          
-                          <Group className="flex justify-between items-center mb-2">
-                            <Text className="font-bold text-lg">INFO</Text>
-                            <Badge className="bg-[#ec777e] text-white px-2 py-1 rounded">
-                              INFO
-                            </Badge>
-                          </Group>
-                          
-                          <Text className="text-sm text-gray-600">
-                            INFO
-                          </Text>
-                        </Card>
-                      </GridCol>
-                    ))
-                  )}
-                </Grid>
-              
-              </div>
-              
-              {isLoading && (
-                <div className="w-full text-center py-4">
-                  <Text>Loading more items...</Text>
-                </div>
-              )}
+            <ScrollArea h={600} viewportRef={containerRef}>
+              <Grid
+              columns={4}
+              >
+                {featureData && featureData.length > 0 && 
+                  featureData.map((data, index) => (
+                    <GridCol span={1} key={index}>
+                    <FeatureCard 
+                      key={index}
+                      data={data}
+                      featureType={featureType}
+                    />
+                    </GridCol>
+                  ))
+                }
+              </Grid>
             </ScrollArea>
           </Flex>
         </>
