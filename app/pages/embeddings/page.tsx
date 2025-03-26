@@ -26,6 +26,7 @@ interface Feature{
   
 }
 
+
 function Home() {
 
   const searchParams = useSearchParams();
@@ -59,7 +60,7 @@ function Home() {
   //const feature = getFeatureResources(indexes,featureName)
   
   useEffect(() => {
-    // Only proceed if indexes is not null
+    // Only proceed if featureName is not an empty string
     if (featureName != "") {
       const loadFeature = async () => {
         try {
@@ -136,6 +137,21 @@ function Home() {
                 {indexes.length} point{indexes.length !== 1 ? 's' : ''} selected
               </p>
             </div>
+        
+            <ScrollArea h={600} viewportRef={setParentElement}>
+            <div
+              style={{
+                height: `${virtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}>
+              
+              {virtualizer.getVirtualItems().map((virtualRow) => {
+                  const firstItemIndex = virtualRow.index * ITEMS_PER_ROW;
+                  const rowItems = featureData.slice(
+                    firstItemIndex,
+                    firstItemIndex + ITEMS_PER_ROW
+                  );
 
             <ScrollArea h={600} ref={containerRef}>
               <div className="grid grid-cols-4 gap-4">
@@ -173,6 +189,12 @@ function Home() {
                 </Grid>
               
               </div>
+              
+              {isLoading && (
+                <div className="w-full text-center py-4">
+                  <Text>Loading more items...</Text>
+                </div>
+              )}
             </ScrollArea>
           </Flex>
         </>
