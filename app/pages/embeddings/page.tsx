@@ -14,6 +14,7 @@ import { image_type, text_type } from "../../properties/types";
 import classes from "./page.module.css"
 import featureLoader from '../../functionalities/FeatureLoader';
 import useStore from '../../store/dsStore';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface Feature{
   
@@ -23,6 +24,7 @@ interface Feature{
     is_logic: boolean
   
 }
+
 
 function Home() {
 
@@ -50,7 +52,7 @@ function Home() {
   //const feature = getFeatureResources(indexes,featureName)
   
   useEffect(() => {
-    // Only proceed if indexes is not null
+    // Only proceed if featureName is not an empty string
     if (featureName != "") {
       const loadFeature = async () => {
         try {
@@ -86,8 +88,7 @@ function Home() {
     }
   }, [indexes]); // Still keep indexes and featureName in the dependency array
 
-
-
+  /*
   const RENDER_BATCH_SIZE = 8; // Number of items to render in each batch
 
   // Gradual rendering effect
@@ -131,6 +132,22 @@ function Home() {
       }
     }
   }, [featureData]);
+  */
+
+  const ROW_HEIGHT = 300; // Adjust based on your card height
+  const ITEMS_PER_ROW = 4; // Since we're using grid-cols-4
+
+  const [parentElement, setParentElement] = useState<HTMLDivElement | null>(null);
+
+  // Calculate the number of rows based on items per row
+  const rowCount = Math.ceil(featureData.length / ITEMS_PER_ROW);
+
+  const virtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => parentElement,
+    estimateSize: () => ROW_HEIGHT,
+    overscan: 2, // Number of rows to render outside the visible area
+  });
 
   return (
     <div className="w-full h-screen">
@@ -176,44 +193,60 @@ function Home() {
                 {indexes.length} point{indexes.length !== 1 ? 's' : ''} selected
               </p>
             </div>
+        
+            <ScrollArea h={600} viewportRef={setParentElement}>
+            <div
+              style={{
+                height: `${virtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}>
+              
+              {virtualizer.getVirtualItems().map((virtualRow) => {
+                  const firstItemIndex = virtualRow.index * ITEMS_PER_ROW;
+                  const rowItems = featureData.slice(
+                    firstItemIndex,
+                    firstItemIndex + ITEMS_PER_ROW
+                  );
 
-            <ScrollArea h={600}>
-              <div className="grid grid-cols-4 gap-4">
-                <Grid columns={4} className="gap-4">
-                  {displayedFeatureData && displayedFeatureData.length > 0 && (
-                    displayedFeatureData.map((data, index) => (
-                      <GridCol span={1} key={index}>
-                        <Card className="shadow-sm p-4 rounded-md border border-gray-200">
-                          <div className="mb-4">
-                            {featureType === image_type ? (
-                              <ImageDisplayer data={data} alt="" />
-                            ) : featureType === text_type ? (
-                              <TextDisplayer data={data}  />
-                            ) : null}
-                          </div>
-                          
-                          <Group className="flex justify-between items-center mb-2">
-                            <Text className="font-bold text-lg">INFO</Text>
-                            <Badge className="bg-[#ec777e] text-white px-2 py-1 rounded">
-                              INFO
-                            </Badge>
-                          </Group>
-                          
-                          <Text className="text-sm text-gray-600">
-                            INFO
-                          </Text>
-                        </Card>
-                      </GridCol>
-                    ))
-                  )}
-                </Grid>
-                
-                {isLoading && (
-                  <div className="w-full text-center py-4">
-                    <Text>Loading more items...</Text>
-                  </div>
-                )}
+                  return (
+                    <div key={virtualRow.key} className="grid grid-cols-4 gap-4">
+                      <Grid columns={4} className="gap-4">
+                        {rowItems.map((data, index) => (
+                          <GridCol span={1} key={`${virtualRow.index}-${index}`}>
+                            <Card className="shadow-sm p-4 rounded-md border border-gray-200">
+                              <div className="mb-4">
+                                {featureType === image_type ? (
+                                  <ImageDisplayer data={data} alt="" />
+                                ) : featureType === text_type ? (
+                                  <TextDisplayer data={data} />
+                                ) : null}
+                              </div>
+                              
+                              <Group className="flex justify-between items-center mb-2">
+                                <Text className="font-bold text-lg">INFO</Text>
+                                <Badge className="bg-[#ec777e] text-white px-2 py-1 rounded">
+                                  INFO
+                                </Badge>
+                              </Group>
+                              
+                              <Text className="text-sm text-gray-600">
+                                INFO
+                              </Text>
+                            </Card>
+                          </GridCol>
+                        ))}
+                      </Grid>
+                    </div>
+                  );
+                })}
               </div>
+              
+              {isLoading && (
+                <div className="w-full text-center py-4">
+                  <Text>Loading more items...</Text>
+                </div>
+              )}
             </ScrollArea>
           </Flex>
         </>
