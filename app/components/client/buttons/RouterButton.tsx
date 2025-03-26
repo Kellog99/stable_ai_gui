@@ -1,5 +1,5 @@
 'use client';
-import React from "react";
+import React , {cache, Suspense, useState, useEffect} from "react";
 import { useRouter } from "next/navigation";
 import Link from 'next/link'
 
@@ -16,6 +16,7 @@ export default function RouterButton({
   
   
   return (
+    <Suspense>
     <Link
       href={{
         pathname: route,
@@ -24,5 +25,6 @@ export default function RouterButton({
     >
       {children}
     </Link>
+    </Suspense>
   )
 }

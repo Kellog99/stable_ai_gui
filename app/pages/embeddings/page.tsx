@@ -15,24 +15,38 @@ import classes from "./page.module.css"
 import featureLoader from '../../functionalities/FeatureLoader';
 import useStore from '../../store/dsStore';
 
+interface Feature{
+  
+    type: string;
+    name: string;
+    datas: string[];
+    is_logic: boolean
+  
+}
 
-export default function Home() {
+function Home() {
 
   const searchParams = useSearchParams();
-  const [feature, setFeature] = useState(null)
-  const [featureData, setFeatureData] = useState([])
-  const [featureType, setFeatureType] = useState("")
-  const [featureName, setFeatureName] = useState("")
-  const [displayedFeatureData, setDisplayedFeatureData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [feature, setFeature] = useState<Feature | null>(null)
+  const [featureData, setFeatureData] = useState<string[]>([])
+  const [featureType, setFeatureType] = useState<any>("")
+  const [featureName, setFeatureName] = useState<any>("")
+  const [datasetName, setDatasetName] = useState<string | null>("")
+  const [displayedFeatureData, setDisplayedFeatureData] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<any>(false);
 
-  const datasetName = searchParams.get("name")
-  
+  //setDatasetName(searchParams.get("name"))
+  //const datasetName = "Animals"
   const indexes = useStore((state) => state.selectedIndexes);
   //const featureName = "image"
   //const datasetName = "Animal Dataset"
 
- 
+  useEffect(() => {
+    if (searchParams.get("name")){
+      setDatasetName(searchParams.get("name"))
+    }
+  }, [searchParams])
+  
   //const feature = getFeatureResources(indexes,featureName)
   
   useEffect(() => {
@@ -40,10 +54,12 @@ export default function Home() {
     if (featureName != "") {
       const loadFeature = async () => {
         try {
+          if (datasetName && featureName){
           const feature = await featureLoader(datasetName,featureName);
           console.log(feature);
           setFeature(feature);
           setFeatureType(feature.type)
+          }
         } catch (error) {
           console.error('Error loading feature:', error);
         }
@@ -54,10 +70,10 @@ export default function Home() {
 
   useEffect(() => {
     // Only proceed if indexes is not null
-    if (indexes != null) {
+    if (indexes != null && feature != null) {
       const filterFeature = async () => {
         try {
-          let filteredArr = [];
+          let filteredArr : string[] = [];
           indexes.forEach(index => {
           filteredArr.push(feature.datas[index]);
           });
@@ -172,7 +188,7 @@ export default function Home() {
                             {featureType === image_type ? (
                               <ImageDisplayer data={data} alt="" />
                             ) : featureType === text_type ? (
-                              <TextDisplayer data={data} alt="" />
+                              <TextDisplayer data={data}  />
                             ) : null}
                           </div>
                           
@@ -206,4 +222,12 @@ export default function Home() {
       )}
     </div>
   );
+}
+
+export default function HomePage(){
+  return (
+  <Suspense>  
+    <Home/>
+  </Suspense>
+)
 }

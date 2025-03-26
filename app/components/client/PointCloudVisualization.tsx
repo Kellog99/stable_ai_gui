@@ -1,56 +1,71 @@
 'use client';
 
-import React, { useState, useRef, useEffect, Suspense} from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
 import { PointCloudLayer } from '@deck.gl/layers';
 import { OrbitView } from '@deck.gl/core';
-import IndexHandler from './IndexHandler';
 import getData from '../../functionalities/Utils';
-import  useStore  from "../../store/dsStore";
+import useStore from "../../store/dsStore";
 
+interface OrbitViewState {
+  target: [number, number, number]; // This ensures 'target' has exactly 3 elements
+  rotationX?: number;
+  rotationOrbit?: number;
+  zoom: number;
+  minZoom?: number;
+  maxZoom?: number;
+  minRotationX?: number;
+  maxRotationX?: number;
+}
 
+interface Point {
+  position: [number, number, number];
+  color: [number, number, number, number];
+}
 
-export async function getDataPoints(){
-  const points = await getData()
+interface Info {
+  index: number;
+  object: any;
+}
+
+export async function getDataPoints(): Promise<Point[]> {
+  const points = await getData();
   return points;
 }
 
-export function PointCloudVisualization() {
+export function PointCloudVisualization(){
   const deckRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<Point[] | null>(null);
 
   useEffect(() => {
     getData().then(fetchedData => {
-      setData(fetchedData); 
+      setData(fetchedData);
     });
-  }, []); 
+  }, []);
 
-  const [viewState, setViewState] = useState({
+  const [viewState, setViewState] = useState<OrbitViewState>({
     target: [0, 0, 0],
     rotationX: 0,
     rotationOrbit: 0,
     zoom: 0,
-    
   });
+
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
   const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>(null);
   const [lassoMode, setLassoMode] = useState<boolean>(false);
-  const isDraggingRef = useRef(false);
+  const isDraggingRef = useRef<boolean>(false);
 
-  const setSelectedIndexes = useStore((state) => state.setSelectedIndexes)
+  const setSelectedIndexes = useStore((state) => state.setSelectedIndexes);
 
-  const handlePointClick = (info) => {
+  const handlePointClick = (info: Info): void => {
     if (info.index !== -1 && !lassoMode) {
-      // Filter points outside of the setSelectedPoints function
       const filteredPoints = selectedPoints.includes(info.index)
         ? selectedPoints.filter((i) => i !== info.index)
         : [...selectedPoints, info.index];
-      
-      // Pass the filtered points to setSelectedPoints
+
       setSelectedPoints(filteredPoints);
-      setSelectedIndexes(filteredPoints)
+      setSelectedIndexes(filteredPoints);
     }
   };
 
@@ -61,39 +76,34 @@ export function PointCloudVisualization() {
     pointSize: 2,
     getPosition: (d: Point) => d.position,
     getColor: (d: Point) => d.color,
-    onClick: (info) => {handlePointClick(info)},
+    onClick: (info: any) => handlePointClick(info),
   });
 
-  const handleDragStart = (info: any, event: any) => {
+  const handleDragStart = (info: any, event: any): void => {
     if (!lassoMode) return;
     if (!isDraggingRef.current) {
       isDraggingRef.current = true;
-      console.log('Lasso drag started:', info, event);
       setDragStart({ x: info.x, y: info.y });
-      setDragCurrent({ x: info.x, y: info.y }); // Initialize dragCurrent to the starting point
+      setDragCurrent({ x: info.x, y: info.y });
     }
   };
 
-  const handleDrag = (info: any, event: any) => {
+  const handleDrag = (info: any, event: any): void => {
     if (!lassoMode || !dragStart) return;
-    // Update the current drag coordinates
     setDragCurrent({ x: info.x, y: info.y });
   };
 
-  const handleDragEnd = (info: any, event: any) => {
+  const handleDragEnd = (info: any, event: any): void => {
     if (!lassoMode || !dragStart) return;
-    console.log('Lasso drag ended:', info, event);
 
     const start = dragStart;
     const end = { x: info.x, y: info.y };
 
-    // Calculate the selection bounding box in screen coordinates
     const minX = Math.min(start.x, end.x);
     const maxX = Math.max(start.x, end.x);
     const minY = Math.min(start.y, end.y);
     const maxY = Math.max(start.y, end.y);
 
-    // Get the deck instance and the current viewport to project points
     const deckInstance = deckRef.current?.deck;
     if (!deckInstance) return;
     const viewports = deckInstance.getViewports();
@@ -101,8 +111,7 @@ export function PointCloudVisualization() {
     const viewport = viewports[0];
 
     const selected: number[] = [];
-    data.forEach((point, index) => {
-      // Use the viewport's project method to convert world coordinates to screen coordinates
+    data?.forEach((point, index) => {
       const screenPos = viewport.project(point.position);
       const [screenX, screenY] = screenPos;
       if (screenX >= minX && screenX <= maxX && screenY >= minY && screenY <= maxY) {
@@ -111,18 +120,16 @@ export function PointCloudVisualization() {
     });
 
     setSelectedPoints(selected);
-    setSelectedIndexes(selected)
-    // Reset drag state
+    setSelectedIndexes(selected);
     setDragStart(null);
     setDragCurrent(null);
     isDraggingRef.current = false;
   };
 
-  const toggleLassoMode = () => {
+  const toggleLassoMode = (): void => {
     setLassoMode((prev) => !prev);
   };
 
-  // Compute the rectangle style if a drag is in progress
   let lassoStyle: React.CSSProperties = {};
   if (dragStart && dragCurrent) {
     const left = Math.min(dragStart.x, dragCurrent.x);
@@ -132,66 +139,51 @@ export function PointCloudVisualization() {
     lassoStyle = {
       position: 'absolute',
       pointerEvents: 'none',
-      border: '2px dashed rgba(232, 11, 11, 0.8)', // White border with good visibility
-      backgroundColor: 'rgba(255, 255, 255, 0.15)',  // Slightly more visible but still transparent
+      border: '2px dashed rgba(232, 11, 11, 0.8)',
+      backgroundColor: 'rgba(255, 255, 255, 0.15)',
       left,
       top,
       width,
       height,
       zIndex: 100,
     };
-    
   }
-
-  
-  //const setter = useStore().setSelectedIndexes
-  //setter(selectedPoints)
-  //const indexes = useStore((state) => state.indexes)
-  //console.log(indexes)
-  //setSelectedIndexes(selectedPoints)
 
   return (
     <>
-      <Suspense fallback={<div>TEST SUSPENSE</div>}>
-      <div id="deckgl-container" style={{width: '800px', height: '800px', position: 'relative', border: '2px solid black'  }}>
-        <DeckGL
-          ref={deckRef}
-          views={new OrbitView({ fov: 50 })}
-          viewState={viewState}
-          onViewStateChange={({ viewState }) => setViewState(viewState)}
-          layers={[layer]}
-          parameters={{
-            clearColor: [0.1, 0.1, 0.1, 1],
-          }}
-          controller={
-            lassoMode
-              ? {
-                  scrollZoom: false,
-                  dragRotate: false,
-                  dragPan: false,
-                  doubleClickZoom: false,
-                }
-              : {
-                  scrollZoom: true,
-                  dragRotate: true,
-                  dragPan: true,
-                  doubleClickZoom: false,
-                }
-          }
-          enableEvents={true}
-          onDragStart={handleDragStart}
-          onDrag={handleDrag}
-          onDragEnd={handleDragEnd}
-        />
-        {/* Lasso rectangle visualization */}
-        {lassoMode && dragStart && dragCurrent && (
-          <div style={lassoStyle} />
-        )}
-
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <div id="deckgl-container" style={{ width: '800px', height: '800px', position: 'relative', border: '2px solid black' }}>
+          <DeckGL
+            ref={deckRef}
+            views={new OrbitView({ fovy: 50 })}
+            viewState={viewState}
+            onViewStateChange={({ viewState }) => setViewState(viewState)}
+            layers={[layer]}
+            controller={
+              lassoMode
+                ? {
+                    scrollZoom: false,
+                    dragRotate: false,
+                    dragPan: false,
+                    doubleClickZoom: false,
+                  }
+                : {
+                    scrollZoom: true,
+                    dragRotate: true,
+                    dragPan: true,
+                    doubleClickZoom: false,
+                  }
+            }
+            onDragStart={handleDragStart}
+            onDrag={handleDrag}
+            onDragEnd={handleDragEnd}
+          />
+          {lassoMode && dragStart && dragCurrent && (
+            <div style={lassoStyle} />
+          )}
+        </div>
       </Suspense>
 
-      {/* Toggle button placed outside the DeckGL container */}
       <button
         onClick={toggleLassoMode}
         style={{
@@ -204,7 +196,7 @@ export function PointCloudVisualization() {
           backgroundColor: lassoMode ? '#dc2626' : '#16a34a',
           color: 'white',
           border: 'none',
-          cursor: 'pointer'
+          cursor: 'pointer',
         }}
       >
         {lassoMode ? 'Exit Lasso Mode' : 'Enter Lasso Mode'}

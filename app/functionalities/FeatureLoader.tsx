@@ -21,7 +21,7 @@ function readPublicFolder(directory: string): string[] {
     return arrowFiles;
     }
 
-export async function getArrowFileNames(datasetName) {
+export async function getArrowFileNames(datasetName: string) {
     try {
         const datasetsDir = path.join(process.cwd(), 'public', 'datasets', datasetName);
         const arrowFiles = readPublicFolder(datasetsDir);
@@ -42,7 +42,8 @@ export async function getArrowFileNames(datasetName) {
       }
 
 
-export default async function featureLoader(datasetName, featureName) {
+export default async function featureLoader(datasetName: string | null, featureName: string | null) {
+    if (datasetName && featureName){
     try {
         const request = await getArrowFileNames(datasetName);
         const data = await request.json();
@@ -72,4 +73,6 @@ export default async function featureLoader(datasetName, featureName) {
     } catch (error) {
         console.error('Error:', error);
     }
+}
+console.log("Invalid arguments")
 }

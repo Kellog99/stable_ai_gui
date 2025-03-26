@@ -5,7 +5,7 @@ interface AppState {
     datasetUsed: Dataset | null;
     selectedIndexes : number[] | [];
     selectedFeature : string | null;
-    setSelectedIndexes : (selectedIndexes : number[] | ((prev: number[]) => number[])) => void;
+    setSelectedIndexes : (selectedIndexes : number[]) => void;
     setSelectedFeature : (selectedFeature : string) => void;
     setData: (datasetUsed: Dataset) => void;
   }
@@ -15,8 +15,8 @@ const useStore = create<AppState>((set) => ({
     selectedIndexes: [],
     selectedFeature: null,
     setData: (datasetUsed) => set({ datasetUsed }),
-    setSelectedIndexes : (selectedIndexes) => set({selectedIndexes}),
-    setSelectedFeature : (selectedFeature)  => set({selectedFeature})
+    setSelectedIndexes : (selectedIndexes : number[])  => set({selectedIndexes}),
+    setSelectedFeature : (selectedFeature : string)  => set({selectedFeature})
   }));
 
 export default useStore;
