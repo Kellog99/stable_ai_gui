@@ -30,10 +30,10 @@ function AppHeader() {
 
             <Group>
                 <Link href="/">
-                    <Button radius={50} variant={isActive("/") ? "filled" : "subtle"}>Home</Button>
+                    <Button radius={50} variant={isActive("/") ? "filled" : "subtle"}>Data Quality</Button>
                 </Link>
-                <Link href="/pages/embeddings">
-                    <Button radius={50} variant={isActive("/pages/embeddings") ? "filled" : "subtle"}>Embeddings</Button>
+                <Link href="/pages/nntrust">
+                    <Button radius={50} variant={isActive("/pages/nntrust") ? "filled" : "subtle"}>NN trust</Button>
                 </Link>
             </Group>
             <Group>

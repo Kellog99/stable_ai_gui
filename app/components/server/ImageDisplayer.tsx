@@ -12,7 +12,7 @@ function ImageDisplayer({ data, alt }: {data: string | Uint8Array | URL, alt: st
         source = URL.createObjectURL(blob);
       } else {
 
-        return <p>Invalid image data</p>; // Handle unexpected cases
+        return <p>Invalid image data</p>;
       }
 
     return(

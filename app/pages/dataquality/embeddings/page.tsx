@@ -1,14 +1,14 @@
 "use client";
 
-import PointCloudVisualization from '../../components/client/PointCloudVisualization';
-import { useSearchParams} from 'next/navigation';
+import PointCloudVisualization from '../../../components/client/PointCloudVisualization';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
-import ImageDisplayer from '../../components/server/ImageDisplayer';
-import TextDisplayer from '../../components/server/TextDisplayer';
+import ImageDisplayer from '../../../components/server/ImageDisplayer';
+import TextDisplayer from '../../../components/server/TextDisplayer';
 import { Card, Text, Badge, Group, CardSection, GridCol, Autocomplete, Flex, ScrollArea } from '@mantine/core';
-import { image_type, text_type } from "../../properties/types";
-import featureLoader from '../../functionalities/FeatureLoader';
-import useStore from '../../store/dsStore';
+import { image_type, text_type } from "../../../properties/types";
+import featureLoader from '../../../functionalities/FeatureLoader';
+import useStore from '../../../store/dsStore';
 import { FixedSizeGrid as Grid, GridChildComponentProps } from 'react-window';
 
 interface Feature
@@ -26,11 +26,11 @@ function FeatureCard ( { data, featureType }: { data: string, featureType: strin
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <CardSection>
-          { featureType === image_type ? (
-            <ImageDisplayer data={data} alt=""/>
-          ) : featureType === text_type ? (
-            <TextDisplayer data={data} />
-          ) : null }
+        { featureType === image_type ? (
+          <ImageDisplayer data={ data } alt="" />
+        ) : featureType === text_type ? (
+          <TextDisplayer data={ data } />
+        ) : null }
       </CardSection>
       <Group justify="space-between" mt="md" mb="xs">
         <Text fw={ 700 } size="lg">INFO</Text>
@@ -162,14 +162,14 @@ function Home ()
             </div>
 
             <div className="flex justify-center w-full">
-              <div ref={containerRef} className="h-[600px] overflow-auto">
+              <div ref={ containerRef } className="h-[600px] overflow-auto">
                 <Grid
                   columnCount={ COLUMN_COUNT }
                   columnWidth={ COLUMN_WIDTH }
                   height={ 600 }
                   rowCount={ rowCount }
                   rowHeight={ ROW_HEIGHT }
-                  width={COLUMN_COUNT * COLUMN_WIDTH}
+                  width={ COLUMN_COUNT * COLUMN_WIDTH }
                   className="mx-auto"
                 >
                   { ( { columnIndex, rowIndex, style }: GridChildComponentProps ) =>
@@ -178,10 +178,10 @@ function Home ()
                     if ( index >= featureData.length ) return null;
 
                     return (
-                      <div style={{
+                      <div style={ {
                         ...style,
                         padding: '8px',
-                      }}>
+                      } }>
                         <FeatureCard data={ featureData[ index ] } featureType={ featureType } />
                       </div>
                     );
