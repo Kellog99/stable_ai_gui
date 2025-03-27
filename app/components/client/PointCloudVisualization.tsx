@@ -33,16 +33,15 @@ export async function getDataPoints(): Promise<Point[]> {
   return points;
 }
 
-export function PointCloudVisualization(){
+export default function PointCloudVisualization(){
   const deckRef = useRef<any>(null);
+  const isDraggingRef = useRef<boolean>(false);
+
+  const setSelectedIndexes = useStore((state) => state.setSelectedIndexes);
+
+
   const [data, setData] = useState<Point[] | null>(null);
-
-  useEffect(() => {
-    getData().then(fetchedData => {
-      setData(fetchedData);
-    });
-  }, []);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [viewState, setViewState] = useState<OrbitViewState>({
     target: [0, 0, 0],
     rotationX: 0,
@@ -54,9 +53,34 @@ export function PointCloudVisualization(){
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
   const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>(null);
   const [lassoMode, setLassoMode] = useState<boolean>(false);
-  const isDraggingRef = useRef<boolean>(false);
 
-  const setSelectedIndexes = useStore((state) => state.setSelectedIndexes);
+  
+  
+  
+  useEffect(() => {
+    getData()
+      .then(fetchedData => {
+        setData(fetchedData);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!data) {
+    return <div>No data available</div>;
+  }
+
+
+
+  
+  
+
+  
 
   const handlePointClick = (info: Info): void => {
     if (info.index !== -1 && !lassoMode) {

@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@deck.gl-community/editable-layers": "^9.0.3",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@loaders.gl/las": "^4.2.0",
     "@mantine/core": "^7.17.1",
     "@mantine/form": "^7.17.2",
@@ -36,6 +38,7 @@
     "@types/node": "22.10.7",
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
+    "@types/react-window": "^1.8.8",
     "eslint": "9.18.0",
     "eslint-config-next": "15.1.5",
     "postcss": "^8.5.1",
