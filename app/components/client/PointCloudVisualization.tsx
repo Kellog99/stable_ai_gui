@@ -3,9 +3,12 @@
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
 import { PointCloudLayer } from '@deck.gl/layers';
-import { OrbitView } from '@deck.gl/core';
+import { OrbitView, project } from '@deck.gl/core';
 import getData from '../../functionalities/Utils';
 import useStore from "../../store/dsStore";
+import LassoOverlay, {LassoDrawing} from './Lasso';
+import LassoDrawer from './Lasso';
+import deck from '@deck.gl/core/dist/lib/deck';
 
 interface OrbitViewState {
   target: [number, number, number]; // This ensures 'target' has exactly 3 elements
@@ -38,7 +41,7 @@ export default function PointCloudVisualization(){
   const isDraggingRef = useRef<boolean>(false);
 
   const setSelectedIndexes = useStore((state) => state.setSelectedIndexes);
-
+  const lassoMode = useStore((state) => state.lazoMode);
 
   const [data, setData] = useState<Point[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,15 +51,10 @@ export default function PointCloudVisualization(){
     rotationOrbit: 0,
     zoom: 0,
   });
-
   const [selectedPoints, setSelectedPoints] = useState<number[]>([]);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
-  const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>(null);
-  const [lassoMode, setLassoMode] = useState<boolean>(false);
+  const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>([]);
 
-  
-  
-  
   useEffect(() => {
     getData()
       .then(fetchedData => {
@@ -74,13 +72,6 @@ export default function PointCloudVisualization(){
   if (!data) {
     return <div>No data available</div>;
   }
-
-
-
-  
-  
-
-  
 
   const handlePointClick = (info: Info): void => {
     if (info.index !== -1 && !lassoMode) {
@@ -103,55 +94,71 @@ export default function PointCloudVisualization(){
     onClick: (info: any) => handlePointClick(info),
   });
 
+  const isPointInPolygon = (point: Point, polygon: Point[]): boolean => {
+    let inside = false;
+    const n = polygon.length;
+    
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const pi = polygon[i];
+      const pj = polygon[j];
+      
+      const intersect = 
+        ((pi.y > point.y) !== (pj.y > point.y)) && 
+        (point.x < (pj.x - pi.x) * (point.y - pi.y) / (pj.y - pi.y) + pi.x);
+      
+      if (intersect) inside = !inside;
+    }
+    
+    return inside;
+  }
+
   const handleDragStart = (info: any, event: any): void => {
     if (!lassoMode) return;
     if (!isDraggingRef.current) {
       isDraggingRef.current = true;
       setDragStart({ x: info.x, y: info.y });
-      setDragCurrent({ x: info.x, y: info.y });
+      setDragCurrent(prev => [...prev, { x: info.x, y: info.y }]); 
     }
   };
 
   const handleDrag = (info: any, event: any): void => {
     if (!lassoMode || !dragStart) return;
-    setDragCurrent({ x: info.x, y: info.y });
+    setDragCurrent(prev => [...prev, { x: info.x, y: info.y }]); 
   };
 
   const handleDragEnd = (info: any, event: any): void => {
     if (!lassoMode || !dragStart) return;
-
+    
     const start = dragStart;
     const end = { x: info.x, y: info.y };
-
-    const minX = Math.min(start.x, end.x);
-    const maxX = Math.max(start.x, end.x);
-    const minY = Math.min(start.y, end.y);
-    const maxY = Math.max(start.y, end.y);
-
+    
+    // Polygon points defining the lasso area
+    const polygon = dragCurrent
+    
     const deckInstance = deckRef.current?.deck;
     if (!deckInstance) return;
+    
     const viewports = deckInstance.getViewports();
     if (!viewports || viewports.length === 0) return;
+    
     const viewport = viewports[0];
-
     const selected: number[] = [];
+    
     data?.forEach((point, index) => {
       const screenPos = viewport.project(point.position);
       const [screenX, screenY] = screenPos;
-      if (screenX >= minX && screenX <= maxX && screenY >= minY && screenY <= maxY) {
+      
+      // Check if the point is inside the polygon
+      if (isPointInPolygon({ x: screenX, y: screenY }, polygon)) {
         selected.push(index);
       }
     });
-
+    
     setSelectedPoints(selected);
     setSelectedIndexes(selected);
     setDragStart(null);
-    setDragCurrent(null);
+    setDragCurrent([]);
     isDraggingRef.current = false;
-  };
-
-  const toggleLassoMode = (): void => {
-    setLassoMode((prev) => !prev);
   };
 
   let lassoStyle: React.CSSProperties = {};
@@ -172,7 +179,7 @@ export default function PointCloudVisualization(){
       zIndex: 100,
     };
   }
-
+  
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
@@ -202,29 +209,8 @@ export default function PointCloudVisualization(){
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
           />
-          {lassoMode && dragStart && dragCurrent && (
-            <div style={lassoStyle} />
-          )}
         </div>
       </Suspense>
-
-      <button
-        onClick={toggleLassoMode}
-        style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          zIndex: 1000,
-          padding: '6px 12px',
-          borderRadius: '4px',
-          backgroundColor: lassoMode ? '#dc2626' : '#16a34a',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-        }}
-      >
-        {lassoMode ? 'Exit Lasso Mode' : 'Enter Lasso Mode'}
-      </button>
     </>
   );
 }

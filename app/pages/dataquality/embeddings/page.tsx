@@ -10,6 +10,8 @@ import { image_type, text_type } from "../../../properties/types";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
 import { FixedSizeGrid as Grid, GridChildComponentProps } from 'react-window';
+import LassoDrawer from '@/components/client/Lasso';
+import style from 'styled-jsx/style';
 
 interface Feature
 {
@@ -55,6 +57,8 @@ function Home ()
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
+  const [lassoMode, setLassoMode] = useState<bool>(false)
+
   const containerRef = useRef<HTMLDivElement>( null );
   const COLUMN_COUNT = 4;
   const COLUMN_WIDTH = 320;
@@ -64,6 +68,7 @@ function Home ()
   //setDatasetName(searchParams.get("name"))
   //const datasetName = "Animals"
   const indexes = useStore( ( state ) => state.selectedIndexes );
+  const lazoModeSetter = useStore((state) => state.setLazoMode);
   //const featureName = "image"
   //const datasetName = "Animal Dataset"
 
@@ -73,6 +78,12 @@ function Home ()
       setDatasetName( searchParams.get( "name" ) )
     }
   }, [ searchParams ] )
+
+  const toggleLassoMode = ()=>{
+    const prev = !lassoMode
+    setLassoMode(prev)
+    lazoModeSetter(prev)
+  }
 
   //const feature = getFeatureResources(indexes,featureName)
 
@@ -105,10 +116,12 @@ function Home ()
       {
         try {
           let filteredArr: string[] = [];
+          console.log("DATAS",feature.datas)
           indexes.forEach( index =>
           {
             filteredArr.push( feature.datas[ index ] );
           } );
+          console.log("FILTERED",filteredArr)
           setFeatureData( filteredArr )
         } catch ( error ) {
           console.error( 'Error loading feature:', error );
@@ -152,7 +165,9 @@ function Home ()
             style={ { width: '100%' } }
           >
             <Suspense>
+              <LassoDrawer>
               <PointCloudVisualization />
+              </LassoDrawer>
             </Suspense>
 
             <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg z-50">
@@ -194,6 +209,25 @@ function Home ()
       ) : (
         <p>Select Feature</p>
       ) }
+      
+      <button
+        onClick={toggleLassoMode}
+        style={{
+          position: 'fixed',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+          padding: '6px 12px',
+          borderRadius: '4px',
+          backgroundColor: lassoMode ? '#dc2626' : '#16a34a',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        {lassoMode ? 'Exit Lasso Mode' : 'Enter Lasso Mode'}
+        
+      </button>
     </div>
   );
 }
