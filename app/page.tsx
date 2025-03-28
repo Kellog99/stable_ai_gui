@@ -21,7 +21,7 @@ export default async function HomePage ( props: { searchParams: Promise<{ query:
   const { query } = await searchParams;
   const datasets = await DatasetsLoader()
 
-  console.log( "Server Response:", datasets )
+  //console.log( "Server Response:", datasets )
 
   return (
     <>

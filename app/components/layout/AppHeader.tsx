@@ -4,10 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from "react";
 import {
-    MantineProvider,
-    ColorSchemeScript,
-    mantineHtmlProps,
-    AppShell, AppShellHeader, AppShellNavbar, AppShellMain, Image, Title, Flex, Group, Burger, Button
+ Image, Group, Burger, Button
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -15,6 +12,8 @@ function AppHeader() {
     const [opened, { toggle, close }] = useDisclosure(false)
     const pathName = usePathname();
     const isActive = (path: string) => pathName === path;
+
+    const isNNTrust = pathName.includes('/nntrust');
     return (
         <>
             <Group>
@@ -30,10 +29,10 @@ function AppHeader() {
 
             <Group>
                 <Link href="/">
-                    <Button radius={50} variant={isActive("/") ? "filled" : "subtle"}>Data Quality</Button>
+                    <Button radius={50} variant={isNNTrust ? "subtle" : "filled"}>Data Quality</Button>
                 </Link>
                 <Link href="/pages/nntrust">
-                    <Button radius={50} variant={isActive("/pages/nntrust") ? "filled" : "subtle"}>NN trust</Button>
+                    <Button radius={50} variant={isNNTrust ? "filled" : "subtle"}>NN Trust</Button>
                 </Link>
             </Group>
             <Group>

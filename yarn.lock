@@ -1731,6 +1731,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tabler/icons-react@npm:^3.31.0":
+  version: 3.31.0
+  resolution: "@tabler/icons-react@npm:3.31.0"
+  dependencies:
+    "@tabler/icons": "npm:3.31.0"
+  peerDependencies:
+    react: ">= 16"
+  checksum: 10c0/aceefe1b6c12a2e64921900f49c09c0c24bcd837dfb3d4274914065e33a5175944f1e25ce9a80d110272e5ae0fefc24062a38f1ec75a4ec79c63d40acb9d1d12
+  languageName: node
+  linkType: hard
+
+"@tabler/icons@npm:3.31.0":
+  version: 3.31.0
+  resolution: "@tabler/icons@npm:3.31.0"
+  checksum: 10c0/03fcfff0b705e1474030acee2ff0523bfa1fda7a29a33d031a9fd8e3b52ecc2e0380f9cf5e81bd054b30dc0acdb819b1e08ab746805be8d660934a08b2c3545e
+  languageName: node
+  linkType: hard
+
 "@tanstack/react-virtual@npm:^3.13.5":
   version: 3.13.5
   resolution: "@tanstack/react-virtual@npm:3.13.5"
@@ -6007,6 +6025,7 @@ __metadata:
     "@nebula.gl/layers": "npm:^1.0.4"
     "@react-three/drei": "npm:^10.0.4"
     "@react-three/fiber": "npm:^9.1.0"
+    "@tabler/icons-react": "npm:^3.31.0"
     "@tanstack/react-virtual": "npm:^3.13.5"
     "@types/node": "npm:22.10.7"
     "@types/react": "npm:19.0.7"

@@ -16,6 +16,8 @@ import AppNavbar from './components/layout/AppNavbar';
 
 import { theme } from "../theme";
 import AppHeader from "@/components/layout/AppHeader"
+import AppNavbarNNTrust from "./components/layout/NavBars/AppNavbarNNTrust";
+import { headers } from "next/headers";
 
 const myTheme = createTheme( {
   defaultRadius: 0,
@@ -25,8 +27,8 @@ const myTheme = createTheme( {
 } )
 
 
-export default function RootLayout ( { children }: { children: any } )
-{
+export default async function RootLayout ( { children }: { children: any } )
+{  
 
   return (
     <html lang="en" { ...mantineHtmlProps }>
@@ -46,12 +48,12 @@ export default function RootLayout ( { children }: { children: any } )
           <AppShell
             header={ { height: 60 } }
             navbar={ {
-              width: 150,
+              width: 250,
               breakpoint: 'sm',
               //collapsed: { mobile: !opened },
             } }
             padding="md"
-            withBorder={ true }
+            withBorder={ false }
           >
             <AppShellHeader p="md" bg="#f0f0f0" style={ { display: "flex", alignItems: "center", justifyContent: "space-between" } }>
               <AppHeader />
@@ -61,7 +63,9 @@ export default function RootLayout ( { children }: { children: any } )
               p="md"
               bg="#f0f0f0"
             >
-              <AppNavbar />
+              
+             <AppNavbar />
+              
 
             </AppShellNavbar>
 
