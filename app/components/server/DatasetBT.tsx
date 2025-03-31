@@ -6,39 +6,24 @@ import ImageDisplayer from "./ImageDisplayer";
 import TextDisplayer from "./TextDisplayer";
 import { image_type, text_type } from "../../properties/types";
 import RouterButton from "../client/buttons/RouterButton";
-
-/*
-    interface Dataset {
-        id: string;
-        name: string;
-    }
-*/
   
   interface DatasetBTProps {
     query?: string;
-    datasets: Dataset[];
+    datasets: Dataset[] | null;
   }
   
   
   export default function DatasetBT({ query, datasets }: DatasetBTProps) {
 
-      const filteredDatasets = query
-    ? datasets.filter(dataset => 
-        dataset.name.toLowerCase().includes(query.toLowerCase())
-      )
-    : datasets;
-/*
-    return (
-        <div className="grid gap-4">
-          {filteredDatasets.map(dataset => (
-            <div key={dataset.id} className="p-4 border rounded">
-              <h3 className="font-semibold">{dataset.name}</h3>
-            </div>
-          ))}
-        </div>
-      );
-    }
-*/
+    if (!datasets) {
+      return null
+    } else {
+    const filteredDatasets = query
+  ? datasets?.filter(dataset => 
+      dataset.name.toLowerCase().includes(query.toLowerCase())
+    )
+  : datasets;
+
     return (
         <div className={classes.dataset_buttons}>
             <Grid
@@ -76,12 +61,4 @@ import RouterButton from "../client/buttons/RouterButton";
         </div>
     );
     
-}
-
-/*
-<Image
-    src={dataset.prototype.datas[0]}
-    height={300}
-    alt={dataset.name}
-/>
-*/
+}}

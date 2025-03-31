@@ -5,13 +5,15 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
 import ImageDisplayer from '../../../components/server/ImageDisplayer';
 import TextDisplayer from '../../../components/server/TextDisplayer';
-import { Card, Text, Badge, Group, CardSection, GridCol, Autocomplete, Flex, ScrollArea } from '@mantine/core';
+import { Card, Text, Badge, Group, CardSection, GridCol, Autocomplete, Flex, ScrollArea, Button, Box, Space } from '@mantine/core';
 import { image_type, text_type } from "../../../properties/types";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
 import { FixedSizeGrid as Grid, GridChildComponentProps } from 'react-window';
 import LassoDrawer from '@/components/client/Lasso';
 import style from 'styled-jsx/style';
+import RouterButton from '@/components/client/buttons/RouterButton';
+import classes from './page.module.css'
 
 interface Feature
 {
@@ -57,7 +59,7 @@ function Home ()
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
-  const [lassoMode, setLassoMode] = useState<bool>(false)
+  const [lassoMode, setLassoMode] = useState<boolean>(false)
 
   const containerRef = useRef<HTMLDivElement>( null );
   const COLUMN_COUNT = 4;
@@ -137,11 +139,17 @@ function Home ()
 
   return (
     <div className="w-full h-screen">
-      <div>
-        <h1>This is the Embedding Visualization Page</h1>
-        <h2>You are using { datasetName } dataset</h2>
-      </div>
 
+      <Box
+        className={classes.title}>
+            <h1>Embeddings for { datasetName } dataset</h1>
+            <RouterButton name={datasetName} route={"/pages/dataquality/datasets"}>
+                <Button>Go Back to Dataset Page</Button>
+            </RouterButton>
+        </Box>
+
+
+      <Space h="md"/>
       <label htmlFor="feature" className="font-bold">Feature</label>
       <div id="autocomplete-container" style={ { width: '300px', position: 'relative', marginBottom: '20px' } }>
         <Autocomplete
@@ -153,6 +161,8 @@ function Home ()
           onChange={ ( value ) => setFeatureName( value ) }
         />
       </div>
+
+      
 
       { featureName !== "" ? (
         <>

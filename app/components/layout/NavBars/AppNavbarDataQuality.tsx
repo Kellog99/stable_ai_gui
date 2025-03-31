@@ -30,7 +30,9 @@ function AppNavbarDataQuality() {
     
     const isHomePage = pathName.endsWith('/');
 
-    const [visible, setVisible] = useState(false);
+    const [visualVisible, setVisualVisible] = useState(false);
+    const [metricVisible, setMetricVisible] = useState(false);
+    const [actionVisible, setActionVisible] = useState(false);
 
     const searchParams = useSearchParams();
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
@@ -58,31 +60,12 @@ function AppNavbarDataQuality() {
                 </Box>
 
                 <Space h="xs" />
-                {/*
-                <Box>
-                <Group gap="xs" mb="xs">
-                    <FontAwesomeIcon icon={faImage} size="sm" style={{ opacity: 0.6 }} />
-                    <Text size="sm" fw={500} c="dimmed">
-                        Visualization
-                    </Text>
-                </Group>
-                    <Stack gap="xs">
-                        <Link href="/pages/dataquality/embeddings">
-                            <Button 
-                                radius="xl"
-                                variant={isActive("/pages/dataquality/embeddings") ? "filled" : "subtle"}
-                            >
-                                Embeddings
-                            </Button>
-                        </Link>
-                    </Stack>
-                </Box>
-                */}
+
                 <Box>
                 <Group gap="xs" mb="xs" mr="xs">
                 <Button
                 className={classes.navbar}
-                onClick={() => setVisible((prev) => !prev)}
+                onClick={() => setVisualVisible((prev) => !prev)}
                 rightSection={<IconChevronDown size={18} stroke={1.5} />} pr={12}
                 leftSection={<FontAwesomeIcon icon={faImage} size="sm" style={{ opacity: 0.6 }} />}>
                     <Text size="sm" fw={600} c="dimmed">
@@ -91,7 +74,7 @@ function AppNavbarDataQuality() {
                 </Button>
                 </Group>
 
-                {visible && (
+                {visualVisible && (
                     <Stack mt="sm">
                         <Box >
                         {/*<Link href="/pages/dataquality/embeddings">*/}
@@ -124,13 +107,20 @@ function AppNavbarDataQuality() {
                 </Box>
 
                 <Box>
-                    <Group gap="xs" mb="xs">
-                        <FontAwesomeIcon icon={faChartLine} size="sm" style={{ opacity: 0.6 }} />
-                        <Text size="sm" fw={500} c="dimmed">
-                            Metrics
-                        </Text>
-                    </Group>
-                    <Stack gap="xs">
+                <Group gap="xs" mb="xs" mr="xs">
+                <Button
+                className={classes.navbar}
+                onClick={() => setMetricVisible((prev) => !prev)}
+                rightSection={<IconChevronDown size={18} stroke={1.5} />} pr={12}
+                leftSection={<FontAwesomeIcon icon={faChartLine} size="sm" style={{ opacity: 0.6 }} />}>
+                    <Text size="sm" fw={600} c="dimmed">
+                        Metrics
+                    </Text>
+                </Button>
+                </Group>
+
+                {metricVisible && (
+                    <Stack mt="sm">
                         <Box>
                             <Link href="/">
                                 <Button 
@@ -152,16 +142,26 @@ function AppNavbarDataQuality() {
                             </Link>
                         </Box>
                     </Stack>
+                )}
                 </Box>
 
+
                 <Box>
-                    <Group gap="xs" mb="xs">
-                        <FontAwesomeIcon icon={faBolt} size="sm" style={{ opacity: 0.6 }} />
-                        <Text size="sm" fw={500} c="dimmed">
-                            Action
-                        </Text>
-                    </Group>
-                    <Stack gap="xs">
+                <Group gap="xs" mb="xs" mr="xs">
+                <Button
+                className={classes.navbar}
+                onClick={() => setActionVisible((prev) => !prev)}
+                rightSection={<IconChevronDown size={18} stroke={1.5} />} pr={12}
+                leftSection={<FontAwesomeIcon icon={faBolt} size="sm" style={{ opacity: 0.6 }} />}>
+                    <Text size="sm" fw={600} c="dimmed">
+                        Actions
+                    </Text>
+                </Button>
+                </Group>
+
+                {actionVisible && (
+                    <Stack mt="sm">
+                        <Box>
                         <Link href="/">
                             <Button 
                                 radius="xl"
@@ -171,7 +171,9 @@ function AppNavbarDataQuality() {
                                 Embeddings
                             </Button>
                         </Link>
+                        </Box>
                     </Stack>
+                )}
                 </Box>
             </Stack>
         </Box>
