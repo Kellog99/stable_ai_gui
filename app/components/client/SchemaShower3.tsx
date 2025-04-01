@@ -1,88 +1,132 @@
-import React from 'react';
-import { Group, Paper, Box, HoverCard, Text, useMantineTheme } from '@mantine/core';
+import React, { useState, useRef, useEffect } from 'react';
+import tinycolor from 'tinycolor2';
 
-const CircleSchema = () => {
-  const theme = useMantineTheme();
+interface Feature {
+  type: string;
+  name: string;
+}
 
-  // Circle styles
-  const circleRadius = 40;
-  const circle1Color = theme.colors.blue[6];
-  const circle2Color = theme.colors.green[6];
-  
+interface SchemaVisualizationProps {
+  features: Feature[];
+  connections: [number, number][];
+  labelColorMap: Record<string, string>;
+}
+
+const SchemaVisualization: React.FC<SchemaVisualizationProps> = ({
+  features,
+  connections,
+  labelColorMap,
+}) => {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 800, height: 800 });
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (svgRef.current?.parentElement) {
+        const { width } = svgRef.current.parentElement.getBoundingClientRect();
+        setDimensions({
+          width,
+          height: Math.max(400, width * 0.5),
+        });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  const radius = Math.min(dimensions.width, dimensions.height) * 0.08;
+  const centerX = dimensions.width * 0.25;
+  const centerY = dimensions.height / 2;
+
+  const getCirclePosition = (index: number, total: number) => {
+    if (index === 0) {
+      return { x: centerX, y: centerY };
+    } else {
+      const connectedNodesCount = total - 1;
+      const rightSectionWidth = dimensions.width * 0.5;
+      const spacing = rightSectionWidth / connectedNodesCount;
+      const x = centerX + dimensions.width * 0.25 + spacing * (index - 1);
+      const yOffset = index % 2 === 0 ? radius : -radius;
+      return { x, y: centerY + yOffset };
+    }
+  };
+
+  const darkenHexColor = (color: string): string => {
+    return tinycolor(color).darken(40).toString();
+  };
+
+  const maxRadius = features.reduce((max, feature) => {
+    const nameParts = feature.name.includes("_") ? feature.name.split("_") : [feature.name];
+    const estimatedWidth = Math.max(...nameParts.map(part => part.length)) * 6;
+    return Math.max(max, estimatedWidth / 2 + 10);
+  }, 20);
+
   return (
-    <Paper p="xl" style={{ width: '100%', maxWidth: 600, margin: '0 auto' }}>
-      <Box style={{ position: 'relative', height: 200, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 100px' }}>
-        {/* Line connecting circles */}
-        <Box 
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: 100 + circleRadius,
-            right: 100 + circleRadius,
-            height: 2,
-            backgroundColor: theme.colors.gray[5],
-            zIndex: 1
-          }}
-        />
-        
-        {/* First Circle with HoverCard */}
-        <HoverCard width={280} shadow="md" withArrow>
-          <HoverCard.Target>
-            <Box 
-              style={{
-                width: circleRadius * 2,
-                height: circleRadius * 2,
-                borderRadius: '50%',
-                backgroundColor: circle1Color,
-                zIndex: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
+    <div className="w-full">
+      <svg
+        ref={svgRef}
+        width={dimensions.width}
+        height={dimensions.height}
+        className="w-full"
+      >
+        {connections.map(([from, to], idx) => {
+          const fromPos = getCirclePosition(from, features.length);
+          const toPos = getCirclePosition(to, features.length);
+          return (
+            <line
+              key={`connection-${idx}`}
+              x1={fromPos.x}
+              y1={fromPos.y}
+              x2={toPos.x}
+              y2={toPos.y}
+              stroke="#CBD5E1"
+              strokeWidth="2"
+            />
+          );
+        })}
+
+        {features.map((feature, idx) => {
+          const { x, y } = getCirclePosition(idx, features.length);
+          const baseColor = labelColorMap[feature.name] || '#FFABAB';
+          const textColor = darkenHexColor(baseColor);
+          const nameParts = feature.name.includes("_")
+            ? feature.name.split("_").map(part => part === "embeddings" ? "embs" : part)
+            : [feature.name === "embeddings" ? "embs" : feature.name];
+
+          return (
+            <g 
+              key={`feature-${idx}`}
             >
-              Image
-            </Box>
-          </HoverCard.Target>
-          <HoverCard.Dropdown>
-            <Text size="sm">
-              The are 5400 images in jpg format. 
-            </Text>
-          </HoverCard.Dropdown>
-        </HoverCard>
-        
-        {/* Second Circle with HoverCard */}
-        <HoverCard width={280} shadow="md" withArrow>
-          <HoverCard.Target>
-            <Box 
-              style={{
-                width: circleRadius * 2,
-                height: circleRadius * 2,
-                borderRadius: '50%',
-                backgroundColor: circle2Color,
-                zIndex: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}
-            >
-              Label
-            </Box>
-          </HoverCard.Target>
-          <HoverCard.Dropdown>
-            <Text size="sm">
-              There are 5400 labels in string format.
-            </Text>
-          </HoverCard.Dropdown>
-        </HoverCard>
-      </Box>
-    </Paper>
+              <circle
+                cx={x}
+                cy={y}
+                r={maxRadius}
+                fill={baseColor}
+                stroke={textColor}
+                strokeWidth="2"
+                className="transition-all duration-200 cursor-pointer"
+              />
+              {nameParts.map((part, index) => (
+                <text
+                  key={index}
+                  x={x}
+                  y={y + (index - (nameParts.length - 1) / 2) * 14}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={textColor}
+                  className="text-sm font-medium select-none"
+                >
+                  {part}
+                </text>
+              ))}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
   );
 };
 
-export default CircleSchema;
+export default SchemaVisualization;

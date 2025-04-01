@@ -9,7 +9,7 @@ import { Card, Text, Badge, Group, CardSection, GridCol, Autocomplete, Flex, Scr
 import { image_type, text_type } from "../../../properties/types";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
-import { FixedSizeGrid as Grid, GridChildComponentProps } from 'react-window';
+import { FixedSizeGrid, GridChildComponentProps } from 'react-window';
 import LassoDrawer from '@/components/client/Lasso';
 import style from 'styled-jsx/style';
 import RouterButton from '@/components/client/buttons/RouterButton';
@@ -143,7 +143,7 @@ function Home ()
       <Box
         className={classes.title}>
             <h1>Embeddings for { datasetName } dataset</h1>
-            <RouterButton name={datasetName} route={"/pages/dataquality/datasets"}>
+            <RouterButton name={datasetName!} route={"/pages/dataquality/datasets"}>
                 <Button>Go Back to Dataset Page</Button>
             </RouterButton>
         </Box>
@@ -188,7 +188,7 @@ function Home ()
 
             <div className="flex justify-center w-full">
               <div ref={ containerRef } className="h-[600px] overflow-auto">
-                <Grid
+                <FixedSizeGrid
                   columnCount={ COLUMN_COUNT }
                   columnWidth={ COLUMN_WIDTH }
                   height={ 600 }
@@ -211,7 +211,7 @@ function Home ()
                       </div>
                     );
                   } }
-                </Grid>
+                </FixedSizeGrid>
               </div>
             </div>
           </Flex>
