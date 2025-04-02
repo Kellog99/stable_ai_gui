@@ -5,6 +5,7 @@ export default interface Dataset {
     features: {
         type: string;
         name: string;
+        depth: number,
         datas: string[];
         is_logic: boolean;
         description?: string;
@@ -13,12 +14,20 @@ export default interface Dataset {
     prototype: {
         type: string;
         name: string;
+        depth: number,
         datas: string[];
         is_logic: boolean
         description?: string;
         label_dict?: any;
       };  
+    edges: [string, string][];
     n_classes: number;
     samples_per_class?: number;
     description?: string
   }
+
+export interface FeatureSchema{
+    type: string;
+    name: string;
+    depth: number;
+}
