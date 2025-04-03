@@ -25,7 +25,7 @@ interface Feature
 
 }
 
-function FeatureCard ( { data, featureType }: { data: string, featureType: string } )
+function FeatureCard ( { index, data, featureType, label }: { index: number, data: string, featureType: string, label: number } )
 {
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -37,8 +37,8 @@ function FeatureCard ( { data, featureType }: { data: string, featureType: strin
         ) : null }
       </CardSection>
       <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={ 700 } size="lg">INFO</Text>
-        <Badge color="#ec777e">INFO</Badge>
+        <Text fw={ 700 } size="lg">Sample: { index }</Text>
+        <Badge color="#ec777e">Class: { label }</Badge>
       </Group>
       <Text size="sm" c="dimmed">
         INFO
@@ -55,11 +55,13 @@ function Home ()
   const searchParams = useSearchParams();
   const [ feature, setFeature ] = useState<Feature | null>( null )
   const [ featureData, setFeatureData ] = useState<string[]>( [] )
+  const [ labelFeature, setLabelFeature ] = useState<number[]>( [] )
+  const [ labelData, setLabelData ] = useState<number[]>( [] )
   const [ featureType, setFeatureType ] = useState<any>( "" )
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
-  const [lassoMode, setLassoMode] = useState<boolean>(false)
+  const [ lassoMode, setLassoMode ] = useState<boolean>( false )
 
   const containerRef = useRef<HTMLDivElement>( null );
   const COLUMN_COUNT = 4;
@@ -70,7 +72,10 @@ function Home ()
   //setDatasetName(searchParams.get("name"))
   //const datasetName = "Animals"
   const indexes = useStore( ( state ) => state.selectedIndexes );
-  const lazoModeSetter = useStore((state) => state.setLazoMode);
+  const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
+
+  const datasetUsed = useStore( ( state ) => state.datasetUsed )
+
   //const featureName = "image"
   //const datasetName = "Animal Dataset"
 
@@ -81,10 +86,11 @@ function Home ()
     }
   }, [ searchParams ] )
 
-  const toggleLassoMode = ()=>{
+  const toggleLassoMode = () =>
+  {
     const prev = !lassoMode
-    setLassoMode(prev)
-    lazoModeSetter(prev)
+    setLassoMode( prev )
+    lazoModeSetter( prev )
   }
 
   //const feature = getFeatureResources(indexes,featureName)
@@ -107,8 +113,20 @@ function Home ()
         }
       };
       loadFeature();
+
     }
   }, [ featureName ] ); // Still keep indexes and featureName in the dependency array
+
+
+  useEffect( () =>
+  {
+    if ( datasetUsed ) {
+      if ( Array.isArray( datasetUsed.features ) ) {
+        const labelF = datasetUsed.features.find( ( feature ) => feature.type === "LABEL_FEATURE" );
+        setLabelFeature( labelF.datas )
+      }
+    }
+  }, [] )
 
   useEffect( () =>
   {
@@ -118,20 +136,26 @@ function Home ()
       {
         try {
           let filteredArr: string[] = [];
-          console.log("DATAS",feature.datas)
+          let filteredLabel: number[] = [];
+
           indexes.forEach( index =>
           {
             filteredArr.push( feature.datas[ index ] );
+            filteredLabel.push( labelFeature[ index ] )
           } );
-          console.log("FILTERED",filteredArr)
           setFeatureData( filteredArr )
+          setLabelData( filteredLabel )
+
         } catch ( error ) {
           console.error( 'Error loading feature:', error );
         }
       };
+
       filterFeature();
     }
   }, [ indexes ] ); // Still keep indexes and featureName in the dependency array
+
+  console.log( "LABEL DATA:", labelData )
 
 
 
@@ -139,33 +163,55 @@ function Home ()
 
   return (
     <div className="w-full h-screen">
-
-      <Box
-        className={classes.title}>
-            <h1>Embeddings for { datasetName } dataset</h1>
-            <RouterButton name={datasetName!} route={"/pages/dataquality/datasets"}>
-                <Button>Go Back to Dataset Page</Button>
-            </RouterButton>
+      {/* Centered content section */}
+      <div className="max-w-4xl mx-auto px-4">
+        <Box className={classes.title}>
+          <h1>Embeddings for {datasetName} dataset</h1>
+          <RouterButton name={datasetName!} route={"/pages/dataquality/datasets"}>
+            <Button>Go Back to Dataset Page</Button>
+          </RouterButton>
         </Box>
-
-
-      <Space h="md"/>
-      <label htmlFor="feature" className="font-bold">Feature</label>
-      <div id="autocomplete-container" style={ { width: '300px', position: 'relative', marginBottom: '20px' } }>
-        <Autocomplete
-          id="feature"
-          radius="md"
-          placeholder="Choose feature to visualize"
-          data={ [ 'image' ] }
-          value={ featureName }
-          onChange={ ( value ) => setFeatureName( value ) }
-        />
+        <Space h="md" />
+        <label htmlFor="feature" className="font-bold">Feature</label>
+        <div id="autocomplete-container" style={{ width: '300px', position: 'relative', marginBottom: '20px' }}>
+          <Autocomplete
+            id="feature"
+            radius="md"
+            placeholder="Choose feature to visualize"
+            data={['image']}
+            value={featureName}
+            onChange={(value) => setFeatureName(value)}
+          />
+        </div>
       </div>
-
-      
-
-      { featureName !== "" ? (
+  
+      {featureName !== "" ? (
         <>
+          {/* Full-width visualization container that breaks out of the centered layout */}
+          <div className="w-full" style={{ position: 'relative', marginBottom: '20px' }}>
+            <Suspense>
+              <div className="w-full">
+                <LassoDrawer>
+                  <PointCloudVisualization />
+                </LassoDrawer>
+              </div>
+            </Suspense>
+            
+            <Flex
+            mih={ 150 }
+            justify="center"
+            align="center"
+            direction="column"
+            wrap="wrap"
+            style={ { width: '100%', marginTop:'6px' } }
+          >
+              <p className="text-sm font-medium">
+                {indexes.length} point{indexes.length !== 1 ? 's' : ''} selected
+              </p>
+            </Flex>
+          </div>
+  
+          {/* Back to centered layout */}
           <Flex
             mih={ 150 }
             justify="center"
@@ -174,52 +220,36 @@ function Home ()
             wrap="wrap"
             style={ { width: '100%' } }
           >
-            <Suspense>
-              <LassoDrawer>
-              <PointCloudVisualization />
-              </LassoDrawer>
-            </Suspense>
-
-            <div className="absolute top-4 left-4 bg-black/50 text-white px-4 py-2 rounded-lg z-50">
-              <p className="text-sm font-medium">
-                { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
-              </p>
-            </div>
-
-            <div className="flex justify-center w-full">
-              <div ref={ containerRef } className="h-[600px] overflow-auto">
+              <div ref={containerRef} className="h-[600px] overflow-auto">
                 <FixedSizeGrid
-                  columnCount={ COLUMN_COUNT }
-                  columnWidth={ COLUMN_WIDTH }
-                  height={ 600 }
-                  rowCount={ rowCount }
-                  rowHeight={ ROW_HEIGHT }
-                  width={ COLUMN_COUNT * COLUMN_WIDTH }
+                  columnCount={COLUMN_COUNT}
+                  columnWidth={COLUMN_WIDTH}
+                  height={600}
+                  rowCount={rowCount}
+                  rowHeight={ROW_HEIGHT}
+                  width={COLUMN_COUNT * COLUMN_WIDTH}
                   className="mx-auto"
                 >
-                  { ( { columnIndex, rowIndex, style }: GridChildComponentProps ) =>
-                  {
+                  {({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
                     const index = rowIndex * COLUMN_COUNT + columnIndex;
-                    if ( index >= featureData.length ) return null;
-
+                    if (index >= featureData.length) return null;
                     return (
-                      <div style={ {
+                      <div style={{
                         ...style,
                         padding: '8px',
-                      } }>
-                        <FeatureCard data={ featureData[ index ] } featureType={ featureType } />
+                      }}>
+                        <FeatureCard index={indexes[index]} data={featureData[index]} featureType={featureType} label={labelData[index]} />
                       </div>
                     );
-                  } }
+                  }}
                 </FixedSizeGrid>
               </div>
-            </div>
-          </Flex>
+            </Flex>
         </>
       ) : (
-        <p>Select Feature</p>
-      ) }
-      
+          <p>Select Feature</p>
+      )}
+  
       <button
         onClick={toggleLassoMode}
         style={{
@@ -236,7 +266,6 @@ function Home ()
         }}
       >
         {lassoMode ? 'Exit Lasso Mode' : 'Enter Lasso Mode'}
-        
       </button>
     </div>
   );

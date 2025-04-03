@@ -69,7 +69,7 @@ export default async function RootLayout ( { children }: { children: any } )
 
             </AppShellNavbar>
 
-            <AppShellMain style={ { height: "calc(100vh-60px)", overflow: "hidden" } } >
+            <AppShellMain style={ { height: "calc(100vh - 60px)", overflow: "hidden" } } >
               <ScrollArea style={ { height: "100%" } }>
                 <Container size="100%">
                   { children }

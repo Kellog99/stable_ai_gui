@@ -43,9 +43,7 @@ interface AppState {
           partialize: (state) => ({
               datasets: state.datasets,
               datasetUsed: state.datasetUsed,
-              selectedIndexes: state.selectedIndexes,
               selectedFeature: state.selectedFeature,
-              lazoMode: state.lazoMode,
               featureToDisplay: state.featureToDisplay
               // queryDataset is NOT included, so it won't be persisted
           }),

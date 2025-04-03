@@ -27,8 +27,8 @@ export default function Datasets ()
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const setData = useStore( ( state ) => ( state.setData ) );
 
-  const featureToDisplay = useStore((state) => state.featureToDisplay);
-  
+  const featureToDisplay = useStore( ( state ) => state.featureToDisplay );
+
 
   //console.log("DATASETS:",datasets)
 
@@ -90,96 +90,58 @@ export default function Datasets ()
   }, [ datasetUsed ] );
 
 
-  const collectFeatureData = (name: string) => {
-    if (datasetUsed) {
+  const collectFeatureData = ( name: string ) =>
+  {
+    if ( datasetUsed ) {
       if ( Array.isArray( datasetUsed?.features ) ) {
-        const featureId = datasetUsed.features.find((feature) => feature.name === name);
-      
-      if (featureId) {
-        return featureId.datas;
-      } else {
-        console.log('Feature not found');
-        return null;
+        const featureId = datasetUsed.features.find( ( feature ) => feature.name === name );
+
+        if ( featureId ) {
+          const datas = featureId.datas
+          return datas;
+        } else {
+          console.log( 'Feature not found' );
+          return null;
+        }
       }
+      return null;
     }
-    return null;
-  }}
+  }
 
 
-  /*
-  const features = [
-    {
-      type: "IMAGE_FEATURE",
-      name: "image",
-      depth: 0
-    },
-    {
-      type: "BBOX_FEATURE",
-      name: "bbox",
-      depth: 1
-    }, 
-    {
-      type: "LABEL_FEATURE",
-      name: "bbox_label",
-      depth: 1
-    }
-
-  ]
-
-  const connections: [string, string][] = [
-    ["image", "bbox"], ["image","bbox_label"]
-  ];
-
-  const labelColorMap: Record<string, string> = {
-    image: "#FFDDC1",
-    image_crops: "#FFDDC1",
-    bbox: "#C1E1DC",
-    label: "#F7D1CD",
-    image_label: "#F7D1CD",
-    bbox_label: "#F7D1CD",
-    text: "#C1F7C1",
-    image_embeddings: "#FFABAB",
-    bbox_embeddings: "#FFABAB",
-    image_crops_embeddings: "#FFABAB",
-  };
-
+  
+  /*  
+      const features = [
+        { type: "IMAGE_FEATURE", name: "image", depth: 0 },
+        { type: "EMBEDDINGS_FEATURE", name: "image_embeddings", depth: 1 },
+        { type: "TEXT_FEATURE", name: "text", depth: 2 },
+        { type: "BBOX_FEATURE", name: "bbox", depth: 1 },
+        { type: "LABEL_FEATURE", name: "bbox_label", depth: 2 },
+        { type: "CROP_FEATURE", name: "image_crops", depth: 2 },
+      ];
+    
+      const connections: [ string, string ][] = [
+        [ "image", "image_embeddings" ],
+        [ "image", "bbox" ],
+        [ "image_embeddings", "text" ],
+        [ "bbox", "bbox_label" ],
+        [ "bbox", "image_crops" ],
+      ];
+    
+      const labelColorMap: Record<string, string> = {
+        image: "#FFDDC1",
+        image_crops: "#FFDDC1",
+        bbox: "#C1E1DC",
+        label: "#F7D1CD",
+        image_label: "#F7D1CD",
+        bbox_label: "#F7D1CD",
+        text: "#C1F7C1",
+        image_embeddings: "#FFABAB",
+        bbox_embeddings: "#FFABAB",
+        image_crops_embeddings: "#FFABAB",
+      };
 */
 
-
-
-  /*
-    const features = [
-      { type: "IMAGE_FEATURE", name: "image", depth: 0 },
-      { type: "EMBEDDINGS_FEATURE", name: "image_embeddings", depth: 1 },
-      { type: "TEXT_FEATURE", name: "text", depth: 2 },
-      { type: "BBOX_FEATURE", name: "bbox", depth: 1 },
-      { type: "LABEL_FEATURE", name: "bbox_label", depth: 2 },
-      { type: "CROP_FEATURE", name: "image_crops", depth: 2 },
-    ];
-  
-    const connections: [ string, string ][] = [
-      [ "image", "image_embeddings" ],
-      [ "image", "bbox" ],
-      [ "image_embeddings", "text" ],
-      [ "bbox", "bbox_label" ],
-      [ "bbox", "image_crops" ],
-    ];
-  
-    const labelColorMap: Record<string, string> = {
-      image: "#FFDDC1",
-      image_crops: "#FFDDC1",
-      bbox: "#C1E1DC",
-      label: "#F7D1CD",
-      image_label: "#F7D1CD",
-      bbox_label: "#F7D1CD",
-      text: "#C1F7C1",
-      image_embeddings: "#FFABAB",
-      bbox_embeddings: "#FFABAB",
-      image_crops_embeddings: "#FFABAB",
-    };
-  
-  */
-
   const labelColorMap: Record<string, string> = {
     image: "#FFDDC1",
     image_crops: "#FFDDC1",
@@ -192,7 +154,9 @@ export default function Datasets ()
     bbox_embeddings: "#FFABAB",
     image_crops_embeddings: "#FFABAB",
   };
-
+ 
+  const datas = featureToDisplay ? collectFeatureData(featureToDisplay) : [];
+ 
   return (
     <div>
       <Box className={ classes.title } style={ { display: "flex", flexDirection: "column", gap: "0px" } }>
@@ -200,18 +164,23 @@ export default function Datasets ()
         <SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />
       </Box>
 
-      <Box style={ { marginLeft: "50px", marginRight:"50px"} }>
-      <h2>
-        Description
-      </h2>
-      <Box style={ { display: 'flex', alignItems: 'center', gap: '4px' } }>
-        <Text fw={ 600 }>{ datasetUsed?.name || "" }</Text> is a dataset for { datasetUsed?.task || "" }.
-        It has { datasetUsed?.n_classes || "" } classes. { " " }
-        { descriptions?.map( ( description, index ) => (
-          <span key={ index }>{ description } </span> // Adds space after each description
-        ) ) }
-      </Box>
-      {featureToDisplay? <ImageDisplayer data={collectFeatureData(featureToDisplay)} alt=""/> : null}
+      <Box style={ { marginLeft: "50px", marginRight: "50px" } }>
+        <h2>
+          Description
+        </h2>
+        <Box style={ { display: 'flex', alignItems: 'center', gap: '4px' } }>
+          <Text fw={ 600 }>{ datasetUsed?.name || "" }</Text> is a dataset for { datasetUsed?.task || "" }.
+          It has { datasetUsed?.n_classes || "" } classes. { " " }
+          { descriptions?.map( ( description, index ) => (
+            <span key={ index }>{ description } </span> // Adds space after each description
+          ) ) }
+        </Box>
+        
+        {
+        /*{datas.length > 0 ? (
+          datas.map( ( data: string) => <ImageDisplayer data={ data } alt="" /> )
+        ) : null }
+         */}
       </Box>
     </div>
   )
