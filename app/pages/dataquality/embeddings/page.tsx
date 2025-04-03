@@ -1,6 +1,6 @@
 "use client";
 
-import PointCloudVisualization from '../../../components/client/PointCloudVisualization';
+import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
 import ImageDisplayer from '../../../components/server/ImageDisplayer';
@@ -14,6 +14,7 @@ import LassoDrawer from '@/components/client/Lasso';
 import style from 'styled-jsx/style';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
+import {log} from 'console';
 
 interface Feature
 {
@@ -70,7 +71,6 @@ function Home ()
   //setDatasetName(searchParams.get("name"))
   //const datasetName = "Animals"
   const indexes = useStore( ( state ) => state.selectedIndexes );
-  const lazoModeSetter = useStore((state) => state.setLazoMode);
   //const featureName = "image"
   //const datasetName = "Animal Dataset"
 
@@ -84,10 +84,19 @@ function Home ()
   const toggleLassoMode = ()=>{
     const prev = !lassoMode
     setLassoMode(prev)
-    lazoModeSetter(prev)
   }
 
-  //const feature = getFeatureResources(indexes,featureName)
+  useEffect(() => {
+    const handleMouseDown = () => {
+      toggleLassoMode()
+      console.log("DOWN")
+    };
+
+    const handleMouseUp = () => {
+      toggleLassoMode()
+      console.log("UP")
+    };
+  }, []); 
 
   useEffect( () =>
   {
@@ -176,7 +185,7 @@ function Home ()
           >
             <Suspense>
               <LassoDrawer>
-              <PointCloudVisualization />
+              <ScatterPlotVisualization />
               </LassoDrawer>
             </Suspense>
 
