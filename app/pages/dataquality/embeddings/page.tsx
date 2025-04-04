@@ -1,6 +1,6 @@
 "use client";
 
-import PointCloudVisualization from '../../../components/client/PointCloudVisualization';
+import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
 import ImageDisplayer from '../../../components/server/ImageDisplayer';
@@ -14,6 +14,7 @@ import LassoDrawer from '@/components/client/Lasso';
 import style from 'styled-jsx/style';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
+import {log} from 'console';
 
 interface Feature
 {
@@ -89,11 +90,20 @@ function Home ()
   const toggleLassoMode = () =>
   {
     const prev = !lassoMode
-    setLassoMode( prev )
-    lazoModeSetter( prev )
+    setLassoMode(prev)
   }
 
-  //const feature = getFeatureResources(indexes,featureName)
+  useEffect(() => {
+    const handleMouseDown = () => {
+      toggleLassoMode()
+      console.log("DOWN")
+    };
+
+    const handleMouseUp = () => {
+      toggleLassoMode()
+      console.log("UP")
+    };
+  }, []); 
 
   useEffect( () =>
   {
@@ -192,7 +202,7 @@ function Home ()
             <Suspense>
               <div className="w-full">
                 <LassoDrawer>
-                  <PointCloudVisualization />
+                  <ScatterPlotVisualization />
                 </LassoDrawer>
               </div>
             </Suspense>
