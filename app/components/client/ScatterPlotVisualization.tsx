@@ -42,7 +42,8 @@ export default function ScatterPlotVisualization(){
   const deckRef = useRef<any>(null);
   const isDraggingRef = useRef<boolean>(false);
 
-  const [lassoMode, setLassoMode] = useState<boolean>(false);
+  //const [lassoMode, setLassoMode] = useState<boolean>(false);
+
   const [data, setData] = useState<Point[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [viewState, setViewState] = useState<OrbitViewState>({
@@ -56,6 +57,8 @@ export default function ScatterPlotVisualization(){
   const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>([]);
 
   const setSelectedIndexes = useStore((state) => state.setSelectedIndexes);
+
+  const lassoMode = useStore((state) => state.lazoMode);
   const lazoModeSetter = useStore((state) => state.setLazoMode);
 
   useEffect(() => {
@@ -73,8 +76,10 @@ export default function ScatterPlotVisualization(){
     //console.log("BASE",lassoMode)
     const handleMouseDown = (event) => {
       // Middle mouse button has button value of 1
+      event.preventDefault()
       if (event.button === 1) {
-        setLassoMode(true)
+        event.preventDefault()
+        lazoModeSetter(true)
         console.log("I AM MOUSE DOWN")
         //console.log('Mouse wheel button pressed down',lassoMode);
       }
@@ -82,8 +87,9 @@ export default function ScatterPlotVisualization(){
 
     // Handler for mouse up events
     const handleMouseUp = (event) => {
+      event.preventDefault()
       if (event.button === 1) {
-        setLassoMode(false)
+        lazoModeSetter(false)
         console.log("I AM MOUSE UP")
         //console.log('Mouse wheel button released',!lassoMode);
       }
