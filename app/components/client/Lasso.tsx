@@ -1,5 +1,5 @@
 import path from 'path';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import useStore from "../../store/dsStore";
 
 interface LassoDrawerProps {
@@ -8,42 +8,56 @@ interface LassoDrawerProps {
 
 const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  
   const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   
   const lassoMode = useStore((state) => state.lazoMode);
+  //const lassoModeRef = useRef(lassoMode);
+  //const [lassoMode,setLassoMode] = useState<boolean>(false)
+  
 
   useEffect(() => {
+    console.log("USEEFFECT",lassoMode)
     setPoints([])
   }, [lassoMode]);
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!lassoMode) return;
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+
+    console.log("LASSO IN",lassoMode)
+    if (lassoMode) return;
     if (!containerRef.current) return;
-    
+    //if (e.button!==1) return;
+    console.log("QUI")
+    console.log(lassoMode)
+    console.log("QUI2")
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
     setPoints([{ x, y }]);
     setIsDrawing(true);
-  };
+  }, [lassoMode]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    console.log("MOVE",lassoMode)
     if (!lassoMode) return;
     if (!isDrawing || !containerRef.current) return;
-    
+    //if (e.button!==1) return;
+    console.log("ADDING POINTS...")
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
     setPoints(prev => [...prev, { x, y }]);
-  };
+  }, [lassoMode]);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    console.log("LASSO OUT",lassoMode)
     if (!lassoMode) return;
+    //if (e.button!==1) return;
     setIsDrawing(false);
-  };
+  }, [lassoMode]);
 
   // Generate SVG path from points
   const generatePath = () => {

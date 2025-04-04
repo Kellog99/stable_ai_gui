@@ -64,10 +64,11 @@ export default async function featureLoader(datasetName: string | null, featureN
             headers: { 'Content-Type': 'application/octet-stream' },
             body: blob,
         });
-
+        
         if (!response.ok) throw new Error('Failed to send files to backend');
 
         const feature = await response.json();
+        console.log("RESPONSE",feature,"FEATURE",featureName)
         return feature
 
     } catch (error) {

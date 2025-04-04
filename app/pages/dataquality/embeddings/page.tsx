@@ -1,6 +1,6 @@
 "use client";
 
-import PointCloudVisualization from '../../../components/client/PointCloudVisualization';
+import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
 import ImageDisplayer from '../../../components/server/ImageDisplayer';
@@ -14,13 +14,14 @@ import LassoDrawer from '@/components/client/Lasso';
 import style from 'styled-jsx/style';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
+import {log} from 'console';
 
 interface Feature
 {
 
   type: string;
   name: string;
-  datas: string[];
+  datas: any[];
   is_logic: boolean
 
 }
@@ -55,13 +56,17 @@ function Home ()
   const searchParams = useSearchParams();
   const [ feature, setFeature ] = useState<Feature | null>( null )
   const [ featureData, setFeatureData ] = useState<string[]>( [] )
-  const [ labelFeature, setLabelFeature ] = useState<number[]>( [] )
+  const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null)
   const [ labelData, setLabelData ] = useState<number[]>( [] )
   const [ featureType, setFeatureType ] = useState<any>( "" )
+  const [ labelFeatureType, setLabelFeatureType] = useState<any>("")
   const [ featureName, setFeatureName ] = useState<any>( "" )
+  const [ labelFeatureName, setLabelFeatureName] = useState<string>("")
+
+  const [ features,setFeatures] = useState<string[]>([])
+  const [ labelFeatures,setLabelFeatures] = useState<string[]>([])
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
-  const [ lassoMode, setLassoMode ] = useState<boolean>( false )
 
   const containerRef = useRef<HTMLDivElement>( null );
   const COLUMN_COUNT = 4;
@@ -69,15 +74,30 @@ function Home ()
   const ROW_HEIGHT = 450;
   const rowCount = Math.ceil( featureData.length / COLUMN_COUNT );
 
-  //setDatasetName(searchParams.get("name"))
-  //const datasetName = "Animals"
+
   const indexes = useStore( ( state ) => state.selectedIndexes );
-  const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
 
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
 
-  //const featureName = "image"
-  //const datasetName = "Animal Dataset"
+  useEffect(() => {
+  if ( Array.isArray( datasetUsed?.features ) ) {
+    const extractedFeatures = datasetUsed.features
+        .filter(({ type }) => type === "IMAGE_FEATURE" || type === "TEXT_FEATURE")
+        .map(({ name }) => name);
+
+    const extractedlabelFeatures = datasetUsed.features
+      .filter(({ type }) => type === "LABEL_FEATURE")
+      .map(({ name }) => name);
+
+    setFeatures( extractedFeatures );
+    setLabelFeatures(extractedlabelFeatures)
+    console.log(features)
+    console.log(labelFeatures)
+  }},[datasetUsed])
+
+  console.log("PAGE",datasetUsed)
+  console.log("PAGE",features)
+  console.log("PAGE",labelFeatures)
 
   useEffect( () =>
   {
@@ -85,15 +105,6 @@ function Home ()
       setDatasetName( searchParams.get( "name" ) )
     }
   }, [ searchParams ] )
-
-  const toggleLassoMode = () =>
-  {
-    const prev = !lassoMode
-    setLassoMode( prev )
-    lazoModeSetter( prev )
-  }
-
-  //const feature = getFeatureResources(indexes,featureName)
 
   useEffect( () =>
   {
@@ -117,31 +128,44 @@ function Home ()
     }
   }, [ featureName ] ); // Still keep indexes and featureName in the dependency array
 
-
   useEffect( () =>
-  {
-    if ( datasetUsed ) {
-      if ( Array.isArray( datasetUsed.features ) ) {
-        const labelF = datasetUsed.features.find( ( feature ) => feature.type === "LABEL_FEATURE" );
-        setLabelFeature( labelF.datas )
+    {
+      // Only proceed if featureName is not an empty string
+      if ( labelFeatureName != "" ) {
+        const loadFeature = async () =>
+        {
+          try {
+            if ( datasetName && labelFeatureName ) {
+              const labelFeature = await featureLoader( datasetName, labelFeatureName );
+              console.log( "FETCHING",labelFeature );
+              setLabelFeature( labelFeature );
+              setLabelFeatureType( labelFeature.type )
+            }
+          } catch ( error ) {
+            console.error( 'Error loading feature:', error );
+          }
+        };
+        loadFeature();
+  
       }
-    }
-  }, [] )
+    }, [ labelFeatureName ] ); // Still keep indexes and featureName in the dependency array
+
+
 
   useEffect( () =>
   {
     // Only proceed if indexes is not null
-    if ( indexes != null && feature != null ) {
+    if ( indexes != null && feature != null && labelFeature != null) {
       const filterFeature = async () =>
       {
         try {
-          let filteredArr: string[] = [];
-          let filteredLabel: number[] = [];
+          let filteredArr: any[]= [];
+          let filteredLabel: any[] = [];
 
           indexes.forEach( index =>
           {
             filteredArr.push( feature.datas[ index ] );
-            filteredLabel.push( labelFeature[ index ] )
+            filteredLabel.push( labelFeature.datas[ index ] )
           } );
           setFeatureData( filteredArr )
           setLabelData( filteredLabel )
@@ -174,14 +198,24 @@ function Home ()
         <Space h="md" />
         <label htmlFor="feature" className="font-bold">Feature</label>
         <div id="autocomplete-container" style={{ width: '300px', position: 'relative', marginBottom: '20px' }}>
+          <Flex>
           <Autocomplete
             id="feature"
             radius="md"
             placeholder="Choose feature to visualize"
-            data={['image']}
+            data={features}
             value={featureName}
             onChange={(value) => setFeatureName(value)}
           />
+           <Autocomplete
+            id="labelFeature"
+            radius="md"
+            placeholder="Choose label"
+            data={labelFeatures}
+            value={labelFeatureName}
+            onChange={(value) => setLabelFeatureName(value)}
+          />
+          </Flex>
         </div>
       </div>
   
@@ -192,7 +226,7 @@ function Home ()
             <Suspense>
               <div className="w-full">
                 <LassoDrawer>
-                  <PointCloudVisualization />
+                  <ScatterPlotVisualization />
                 </LassoDrawer>
               </div>
             </Suspense>
@@ -250,23 +284,7 @@ function Home ()
           <p>Select Feature</p>
       )}
   
-      <button
-        onClick={toggleLassoMode}
-        style={{
-          position: 'fixed',
-          top: '10px',
-          right: '10px',
-          zIndex: 1000,
-          padding: '6px 12px',
-          borderRadius: '4px',
-          backgroundColor: lassoMode ? '#dc2626' : '#16a34a',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-        }}
-      >
-        {lassoMode ? 'Exit Lasso Mode' : 'Enter Lasso Mode'}
-      </button>
+      
     </div>
   );
 }

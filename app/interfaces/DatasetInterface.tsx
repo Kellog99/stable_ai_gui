@@ -6,7 +6,7 @@ export default interface Dataset {
         type: string;
         name: string;
         depth: number,
-        datas: string[];
+        datas: string[] | number[];
         is_logic: boolean;
         description?: string;
         label_dict?: any;
@@ -15,7 +15,7 @@ export default interface Dataset {
         type: string;
         name: string;
         depth: number,
-        datas: string[];
+        datas: string[] | number[];
         is_logic: boolean
         description?: string;
         label_dict?: any;
