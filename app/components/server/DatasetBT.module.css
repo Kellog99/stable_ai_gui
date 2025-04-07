@@ -1,12 +1,65 @@
-.dataset_buttons{
-    margin-left: 100px;
-    margin-right: 250px;
+.dataset_buttons {
+  margin-left: 100px;
+  margin-right: 250px;
+  margin-bottom: 30px;
 }
 
 .card {
-    transition: transform 0.2s ease-in-out;
-  }
-  
+  transition: transform 0.2s ease-in-out;
+  height: 300px;
+  width: 100%;
+}
+
 .card:hover {
-transform: scale(1.05);
+  transform: scale(1.05);
+}
+
+.cardsection {
+  height: 180px;
+  overflow: hidden;
+  position: relative;
+}
+
+.ImageDisplayer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ImageDisplayer .mantine-Image-root {
+  width: 100%;
+  height: 100%;
+}
+
+.ImageDisplayer .mantine-Image-imageWrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.ImageDisplayer .mantine-Image-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.TextDisplayer {
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;       /* Makes text scrollable */
+  display: block;         /* No need to center content with flex */
+}
+
+.TextDisplayer .mantine-Text-root {
+  margin-top: 0;         /* Reset the margin you had */
+  width: 100%;
+  text-align: left;
+  overflow-wrap: break-word; /* Optional: break long words */
+  white-space: pre-wrap;     /* Preserve line breaks if your text has them */
 }

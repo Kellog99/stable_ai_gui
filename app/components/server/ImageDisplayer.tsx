@@ -1,6 +1,6 @@
 import { Image} from '@mantine/core';
 
-function ImageDisplayer({ data, alt }: {data: string | Uint8Array | URL, alt: string }) {
+function ImageDisplayer({ data, alt, className }: {data: string | Uint8Array | URL, alt: string, className: string}) {
     
     let source: string;
 
@@ -16,10 +16,9 @@ function ImageDisplayer({ data, alt }: {data: string | Uint8Array | URL, alt: st
       }
 
     return(
-        <div>
+        <div className={className}>
             <Image
                 src={source}
-                height={300}
                 alt={alt}
             />
         </div>

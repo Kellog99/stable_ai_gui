@@ -18,11 +18,12 @@ export default function RouterButton({
   return (
     <Suspense>
     <Link
-      href={{
-        pathname: route,
-        query: { name: name},
-      }}
-    >
+        href={{
+          pathname: route,
+          query: { name: name },
+        }}
+        style={{ textDecoration: 'none', color: 'inherit' }}
+      >
       {children}
     </Link>
     </Suspense>

@@ -29,12 +29,12 @@ interface Feature
 function FeatureCard ( { index, data, featureType, label }: { index: number, data: string, featureType: string, label: number } )
 {
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <CardSection>
+    <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
+      <CardSection className={classes.cardsection}>
         { featureType === image_type ? (
-          <ImageDisplayer data={ data } alt="" />
+           <ImageDisplayer className={classes.ImageDisplayer} data={ data } alt="" />
         ) : featureType === text_type ? (
-          <TextDisplayer data={ data } />
+          <TextDisplayer className={classes.TextDisplayer} data={ data } />
         ) : null }
       </CardSection>
       <Group justify="space-between" mt="md" mb="xs">
@@ -71,7 +71,7 @@ function Home ()
   const containerRef = useRef<HTMLDivElement>( null );
   const COLUMN_COUNT = 4;
   const COLUMN_WIDTH = 320;
-  const ROW_HEIGHT = 450;
+  const ROW_HEIGHT = 350;
   const rowCount = Math.ceil( featureData.length / COLUMN_COUNT );
 
 

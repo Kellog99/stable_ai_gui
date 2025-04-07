@@ -28,18 +28,19 @@ import RouterButton from "../client/buttons/RouterButton";
         <div className={classes.dataset_buttons}>
             <Grid
             columns={4}
+            gutter="xs"
             >
 
             {filteredDatasets.length > 0 ? (filteredDatasets.map((dataset, index) => (
                 
                 <GridCol span={1} key={index}>
                     <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
-                    <CardSection>
+                    <CardSection className={classes.cardsection}>
                         <RouterButton name={dataset.name} route="/pages/dataquality/datasets">
                           {dataset.prototype.type === image_type ? (
-                            <ImageDisplayer data={dataset.prototype.datas[0]} alt={dataset.name} />
+                            <ImageDisplayer className={classes.ImageDisplayer} data={dataset.prototype.datas[0]} alt={dataset.name} />
                           ) : dataset.prototype.type === text_type ? (
-                            <TextDisplayer data={dataset.prototype.datas[0]} />
+                            <TextDisplayer className={classes.TextDisplayer} data={dataset.prototype.datas[0]} />
                           ) : null}
                         </RouterButton>
                     </CardSection>
