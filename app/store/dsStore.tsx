@@ -44,7 +44,7 @@ interface AppState {
               datasets: state.datasets,
               datasetUsed: state.datasetUsed,
               selectedFeature: state.selectedFeature,
-              featureToDisplay: state.featureToDisplay
+              //featureToDisplay: state.featureToDisplay
               // queryDataset is NOT included, so it won't be persisted
           }),
       }

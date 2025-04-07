@@ -1,25 +1,45 @@
 "use client";
 import RouterButton from "@/components/client/buttons/RouterButton";
-import { Box, Button, Text } from "@mantine/core";
+import { Box, Button, Flex, Text } from "@mantine/core";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import classes from './datasets.module.css'
 import useStore from '@/store/dsStore';
 import SchemaShower from "@/components/client/SchemaShower";
 import { FeatureSchema } from "@/interfaces/DatasetInterface";
 import ImageDisplayer from "@/components/server/ImageDisplayer";
+import FeatureDisplayer from "@/components/server/FeatureDisplayer";
+import featureLoader from "@/functionalities/FeatureLoader";
+import { image_type, label_type, text_type } from "@/properties/types";
 
+interface Feature
+{
+
+  type: string;
+  name: string;
+  datas: any[];
+  is_logic: boolean
+
+} 
 
 export default function Datasets ()
 {
 
   const searchParams = useSearchParams();
-
+  
+  const containerRef = useRef<HTMLDivElement>( null );
+  
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
   const [ features, setFeatures ] = useState<FeatureSchema[]>( [] )
   const [ connections, setConnections ] = useState<[ string, string ][]>( [] )
   const [ descriptions, setDescriptions ] = useState<string[]>( [] )
+  const [ feature, setFeature] = useState<Feature | null >(null)
+  const [ featureType, setFeatureType] = useState<any>("")
+  const [indexes, setIndexes] = useState<number[]>([]);
+
+
+  const [labelFeature, setLabelFeature] = useState<Feature | null>(null)
 
 
   const datasets = useStore( ( state ) => ( state.datasets ) )
@@ -90,25 +110,32 @@ export default function Datasets ()
   }, [ datasetUsed ] );
 
 
-  const collectFeatureData = ( name: string ) =>
-  {
-    if ( datasetUsed ) {
-      if ( Array.isArray( datasetUsed?.features ) ) {
-        const featureId = datasetUsed.features.find( ( feature ) => feature.name === name );
-
-        if ( featureId ) {
-          const datas = featureId.datas
-          return datas;
-        } else {
-          console.log( 'Feature not found' );
-          return null;
-        }
+  useEffect( () =>
+    {
+      if ( featureToDisplay ) {
+        const loadFeature = async () =>
+        {
+          try {
+            if ( datasetName && featureToDisplay ) {
+              const featureLoaded = await featureLoader( datasetName, featureToDisplay );
+              console.log("FEATURE LOADED:", featureLoaded );
+              if (featureLoaded.type === image_type || featureLoaded.type === text_type){
+              setFeature( featureLoaded );
+              setFeatureType( featureLoaded.type )
+              } else if (featureLoaded.type === label_type) {
+                setLabelFeature(featureLoaded)
+              }
+            }
+          } catch ( error ) {
+            console.error( 'Error loading feature:', error );
+          }
+        };
+        loadFeature();
       }
-      return null;
-    }
-  }
+    }, [featureToDisplay] );
 
 
+  // *********************************************************************************************************************
   
   /*  
       const features = [
@@ -155,33 +182,73 @@ export default function Datasets ()
     image_crops_embeddings: "#FFABAB",
   };
  
-  const datas = featureToDisplay ? collectFeatureData(featureToDisplay) : [];
- 
+  useEffect(() => {
+    if (feature && Array.isArray(feature.datas)) {
+      const indexesList = Array.from({ length: feature.datas.length }, (_, i) => i);
+      setIndexes(indexesList);
+    }
+  }, [feature]);
+
+  console.log("FEATURE:", feature)
+  console.log("LABEL:", labelFeature?.datas)
+  
   return (
-    <div>
+    <div className="w-full h-screen">
+      <div className="max-w-4xl mx-auto px-4">
+      
       <Box className={ classes.title } style={ { display: "flex", flexDirection: "column", gap: "0px" } }>
         <h1 style={ { marginTop: "0", marginBottom: "30px" } }>{ datasetName } dataset</h1>
         <SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />
       </Box>
 
-      <Box style={ { marginLeft: "50px", marginRight: "50px" } }>
         <h2>
           Description
         </h2>
-        <Box style={ { display: 'flex', alignItems: 'center', gap: '4px' } }>
+        <Box style={ { display: 'flex', alignItems: 'center', gap: '4px' , marginBottom:'70px'} }>
           <Text fw={ 600 }>{ datasetUsed?.name || "" }</Text> is a dataset for { datasetUsed?.task || "" }.
           It has { datasetUsed?.n_classes || "" } classes. { " " }
           { descriptions?.map( ( description, index ) => (
-            <span key={ index }>{ description } </span> // Adds space after each description
+            <span key={ index }>{ description } </span> 
           ) ) }
         </Box>
+      </div>
         
-        {
-        /*{datas.length > 0 ? (
-          datas.map( ( data: string) => <ImageDisplayer data={ data } alt="" /> )
-        ) : null }
-         */}
-      </Box>
+      {featureToDisplay && feature ? (
+          <div className="w-full" style={{ position: 'relative', marginBottom: '20px' }}>
+            <h2>Explore the {feature.name} feature</h2>
+            <Flex
+              mih={150}
+              justify="center"
+              align="center"
+              direction="column"
+              wrap="wrap"
+              style={{ width: '100%' }}
+            >
+              <div ref={containerRef} className="h-[600px] overflow-auto">
+              {labelFeature ? (
+                  <FeatureDisplayer
+                    indexes={indexes}
+                    featureData={feature.datas}
+                    featureType={featureType}
+                    labelData={labelFeature.datas}
+                  />
+                ) : (
+                  <FeatureDisplayer
+                    indexes={indexes}
+                    featureData={feature.datas}
+                    featureType={featureType}
+                  />
+                )}
+              </div>
+            </Flex>
+          </div>
+        ) : (
+          <>
+            <h2>Explore</h2>
+            <p>Click on the schema to explore the features!</p>
+          </>
+        )}
+
     </div>
   )
 }

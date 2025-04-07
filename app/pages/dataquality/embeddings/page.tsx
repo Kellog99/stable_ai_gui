@@ -3,18 +3,13 @@
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
-import ImageDisplayer from '../../../components/server/ImageDisplayer';
-import TextDisplayer from '../../../components/server/TextDisplayer';
-import { Card, Text, Badge, Group, CardSection, GridCol, Autocomplete, Flex, ScrollArea, Button, Box, Space } from '@mantine/core';
-import { image_type, text_type } from "../../../properties/types";
+import {  Autocomplete, Flex, Button, Box, Space } from '@mantine/core';
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
-import { FixedSizeGrid, GridChildComponentProps } from 'react-window';
 import LassoDrawer from '@/components/client/Lasso';
-import style from 'styled-jsx/style';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
-import {log} from 'console';
+import FeatureDisplayer from '@/components/server/FeatureDisplayer';
 
 interface Feature
 {
@@ -25,30 +20,6 @@ interface Feature
   is_logic: boolean
 
 }
-
-function FeatureCard ( { index, data, featureType, label }: { index: number, data: string, featureType: string, label: number } )
-{
-  return (
-    <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
-      <CardSection className={classes.cardsection}>
-        { featureType === image_type ? (
-           <ImageDisplayer className={classes.ImageDisplayer} data={ data } alt="" />
-        ) : featureType === text_type ? (
-          <TextDisplayer className={classes.TextDisplayer} data={ data } />
-        ) : null }
-      </CardSection>
-      <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={ 700 } size="lg">Sample: { index }</Text>
-        <Badge color="#ec777e">Class: { label }</Badge>
-      </Group>
-      <Text size="sm" c="dimmed">
-        INFO
-      </Text>
-    </Card>
-  );
-}
-
-
 
 function Home ()
 {
@@ -69,11 +40,6 @@ function Home ()
 
 
   const containerRef = useRef<HTMLDivElement>( null );
-  const COLUMN_COUNT = 4;
-  const COLUMN_WIDTH = 320;
-  const ROW_HEIGHT = 350;
-  const rowCount = Math.ceil( featureData.length / COLUMN_COUNT );
-
 
   const indexes = useStore( ( state ) => state.selectedIndexes );
 
@@ -255,28 +221,7 @@ function Home ()
             style={ { width: '100%' } }
           >
               <div ref={containerRef} className="h-[600px] overflow-auto">
-                <FixedSizeGrid
-                  columnCount={COLUMN_COUNT}
-                  columnWidth={COLUMN_WIDTH}
-                  height={600}
-                  rowCount={rowCount}
-                  rowHeight={ROW_HEIGHT}
-                  width={COLUMN_COUNT * COLUMN_WIDTH}
-                  className="mx-auto"
-                >
-                  {({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
-                    const index = rowIndex * COLUMN_COUNT + columnIndex;
-                    if (index >= featureData.length) return null;
-                    return (
-                      <div style={{
-                        ...style,
-                        padding: '8px',
-                      }}>
-                        <FeatureCard index={indexes[index]} data={featureData[index]} featureType={featureType} label={labelData[index]} />
-                      </div>
-                    );
-                  }}
-                </FixedSizeGrid>
+                <FeatureDisplayer indexes={indexes} featureData={featureData} featureType={featureType} labelData={labelData} />
               </div>
             </Flex>
         </>
