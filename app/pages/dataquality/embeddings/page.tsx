@@ -121,7 +121,7 @@ function Home ()
   useEffect( () =>
   {
     // Only proceed if indexes is not null
-    if ( indexes != null && feature != null && labelFeature != null) {
+    if ( indexes != null && feature != null) {
       const filterFeature = async () =>
       {
         try {
@@ -131,10 +131,15 @@ function Home ()
           indexes.forEach( index =>
           {
             filteredArr.push( feature.datas[ index ] );
+            if (labelFeature != null) {
             filteredLabel.push( labelFeature.datas[ index ] )
+            }
           } );
+          console.log("DATA",feature.datas)
           setFeatureData( filteredArr )
+          if (labelFeature!=null){
           setLabelData( filteredLabel )
+          }
 
         } catch ( error ) {
           console.error( 'Error loading feature:', error );
@@ -146,7 +151,8 @@ function Home ()
   }, [ indexes ] ); // Still keep indexes and featureName in the dependency array
 
   console.log( "LABEL DATA:", labelData )
-
+  console.log( "FEATURE DATA", feature)
+  console.log( "FILTERED", featureData)
 
 
 
