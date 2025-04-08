@@ -20,31 +20,6 @@
   position: relative;
 }
 
-.ImageDisplayer {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ImageDisplayer .mantine-Image-root {
-  width: 100%;
-  height: 100%;
-}
-
-.ImageDisplayer .mantine-Image-imageWrapper {
-  width: 100%;
-  height: 100%;
-}
-
-.ImageDisplayer .mantine-Image-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .TextDisplayer {
   width: 100%;
   height: 100%;

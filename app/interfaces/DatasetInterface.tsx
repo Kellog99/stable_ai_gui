@@ -6,23 +6,23 @@ export default interface Dataset {
         type: string;
         name: string;
         depth: number,
-        datas: string[] | number[];
+        datas: any[];
         is_logic: boolean;
         description?: string;
-        label_dict?: any;
+        label_dict?: {[key: number]: string};
       };
     prototype: {
         type: string;
         name: string;
         depth: number,
-        datas: string[] | number[];
+        datas: any[];
         is_logic: boolean
         description?: string;
         label_dict?: any;
       };  
     edges: [string, string][];
     n_classes: number;
-    samples_per_class?: number;
+    samples_per_class?: {[key: number]: number};
     description?: string
   }
 

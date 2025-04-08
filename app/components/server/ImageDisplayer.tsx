@@ -6,7 +6,7 @@ function ImageDisplayer({ data, alt, className }: {data: string | Uint8Array | U
 
     if (typeof data === "string" || data instanceof URL )  {
         source = data.toString();
-        
+
       } else if (data instanceof Uint8Array) {
         const blob = new Blob([data], { type: "image/png" });
         source = URL.createObjectURL(blob);
@@ -20,6 +20,12 @@ function ImageDisplayer({ data, alt, className }: {data: string | Uint8Array | U
             <Image
                 src={source}
                 alt={alt}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover", // 🔥 this makes it fill the space nicely
+                  display: "block"
+                }}
             />
         </div>
     )

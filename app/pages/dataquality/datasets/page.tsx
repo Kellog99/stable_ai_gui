@@ -1,10 +1,12 @@
 "use client";
 import RouterButton from "@/components/client/buttons/RouterButton";
-import { Box, Button, Flex, Text } from "@mantine/core";
+import { Box, Flex, Text } from "@mantine/core";
+import { BarChart } from '@mantine/charts';
+import '@mantine/charts/styles.css';
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react"
-import classes from './datasets.module.css'
+import classes from './page.module.css'
 import useStore from '@/store/dsStore';
 import SchemaShower from "@/components/client/SchemaShower";
 import { FeatureSchema } from "@/interfaces/DatasetInterface";
@@ -21,25 +23,29 @@ interface Feature
   datas: any[];
   is_logic: boolean
 
-} 
+}
 
 export default function Datasets ()
 {
 
   const searchParams = useSearchParams();
-  
+
   const containerRef = useRef<HTMLDivElement>( null );
-  
+
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
   const [ features, setFeatures ] = useState<FeatureSchema[]>( [] )
   const [ connections, setConnections ] = useState<[ string, string ][]>( [] )
   const [ descriptions, setDescriptions ] = useState<string[]>( [] )
-  const [ feature, setFeature] = useState<Feature | null >(null)
-  const [ featureType, setFeatureType] = useState<any>("")
-  const [indexes, setIndexes] = useState<number[]>([]);
+  const [ feature, setFeature ] = useState<Feature | null>( null )
+  const [ featureType, setFeatureType ] = useState<any>( "" )
+  const [ indexes, setIndexes ] = useState<number[]>( [] );
+  const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
+  const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null )
 
-
-  const [labelFeature, setLabelFeature] = useState<Feature | null>(null)
+  const barSize = 60;            // Width of each bar
+  const barSpacing = 30;         // Space between each bar
+  const numberOfBars = labelToSamples.length;
+  const chartWidth = numberOfBars * ( barSize + barSpacing );
 
 
   const datasets = useStore( ( state ) => ( state.datasets ) )
@@ -111,32 +117,67 @@ export default function Datasets ()
 
 
   useEffect( () =>
-    {
-      if ( featureToDisplay ) {
-        const loadFeature = async () =>
-        {
-          try {
-            if ( datasetName && featureToDisplay ) {
-              const featureLoaded = await featureLoader( datasetName, featureToDisplay );
-              console.log("FEATURE LOADED:", featureLoaded );
-              if (featureLoaded.type === image_type || featureLoaded.type === text_type){
+  {
+    if ( featureToDisplay ) {
+      const loadFeature = async () =>
+      {
+        try {
+          if ( datasetName && featureToDisplay ) {
+            const featureLoaded = await featureLoader( datasetName, featureToDisplay );
+            console.log( "FEATURE LOADED:", featureLoaded );
+            if ( featureLoaded.type === image_type || featureLoaded.type === text_type ) {
               setFeature( featureLoaded );
               setFeatureType( featureLoaded.type )
-              } else if (featureLoaded.type === label_type) {
-                setLabelFeature(featureLoaded)
-              }
+            } else if ( featureLoaded.type === label_type ) {
+              setLabelFeature( featureLoaded )
             }
-          } catch ( error ) {
-            console.error( 'Error loading feature:', error );
           }
-        };
-        loadFeature();
-      }
-    }, [featureToDisplay] );
+        } catch ( error ) {
+          console.error( 'Error loading feature:', error );
+        }
+      };
+      loadFeature();
+    }
+  }, [ featureToDisplay ] );
 
+
+  useEffect( () =>
+  {
+    if ( Array.isArray( datasetUsed?.features ) ) {
+
+      const labelFeature = datasetUsed?.features.find( feature => feature.type === label_type );
+
+      if ( labelFeature ) {
+        const samplesPerClass = datasetUsed.samples_per_class;
+
+        if ( labelFeature.label_dict ) {
+          const labelDict = labelFeature.label_dict;
+          const mapping = Object.entries( labelDict ).map( ( [ labelKey, labelName ] ) =>
+          {
+            const key = parseInt( labelKey );
+            return {
+              label: labelName as string,
+              samples: samplesPerClass && samplesPerClass[ key ] ? samplesPerClass[ key ] : 0
+            };
+          } );
+          setLabelToSamples( mapping );
+
+        } else {
+
+          const fallbackMapping = samplesPerClass
+            ? Object.entries( samplesPerClass ).map( ( [ key, count ] ) => ( {
+              label: key.toString(),
+              samples: count as number,
+            } ) )
+            : [];
+          setLabelToSamples( fallbackMapping );
+        }
+      }
+    }
+  }, [ datasetUsed ] );
 
   // *********************************************************************************************************************
-  
+
   /*  
       const features = [
         { type: "IMAGE_FEATURE", name: "image", depth: 0 },
@@ -181,73 +222,90 @@ export default function Datasets ()
     bbox_embeddings: "#FFABAB",
     image_crops_embeddings: "#FFABAB",
   };
- 
-  useEffect(() => {
-    if (feature && Array.isArray(feature.datas)) {
-      const indexesList = Array.from({ length: feature.datas.length }, (_, i) => i);
-      setIndexes(indexesList);
-    }
-  }, [feature]);
 
-  console.log("FEATURE:", feature)
-  console.log("LABEL:", labelFeature?.datas)
-  
+  useEffect( () =>
+  {
+    if ( feature && Array.isArray( feature.datas ) ) {
+      const indexesList = Array.from( { length: feature.datas.length }, ( _, i ) => i );
+      setIndexes( indexesList );
+    }
+  }, [ feature ] );
+
   return (
     <div className="w-full h-screen">
       <div className="max-w-4xl mx-auto px-4">
-      
-      <Box className={ classes.title } style={ { display: "flex", flexDirection: "column", gap: "0px" } }>
-        <h1 style={ { marginTop: "0", marginBottom: "30px" } }>{ datasetName } dataset</h1>
-        <SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />
-      </Box>
+
+        <Box className={ classes.title } style={ { display: "flex", flexDirection: "column", gap: "0px" } }>
+          <h1 style={ { marginTop: "0", marginBottom: "30px" } }>{ datasetName } dataset</h1>
+          <SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />
+        </Box>
 
         <h2>
           Description
         </h2>
-        <Box style={ { display: 'flex', alignItems: 'center', gap: '4px' , marginBottom:'70px'} }>
-          <Text fw={ 600 }>{ datasetUsed?.name || "" }</Text> is a dataset for { datasetUsed?.task || "" }.
-          It has { datasetUsed?.n_classes || "" } classes. { " " }
+        <Box style={ { marginBottom: '70px' } }>
+          <Text fw={ 600 } component="span">
+            { datasetUsed?.name || "" }
+          </Text>{ " " }
+          is a dataset for { datasetUsed?.task || "" }.
+          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes.{ " " }</> : <>{ " " }</> }
           { descriptions?.map( ( description, index ) => (
-            <span key={ index }>{ description } </span> 
+            <span key={ index }>{ description } </span>
           ) ) }
         </Box>
       </div>
-        
-      {featureToDisplay && feature ? (
-          <div className="w-full" style={{ position: 'relative', marginBottom: '20px' }}>
-            <h2>Explore the {feature.name} feature</h2>
-            <Flex
-              mih={150}
-              justify="center"
-              align="center"
-              direction="column"
-              wrap="wrap"
-              style={{ width: '100%' }}
-            >
-              <div ref={containerRef} className="h-[600px] overflow-auto">
-              {labelFeature ? (
-                  <FeatureDisplayer
-                    indexes={indexes}
-                    featureData={feature.datas}
-                    featureType={featureType}
-                    labelData={labelFeature.datas}
-                  />
-                ) : (
-                  <FeatureDisplayer
-                    indexes={indexes}
-                    featureData={feature.datas}
-                    featureType={featureType}
-                  />
-                )}
-              </div>
-            </Flex>
-          </div>
-        ) : (
-          <>
-            <h2>Explore</h2>
-            <p>Click on the schema to explore the features!</p>
-          </>
-        )}
+
+      { datasetUsed?.samples_per_class ?
+        ( <>
+          <h2>Numerosity per class</h2>
+          <Box style={ { marginLeft: "30px", marginRight:"30px" } }>
+            <BarChart
+              className={ classes.barchart }
+              h={ 400 }
+              w={chartWidth}
+              data={ labelToSamples }
+              dataKey="label"
+              series={ [ { name: 'samples', color: '#a9adb9' } ] }
+              barProps={ { barSize: 60 } } />
+          </Box>
+        </> ) : null }
+
+
+      { featureToDisplay && feature ? (
+        <div className="w-full" style={ { position: 'relative', marginBottom: '20px' } }>
+          <h2>Explore the { feature.name } feature</h2>
+          <Flex
+            mih={ 150 }
+            justify="center"
+            align="center"
+            direction="column"
+            wrap="wrap"
+            style={ { width: '100%' } }
+          >
+            <div ref={ containerRef } className="h-[600px] overflow-auto">
+              { labelFeature ? (
+                <FeatureDisplayer
+                  indexes={ indexes }
+                  featureData={ feature.datas }
+                  featureType={ featureType }
+                  labelData={ labelFeature.datas }
+                />
+              ) : (
+                <FeatureDisplayer
+                  indexes={ indexes }
+                  featureData={ feature.datas }
+                  featureType={ featureType }
+                />
+              ) }
+            </div>
+          </Flex>
+        </div>
+      ) : (
+        <>
+          <h2>Explore</h2>
+          <p>Click on the schema to explore the features!</p>
+        </>
+      ) }
 
     </div>
   )
