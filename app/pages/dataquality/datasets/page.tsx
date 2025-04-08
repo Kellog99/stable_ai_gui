@@ -47,6 +47,9 @@ export default function Datasets ()
   const numberOfBars = labelToSamples.length;
   const chartWidth = numberOfBars * ( barSize + barSpacing );
 
+  const containerWidth = 800; // for example
+  const availableWidth = containerWidth - 30;
+
 
   const datasets = useStore( ( state ) => ( state.datasets ) )
   const setDatasets: ( datasets: null ) => void = useStore( ( state ) => state.setDatasets );
@@ -258,16 +261,42 @@ export default function Datasets ()
       { datasetUsed?.samples_per_class ?
         ( <>
           <h2>Numerosity per class</h2>
-          <Box style={ { marginLeft: "30px", marginRight:"30px" } }>
-            <BarChart
-              className={ classes.barchart }
-              h={ 400 }
-              w={chartWidth}
-              data={ labelToSamples }
-              dataKey="label"
-              series={ [ { name: 'samples', color: '#a9adb9' } ] }
-              barProps={ { barSize: 60 } } />
-          </Box>
+          <div style={ { width: '1000px', margin: '20px auto' } }>
+
+            <Flex
+              justify="center"
+              align="center"
+              direction="column"
+              wrap="wrap"
+            >
+              <Box
+                style={ {
+                  marginLeft: "30px",
+                  marginRight: "30px",
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                  maxWidth: '100%',
+                } }
+              >
+                <BarChart
+                  h={ 400 }
+                  w={ chartWidth }
+                  data={ labelToSamples }
+                  dataKey="label"
+                  series={ [ { name: 'samples', color: '#a9adb9' } ] }
+                  barProps={ {
+                    barSize: barSize,
+                    onClick: ( bar ) =>
+                    {
+                      console.log( 'Clicked bar data:', bar );
+                      // You can do anything here — route, open modal, filter data, etc.
+                    }
+                  } }
+                  style={ { paddingRight: barSpacing / 2 } }
+                />
+              </Box>
+            </Flex>
+          </div>
         </> ) : null }
 
 
