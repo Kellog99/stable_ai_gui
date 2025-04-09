@@ -296,18 +296,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
             wrap="wrap"
             style={ { width: '100%' } }
           >
-            Loading...
-          </Flex>
-          <div
-            style={ {
-              position: 'absolute',
-              top: '10px',
-              right: '10px',
-              zIndex: 10, // ensure it's above other content
-            } }
-          >
+            <p>Loading...</p>
             <Loader />
-          </div>
+          </Flex>
         </>
       ) : ( <>
         { !data ? ( <Flex
