@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link'
 
 interface ClickableImageProps {
-  name: string;
+  name: string |null;
   route: string;
 }
 
@@ -20,7 +20,7 @@ export default function RouterButton({
     <Link
         href={{
           pathname: route,
-          query: { name: name },
+          query: { datasetName: name },
         }}
         style={{ textDecoration: 'none', color: 'inherit' }}
       >

@@ -30,12 +30,22 @@ interface Info {
   object: any;
 }
 
+{/*
 export async function getDataPoints(): Promise<Point[]> {
   const points = await getData();
   return points;
 }
+*/}
 
-export default function ScatterPlotVisualization(){
+interface propsTypes{
+  datasetName: string,
+  featureName: string,
+  labelFeatureName?: string
+}
+
+export default function ScatterPlotVisualization(props: propsTypes){
+
+
   const deckRef = useRef<any>(null);
   const isDraggingRef = useRef<boolean>(false);
 
@@ -59,7 +69,7 @@ export default function ScatterPlotVisualization(){
   const lazoModeSetter = useStore((state) => state.setLazoMode);
 
   useEffect(() => {
-    getData()
+    getData(props.datasetName, props.featureName, props.labelFeatureName)
       .then(fetchedData => {
         setData(fetchedData);
       })

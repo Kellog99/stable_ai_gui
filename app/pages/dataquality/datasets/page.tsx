@@ -59,15 +59,13 @@ export default function Datasets ()
   const featureToDisplay = useStore( ( state ) => state.featureToDisplay );
 
 
-  //console.log("DATASETS:",datasets)
-
   useEffect( () =>
   {
-    if ( searchParams.get( "name" ) ) {
-      setDatasetName( searchParams.get( "name" ) );
+    if ( searchParams.get( "datasetName" ) ) {
+      setDatasetName( searchParams.get( "datasetName" ) );
 
       const filteredDataset = datasets?.find( dataset =>
-        dataset.name === searchParams.get( "name" )
+        dataset.name === searchParams.get( "datasetName" )
       );
 
       if ( filteredDataset ) {
@@ -179,6 +177,7 @@ export default function Datasets ()
     }
   }, [ datasetUsed ] );
 
+  
   // *********************************************************************************************************************
 
   /*  
@@ -234,6 +233,16 @@ export default function Datasets ()
     }
   }, [ feature ] );
 
+{/*
+  const handleClick: (bar) => {
+    
+    
+  }
+*/}
+
+
+
+
   return (
     <div className="w-full h-screen">
       <div className="max-w-4xl mx-auto px-4">
@@ -288,8 +297,7 @@ export default function Datasets ()
                     barSize: barSize,
                     onClick: ( bar ) =>
                     {
-                      console.log( 'Clicked bar data:', bar );
-                      // You can do anything here — route, open modal, filter data, etc.
+                      console.log( 'Clicked bar data:', bar.label );
                     }
                   } }
                   style={ { paddingRight: barSpacing / 2 } }

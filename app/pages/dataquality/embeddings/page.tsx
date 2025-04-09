@@ -67,10 +67,13 @@ function Home ()
 
   useEffect( () =>
   {
-    if ( searchParams.get( "name" ) ) {
-      setDatasetName( searchParams.get( "name" ) )
+    if ( searchParams.get( "datasetName" ) ) {
+      setDatasetName( searchParams.get( "datasetName" ) )
     }
   }, [ searchParams ] )
+
+
+  
 
   useEffect( () =>
   {
@@ -198,7 +201,7 @@ function Home ()
             <Suspense>
               <div className="w-full">
                 <LassoDrawer>
-                  <ScatterPlotVisualization />
+                  <ScatterPlotVisualization datasetName={datasetName as string} featureName={featureName} labelFeatureName={labelFeatureName} />
                 </LassoDrawer>
               </div>
             </Suspense>

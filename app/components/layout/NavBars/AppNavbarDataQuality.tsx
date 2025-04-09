@@ -39,8 +39,8 @@ function AppNavbarDataQuality() {
     
         useEffect( () =>
           {
-            if ( searchParams.get( "name" ) ) {
-              setDatasetName( searchParams.get( "name" ) )
+            if ( searchParams.get( "datasetName" ) ) {
+              setDatasetName( searchParams.get( "datasetName" ) )
             }
           }, [ searchParams ] )
     
