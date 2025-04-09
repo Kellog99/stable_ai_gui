@@ -69,6 +69,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ dragCurrent, setDragCurrent ] = useState<{ x: number; y: number } | null>( [] );
 
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
+  const selectedIndexes = useStore ((state) => state.selectedIndexes)
 
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
@@ -87,6 +88,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       } );
   }, [ props.featureName, props.labelFeatureName ] );
 
+
+  console.log("DATA:", data)
+  
   useEffect( () =>
   {
     // Handler for mouse down events
@@ -131,44 +135,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     console.log( "lassoMode changed:", lassoMode );
   }, [ lassoMode ] );
 
-  {/*
-  if ( isLoading ) {
-    return (
-      <>
-        <Flex
-          mih={ 150 }
-          justify="center"
-          align="center"
-          direction="column"
-          wrap="wrap"
-          style={ { width: '100%' } }
-        > Loading...
-        </Flex>
-        <div style={ {
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 10 // ensure it's above other content
-        } }>
-          <Loader />
-        </div>
-      </>
-    )
-  }
-
-
-
-  if ( !data ) {
-    return <Flex
-      mih={ 150 }
-      justify="center"
-      align="center"
-      direction="column"
-      wrap="wrap"
-      style={ { width: '100%' } }
-    >No data available</Flex>;
-  }
-*/}
 
 
   const handlePointClick = ( info: Info ): void =>
@@ -180,9 +146,39 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
       setSelectedPoints( filteredPoints );
       setSelectedIndexes( filteredPoints );
+      
     }
   };
+// *******************************************************************************************************************************************
+const [originalColors] = useState<Map<number, [number, number, number]>>(
+  new Map(data?.map((item, index) => [index, item.color]))
+);  
 
+useEffect(() => {
+    const highlightIndicesSet = new Set<number>(selectedIndexes);
+    
+    if (data){
+    const updatedData = data.map((item, index) => {
+      if (highlightIndicesSet.has(index)) {
+        return item; // Keep original color for highlighted indices
+      }
+
+      // Make color lighter (adjust opacity or lighten color)
+      const fadedColor: [number, number, number] = item.color.map(
+        (channel) => Math.min(255, Math.floor(channel + (255 - channel) * 0.6))
+      ) as [number, number, number];
+
+      return {
+        ...item,
+        color: fadedColor,
+      };
+    });
+
+    setData(updatedData); }
+
+  }, [selectedIndexes]); 
+
+// ****************************************************************************************************************************************************
   const layer = new PointCloudLayer( {
     id: 'point-cloud-layer',
     data,
@@ -260,6 +256,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
     setSelectedPoints( selected );
     setSelectedIndexes( selected );
+
     setDragStart( null );
     setDragCurrent( [] );
     isDraggingRef.current = false;
