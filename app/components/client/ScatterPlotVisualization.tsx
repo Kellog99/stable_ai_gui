@@ -71,12 +71,13 @@ export default function ScatterPlotVisualization(props: propsTypes){
   useEffect(() => {
     getData(props.datasetName, props.featureName, props.labelFeatureName)
       .then(fetchedData => {
+        setIsLoading(true)
         setData(fetchedData);
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [props.featureName, props.labelFeatureName]);
 
   useEffect(() => {
     // Handler for mouse down events

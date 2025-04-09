@@ -2,8 +2,12 @@
 
 import { NextResponse } from 'next/server';
 import fs from 'fs';
-import path from 'path';
+import path, {join} from 'path';
 import { dataset_post } from '../properties/urls';
+import {ok} from 'assert';
+import {headers} from 'next/headers';
+import {json} from 'stream/consumers';
+import {isArray} from 'util';
 
 function readPublicFolder(directory: string): string[] {
     let arrowFiles: string[] = [];
@@ -44,7 +48,8 @@ export async function getArrowFileNames() {
 
 
 export default async function DatasetsLoader() {
-    try {
+    /* try {
+       
         const request = await getArrowFileNames();
         const data = await request.json();
         
@@ -77,5 +82,26 @@ export default async function DatasetsLoader() {
         return datasets;
     } catch (error) {
         console.error('Error:', error);
-    }
+    }*/
+
+    const baseUrl = 'http://localhost:8000/getDatasets'
+
+    const datasetName = "visdrone"
+
+    const url = new URL(baseUrl);
+  
+    // Option 1: Pass datasets as a single comma-separated list
+    url.searchParams.append('dataset', datasetName);
+  
+
+    const response = await fetch(url);
+
+    if (!response.ok) throw new Error('Failed to send files to backend');
+
+    const datasets = await response.json();
+
+    console.log('Server response:', datasets); // Handle the JSON response
+    
+    return datasets;
+  
 }
