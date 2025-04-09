@@ -75,10 +75,10 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   useEffect( () =>
   {
+    setIsLoading( true )
     getData( props.datasetName, props.featureName, props.labelFeatureName )
       .then( fetchedData =>
       {
-        setIsLoading( true )
         setData( fetchedData );
       } )
       .finally( () =>
@@ -131,6 +131,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     console.log( "lassoMode changed:", lassoMode );
   }, [ lassoMode ] );
 
+  {/*
   if ( isLoading ) {
     return (
       <>
@@ -156,6 +157,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   }
 
 
+
   if ( !data ) {
     return <Flex
       mih={ 150 }
@@ -166,7 +168,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       style={ { width: '100%' } }
     >No data available</Flex>;
   }
-
+*/}
 
 
   const handlePointClick = ( info: Info ): void =>
@@ -284,37 +286,72 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   return (
     <>
-    {!isLoading && (
-      <Suspense >
-        <div id="deckgl-container" style={ { width: "100%", height: '600px', borderTop: '2px solid #9a9a9a', borderBottom: '2px solid #9a9a9a', background: '#f0f0f0' } }>
-          <DeckGL
-            ref={ deckRef }
-            views={ new OrthographicView( { fovy: 50 } ) }
-            viewState={ viewState }
-            onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
-            layers={ [ layer ] }
-            controller={
-              lassoMode
-                ? {
-                  scrollZoom: false,
-                  dragRotate: false,
-                  dragPan: false,
-                  doubleClickZoom: false,
+      { isLoading ? (
+        <>
+          <Flex
+            mih={ 150 }
+            justify="center"
+            align="center"
+            direction="column"
+            wrap="wrap"
+            style={ { width: '100%' } }
+          >
+            Loading...
+          </Flex>
+          <div
+            style={ {
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              zIndex: 10, // ensure it's above other content
+            } }
+          >
+            <Loader />
+          </div>
+        </>
+      ) : ( <>
+        { !data ? ( <Flex
+          mih={ 150 }
+          justify="center"
+          align="center"
+          direction="column"
+          wrap="wrap"
+          style={ { width: '100%' } }
+        >No data available</Flex> ) : (
+          <Suspense>
+            <div id="deckgl-container" style={ { width: "100%", height: '600px', borderTop: '2px solid #9a9a9a', borderBottom: '2px solid #9a9a9a', background: '#f0f0f0' } }>
+              <DeckGL
+                ref={ deckRef }
+                views={ new OrthographicView( { fovy: 50 } ) }
+                viewState={ viewState }
+                onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
+                layers={ [ layer ] }
+                controller={
+                  lassoMode
+                    ? {
+                      scrollZoom: false,
+                      dragRotate: false,
+                      dragPan: false,
+                      doubleClickZoom: false,
+                    }
+                    : {
+                      scrollZoom: true,
+                      dragRotate: true,
+                      dragPan: true,
+                      doubleClickZoom: false,
+                    }
                 }
-                : {
-                  scrollZoom: true,
-                  dragRotate: true,
-                  dragPan: true,
-                  doubleClickZoom: false,
-                }
-            }
-            onDragStart={ handleDragStart }
-            onDrag={ handleDrag }
-            onDragEnd={ handleDragEnd }
-          />
-        </div>
-      </Suspense>
-      )}
+                onDragStart={ handleDragStart }
+                onDrag={ handleDrag }
+                onDragEnd={ handleDragEnd }
+              />
+            </div>
+          </Suspense>
+        ) }
+      </>
+      ) }
+
+
     </>
   );
 }
