@@ -44,7 +44,7 @@ export async function getArrowFileNames(datasetName: string) {
 
 export default async function featureLoader(datasetName: string | null, featureName: string | null) {
     if (datasetName && featureName){
-    try {
+    /*try {
         const request = await getArrowFileNames(datasetName);
         const data = await request.json();
         const fileNames: string[] = data.files;
@@ -73,7 +73,25 @@ export default async function featureLoader(datasetName: string | null, featureN
 
     } catch (error) {
         console.error('Error:', error);
-    }
+    }*/
+    const baseUrl = feature_post
+
+    const url = new URL(baseUrl);
+    
+    // Option 1: Pass datasets as a single comma-separated list
+    url.searchParams.append('featureName', featureName);
+    url.searchParams.append('datasetName', datasetName);
+    
+
+    const response = await fetch(url);
+
+    if (!response.ok) throw new Error('Failed to send files to backend');
+
+    const feature = await response.json();
+
+    console.log('Server response:', feature); // Handle the JSON response
+    
+    return feature;
 }
 console.log("Invalid arguments")
 }
