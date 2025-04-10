@@ -87,7 +87,8 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
         color: "black",
         border: `2px solid ${darkerColor}`,
         pointerEvents: "auto",
-        cursor: feature.name === "image" ? "pointer" : "default",
+        //cursor: feature.name === "image" ? "pointer" : "default",
+        cursor: "pointer"
       },
       sourcePosition: Position.Right,
       targetPosition: Position.Left,

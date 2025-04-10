@@ -67,20 +67,22 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ selectedPoints, setSelectedPoints ] = useState<number[]>( [] );
   const [ dragStart, setDragStart ] = useState<{ x: number; y: number } | null>( null );
   const [ dragCurrent, setDragCurrent ] = useState<{ x: number; y: number } | null>( [] );
+  const [ originalColors, setOriginalColors ] = useState<Map<number, [ number, number, number ]>>( new Map() );
 
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
-  const selectedIndexes = useStore ((state) => state.selectedIndexes)
+  const selectedIndexes = useStore( ( state ) => state.selectedIndexes )
 
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
 
   useEffect( () =>
-  {
+  { setSelectedIndexes([])
     setIsLoading( true )
     getData( props.datasetName, props.featureName, props.labelFeatureName )
       .then( fetchedData =>
       {
         setData( fetchedData );
+        setOriginalColors(new Map(fetchedData.map((item, index) => [index, item.color])));
       } )
       .finally( () =>
       {
@@ -88,9 +90,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       } );
   }, [ props.featureName, props.labelFeatureName ] );
 
-
-  console.log("DATA:", data)
-  
+console.log("DATA COLORS", data)
   useEffect( () =>
   {
     // Handler for mouse down events
@@ -146,44 +146,45 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
       setSelectedPoints( filteredPoints );
       setSelectedIndexes( filteredPoints );
-      
+
     }
   };
-// *******************************************************************************************************************************************
-const [originalColors] = useState<Map<number, [number, number, number]>>(
-  new Map(data?.map((item, index) => [index, item.color]))
-);  
+  // *******************************************************************************************************************************************
 
-useEffect(() => {
-    const highlightIndicesSet = new Set<number>(selectedIndexes);
-    
-    if (data){
-    const updatedData = data.map((item, index) => {
-      if (highlightIndicesSet.has(index)) {
-        return item; // Keep original color for highlighted indices
-      }
+  useEffect( () =>
+  {
+    const highlightIndicesSet = new Set<number>( selectedIndexes );
 
-      // Make color lighter (adjust opacity or lighten color)
-      const fadedColor: [number, number, number] = item.color.map(
-        (channel) => Math.min(255, Math.floor(channel + (255 - channel) * 0.6))
-      ) as [number, number, number];
+    if ( data ) {
+      const updatedData = data.map( ( item, index ) =>
+      {
+        const originalColor = originalColors.get( index ) ?? item.color;
+        if ( highlightIndicesSet.has( index ) ) {
+          return { ...item, color: originalColors.get( index )! };
+        }
 
-      return {
-        ...item,
-        color: fadedColor,
-      };
-    });
+        // Make color lighter (adjust opacity or lighten color)
+        const fadedColor: [ number, number, number ] = originalColor.map(
+          ( channel ) => Math.min( 255, Math.floor( channel + ( 255 - channel ) * 0.8 ) )
+        ) as [ number, number, number ];
 
-    setData(updatedData); }
+        return {
+          ...item,
+          color: fadedColor,
+        };
+      } );
 
-  }, [selectedIndexes]); 
+      setData( updatedData );
+    }
 
-// ****************************************************************************************************************************************************
+  }, [ selectedIndexes ] );
+
+  // ****************************************************************************************************************************************************
   const layer = new PointCloudLayer( {
     id: 'point-cloud-layer',
     data,
     pickable: true,
-    pointSize: 2,
+    pointSize: 3.5,
     getPosition: ( d: Point ) => d.position,
     getColor: ( d: Point ) => d.color,
     onClick: ( info: any ) => handlePointClick( info ),
@@ -307,7 +308,14 @@ useEffect(() => {
           style={ { width: '100%' } }
         >No data available</Flex> ) : (
           <Suspense>
-            <div id="deckgl-container" style={ { width: "100%", height: '600px', borderTop: '2px solid #9a9a9a', borderBottom: '2px solid #9a9a9a', background: '#f0f0f0' } }>
+            <div id="deckgl-container" style={ {
+              position: 'relative', // 👈 this is key!
+              width: '1030px',
+              height: '600px',
+              border: '2px solid #9a9a9a',
+              background: 'white',
+              overflow: 'hidden'
+            } }>
               <DeckGL
                 ref={ deckRef }
                 views={ new OrthographicView( { fovy: 50 } ) }

@@ -14,6 +14,9 @@ import ImageDisplayer from "@/components/server/ImageDisplayer";
 import FeatureDisplayer from "@/components/server/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { image_type, label_type, text_type } from "@/properties/types";
+import { motion } from 'framer-motion'
+
+
 
 interface Feature
 {
@@ -41,6 +44,7 @@ export default function Datasets ()
   const [ indexes, setIndexes ] = useState<number[]>( [] );
   const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
   const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null )
+  const [ labelDict, setLabelDict ] = useState<{ [ key: number ]: string } | null>( null )
 
   const barSize = 60;            // Width of each bar
   const barSpacing = 30;         // Space between each bar
@@ -58,6 +62,7 @@ export default function Datasets ()
 
   const featureToDisplay = useStore( ( state ) => state.featureToDisplay );
 
+  const MotionSchemaShower = motion(SchemaShower);
 
   useEffect( () =>
   {
@@ -131,6 +136,10 @@ export default function Datasets ()
               setFeatureType( featureLoaded.type )
             } else if ( featureLoaded.type === label_type ) {
               setLabelFeature( featureLoaded )
+
+              if ( featureLoaded && featureLoaded.label_dict ) {
+                setLabelDict( featureLoaded.label_dict )
+              }
             }
           }
         } catch ( error ) {
@@ -140,7 +149,6 @@ export default function Datasets ()
       loadFeature();
     }
   }, [ featureToDisplay ] );
-
 
   useEffect( () =>
   {
@@ -177,7 +185,7 @@ export default function Datasets ()
     }
   }, [ datasetUsed ] );
 
-  
+
   // *********************************************************************************************************************
 
   /*  
@@ -233,10 +241,8 @@ export default function Datasets ()
     }
   }, [ feature ] );
 
-{/*
+  {/*
   const handleClick: (bar) => {
-    
-    
   }
 */}
 
@@ -249,7 +255,67 @@ export default function Datasets ()
 
         <Box className={ classes.title } style={ { display: "flex", flexDirection: "column", gap: "0px" } }>
           <h1 style={ { marginTop: "0", marginBottom: "30px" } }>{ datasetName } dataset</h1>
-          <SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />
+
+          { featureToDisplay && feature ? (
+            
+            <motion.div layout>
+              <Flex
+              direction="row"
+              align="center">
+                <MotionSchemaShower 
+                  layoutId="schema-shower" 
+                  initial={false}
+                  features={features} 
+                  connections={connections} 
+                  labelColorMap={labelColorMap} 
+                />
+                {/*<SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />*/}
+                <div className="w-full" style={ { position: 'relative', marginBottom: '20px' } }>
+                  <h3>Explore the { feature.name } feature</h3>
+                  <Flex
+                    mih={ 150 }
+                    justify="center"
+                    align="center"
+                    direction="column"
+                    wrap="wrap"
+                    style={ { width: '100%' } }
+                  >
+                    <div ref={ containerRef } className="h-[600px] overflow-auto">
+                      { labelFeature ? (
+                        <FeatureDisplayer
+                          indexes={ indexes }
+                          featureData={ feature.datas }
+                          featureType={ featureType }
+                          labelData={ labelFeature.datas }
+                          label_dict={ labelDict }
+                          columnCount={2}
+                        />
+                      ) : (
+                        <FeatureDisplayer
+                          indexes={ indexes }
+                          featureData={ feature.datas }
+                          featureType={ featureType }
+                          columnCount={2}
+                        />
+                      ) }
+                    </div>
+                  </Flex>
+                </div>
+              </Flex> 
+              </motion.div>) : (
+              <motion.div layout>
+              <MotionSchemaShower 
+                  layoutId="schema-shower" 
+                  initial={false}
+                  features={features} 
+                  connections={connections} 
+                  labelColorMap={labelColorMap} 
+                />
+              {/*<SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />*/}
+              <p>Click on the schema to explore the features!</p>
+            </motion.div>
+          ) }
+
         </Box>
 
         <h2>
@@ -306,44 +372,6 @@ export default function Datasets ()
             </Flex>
           </div>
         </> ) : null }
-
-
-      { featureToDisplay && feature ? (
-        <div className="w-full" style={ { position: 'relative', marginBottom: '20px' } }>
-          <h2>Explore the { feature.name } feature</h2>
-          <Flex
-            mih={ 150 }
-            justify="center"
-            align="center"
-            direction="column"
-            wrap="wrap"
-            style={ { width: '100%' } }
-          >
-            <div ref={ containerRef } className="h-[600px] overflow-auto">
-              { labelFeature ? (
-                <FeatureDisplayer
-                  indexes={ indexes }
-                  featureData={ feature.datas }
-                  featureType={ featureType }
-                  labelData={ labelFeature.datas }
-                />
-              ) : (
-                <FeatureDisplayer
-                  indexes={ indexes }
-                  featureData={ feature.datas }
-                  featureType={ featureType }
-                />
-              ) }
-            </div>
-          </Flex>
-        </div>
-      ) : (
-        <>
-          <h2>Explore</h2>
-          <p>Click on the schema to explore the features!</p>
-        </>
-      ) }
-
     </div>
   )
 }
