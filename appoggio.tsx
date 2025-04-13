@@ -246,92 +246,75 @@ export default function Datasets ()
   }
 */}
 
+const [isReady, setIsReady] = useState(false);
 
+useEffect(() => {
+  const timer = setTimeout(() => setIsReady(true), 50);
+  return () => clearTimeout(timer);
+}, []);
+
+  
 return (
-  <div className="w-full h-screen">
-  <div className="max-w-4xl mx-auto px-4">
-    <Box
-      className={classes.title}
-      style={{ display: "flex", flexDirection: "column", gap: "0px" }}
-    >
-      <h1 style={{ marginTop: "0", marginBottom: "30px" }}>
-        {datasetName} dataset
-      </h1>
-    </Box>
+    <div className="w-full h-screen">
+      <div className="max-w-4xl mx-auto px-4">
 
-<div style={{ display: 'flex', alignItems: 'flex-start' /* Optional: aligns items to the top */ }}>
+        <Box className={ classes.title } style={ { display: "flex", flexDirection: "column", gap: "0px" } }>
+          <h1 style={ { marginTop: "0", marginBottom: "30px" } }>{ datasetName } dataset</h1>
 
-{/* Left Column: SchemaShower Container */}
-{/* This div now acts as the flex item.
-    'flex: 1' makes it take up available space.
-    When FeatureDisplayer is hidden, this will take 100% width.
-    When FeatureDisplayer is shown (taking 50%), this will take the other 50%. */}
-<div style={{ flex: 1, position: 'relative' /* For motion positioning context */ }}>
-    <motion.div
-        // This animation moves the SchemaShower visually *within* its allocated space
-        animate={{
-            // of the FeatureDisplayer column and how much overlap/shift you want.
-            // Maybe calculate it based on containerRef width or a fixed value that looks good.
-            x: featureToDisplay && feature ? '-100px' : '0',
-            y: featureToDisplay && feature ? '150px' : '0px'
-        }}
-        transition={{ duration: 0.5 }}
-        style={{ width: '100%' /* Ensure motion div fills its container initially */ }}
-    >
-        {/* The original scrollable container for SchemaShower */}
-        <div ref={containerRef} className="h-[600px] overflow-auto">
-            <SchemaShower
-                features={features}
-                connections={connections}
-                labelColorMap={labelColorMap}
-            />
-        </div>
-    </motion.div>
-    {!featureToDisplay && (
-            <p>Click on the schema to explore the features!</p>
-        )}
-</div>
+          { featureToDisplay && feature ? (
+            
+            <>
+              <Flex
+              direction="row"
+              align="center">
+                <SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />
+                <div className="w-full" style={ { position: 'relative', marginBottom: '20px' } }>
+                  <h3>Explore the { feature.name } feature</h3>
+                  <Flex
+                    mih={ 150 }
+                    justify="center"
+                    align="center"
+                    direction="column"
+                    wrap="wrap"
+                    style={ { width: '100%' } }
+                  >
+                    <div ref={ containerRef } className="h-[600px] overflow-auto">
+                      { labelFeature ? (
+                        <FeatureDisplayer
+                          indexes={ indexes }
+                          featureData={ feature.datas }
+                          featureType={ featureType }
+                          labelData={ labelFeature.datas }
+                          label_dict={ labelDict }
+                          columnCount={2}
+                        />
+                      ) : (
+                        <FeatureDisplayer
+                          indexes={ indexes }
+                          featureData={ feature.datas }
+                          featureType={ featureType }
+                          columnCount={2}
+                        />
+                      ) }
+                    </div>
+                  </Flex>
+                </div>
+              </Flex> 
+              </>) : (
+              <motion.div layout animate={isReady ? { opacity: 1 } : { opacity: 0.99 }}>
+              <MotionSchemaShower
+                  layoutId="schema-shower"
+                  transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
+                  features={features}
+                  connections={connections}
+                  labelColorMap={labelColorMap}
+                />
+              {/*<SchemaShower features={ features } connections={ connections } labelColorMap={ labelColorMap } />*/}
+              <p>Click on the schema to explore the features!</p>
+            </motion.div>
+          ) }
 
-{/* Right Column: FeatureDisplayer Container (Conditionally Rendered) */}
-{/* This appears only when featureToDisplay and feature are true */}
-{featureToDisplay && feature && (
-    <div style={{
-        width: '50%',        // Takes up 50% of the flex container width
-        position: 'relative', // Now works as expected within the flex layout
-        overflow: 'auto',    // Keep internal scroll if needed
-    }}>
-        <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
-        >
-            <h3>Explore the {feature.name} feature</h3>
-            <div className="h-96 overflow-auto">
-                {labelFeature ? (
-                    <FeatureDisplayer
-                        indexes={indexes}
-                        featureData={feature.datas}
-                        featureType={featureType}
-                        labelData={labelFeature.datas}
-                        label_dict={labelDict}
-                        columnCount={2}
-                    />
-                ) : (
-                    <FeatureDisplayer
-                        indexes={indexes}
-                        featureData={feature.datas}
-                        featureType={featureType}
-                        columnCount={2}
-                    />
-                )}
-            </div>
-        </motion.div>
-    </div>
-)}
-</div>
-    
-    
-    
+        </Box>
 
         <h2>
           Description
@@ -390,3 +373,13 @@ return (
     </div>
   )
 }
+
+
+
+
+
+
+
+
+
+
