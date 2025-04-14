@@ -11,6 +11,7 @@ import LassoDrawer from '@/components/client/Lasso';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
 import FeatureDisplayer, { FeatureCard } from '@/components/server/FeatureDisplayer';
+import { image_type, label_type, text_type } from '@/properties/types';
 
 interface Feature
 {
@@ -50,11 +51,11 @@ function Home ()
   {
     if ( Array.isArray( datasetUsed?.features ) ) {
       const extractedFeatures = datasetUsed.features
-        .filter( ( { type } ) => type === "IMAGE_FEATURE" || type === "TEXT_FEATURE" )
+        .filter( ( { type } ) => type === image_type || type === text_type )
         .map( ( { name } ) => name );
 
       const extractedlabelFeatures = datasetUsed.features
-        .filter( ( { type } ) => type === "LABEL_FEATURE" )
+        .filter( ( { type } ) => type === label_type )
         .map( ( { name } ) => name );
 
       setFeatures( extractedFeatures );
@@ -181,7 +182,7 @@ function Home ()
         <Space h="md" />
 
 
-        <div id="autocomplete-container" style={ { width: '300px', position: 'relative', marginBottom: '20px' } }>
+        <div style={ { width: '300px', position: 'relative', marginBottom: '20px' } }>
           <Flex
             direction="row"
             gap="xs">
@@ -204,7 +205,7 @@ function Home ()
               placeholder="Choose label"
               data={ labelFeatures }
               value={ labelFeatureName }
-              onChange={ ( value ) => setLabelFeatureName( value ) }
+              onChange={ ( value ) => setLabelFeatureName( value as string ) }
               onClear={()=>setLabelFeatureName("")}
               clearable={ true }
             />
@@ -252,7 +253,7 @@ function Home ()
               style={ { width: '100%' } }
             >
               <div ref={ containerRef } className="h-[600px] overflow-auto">
-                <FeatureDisplayer indexes={indexes} featureData={featureData} featureType={featureType} labelData={labelData} label_dict={labelDict} columnCount={2}/>
+                <FeatureDisplayer indexes={indexes} featureData={featureData} featureType={featureType} labelData={labelData} label_dict={labelDict as {[key: number]: string}} columnCount={2}/>
               </div>
             </Flex>
           </Flex>

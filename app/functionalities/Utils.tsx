@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { data_get } from '../properties/urls';
+import { data_get, prototypes_get } from '../properties/urls';
 
 
 export async function postIndexes ( url: string, indexes: number[] )
@@ -47,5 +47,17 @@ async function getData ( datasetName: string, featureName: string, labelFeatureN
   }
 };
 
-
 export default getData;
+
+
+export async function getPrototypes (datasetName: string, featureName: string, labelFeatureName: string ){
+  const response = await fetch(
+    `${prototypes_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&labelFeatureName=${encodeURIComponent(labelFeatureName)}`
+  );
+
+  if ( !response.ok ) throw new Error( 'Failed to get prototypes from the backend' );
+  
+  const prototypes = await response.json();
+    return prototypes
+
+}

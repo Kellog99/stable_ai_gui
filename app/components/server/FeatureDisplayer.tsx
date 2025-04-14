@@ -7,7 +7,7 @@ import { image_type, text_type } from "@/properties/types";
 
 //label_dict?:{[key: number]: string} 
 
-export function FeatureCard ( { index, data, featureType, label, labelString }: { index: number, data: string, featureType: string, label?: number, labelString?: string } )
+export function FeatureCard ( { index, data, featureType, label, labelString }: { index?: number, data: string, featureType: string, label?: number, labelString?: string } )
 {
 
   return (
@@ -23,17 +23,18 @@ export function FeatureCard ( { index, data, featureType, label, labelString }: 
         {labelString != null? <Text fw={ 700 } size="lg">{labelString}</Text> : null }
         { label != null ? <Badge color="#ec777e"> Class: { label } </Badge> : null }
       </Group>
-
+      
+      {index || index==0 ? (
       <Text size="sm" c="dimmed">
         Sample: { index }
-      </Text>
+      </Text>) : null}
 
     </Card>
   );
 }
 
 
-export default function FeatureDisplayer ( { indexes, featureData, featureType, labelData, label_dict, columnCount }: { indexes: number[], featureData: string[], featureType: string, labelData?: number[], label_dict?: { [ key: number ]: string }, columnCount?: number} )
+export default function FeatureDisplayer ( { indexes, featureData, featureType, labelData, label_dict, columnCount }: { indexes?: number[], featureData: string[], featureType: string, labelData?: number[], label_dict?: { [ key: number ]: string }, columnCount?: number} )
 {
 
   const COLUMN_COUNT = columnCount? columnCount: 4;
@@ -63,9 +64,9 @@ export default function FeatureDisplayer ( { indexes, featureData, featureType, 
             padding: '8px',
           } }>
             <FeatureCard
-              index={ indexes[ index ] }
               data={ featureData[ index ] }
               featureType={ featureType }
+              { ...( indexes ? { index: indexes[ index ] } : {} ) }
               { ...( labelData ? { label: labelData[ index ] } : {} ) }
               { ...( labelData && label_dict ?
                  { labelString: label_dict[ labelData[ index ] ] }

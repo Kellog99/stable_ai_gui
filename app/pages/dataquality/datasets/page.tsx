@@ -1,6 +1,6 @@
 "use client";
 import RouterButton from "@/components/client/buttons/RouterButton";
-import { Box, Flex, Text } from "@mantine/core";
+import { Box, CloseButton, Flex, Text } from "@mantine/core";
 import { BarChart } from '@mantine/charts';
 import '@mantine/charts/styles.css';
 import Link from "next/link";
@@ -61,8 +61,8 @@ export default function Datasets ()
   const setData = useStore( ( state ) => ( state.setData ) );
 
   const featureToDisplay = useStore( ( state ) => state.featureToDisplay );
+  const setFeatureToDisplay = useStore( ( state ) => state.setFeatureToDisplay )
 
-  const MotionSchemaShower = motion(SchemaShower);
 
   useEffect( () =>
   {
@@ -154,7 +154,7 @@ export default function Datasets ()
   {
     if ( Array.isArray( datasetUsed?.features ) ) {
 
-      const labelFeature = datasetUsed?.features.find( feature => feature.type === label_type );
+      const labelFeature = datasetUsed.features.find( feature => feature.type === label_type );
 
       if ( labelFeature ) {
         const samplesPerClass = datasetUsed.samples_per_class;
@@ -247,91 +247,104 @@ export default function Datasets ()
 */}
 
 
-return (
-  <div className="w-full h-screen">
-  <div className="max-w-4xl mx-auto px-4">
-    <Box
-      className={classes.title}
-      style={{ display: "flex", flexDirection: "column", gap: "0px" }}
-    >
-      <h1 style={{ marginTop: "0", marginBottom: "30px" }}>
-        {datasetName} dataset
-      </h1>
-    </Box>
-
-<div style={{ display: 'flex', alignItems: 'flex-start' /* Optional: aligns items to the top */ }}>
-
-{/* Left Column: SchemaShower Container */}
-{/* This div now acts as the flex item.
-    'flex: 1' makes it take up available space.
-    When FeatureDisplayer is hidden, this will take 100% width.
-    When FeatureDisplayer is shown (taking 50%), this will take the other 50%. */}
-<div style={{ flex: 1, position: 'relative' /* For motion positioning context */ }}>
-    <motion.div
-        // This animation moves the SchemaShower visually *within* its allocated space
-        animate={{
-            // of the FeatureDisplayer column and how much overlap/shift you want.
-            // Maybe calculate it based on containerRef width or a fixed value that looks good.
-            x: featureToDisplay && feature ? '-100px' : '0',
-            y: featureToDisplay && feature ? '150px' : '0px'
-        }}
-        transition={{ duration: 0.5 }}
-        style={{ width: '100%' /* Ensure motion div fills its container initially */ }}
-    >
-        {/* The original scrollable container for SchemaShower */}
-        <div ref={containerRef} className="h-[600px] overflow-auto">
-            <SchemaShower
-                features={features}
-                connections={connections}
-                labelColorMap={labelColorMap}
-            />
-        </div>
-    </motion.div>
-    {!featureToDisplay && (
-            <p>Click on the schema to explore the features!</p>
-        )}
-</div>
-
-{/* Right Column: FeatureDisplayer Container (Conditionally Rendered) */}
-{/* This appears only when featureToDisplay and feature are true */}
-{featureToDisplay && feature && (
-    <div style={{
-        width: '50%',        // Takes up 50% of the flex container width
-        position: 'relative', // Now works as expected within the flex layout
-        overflow: 'auto',    // Keep internal scroll if needed
-    }}>
-        <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
+  return (
+    <div className="w-full h-screen">
+      <div className="max-w-4xl mx-auto px-4">
+        <Box
+          className={ classes.title }
+          style={ { display: "flex", flexDirection: "column", gap: "0px" } }
         >
-            <h3>Explore the {feature.name} feature</h3>
-            <div className="h-96 overflow-auto">
-                {labelFeature ? (
+          <h1 style={ { marginTop: "0", marginBottom: "30px" } }>
+            { datasetName } dataset
+          </h1>
+        </Box>
+
+        <div style={ { display: 'flex', alignItems: 'flex-start' } }>
+
+          <div style={ { flex: 1, position: 'relative' } }>
+            <Flex
+              direction='column'
+              align='center'>
+              <motion.div
+                animate={ {
+                  transform: featureToDisplay && feature
+                    ? 'translate(-100px, 150px)'
+                    : 'translate(0, 0)'
+                } }
+                transition={ { duration: 0.5, ease: "easeInOut" } }
+                style={ {
+                  width: '100%',
+                  willChange: 'transform'
+                } }
+              >
+                <div ref={ containerRef } className="h-[600px] overflow-auto">
+                  <SchemaShower
+                    features={ features }
+                    connections={ connections }
+                    labelColorMap={ labelColorMap }
+                  />
+                </div>
+              </motion.div>
+              { !featureToDisplay && (
+                <p>Click on the schema to explore the features!</p>
+              ) }
+            </Flex>
+          </div>
+
+          { featureToDisplay && feature && (
+            <div style={ {
+              width: '50%',        // Takes up 50% of the flex container width
+              position: 'relative', // Now works as expected within the flex layout
+              overflow: 'auto',    // Keep internal scroll if needed
+              visibility: featureToDisplay && feature ? 'visible' : 'hidden',
+              pointerEvents: featureToDisplay && feature ? 'auto' : 'none'
+            } }>
+
+              <motion.div
+                initial={ { opacity: 0, transform: 'translateX(100px)' } }
+                animate={ {
+                  opacity: featureToDisplay && feature ? 1 : 0,
+                  transform: featureToDisplay && feature ? 'translateX(0)' : 'translateX(100px)'
+                } }
+                transition={ { type: "tween", duration: 0.5, ease: "easeInOut" } }
+                style={ { willChange: 'transform, opacity' } }
+              >
+                <Flex
+                  direction='row'
+                  align='center'
+                  gap='md'>
+                  <h3>Explore the { feature.name } feature</h3>
+                  <CloseButton
+                    onClick={ () => setFeatureToDisplay( null ) } />
+                </Flex>
+                <div className="h-96 overflow-auto">
+                  { labelFeature ? (
                     <FeatureDisplayer
-                        indexes={indexes}
-                        featureData={feature.datas}
-                        featureType={featureType}
-                        labelData={labelFeature.datas}
-                        label_dict={labelDict}
-                        columnCount={2}
+                      indexes={ indexes }
+                      featureData={ feature.datas }
+                      featureType={ featureType }
+                      labelData={ labelFeature.datas }
+                      label_dict={ labelDict as { [ key: number ]: string } }
+                      columnCount={ 2 }
                     />
-                ) : (
+                  ) : (
                     <FeatureDisplayer
-                        indexes={indexes}
-                        featureData={feature.datas}
-                        featureType={featureType}
-                        columnCount={2}
+                      indexes={ indexes }
+                      featureData={ feature.datas }
+                      featureType={ featureType }
+                      columnCount={ 2 }
                     />
-                )}
+                  ) }
+                </div>
+              </motion.div>
+
+
             </div>
-        </motion.div>
-    </div>
-)}
-</div>
-    
-    
-    
+          ) }
+        </div>
+
+
+
 
         <h2>
           Description
@@ -341,7 +354,14 @@ return (
             { datasetUsed?.name || "" }
           </Text>{ " " }
           is a dataset for { datasetUsed?.task || "" }.
-          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes.{ " " }</> : <>{ " " }</> }
+          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes. You can check the protoypes{ " " }
+            {<Link
+              href={ {
+                pathname: "/pages/dataquality/prototypes",
+                query: { datasetName: datasetName }
+              } }
+              style={{color: 'blue'}}
+            >here</Link> }. { " " }</> : <>{ " " }</> }
           { descriptions?.map( ( description, index ) => (
             <span key={ index }>{ description } </span>
           ) ) }

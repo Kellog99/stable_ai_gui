@@ -17,7 +17,7 @@ interface AppState {
     setDatasets: (datasets: Dataset[] | null) => void;
     setLazoMode: (lazoMode : boolean ) => void;
     setQueryDataset: (queryDataset : string) => void;
-    setFeatureToDisplay : (featureToDisplay: string) => void;
+    setFeatureToDisplay : (featureToDisplay: string | null) => void;
   }
 
   const useStore = create<AppState>()(
@@ -36,7 +36,7 @@ interface AppState {
             setSelectedFeature: (selectedFeature: string) => set({ selectedFeature }),
             setLazoMode: (lazoMode: boolean) => set({ lazoMode }),
             setQueryDataset: (queryDataset: string) => set({ queryDataset }),
-            setFeatureToDisplay : (featureToDisplay: string) => set({featureToDisplay}),
+            setFeatureToDisplay : (featureToDisplay: string | null) => set({featureToDisplay}),
         }),
         {
           name: "app-storage",
