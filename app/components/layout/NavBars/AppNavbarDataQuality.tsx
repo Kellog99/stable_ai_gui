@@ -1,33 +1,37 @@
 "use client"
+
 import "@mantine/core/styles.css";
-import { usePathname, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from "react";
 import Link from 'next/link'
 import
-    {
-        Stack,
-        Button,
-        Text,
-        Box,
-        Space, Group,
-        Menu
-    } from "@mantine/core";
+{
+    Stack,
+    Button,
+    Text,
+    Box,
+    Space, Group,
+    Menu
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
-    {
-        faHouse, faImage, faChartLine, faBolt
-    } from '@fortawesome/free-solid-svg-icons';
+{
+    faHouse, faImage, faChartLine, faBolt
+} from '@fortawesome/free-solid-svg-icons';
 import
-    {
-        IconChevronDown
-    } from '@tabler/icons-react';
+{
+    IconChevronDown
+} from '@tabler/icons-react';
 import classes from './AppNavbarDataQuality.module.css';
 import RouterButton from "@/components/client/buttons/RouterButton";
 
 
 function AppNavbarDataQuality ()
 {
+    const router = useRouter();
+
+
     const [ opened, { toggle, close } ] = useDisclosure( false )
     const pathName = usePathname();
     const isActive = ( path: string ) => pathName === path;
@@ -47,6 +51,18 @@ function AppNavbarDataQuality ()
             setDatasetName( searchParams.get( "datasetName" ) )
         }
     }, [ searchParams ] )
+
+    const isMetricActive = ( metricName: string ) =>
+    {
+        return pathName === "/pages/dataquality/metrics" && searchParams.get( 'metric' ) === metricName;
+    };
+
+    const handleButtonClick = ( itemId: any ) =>
+    {
+        const params = new URLSearchParams( searchParams );
+        params.set( 'metric', itemId );
+        router.push( `/pages/dataquality/metrics?${params.toString()}` );
+    };
 
     return (
         <Box p="md" style={ { height: '100%' } }>
@@ -124,26 +140,39 @@ function AppNavbarDataQuality ()
                     { metricVisible && (
                         <Stack mt="sm">
                             <Box>
-                            <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics" }>
+                                <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics" }>
                                     <Button
                                         radius="xl"
                                         variant={ isActive( "/pages/dataquality/metrics" ) ? "filled" : "subtle" }
                                         disabled={ isHomePage }
                                     >
                                         <Text size="sm" fw={ 600 } c="dimmed">
-                                            Duplicates
+                                            Metric Page
                                         </Text>
                                     </Button>
                                 </RouterButton>
-                                <Link href="/">
-                                    <Button
-                                        radius="xl"
-                                        variant={ isActive( "/" ) ? "filled" : "subtle" }
-                                        disabled
-                                    >
+
+                                <Button
+                                    radius="xl"
+                                    variant={ isMetricActive( "duplicates" ) ? "filled" : "subtle" }
+                                    disabled={ isHomePage }
+                                    onClick={ () => handleButtonClick( "duplicates" ) }
+                                >
+                                    <Text size="sm" fw={ 600 } c="dimmed">
+                                        Duplicates
+                                    </Text>
+                                </Button>
+
+                                <Button
+                                    radius="xl"
+                                    variant={ isMetricActive( "outliers" ) ? "filled" : "subtle" }
+                                    disabled={ isHomePage }
+                                    onClick={ () => handleButtonClick( "outliers" ) }
+                                >
+                                    <Text size="sm" fw={ 600 } c="dimmed">
                                         Outliers
-                                    </Button>
-                                </Link>
+                                    </Text>
+                                </Button>
                             </Box>
                         </Stack>
                     ) }
