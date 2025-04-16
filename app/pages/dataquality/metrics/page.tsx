@@ -1,13 +1,12 @@
 "use client";
 
-import DuplicatesDisplayer from "@/components/client/metrics/DuplicatesDisplayer";
-import OutlierDisplayer from "@/components/client/metrics/OutlierDisplayer";
-import { Accordion, Box, Text, Space, Button } from "@mantine/core";
+import { Accordion, Box, Text, Space, Button, Divider, Paper, Flex, Blockquote } from "@mantine/core";
 import classes from './page.module.css'
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import useStore from '../../../store/dsStore';
 import { useEffect, useState } from "react";
 import Config from "@/components/client/metrics/Config";
+import { IconInfoCircle } from '@tabler/icons-react';
 
 export default function Metrics ()
 {
@@ -16,16 +15,9 @@ export default function Metrics ()
     const itemParam = searchParams.get( 'metric' );
 
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
+    const configs = useStore( ( state ) => state.metricsConfig )
+    const addToReport = useStore( ( state ) => state.addToReport )
 
-    const name_dpl = "Uniqueness"
-    const featureName = "Image"
-    const score_dpl = 90
-    const indexes_dpl: [ number, number ][] = [ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ]
-
-    const name_otl = "Outliers"
-    const score_otl = 85
-    const indexes = [ 10, 11, 12 ]
-    const score_per_sample = [ 10, 20, 80, 98, 67, 99 ]
 
 
     const [ openedItem, setOpenedItem ] = useState<string | null>( null );
@@ -59,6 +51,7 @@ export default function Metrics ()
         router.push( `/pages/dataquality/metrics?${params.toString()}` );
     };
 
+    const icon = <IconInfoCircle />;
     return (
         <>
             <div className="max-w-4xl mx-auto px-4">
@@ -68,32 +61,50 @@ export default function Metrics ()
                         Obtain report with default configurations
                     </Button>
                 </Box>
-                <Space h="md" />
 
+                <Flex
+                    direction="row"
+                    justify="left"
+                    align="start"
+                >
 
-                <Box style={ {
-                    marginLeft: 400,
-                    marginRight: 400
-                } }>
-                    <Accordion value={ openedItem } onChange={ handleAccordionChange }>
-                        <Accordion.Item value="duplicates">
-                            <Accordion.Control>
-                                <Text fw={ 700 } size="lg">Duplicates</Text>
-                            </Accordion.Control>
-                            <Accordion.Panel>
-                                <Config />
-                            </Accordion.Panel>
-                        </Accordion.Item>
-                        <Accordion.Item value="outliers">
-                            <Accordion.Control>
-                                <Text fw={ 700 } size="lg">Outliers</Text>
-                            </Accordion.Control>
-                            <Accordion.Panel>
-                                <Config labelFeatureReq={true}/>
-                            </Accordion.Panel>
-                        </Accordion.Item>
-                    </Accordion>
-                </Box>
+                    <Blockquote
+                        color="yellow"
+                        icon={ icon } 
+                        
+                        style={ {
+                            marginTop: 80,
+                            width: '300px',
+                            visibility: addToReport === true ? 'visible' : 'hidden',
+                            backgroundColor: '#FFFAE6',
+                        } }
+                    >
+                        <Text fw={700} td="underline">Metrics added to report</Text>
+                        
+                    </Blockquote>
+
+                    <Box style={ { marginLeft: 100, marginRight: 50, marginTop: 80, width: '60%' } }>
+                        <Divider />
+                        <Accordion value={ openedItem } onChange={ handleAccordionChange }>
+                            <Accordion.Item value="duplicates">
+                                <Accordion.Control>
+                                    <Text fw={ 700 } size="lg">Duplicates</Text>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <Config metricName="duplicates" />
+                                </Accordion.Panel>
+                            </Accordion.Item>
+                            <Accordion.Item value="outliers">
+                                <Accordion.Control>
+                                    <Text fw={ 700 } size="lg">Outliers</Text>
+                                </Accordion.Control>
+                                <Accordion.Panel>
+                                    <Config metricName="outliers" labelFeatureReq={ true } />
+                                </Accordion.Panel>
+                            </Accordion.Item>
+                        </Accordion>
+                    </Box>
+                </Flex>
             </div>
         </>
     )

@@ -31,3 +31,11 @@ export interface FeatureSchema{
     name: string;
     depth: number;
 }
+
+
+export interface Configs {
+  metricName: string
+  featureName: string,
+  labelFeatureName?: string,
+  internalConfigs: any
+}
