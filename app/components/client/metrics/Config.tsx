@@ -6,6 +6,7 @@ import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
 import { useDisclosure } from "@mantine/hooks";
 import DuplicatesConfigs from "./DuplicatesConfigs";
+import OutliersConfig from "./OutliersConfig";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
@@ -14,6 +15,7 @@ import
 import { Configs } from "@/interfaces/DatasetInterface";
 import { IconInfoCircle } from '@tabler/icons-react';
 import DuplicatesDisplayer from "./DuplicatesDisplayer";
+
 
 
 interface ConfigsProps
@@ -27,9 +29,12 @@ export default function Config ( props: ConfigsProps )
 {
     const [ features, setFeatures ] = useState<string[]>( [] )
     const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
+    const outliers_modes = [ "Mahalanobis", "Isolation Forest", "Lunar", "LOF", "KNN" ]
 
     const [ featureName, setFeatureName ] = useState<any>( "" )
     const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
+    const [ outliers_mode, setOutliersMode ] = useState<string>( "" )
+
 
     const [ opened, { open, close } ] = useDisclosure( false );
 
@@ -39,6 +44,7 @@ export default function Config ( props: ConfigsProps )
     const configs = useStore( ( state ) => state.metricsConfig )
     const setConfigs = useStore( ( state ) => state.setMetricsConfigs )
     const internalConfigs = useStore( ( state ) => state.internalConfigs )
+
 
 
     useEffect( () =>
@@ -63,15 +69,16 @@ export default function Config ( props: ConfigsProps )
 
     const [ showFeatureError, setShowFeatureError ] = useState( false );
     const [ showLabelError, setShowLabelError ] = useState( false );
+    const [ showOutliersConfig, setShowOutliersConfig ] = useState( false );
     const [ clicked, setClicked ] = useState( false );
     const [ isDuplicate, setIsDuplicate ] = useState( false );
-    const [computeNow, setComputeNow] = useState(false);
-    const setAddToReport = useStore((state) => state.setAddToReport)
+    const [ computeNow, setComputeNow ] = useState( false );
+    const setAddToReport = useStore( ( state ) => state.setAddToReport )
 
 
     const handleClickToReport = ( metricName: string ) =>
-    {   
-        setAddToReport(true)
+    {
+        setAddToReport( true )
         const newConfig: Configs = {
             metricName: metricName,
             featureName: "",
@@ -90,9 +97,17 @@ export default function Config ( props: ConfigsProps )
                 } else {
                     newConfig.labelFeatureName = labelFeatureName;
                     setClicked( true );
+
+                    setTimeout(() => {
+                        setClicked(false);
+                      }, 3000);
                 }
             } else {
                 setClicked( true )
+
+                setTimeout(() => {
+                    setClicked(false);
+                  }, 3000);
             }
         }
 
@@ -104,21 +119,32 @@ export default function Config ( props: ConfigsProps )
             JSON.stringify( config.internalConfigs ) === JSON.stringify( newConfig.internalConfigs )
         );
 
-        if ( !isDuplicate && featureName) {
+        if ( !isDuplicate && featureName ) {
             setConfigs( [ ...configs, newConfig ] );
             setClicked( true );
-            setIsDuplicate(false)
-        } else if (isDuplicate) {
+            setTimeout(() => {
+                setClicked(false);
+              }, 3000);
+            setIsDuplicate( false )
+        } else if ( isDuplicate ) {
             setIsDuplicate( true )
         }
     };
 
-    const handleClickCompute = () => {
-        setComputeNow(!computeNow)
+    const handleClickCompute = () =>
+    {
+        setComputeNow( !computeNow )
     }
 
     const icon = <IconInfoCircle />;
     console.log( "CONFIGS:", configs )
+
+    const metricComponentMap: Record<string, React.ComponentType> = {
+        "duplicates": () => <DuplicatesConfigs />,
+        "outliers": () => <OutliersConfig mode={ outliers_mode } />,
+    };
+
+    const MetricConfigComponent = metricComponentMap[ props.metricName ];
 
     return (
         <div>
@@ -194,14 +220,45 @@ export default function Config ( props: ConfigsProps )
                             Choose a label to continue
                         </Text>
                     ) }
+                </Box>
 
+                <Box style={ { position: "relative" } }>
+                    { props?.metricName == "outliers" ? ( <Select
+                        id="outliers-mode"
+                        radius="md"
+                        label="Mode"
+                        placeholder="Choose a mode to compute outliers"
+                        data={ outliers_modes }
+                        value={ outliers_mode }
+                        onChange={ ( value ) =>
+                        {
+                            setOutliersMode( value as string );
+
+                            if ( value ) {
+                                if ( !showOutliersConfig ) {
+                                    setShowOutliersConfig( true );
+                                }
+                            } else {
+                                setShowOutliersConfig( false );
+                            }
+                        } }
+                        required={ true }
+                        styles={ ( theme ) => ( {
+                            input: {
+                                borderColor: showLabelError ? theme.colors.red[ 6 ] : undefined,
+                                '&:hover': {
+                                    borderColor: showLabelError ? theme.colors.red[ 6 ] : undefined,
+                                },
+                            },
+                        } ) }
+                    /> ) : null }
 
                 </Box>
 
                 <Modal opened={ opened } onClose={ close } title="Configurations">
-                    <DuplicatesConfigs />
+                    { MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div> }
                 </Modal>
-                <Button variant="default" onClick={ open } radius="md">
+                <Button variant="default" onClick={ open } radius="md" disabled={ props.metricName == "outliers" && showOutliersConfig == false }>
                     Configs
                 </Button>
             </Flex>
@@ -220,22 +277,22 @@ export default function Config ( props: ConfigsProps )
                         : "Add to report" }
                 </Button>
 
-                <Button onClick={handleClickCompute}>
+                <Button onClick={ handleClickCompute }>
                     Compute now
                 </Button>
             </Flex>
 
             { isDuplicate ? (
                 <>
-                <Space h="md"/>
-                <Alert variant="light" color="red" withCloseButton onClose={() => {setIsDuplicate(false); setClicked(false)}} title="Attention" icon={ icon }>
-                    A metric with this same configuration has been already added. Please change something or choose another metric.
-                </Alert>
+                    <Space h="md" />
+                    <Alert variant="light" color="red" withCloseButton onClose={ () => { setIsDuplicate( false ); setClicked( false ) } } title="Attention" icon={ icon }>
+                        A metric with this same configuration has been already added. Please change something or choose another metric.
+                    </Alert>
                 </> ) : null }
 
-            {computeNow? (
-                <DuplicatesDisplayer name={ "Duplicates" } featureName={ featureName } score={ 90 } indexes={ [] }/>
-            ) : null}
+            { computeNow ? (
+                <DuplicatesDisplayer name={ "Duplicates" } featureName={ featureName } score={ 90 } indexes={ [] } />
+            ) : null }
         </div >
     )
 }

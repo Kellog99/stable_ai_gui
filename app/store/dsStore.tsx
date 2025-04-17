@@ -10,7 +10,7 @@ interface AppState {
     selectedFeature : string | null;
     lazoMode : boolean;
     featureToDisplay: string | null;
-    metricsConfig: Configs[];
+    metricsConfig: Configs[] | [];
     internalConfigs: Object;
     addToReport: boolean;
     setSelectedIndexes : (selectedIndexes : number[]) => void;
@@ -20,7 +20,7 @@ interface AppState {
     setLazoMode: (lazoMode : boolean ) => void;
     setQueryDataset: (queryDataset : string) => void;
     setFeatureToDisplay : (featureToDisplay: string | null) => void;
-    setMetricsConfigs: (metricsConfig: Configs[]) => void;
+    setMetricsConfigs: (metricsConfig: Configs[] | []) => void;
     setInternalConfigs: (internalConfigs: Object) => void;
     setAddToReport: (addToReport: boolean) => void;
   }
@@ -45,7 +45,7 @@ interface AppState {
             setLazoMode: (lazoMode: boolean) => set({ lazoMode }),
             setQueryDataset: (queryDataset: string) => set({ queryDataset }),
             setFeatureToDisplay : (featureToDisplay: string | null) => set({featureToDisplay}),
-            setMetricsConfigs: (metricsConfig: Configs[]) => set({metricsConfig}),
+            setMetricsConfigs: (metricsConfig: Configs[] | []) => set({metricsConfig}),
             setInternalConfigs: (internalConfigs: Object) => set({internalConfigs}),
             setAddToReport:(addToReport: boolean) => set({addToReport})
         }),

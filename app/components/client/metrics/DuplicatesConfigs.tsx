@@ -29,18 +29,20 @@ export default function DuplicatesConfigs ()
 
     const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
     const [ clicked, setClicked ] = useState( false )
+    
+    console.log("CLICKED?", clicked)
+    
 
-    const handleSubmit = ( formValues: any ) =>
-    {
+    const handleSubmit = ( formValues: any) =>
+    {   
         setInternalConfigs( formValues );
-        setClicked( true )
         console.log( "FORM VALUES:", formValues )
     }
 
 
 
     return (
-        <form onSubmit={ form.onSubmit( handleSubmit ) }>
+        <form onSubmit={ form.onSubmit(handleSubmit) }>
             <Flex
                 direction="column"
                 gap="xl"
@@ -80,7 +82,7 @@ export default function DuplicatesConfigs ()
                 />
             </Flex>
 
-            <Button type="submit" mt="md">
+            <Button type="submit" mt="md" onClick={(() => setClicked(true))}>
                 { clicked ? ( <>
                     <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
                     <span>Configs modified</span></> )
