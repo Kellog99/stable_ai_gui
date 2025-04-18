@@ -9,11 +9,13 @@ import
 {
     faCheck
 } from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
+import { backend_duplicates, metric_duplicates } from './utils';
 
 
 
 
-export default function DuplicatesConfigs ()
+function DuplicatesConfigs ()
 {
 
     const form = useForm( {
@@ -21,23 +23,29 @@ export default function DuplicatesConfigs ()
         initialValues: {
             k: 6,
             thr: 0.05,
-            backend: 'Faiss',
-            metric: 'Euclidean',
+            backend: 'faiss',
+            metric: 'euclidean',
             normalize: true
         },
     } );
 
-    const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
+    
     const [ clicked, setClicked ] = useState( false )
+    
+    const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
     
     console.log("CLICKED?", clicked)
     
 
     const handleSubmit = ( formValues: any) =>
     {   
+        setClicked(true)
         setInternalConfigs( formValues );
+        
         console.log( "FORM VALUES:", formValues )
     }
+
+
 
 
 
@@ -72,8 +80,8 @@ export default function DuplicatesConfigs ()
                     />
                 </Flex>
 
-                <NativeSelect variant="filled" radius="md" label="Backend" data={ [ 'Faiss', 'Scikit' ] } { ...form.getInputProps( 'backend' ) } />
-                <NativeSelect variant="filled" radius="md" label="Metric" data={ [ 'Euclidean', 'Cosine' ] } { ...form.getInputProps( 'metric' ) } />
+                <NativeSelect variant="filled" radius="md" label="Backend" data={backend_duplicates} { ...form.getInputProps( 'backend' ) } />
+                <NativeSelect variant="filled" radius="md" label="Metric" data={metric_duplicates} { ...form.getInputProps( 'metric' ) } />
 
                 <Switch
                     defaultChecked
@@ -82,7 +90,7 @@ export default function DuplicatesConfigs ()
                 />
             </Flex>
 
-            <Button type="submit" mt="md" onClick={(() => setClicked(true))}>
+            <Button type="submit" mt="md" >
                 { clicked ? ( <>
                     <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
                     <span>Configs modified</span></> )
@@ -92,4 +100,6 @@ export default function DuplicatesConfigs ()
         </form>
     );
 }
+
+export default React.memo(DuplicatesConfigs);
 

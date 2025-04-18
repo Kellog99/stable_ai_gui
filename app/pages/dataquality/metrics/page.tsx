@@ -7,7 +7,7 @@ import useStore from '../../../store/dsStore';
 import { useEffect, useState } from "react";
 import Config from "@/components/client/metrics/Config";
 import { IconInfoCircle } from '@tabler/icons-react';
-import MetricsAddedDisplayer from "@/components/client/metrics/MetricsAddedDisplayer";
+import MetricsAddedDisplayer from "@/components/client/metrics/displayer/MetricsAddedDisplayer";
 import RouterButton from "@/components/client/buttons/RouterButton";
 
 export default function Metrics ()

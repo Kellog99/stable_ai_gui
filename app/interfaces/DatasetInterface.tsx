@@ -36,6 +36,7 @@ export interface FeatureSchema{
 export interface Configs {
   metricName: string
   featureName: string,
+  outliersMode?: string,
   labelFeatureName?: string,
   internalConfigs: any
 }

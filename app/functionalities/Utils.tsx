@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { data_get, prototypes_get } from '../properties/urls';
+import { data_get, duplicates_post, outliers_post, prototypes_get } from '../properties/urls';
 
 
 export async function postIndexes ( url: string, indexes: number[] )
@@ -60,4 +60,32 @@ export async function getPrototypes (datasetName: string, featureName: string, l
   const prototypes = await response.json();
     return prototypes
 
+}
+
+
+export async function getDuplicates(datasetName: string, featureName: string, internalConfig: Object){
+  const response = await fetch(`${duplicates_post}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, // binary content type
+    body: JSON.stringify( internalConfig ),
+  } );
+
+  if ( !response.ok ) throw new Error( 'Failed to get duplicates from the backend' );
+  
+  const duplicates = await response.json();
+    return duplicates
+}
+
+
+export async function getOutliers(datasetName: string, featureName: string, internalConfig: Object, outliers_mode: string){
+  const response = await fetch(`${outliers_post}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&outliersMode=${encodeURIComponent(outliers_mode)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, // binary content type
+    body: JSON.stringify( internalConfig ),
+  } );
+
+  if ( !response.ok ) throw new Error( 'Failed to get duplicates from the backend' );
+  
+  const outliers = await response.json();
+    return outliers
 }

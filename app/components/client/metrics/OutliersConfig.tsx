@@ -8,8 +8,8 @@ interface OutliersConfigProp{
 export default function OutliersConfig (props: OutliersConfigProp)
 {
     const metricComponentMap: Record<string, React.ComponentType> = {
-        "Mahalanobis": MahalanobisConfig,
-        "Isolation Forest": IForestConfig,
+        "mahalanobis": MahalanobisConfig,
+        "isolation forest": IForestConfig,
     };
 
     const MetricConfigComponent = metricComponentMap[ props.mode ];

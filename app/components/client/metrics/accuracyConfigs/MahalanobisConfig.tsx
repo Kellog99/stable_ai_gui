@@ -18,15 +18,19 @@ export default function MahalanobisConfig ()
         },
     } );
 
+
+    const [ clicked, setClicked] = useState(false)
     const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
-    const [ clicked, setClicked ] = useState( false )
     
-    const handleSubmit = ( formValues: any ) =>
-    {
-        setInternalConfigs( formValues );
-        setClicked( true )
-        console.log( "FORM VALUES:", formValues )
-    }
+    
+    const handleSubmit = ( formValues: any) =>
+        {   
+            setClicked(true)
+            setInternalConfigs( formValues );
+            
+            console.log( "FORM VALUES:", formValues )
+        }
+    
 
 
     return (

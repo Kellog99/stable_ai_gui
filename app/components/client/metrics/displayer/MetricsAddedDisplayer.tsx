@@ -1,6 +1,6 @@
 "use client"
 
-import useStore from '../../../store/dsStore';
+import useStore from '../../../../store/dsStore';
 import { Accordion, Button, List, Space, Text } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
@@ -51,6 +51,7 @@ export default function MetricsAddedDisplayer ()
               </div>
             </Accordion.Control>
             <Accordion.Panel>
+              {config.outliersMode? (<Text size="sm">Mode: {config.outliersMode}</Text>):null}
               <Text size="sm">Configs:</Text>
               { Object.entries( config.internalConfigs ).map( ( [ key, value ], index2 ) => (
                 <List withPadding key={`config-${key}-${index}-${index2}`}>

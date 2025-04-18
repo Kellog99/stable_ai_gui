@@ -14,7 +14,11 @@ import
 } from '@fortawesome/free-solid-svg-icons';
 import { Configs } from "@/interfaces/DatasetInterface";
 import { IconInfoCircle } from '@tabler/icons-react';
-import DuplicatesDisplayer from "./DuplicatesDisplayer";
+import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
+import { getDuplicates, getOutliers } from "@/functionalities/Utils";
+import { useSearchParams } from "next/navigation";
+import internal from "stream";
+import { outliers_modes } from "./utils";
 
 
 
@@ -24,12 +28,33 @@ interface ConfigsProps
     labelFeatureReq?: boolean
 }
 
+interface DuplicatesDTO
+{
+    name: string,
+    featureName: string,
+    score: number,
+    indexes: [ number, number ][]
+}
+
+interface OutliersDTO{
+    name: string,
+    featureName: string,
+    score: number,
+    indexes: number[], 
+    score_per_sample: number[]
+}
 
 export default function Config ( props: ConfigsProps )
-{
+{   
+    const searchParams = useSearchParams();
+    const [ datasetName, setDatasetName ] = useState<string | null>( "" )
     const [ features, setFeatures ] = useState<string[]>( [] )
     const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
-    const outliers_modes = [ "Mahalanobis", "Isolation Forest", "Lunar", "LOF", "KNN" ]
+    //const outliers_modes = [ "mahalanobis", "isolation forest", "Lunar", "LOF", "KNN" ]
+    const [ isLoading, setIsLoading ] = useState<boolean>( false )
+    const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
+    const [ outliers, setOutliers] = useState<OutliersDTO | null>( null )
+
 
     const [ featureName, setFeatureName ] = useState<any>( "" )
     const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
@@ -43,9 +68,16 @@ export default function Config ( props: ConfigsProps )
 
     const configs = useStore( ( state ) => state.metricsConfig )
     const setConfigs = useStore( ( state ) => state.setMetricsConfigs )
-    const internalConfigs = useStore( ( state ) => state.internalConfigs )
+    const internalConfigs = useStore.getState().internalConfigs;
 
 
+    useEffect( () =>
+        {
+            if ( searchParams.get( "datasetName" ) ) {
+                setDatasetName( searchParams.get( "datasetName" ) )
+            }
+        }, [ searchParams ] )
+    
 
     useEffect( () =>
     {
@@ -109,6 +141,10 @@ export default function Config ( props: ConfigsProps )
                     setClicked(false);
                   }, 3000);
             }
+
+            if (props.metricName == "outliers") {
+                newConfig.outliersMode = outliers_mode;
+            }
         }
 
         const isDuplicate = configs.some( ( config ) =>
@@ -131,10 +167,51 @@ export default function Config ( props: ConfigsProps )
         }
     };
 
+{/*
+    useEffect( () =>
+        {
+            if ( computeNow === true && featureName && internalConfigs ) {
+                setIsLoading( true );
+                getDuplicates( datasetName as string, featureName, internalConfigs )
+                    .then( fetchedData =>
+                    {
+                        setDuplicates( fetchedData );
+    
+                    } )
+                    .finally( () =>
+                    {
+                        setIsLoading( false );
+                    } );
+            }
+        }, [ computeNow ] );
+    */}
+
+        useEffect( () =>
+            {
+                if ( computeNow === true && featureName && internalConfigs && outliers_mode ) {
+                    setIsLoading( true );
+                    getOutliers( datasetName as string, featureName, internalConfigs, outliers_mode )
+                        .then( fetchedData =>
+                        {
+                            setOutliers( fetchedData );
+        
+                        } )
+                        .finally( () =>
+                        {
+                            setIsLoading( false );
+                        } );
+                }
+            }, [ computeNow ] );
+    
+   console.log("OUTLIERS:", outliers)
+
+    
+
     const handleClickCompute = () =>
     {
         setComputeNow( !computeNow )
     }
+
 
     const icon = <IconInfoCircle />;
     console.log( "CONFIGS:", configs )
