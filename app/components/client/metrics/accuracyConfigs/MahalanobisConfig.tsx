@@ -27,6 +27,9 @@ export default function MahalanobisConfig ()
         {   
             setClicked(true)
             setInternalConfigs( formValues );
+            setTimeout(() => {
+                setClicked(false);
+              }, 3000);
             
             console.log( "FORM VALUES:", formValues )
         }

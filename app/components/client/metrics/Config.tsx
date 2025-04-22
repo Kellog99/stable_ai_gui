@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Box, Button, Flex, Modal, Select, Space, Text } from "@mantine/core";
+import { Alert, Box, Button, Flex, Loader, Modal, Select, Space, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
@@ -19,6 +19,7 @@ import { getDuplicates, getOutliers } from "@/functionalities/Utils";
 import { useSearchParams } from "next/navigation";
 import internal from "stream";
 import { outliers_modes } from "./utils";
+import metricsFetcher from "../../server/metricsFetcher";
 
 
 
@@ -44,13 +45,14 @@ interface OutliersDTO{
     score_per_sample: number[]
 }
 
+type MetricType = "duplicates" | "outliers";
+
 export default function Config ( props: ConfigsProps )
 {   
     const searchParams = useSearchParams();
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
     const [ features, setFeatures ] = useState<string[]>( [] )
     const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
-    //const outliers_modes = [ "mahalanobis", "isolation forest", "Lunar", "LOF", "KNN" ]
     const [ isLoading, setIsLoading ] = useState<boolean>( false )
     const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
     const [ outliers, setOutliers] = useState<OutliersDTO | null>( null )
@@ -167,51 +169,30 @@ export default function Config ( props: ConfigsProps )
         }
     };
 
-{/*
-    useEffect( () =>
-        {
-            if ( computeNow === true && featureName && internalConfigs ) {
-                setIsLoading( true );
-                getDuplicates( datasetName as string, featureName, internalConfigs )
-                    .then( fetchedData =>
-                    {
-                        setDuplicates( fetchedData );
-    
-                    } )
-                    .finally( () =>
-                    {
-                        setIsLoading( false );
-                    } );
-            }
-        }, [ computeNow ] );
-    */}
-
-        useEffect( () =>
-            {
-                if ( computeNow === true && featureName && internalConfigs && outliers_mode ) {
-                    setIsLoading( true );
-                    getOutliers( datasetName as string, featureName, internalConfigs, outliers_mode )
-                        .then( fetchedData =>
-                        {
-                            setOutliers( fetchedData );
-        
-                        } )
-                        .finally( () =>
-                        {
-                            setIsLoading( false );
-                        } );
-                }
-            }, [ computeNow ] );
-    
-   console.log("OUTLIERS:", outliers)
-
-    
-
-    const handleClickCompute = () =>
+    const handleClickCompute = async () =>
     {
-        setComputeNow( !computeNow )
-    }
+        setIsLoading(true);
+        setComputeNow(true);
+        try {
+          const data = await metricsFetcher(
+            props.metricName as MetricType, 
+            datasetName as string,
+            featureName,
+            internalConfigs,
+            labelFeatureName,
+            outliers_mode
+          );
 
+          console.log("DATA FETCHED:", data)
+      
+          if (props.metricName === "duplicates") setDuplicates(data);
+          if (props.metricName === "outliers") setOutliers(data);
+        } finally {
+          setIsLoading(false);
+      }};
+
+      console.log("OUTLIERS:", outliers)
+      console.log("DUPLICATES:", duplicates)
 
     const icon = <IconInfoCircle />;
     console.log( "CONFIGS:", configs )
@@ -367,9 +348,23 @@ export default function Config ( props: ConfigsProps )
                     </Alert>
                 </> ) : null }
 
-            { computeNow ? (
-                <DuplicatesDisplayer name={ "Duplicates" } featureName={ featureName } score={ 90 } indexes={ [] } />
-            ) : null }
+                {computeNow ? (
+                    isLoading ? (
+                        <Flex
+                            mih={ 150 }
+                            justify="center"
+                            align="center"
+                            direction="column"
+                            wrap="wrap"
+                            style={ { width: '100%' } }
+                            >
+                            <p>Loading...</p>
+                            <Loader />
+                        </Flex>
+                    ) : (
+                        <DuplicatesDisplayer duplicates={duplicates as DuplicatesDTO}/>
+                    )
+                    ) : null}
         </div >
     )
 }
