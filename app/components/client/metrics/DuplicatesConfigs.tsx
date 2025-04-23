@@ -34,9 +34,6 @@ function DuplicatesConfigs ()
     
     const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
     
-    console.log("CLICKED?", clicked)
-    
-
     const handleSubmit = ( formValues: any) =>
     {   
         setClicked(true)
@@ -45,11 +42,7 @@ function DuplicatesConfigs ()
             setClicked(false);
           }, 3000);
         
-        console.log( "FORM VALUES:", formValues )
     }
-
-
-
 
 
     return (

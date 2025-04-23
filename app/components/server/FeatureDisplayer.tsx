@@ -33,13 +33,12 @@ export function FeatureCard ( { index, data, featureType, label, labelString }: 
   );
 }
 
-
 export default function FeatureDisplayer ( { indexes, featureData, featureType, labelData, label_dict, columnCount }: { indexes?: number[], featureData: string[], featureType: string, labelData?: number[], label_dict?: { [ key: number ]: string }, columnCount?: number} )
 {
 
   const COLUMN_COUNT = columnCount? columnCount: 4;
   const COLUMN_WIDTH = 300;
-  const ROW_HEIGHT = 350;
+  const ROW_HEIGHT = 290;
   const rowCount = Math.ceil( featureData.length / COLUMN_COUNT );
 
 

@@ -78,6 +78,7 @@ export async function getDuplicates(datasetName: string, featureName: string, in
 
 
 export async function getOutliers(datasetName: string, featureName: string, internalConfig: Object, outliers_mode: string){
+  
   const response = await fetch(`${outliers_post}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&outliersMode=${encodeURIComponent(outliers_mode)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }, // binary content type

@@ -88,8 +88,6 @@ export default async function featureLoader(datasetName: string | null, featureN
     if (!response.ok) throw new Error('Failed to send files to backend');
 
     const feature = await response.json();
-
-    console.log('Server response:', feature); // Handle the JSON response
     
     return feature;
 }

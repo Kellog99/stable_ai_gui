@@ -2,9 +2,10 @@
 
 import FeatureDisplayer from "@/components/server/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
+import { FeatureDTO } from "@/interfaces/DatasetInterface";
 import { DuplicatesDTO } from "@/interfaces/metricsInterface"
-import { image_type, label_type, text_type } from "@/properties/types";
-import { Flex, Paper, RingProgress, Text } from "@mantine/core"
+import { image_type, text_type } from "@/properties/types";
+import { Flex, RingProgress, Text } from "@mantine/core"
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -14,9 +15,12 @@ export default function DuplicatesDisplayer(props: { duplicates: DuplicatesDTO }
     const searchParams = useSearchParams();
     const { featureName, score, indexes } = props.duplicates;
     const scoreRound = (score*100).toFixed(1)
-    const [feature, setFeature] = useState(null)
+    const [feature, setFeature] = useState<FeatureDTO | null>(null)
     const [type, setType] = useState("")
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
+
+
+    console.log("INDEXES:", indexes.flat())
 
     useEffect( () =>
         {
@@ -44,7 +48,9 @@ export default function DuplicatesDisplayer(props: { duplicates: DuplicatesDTO }
           loadFeature();}
       }, [datasetName] );
 
-      console.log("LOADED:", feature)
+      console.log("LOADED:", feature?.datas)
+      const indicesFlat = indexes.flat()
+      const duplicatesImages: string[] = indicesFlat.map(i => feature?.datas[i]).filter(Boolean);
 
     return (
         <>
@@ -63,7 +69,7 @@ export default function DuplicatesDisplayer(props: { duplicates: DuplicatesDTO }
                     label={ <Text ta="center" fw={ 700 } size="lg">{scoreRound}%</Text> }
                 />
 
-                <FeatureDisplayer indexes={indexes.flat()} featureData={feature.datas} featureType={type} columnCount={2}/>
+                <FeatureDisplayer indexes={indicesFlat} featureData={duplicatesImages} featureType={type} columnCount={2}/>
             </>) : null
              }    
             </Flex>

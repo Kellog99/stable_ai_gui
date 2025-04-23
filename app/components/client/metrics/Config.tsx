@@ -15,11 +15,12 @@ import
 import { Configs } from "@/interfaces/DatasetInterface";
 import { IconInfoCircle } from '@tabler/icons-react';
 import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
-import { getDuplicates, getOutliers } from "@/functionalities/Utils";
 import { useSearchParams } from "next/navigation";
 import internal from "stream";
 import { outliers_modes } from "./utils";
 import metricsFetcher from "../../server/metricsFetcher";
+import OutlierDisplayer from "./displayer/OutlierDisplayer";
+import { DuplicatesDTO, OutliersDTO } from "@/interfaces/metricsInterface";
 
 
 
@@ -27,22 +28,6 @@ interface ConfigsProps
 {
     metricName: string,
     labelFeatureReq?: boolean
-}
-
-interface DuplicatesDTO
-{
-    name: string,
-    featureName: string,
-    score: number,
-    indexes: [ number, number ][]
-}
-
-interface OutliersDTO{
-    name: string,
-    featureName: string,
-    score: number,
-    indexes: number[], 
-    score_per_sample: number[]
 }
 
 type MetricType = "duplicates" | "outliers";
@@ -182,8 +167,6 @@ export default function Config ( props: ConfigsProps )
             labelFeatureName,
             outliers_mode
           );
-
-          console.log("DATA FETCHED:", data)
       
           if (props.metricName === "duplicates") setDuplicates(data);
           if (props.metricName === "outliers") setOutliers(data);
@@ -203,6 +186,14 @@ export default function Config ( props: ConfigsProps )
     };
 
     const MetricConfigComponent = metricComponentMap[ props.metricName ];
+
+    
+    const metricDisplayerMap: Record<string, React.ComponentType> = {
+        "duplicates": () => <DuplicatesDisplayer duplicates={duplicates as DuplicatesDTO} />,
+        "outliers": () => <OutlierDisplayer outliers={outliers as OutliersDTO} />,
+    };
+
+    const MetricDisplayerComponent = metricDisplayerMap[ props.metricName ];
 
     return (
         <div>
@@ -362,7 +353,7 @@ export default function Config ( props: ConfigsProps )
                             <Loader />
                         </Flex>
                     ) : (
-                        <DuplicatesDisplayer duplicates={duplicates as DuplicatesDTO}/>
+                         MetricDisplayerComponent ? <MetricDisplayerComponent /> : <div>Unsupported metric</div> 
                     )
                     ) : null}
         </div >
