@@ -809,6 +809,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurkle/color@npm:^0.3.0":
+  version: 0.3.4
+  resolution: "@kurkle/color@npm:0.3.4"
+  checksum: 10c0/0e9fd55c614b005c5f0c4c755bca19ec0293bc7513b4ea3ec1725234f9c2fa81afbc78156baf555c8b9cb0d305619253c3f5bca016067daeebb3d00ebb4ea683
+  languageName: node
+  linkType: hard
+
 "@loaders.gl/3d-tiles@npm:^4.2.0":
   version: 4.3.3
   resolution: "@loaders.gl/3d-tiles@npm:4.3.3"
@@ -3203,6 +3210,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4":
+  version: 4.17.16
+  resolution: "@types/lodash@npm:4.17.16"
+  checksum: 10c0/cf017901b8ab1d7aabc86d5189d9288f4f99f19a75caf020c0e2c77b8d4cead4db0d0b842d009b029339f92399f49f34377dd7c2721053388f251778b4c23534
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 22.13.14
   resolution: "@types/node@npm:22.13.14"
@@ -4071,6 +4085,15 @@ __metadata:
   version: 0.0.2
   resolution: "charenc@npm:0.0.2"
   checksum: 10c0/a45ec39363a16799d0f9365c8dd0c78e711415113c6f14787a22462ef451f5013efae8a28f1c058f81fc01f2a6a16955f7a5fd0cd56247ce94a45349c89877d8
+  languageName: node
+  linkType: hard
+
+"chart.js@npm:^4.4.9":
+  version: 4.4.9
+  resolution: "chart.js@npm:4.4.9"
+  dependencies:
+    "@kurkle/color": "npm:^0.3.0"
+  checksum: 10c0/970e06bf1f8f498671b19b3105bb5fc5c25558286baa6141e7895815efca303c4b1a8f9c82430e61d8c772795fd8e40ddf9bc33fdf7559e3a016d7580c2d987c
   languageName: node
   linkType: hard
 
@@ -6598,6 +6621,7 @@ __metadata:
     "@react-three/fiber": "npm:^9.1.0"
     "@tabler/icons-react": "npm:^3.31.0"
     "@tanstack/react-virtual": "npm:^3.13.5"
+    "@types/lodash": "npm:^4"
     "@types/node": "npm:22.10.7"
     "@types/react": "npm:19.0.7"
     "@types/react-dom": "npm:19.0.3"
@@ -6605,16 +6629,19 @@ __metadata:
     "@types/tinycolor2": "npm:^1"
     "@xyflow/react": "npm:^12.5.2"
     canvas: "npm:^3.1.0"
+    chart.js: "npm:^4.4.9"
     deck.gl: "npm:^9.1.0"
     eslint: "npm:9.18.0"
     eslint-config-next: "npm:15.1.5"
     framer-motion: "npm:^12.6.3"
+    lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.483.0"
     next: "npm:^15.1.5"
     postcss: "npm:^8.5.1"
     postcss-preset-mantine: "npm:1.17.0"
     postcss-simple-vars: "npm:^7.0.1"
     react: "npm:19.0.0"
+    react-chartjs-2: "npm:^5.3.0"
     react-d3-tree: "npm:^3.6.6"
     react-dom: "npm:19.0.0"
     react-flow-renderer: "npm:^10.3.17"
@@ -7524,6 +7551,16 @@ __metadata:
   bin:
     rc: ./cli.js
   checksum: 10c0/24a07653150f0d9ac7168e52943cc3cb4b7a22c0e43c7dff3219977c2fdca5a2760a304a029c20811a0e79d351f57d46c9bde216193a0f73978496afc2b85b15
+  languageName: node
+  linkType: hard
+
+"react-chartjs-2@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "react-chartjs-2@npm:5.3.0"
+  peerDependencies:
+    chart.js: ^4.1.1
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/4415d40217c084a49f9a936fbd30f67e0e705148e6f8359bec65601033d1076f31085c45793839fc29ec833e6c427b0bf9861a0c54c432c08d35bc9590ffa41a
   languageName: node
   linkType: hard
 

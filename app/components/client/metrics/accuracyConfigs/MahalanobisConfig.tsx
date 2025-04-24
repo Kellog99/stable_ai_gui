@@ -30,8 +30,6 @@ export default function MahalanobisConfig ()
             setTimeout(() => {
                 setClicked(false);
               }, 3000);
-            
-            console.log( "FORM VALUES:", formValues )
         }
     
 

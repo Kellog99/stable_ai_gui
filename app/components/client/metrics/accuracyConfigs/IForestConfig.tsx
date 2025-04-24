@@ -34,7 +34,6 @@ export default function IForestConfig ()
     {
         setInternalConfigs( formValues );
         setClicked( true )
-        console.log( "FORM VALUES:", formValues )
         setTimeout(() => {
             setClicked(false);
           }, 3000);

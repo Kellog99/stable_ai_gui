@@ -1,194 +1,413 @@
 "use client";
 
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import {
+    Chart as ChartJS,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Tooltip,
+    Legend,
+    ChartOptions,
+    ChartData,
+    InteractionItem,
+} from 'chart.js';
+import { Scatter, getElementAtEvent } from 'react-chartjs-2';
+import { Flex, RingProgress, Text, Image, Box, Card, Group, Badge, Button, CloseButton } from "@mantine/core";
+
 import { OutliersDTO } from "@/interfaces/metricsInterface";
-
-import
-{
-    ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-    TooltipProps,
-} from 'recharts';
-
-import { Center, Flex, Paper, RingProgress, Stack, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
 import { FeatureDTO } from "@/interfaces/DatasetInterface";
-import { useSearchParams } from "next/navigation";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { image_type, text_type } from "@/properties/types";
-import { FeatureCard } from "@/components/server/FeatureDisplayer";
+import FeatureDisplayer, { FeatureCard } from '@/components/server/FeatureDisplayer';
 
 
+ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-interface DataPoint
-{
+// Data interfaces
+
+interface DataPoint {
     index: number;
     score: number;
     group: string;
 }
 
-export default function OutlierDisplayer ( props: { outliers: OutliersDTO } )
-{
+interface ChartJsPoint {
+    x: number;
+    y: number;
+    originalData: DataPoint;
+}
+
+function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO }) {
     const searchParams = useSearchParams();
-    const { featureName, mode, score, indexes, score_per_sample } = props.outliers;
+    const { featureName, mode, score, indexes, score_per_sample } = outliersProp;
 
-    const scoreRound = ( score * 100 ).toFixed( 1 )
-    const [ feature, setFeature ] = useState<FeatureDTO | null>( null )
-    const [ type, setType ] = useState( "" )
-    const [ datasetName, setDatasetName ] = useState<string | null>( "" )
+    const scoreRound = (score * 100).toFixed(1);
+    const [feature, setFeature] = useState<FeatureDTO | null>(null);
+    const [type, setType] = useState("");
+    const [datasetName, setDatasetName] = useState<string | null>("");
+
+    const [clickedOutlierData, setClickedOutlierData] = useState<DataPoint | null>(null);
     const [clicked, setClicked] = useState<boolean>(false)
-    const [outlierData, setOutlierData] = useState(null)
+    const [showAll, setShowAll] = useState<boolean>(false)
+    const [outlierSel, setOutlierSel] = useState<string>("")
 
-    useEffect( () =>
-    {
-        if ( searchParams.get( "datasetName" ) ) {
-            setDatasetName( searchParams.get( "datasetName" ) );
+    const [allOutliers, setAllOutliers] = useState<string[]>([])
+    const [allScores, setAllScores] = useState<number[]>([])
+    const [allGroups, setAllGroups] = useState<string[]>([])
+   
+    
+    
+    const chartRef = React.useRef<ChartJS<'scatter'>>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+   
+    const maxIndex = useMemo(() => {
+        return score_per_sample ? score_per_sample.length - 1 : 0;
+    }, [score_per_sample]);
+
+    useEffect(() => {
+        if (searchParams.get("datasetName")) {
+            setDatasetName(searchParams.get("datasetName"));
         }
-    }, [ searchParams ] );
+    }, [searchParams]);
 
 
-    useEffect( () =>
-    {
-        if ( datasetName ) {
-            const loadFeature = async () =>
-            {
+    useEffect(() => {
+        if (datasetName && featureName) {
+            const loadFeature = async () => {
                 try {
-                    const featureLoaded = await featureLoader( datasetName, featureName );
-                    console.log( "FEATURE LOADED:", featureLoaded );
-                    if ( featureLoaded.type === image_type || featureLoaded.type === text_type ) {
-                        setFeature( featureLoaded );
-                        setType( featureLoaded.type )
+                    const featureLoaded = await featureLoader(datasetName, featureName);
+                    console.log("FEATURE LOADED:", featureLoaded);
+                    if (featureLoaded.type === image_type || featureLoaded.type === text_type) {
+                        setFeature(featureLoaded);
+                        setType(featureLoaded.type);
                     }
-                } catch ( error ) {
-                    console.error( 'Error loading feature:', error );
+                } catch (error) {
+                    console.error('Error loading feature:', error);
                 }
             };
             loadFeature();
         }
-    }, [ datasetName ] );
+    }, [datasetName, featureName]);
+
+    useEffect(() => {
+        if (feature?.datas && clickedOutlierData?.index !== undefined) {
+            const index = clickedOutlierData.index;
+            if (index >= 0 && index < feature.datas.length) {
+                setOutlierSel(feature.datas[index]);
+            }
+        }
+    }, [feature, clickedOutlierData]);
+
+    const chartData = useMemo<ChartData<'scatter', ChartJsPoint[]>>(() => {
+        const outlierSet = new Set(indexes);
+        const inliersPoints: ChartJsPoint[] = [];
+        const outliersPoints: ChartJsPoint[] = [];
+
+        score_per_sample.forEach((sampleScore, i) => {
+            const isOutlier = outlierSet.has(i);
+            const originalData: DataPoint = {
+                index: i,
+                score: sampleScore,
+                group: isOutlier ? "Outlier" : "Inlier",
+            };
+            const point: ChartJsPoint = {
+                x: i,
+                y: sampleScore,
+                originalData: originalData,
+            };
+
+            if (isOutlier) {
+                outliersPoints.push(point);
+                
+            
+            } else {
+                inliersPoints.push(point);
+            }
+        });
+
+        
+        const allScoresOut: number[] = outliersPoints.map(point => point.originalData.score);
+        setAllScores(allScoresOut)
+        const allGroupsOut: string[] = outliersPoints.map(point => point.originalData.group);
+        setAllGroups(allGroupsOut)
+
+        
+
+        return {
+            datasets: [
+                {
+                    label: 'Inliers',
+                    data: inliersPoints,
+                    backgroundColor: '#228be6',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                },
+                {
+                    label: 'Outliers',
+                    data: outliersPoints,
+                    backgroundColor: '#fa5252',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                },
+            ],
+        };
+    }, [score_per_sample, indexes]);
+    console.log("scores", allScores)
+    console.log("groups", allGroups)
     
+    const handlePointClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+        const chart = chartRef.current;
+        if (!chart) {
+            return;
+        }
 
-    const outlierSet = new Set( indexes );
+        const elements: InteractionItem[] = getElementAtEvent(chart, event);
 
-    const outliers: DataPoint[] = [];
-    const inliers: DataPoint[] = [];
+        if (elements.length > 0) {
+            const firstElement = elements[0];
+            const datasetIndex = firstElement.datasetIndex;
+            const index = firstElement.index;
+            const clickedPointData = chart.data.datasets[datasetIndex].data[index] as ChartJsPoint;
+            setTimeout(() => {
+                if (clickedPointData && clickedPointData.originalData) {
+                    setClicked(true)
+                    console.log('Clicked point (Chart.js):', clickedPointData.originalData);
+                    setClickedOutlierData(clickedPointData.originalData);
+                    
+                } else {
+                    setClickedOutlierData(null);
+                }
+            }, 10);
+        }
+    };
+    
+    const handleShowAll = () => {
 
-    score_per_sample.forEach( ( score, i ) =>
-    {
-        const isOutlier = outlierSet.has( i );
-        const point = {
-            index: i,
-            score: score,
-            group: isOutlier ? "Outlier" : "Inlier"
+        const indicesFlat = indexes.flat()
+        const allOutliersList: string[] = indicesFlat.map(i => feature?.datas[i]).filter(Boolean);
+        setAllOutliers(allOutliersList)
+        setShowAll(!showAll)
+        setClicked(false)
+    }
+    
+    const maxScore = useMemo(() => {
+        if (!score_per_sample || score_per_sample.length === 0) return 1;
+        return Math.max(...score_per_sample) * 1.05; // Add 5% padding at the top
+    }, [score_per_sample]);
+
+    const minScore = useMemo(() => {
+        if (!score_per_sample || score_per_sample.length === 0) return 1;
+        return Math.min(...score_per_sample) * 1.05; // Add 5% padding at the bottom
+    }, [score_per_sample]);
+
+    
+    const options = useMemo<ChartOptions<'scatter'>>(() => ({
+        responsive: true,
+        maintainAspectRatio: false,
+        responsiveAnimationDuration: 0,
+        onHover: (event: any, chartElement: any[]) => {
+            const canvas = event?.native?.target as HTMLCanvasElement | null;
+            if (canvas) {
+              canvas.style.cursor = chartElement.length ? 'pointer' : 'default';
+            }
+          },
+
+        plugins: {
+            legend: {
+                position: 'top' as const,
+                labels: {
+                    boxWidth: 10,
+                    padding: 10,
+                    font: {
+                        size: 12
+                    }
+                }
+            },
+            tooltip: {
+                enabled: true,
+                callbacks: {
+                    label: function (context) {
+                        const pointData = context.raw as ChartJsPoint;
+                        if (pointData && pointData.originalData) {
+                            const orig = pointData.originalData;
+                            return [
+                                `Group: ${orig.group}`,
+                                `Index: ${orig.index}`,
+                                `Score: ${orig.score.toFixed(3)}`
+                            ];
+                        }
+                        return `Index: ${context.parsed.x}, Score: ${context.parsed.y.toFixed(3)}`;
+                    },
+                },
+            },
+        },
+        scales: {
+            x: {
+                type: 'linear',
+                position: 'bottom',
+                title: {
+                    display: true,
+                    text: 'Index',
+                    color: '#868e96',
+                    font: { size: 14 }
+                },
+                grid: {
+                    color: '#dee2e6',
+                    borderDash: [2, 4], // Dotted line pattern for grid
+                    lineWidth: 1
+                },
+                border: {
+                    dash: [2, 4],
+                    width: 1,
+                    color: '#868e96'
+                },
+                ticks: {
+                    color: '#868e96',
+                    font: { size: 12 },
+                    maxRotation: 0,
+                    autoSkip: true,
+                    maxTicksLimit: 10
+                },
+                min: 0,
+                max: maxIndex,
+                afterDataLimits: (scale) => {
+                    scale.max = maxIndex;
+                    scale.min = 0;
+                }
+            },
+            y: {
+                type: 'linear',
+                title: {
+                    display: true,
+                    text: 'Score',
+                    color: '#868e96',
+                    font: { size: 14 }
+                },
+                grid: {
+                    color: '#dee2e6',
+                    borderDash: [2, 4], 
+                    lineWidth: 1
+                },
+                border: {
+                    dash: [2, 4],
+                    width: 1,
+                    color: '#868e96'
+                },
+                ticks: {
+                    color: '#868e96',
+                    font: { size: 12 },
+                    autoSkip: true,
+                    maxTicksLimit: 8
+                },
+                min: minScore,
+                max: maxScore,
+                afterDataLimits: (scale) => {
+                    scale.max = maxScore;
+                    scale.min = minScore;
+                }
+            },
+        },
+        parsing: false,
+        normalized: true,
+        spanGaps: false,
+        interaction: {
+            mode: 'nearest' as const,
+            axis: 'xy' as const,
+            intersect: true,
+        },
+    }), [maxIndex, maxScore]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (chartRef.current) {
+                chartRef.current.resize();
+            }
         };
 
-        if ( isOutlier ) {
-            outliers.push( point );
-        } else {
-            inliers.push( point );
-        }
-    } );
-
-
-    const handlePointClick = ( data: any ) =>
-    {
-        console.log( 'Clicked point:', data );
-        if (data) {
-        setOutlierData(data)
-        console.log("outlierData:", feature?.datas[data.index])
-        setClicked(true)
-    }
-    };
-
-    
-
-    const CustomTooltip = ( { active, payload }: TooltipProps<number, string> ) =>
-    {
-        if ( active && payload && payload.length ) {
-            const point = payload[ 0 ].payload as DataPoint;
-
-            return (
-                <Paper shadow="md" radius="md" p="sm" withBorder>
-                    <Center>
-                        <Text fw={ 600 } size="sm">{ point.group }</Text>
-                    </Center>
-                    <Text size="sm">
-                        Index: { point.index }
-                    </Text>
-                    <Text size="sm">
-                        Score: { point.score.toFixed( 3 ) }
-                    </Text>
-                </Paper>
-            );
-        }
-        return null;
-    };
-
-
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     return (
-        <>
-            <Flex
-                direction="column"
-                align="center">
-                <h3>Score computed on { featureName } with { mode } mode</h3>
+        <Flex direction="column" align="center" style={{ width: '100%', maxWidth: '100%' }}>
+            <h3>Score computed on {featureName} with {mode} mode</h3>
+            <RingProgress
+                size={180}
+                roundCaps
+                sections={[{ value: score * 100, color: 'green' }]}
+                transitionDuration={1000}
+                label={<Text ta="center" fw={700} size="lg">{scoreRound}%</Text>}
+            />
 
-                <RingProgress
-                    size={ 180 }
-                    roundCaps
-                    sections={ [ { value: score * 100, color: 'green' } ] }
-                    transitionDuration={ 1000 }
-                    label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
+            <Box 
+                ref={containerRef}
+                style={{
+                    width: '100%',
+                    maxWidth: '100%',
+                    height: '400px',
+                    marginTop: '20px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
+            >
+                <Scatter
+                    ref={chartRef}
+                    options={options}
+                    data={chartData}
+                    onClick={handlePointClick}
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                 />
 
-                <ResponsiveContainer width="100%" height={ 400 }>
-                    <ScatterChart margin={ { top: 20, right: 20, bottom: 20, left: 20 } }>
-                        <CartesianGrid stroke="#dee2e6" strokeDasharray="3 3" />
-                        <XAxis
-                            type="number"
-                            dataKey="index"
-                            name="Index"
-                            domain={ [ 'dataMin', 'dataMax' ] }
-                            axisLine={ false }
-                            tickLine={ false }
-                            tick={ { fill: '#868e96', fontSize: 12 } }
-                        />
-                        <YAxis
-                            type="number"
-                            dataKey="score"
-                            name="Score"
-                            label={ {
-                                value: 'Score',
-                                angle: -90,
-                                position: 'insideLeft',
-                                fill: '#868e96',
-                                fontSize: 14,
-                            } }
-                            axisLine={ false }
-                            tickLine={ false }
-                            tick={ { fill: '#868e96', fontSize: 12 } }
-                        />
-                        <Tooltip content={ <CustomTooltip /> } />
-                        <Legend />
+            </Box>
 
-                        <Scatter
-                            name="Inliers"
-                            data={ inliers }
-                            fill="#228be6"
-                            onClick={ handlePointClick }
-                        />
-                        <Scatter
-                            name="Outliers"
-                            data={ outliers }
-                            fill="#fa5252"
-                            onClick={ handlePointClick }
-                        />
-                    </ScatterChart>
-                </ResponsiveContainer>
+            <Button onClick={handleShowAll}>
+                {showAll ? "Hide outliers" : "Show all outliers"}
+            </Button>
 
-                {clicked && feature? (
-                    <FeatureCard data={feature?.datas[outlierData?.index]} featureType={ type }/>
-                ) : null}
-            </Flex>
-        </>
-    )
+            <Box 
+                ref={containerRef}
+                style={{
+                    width: '100%',
+                    maxWidth: '100%',
+                    height: '400px',
+                    marginTop: '20px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}
+            >
 
+             {clicked && outlierSel!==""? (
+                <>
+                <Box style={{ width: "260px", position: "relative" }}>
+                <CloseButton
+                    style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    zIndex: 1,
+                    }}
+                    onClick={() => setClicked(false)}
+                />
+                <FeatureCard
+                    data={outlierSel}
+                    featureType={type}
+                    outlier={clickedOutlierData?.group}
+                    score={clickedOutlierData?.score}
+                />
+                </Box>
+            </>) : null}
+
+            {showAll? (
+                <FeatureDisplayer featureData={allOutliers} featureType={type} outliers={allGroups} scores={allScores} columnCount={2}/>
+            ) : null}
+            </Box>
+        </Flex>
+    );
 }
+
+export default OutlierDisplayer;
