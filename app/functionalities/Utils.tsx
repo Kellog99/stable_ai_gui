@@ -85,7 +85,7 @@ export async function getOutliers(datasetName: string, featureName: string, inte
     body: JSON.stringify( internalConfig ),
   } );
 
-  if ( !response.ok ) throw new Error( 'Failed to get duplicates from the backend' );
+  if ( !response.ok ) throw new Error( 'Failed to get outliers from the backend' );
   
   const outliers = await response.json();
     return outliers

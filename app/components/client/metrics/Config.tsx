@@ -21,6 +21,7 @@ import { outliers_modes } from "./utils";
 import metricsFetcher from "../../server/metricsFetcher";
 import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import { DuplicatesDTO, OutliersDTO } from "@/interfaces/metricsInterface";
+import { config } from "process";
 
 
 
@@ -153,6 +154,10 @@ export default function Config ( props: ConfigsProps )
             setIsDuplicate( true )
         }
     };
+
+    useEffect(() => {
+        setComputeNow(false)
+    }, [featureName, outliers_mode, labelFeatureName, configs ])
 
     const handleClickCompute = async () =>
     {

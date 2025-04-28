@@ -25,7 +25,6 @@ import FeatureDisplayer, { FeatureCard } from '@/components/server/FeatureDispla
 
 ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-// Data interfaces
 
 interface DataPoint {
     index: number;
@@ -155,8 +154,7 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
             ],
         };
     }, [score_per_sample, indexes]);
-    console.log("scores", allScores)
-    console.log("groups", allGroups)
+    
     
     const handlePointClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
         const chart = chartRef.current;
@@ -374,7 +372,6 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
                 style={{
                     width: '100%',
                     maxWidth: '100%',
-                    height: '400px',
                     marginTop: '20px',
                     position: 'relative',
                     overflow: 'hidden'
@@ -403,7 +400,7 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
             </>) : null}
 
             {showAll? (
-                <FeatureDisplayer featureData={allOutliers} featureType={type} outliers={allGroups} scores={allScores} columnCount={2}/>
+                <FeatureDisplayer featureData={allOutliers} featureType={type} outliers={allGroups} scores={allScores} columnCount={4}/>
             ) : null}
             </Box>
         </Flex>

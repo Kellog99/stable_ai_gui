@@ -18,6 +18,8 @@ export default async function metricsFetcher (
         outliers_mode = "iforest"
     }
 
+    console.log("OUTLIER MODE:", metric)
+
     const analysisMap = {
         "duplicates": () => getDuplicates( datasetName as string, featureName, internalConfigs ),
         "outliers": () => getOutliers( datasetName as string, featureName, internalConfigs, outliers_mode! ),
