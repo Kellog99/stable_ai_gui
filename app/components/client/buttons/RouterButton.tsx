@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from 'next/link'
 
 interface ClickableImageProps {
-  name: string |null;
+  name: string | undefined | null;
   route: string;
 }
 

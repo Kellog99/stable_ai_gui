@@ -42,9 +42,7 @@ function Home ()
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
   const containerRef = useRef<HTMLDivElement>( null );
-
   const indexes = useStore( ( state ) => state.selectedIndexes );
-
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
 
   useEffect( () =>
@@ -175,9 +173,11 @@ function Home ()
       <div className="max-w-4xl mx-auto px-4">
         <Box className={ classes.title }>
           <h1>Embeddings for { datasetName } dataset</h1>
+          {/*
           <RouterButton name={ datasetName! } route={ "/pages/dataquality/datasets" }>
             <Button>Go Back to Dataset Page</Button>
           </RouterButton>
+          */}
         </Box>
         <Space h="md" />
 

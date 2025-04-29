@@ -63,10 +63,12 @@ export default function Metrics ()
                         <Button>
                             Obtain report with default configurations
                         </Button>
-                        <Divider orientation="vertical"/>
+                        {/*
+                        <Divider orientation="vertical"/> 
                         <RouterButton name={ datasetName! } route={ "/pages/dataquality/datasets" }>
                             <Button>Go Back to Dataset Page</Button>
                         </RouterButton>
+                        */}
                     </Flex>
                 </Box>
 

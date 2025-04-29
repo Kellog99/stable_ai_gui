@@ -4,6 +4,7 @@ import ImageDisplayer from "./ImageDisplayer";
 import TextDisplayer from "./TextDisplayer";
 import classes from '../../pages/dataquality/embeddings/page.module.css'
 import { image_type, text_type } from "@/properties/types";
+import useStore from "@/store/dsStore";
 
 //label_dict?:{[key: number]: string}
 
@@ -46,7 +47,7 @@ export function FeatureCard ( props: FeatureCardProps )
         <>
       <Group justify="space-between" mt="md" mb="xs">
         {labelString != null? <Text fw={ 700 } size="lg">{labelString}</Text> : null }
-        { label != null ? <Badge color="#ec777e"> Class: { label } </Badge> : null }
+        { label != null ? <Badge color="#ec777e"> Class ID: { label } </Badge> : null }
       </Group>
       
       {index || index==0 ? (
@@ -73,7 +74,7 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps)
   const COLUMN_WIDTH = 260;
   const ROW_HEIGHT = 290;
   const rowCount = Math.ceil( featureData.length / COLUMN_COUNT );
-
+  const setHoverIndex = useStore((state) => state.setHoverIndex)
 
 
   return (
@@ -94,19 +95,20 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps)
           <div style={ {
             ...style,
             padding: '8px',
+            
           } }>
-            <FeatureCard
-              data={ featureData[ index ] }
-              featureType={ featureType }
-              { ...( indexes ? { index: indexes[ index ] } : {} ) }
-              { ...( labelData ? { label: labelData[ index ] } : {} ) }
-              { ...( labelData && label_dict ?
-                 { labelString: label_dict[ labelData[ index ] ] }
-                : {}
-              ) }
-              { ...( outliers ? { outlier: outliers[ index ] } : {} ) }
-              { ...( scores ? { score: scores[ index ] } : {} ) }
-            />
+           
+           <div onMouseEnter={() => setHoverIndex(indexes[index])} onMouseLeave={() => setHoverIndex(null)}>
+              <FeatureCard
+                data={featureData[index]}
+                featureType={featureType}
+                {...(indexes ? { index: indexes[index] } : {})}
+                {...(labelData ? { label: labelData[index] } : {})}
+                {...(labelData && label_dict ? { labelString: label_dict[labelData[index]] } : {})}
+                {...(outliers ? { outlier: outliers[index] } : {})}
+                {...(scores ? { score: scores[index] } : {})}
+              />
+           </div>
           </div>
         );
       } }

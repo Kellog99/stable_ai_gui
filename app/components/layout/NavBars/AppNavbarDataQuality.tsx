@@ -17,14 +17,16 @@ import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
-    faHouse, faImage, faChartLine, faBolt
+    faHouse, faImage, faChartLine, faBolt, faDatabase
 } from '@fortawesome/free-solid-svg-icons';
 import
 {
-    IconChevronDown
+    IconChevronDown,
+    IconChevronUp
 } from '@tabler/icons-react';
 import classes from './AppNavbarDataQuality.module.css';
 import RouterButton from "@/components/client/buttons/RouterButton";
+import useStore from "@/store/dsStore";
 
 
 function AppNavbarDataQuality ()
@@ -36,7 +38,8 @@ function AppNavbarDataQuality ()
     const pathName = usePathname();
     const isActive = ( path: string ) => pathName === path;
 
-    const isHomePage = pathName.endsWith( '/' );
+    const datasetUsed = useStore( ( state ) => state.datasetUsed ) 
+    const isDatasetUndefined = datasetUsed == undefined;
 
     const [ visualVisible, setVisualVisible ] = useState( false );
     const [ metricVisible, setMetricVisible ] = useState( false );
@@ -70,28 +73,55 @@ function AppNavbarDataQuality ()
                 <Box>
                     <Link href="/" style={ { textDecoration: 'none' } }>
                         <Button
-                            leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
+                            leftSection={ <FontAwesomeIcon icon={ faDatabase } /> }
                             radius="xl"
                             variant={ isActive( "/" ) ? "filled" : "subtle" }
                         >
-                            Home
+                            Datasets
                         </Button>
                     </Link>
+                    <Space h="xs" />
+                   
+                    <RouterButton name={datasetUsed?.name} route={"/pages/dataquality/datasets"}>
+                        <Button
+                            leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
+                            radius="xl"
+                            variant={ isActive( "/pages/dataquality/datasets" ) ? "filled" : "subtle" }
+                            disabled={ isDatasetUndefined }
+                        >
+                            Dataset Description
+                        </Button>
+                    </RouterButton>
+                    
                 </Box>
 
                 <Space h="xs" />
 
                 <Box>
                     <Group gap="xs" mb="xs" mr="xs">
-                        <Button
-                            className={ classes.navbar }
-                            onClick={ () => setVisualVisible( ( prev ) => !prev ) }
-                            rightSection={ <IconChevronDown size={ 18 } stroke={ 1.5 } /> } pr={ 12 }
-                            leftSection={ <FontAwesomeIcon icon={ faImage } size="sm" style={ { opacity: 0.6 } } /> }>
-                            <Text size="sm" fw={ 600 } c="dimmed">
-                                Visualization
-                            </Text>
-                        </Button>
+                    <Button
+                    className={classes.navbar}
+                    onClick={() => setVisualVisible((prev) => !prev)}
+                    rightSection={
+                        visualVisible ? (
+                        <IconChevronUp size={18} stroke={1.5} />
+                        ) : (
+                        <IconChevronDown size={18} stroke={1.5} />
+                        )
+                    }
+                    pr={12}
+                    leftSection={
+                        <FontAwesomeIcon
+                        icon={faImage}
+                        size="sm"
+                        style={{ opacity: 0.6 }}
+                        />
+                    }
+                    >
+                    <Text size="sm" fw={600} c="dimmed">
+                        Visualization
+                    </Text>
+                    </Button>
                     </Group>
 
                     { visualVisible && (
@@ -101,7 +131,7 @@ function AppNavbarDataQuality ()
                                     <Button
                                         radius="xl"
                                         variant={ isActive( "/pages/dataquality/embeddings" ) ? "filled" : "subtle" }
-                                        disabled={ isHomePage }
+                                        disabled={ isDatasetUndefined }
                                     >
                                         <Text size="sm" fw={ 600 } c="dimmed">
                                             Embeddings
@@ -112,7 +142,7 @@ function AppNavbarDataQuality ()
                                     <Button
                                         radius="xl"
                                         variant={ isActive( "/pages/dataquality/prototypes" ) ? "filled" : "subtle" }
-                                        disabled={ isHomePage }
+                                        disabled={ isDatasetUndefined }
                                     >
                                         <Text size="sm" fw={ 600 } c="dimmed">
                                             Prototypes
@@ -128,8 +158,14 @@ function AppNavbarDataQuality ()
                     <Group gap="xs" mb="xs" mr="xs">
                         <Button
                             className={ classes.navbar }
-                            onClick={ () => setMetricVisible( ( prev ) => !prev ) }
-                            rightSection={ <IconChevronDown size={ 18 } stroke={ 1.5 } /> } pr={ 12 }
+                            onClick={() => setMetricVisible((prev) => !prev)}
+                            rightSection={
+                                metricVisible ? (
+                                <IconChevronUp size={18} stroke={1.5} />
+                                ) : (
+                                <IconChevronDown size={18} stroke={1.5} />
+                                )
+                            } pr={ 12 }
                             leftSection={ <FontAwesomeIcon icon={ faChartLine } size="sm" style={ { opacity: 0.6 } } /> }>
                             <Text size="sm" fw={ 600 } c="dimmed">
                                 Metrics
@@ -144,7 +180,7 @@ function AppNavbarDataQuality ()
                                     <Button
                                         radius="xl"
                                         variant={ isActive( "/pages/dataquality/metrics" ) ? "filled" : "subtle" }
-                                        disabled={ isHomePage }
+                                        disabled={ isDatasetUndefined }
                                     >
                                         <Text size="sm" fw={ 600 } c="dimmed">
                                             Metric Page
@@ -155,7 +191,7 @@ function AppNavbarDataQuality ()
                                 <Button
                                     radius="xl"
                                     variant={ isMetricActive( "duplicates" ) ? "filled" : "subtle" }
-                                    disabled={ isHomePage }
+                                    disabled={ isDatasetUndefined }
                                     onClick={ () => handleButtonClick( "duplicates" ) }
                                 >
                                     <Text size="sm" fw={ 600 } c="dimmed">
@@ -166,7 +202,7 @@ function AppNavbarDataQuality ()
                                 <Button
                                     radius="xl"
                                     variant={ isMetricActive( "outliers" ) ? "filled" : "subtle" }
-                                    disabled={ isHomePage }
+                                    disabled={ isDatasetUndefined }
                                     onClick={ () => handleButtonClick( "outliers" ) }
                                 >
                                     <Text size="sm" fw={ 600 } c="dimmed">
@@ -183,8 +219,14 @@ function AppNavbarDataQuality ()
                     <Group gap="xs" mb="xs" mr="xs">
                         <Button
                             className={ classes.navbar }
-                            onClick={ () => setActionVisible( ( prev ) => !prev ) }
-                            rightSection={ <IconChevronDown size={ 18 } stroke={ 1.5 } /> } pr={ 12 }
+                            onClick={() => setActionVisible((prev) => !prev)}
+                            rightSection={
+                                actionVisible ? (
+                                <IconChevronUp size={18} stroke={1.5} />
+                                ) : (
+                                <IconChevronDown size={18} stroke={1.5} />
+                                )
+                            }
                             leftSection={ <FontAwesomeIcon icon={ faBolt } size="sm" style={ { opacity: 0.6 } } /> }>
                             <Text size="sm" fw={ 600 } c="dimmed">
                                 Actions

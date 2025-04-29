@@ -246,6 +246,11 @@ export default function Datasets ()
   }
 */}
 
+const handleonClose = () => {
+  setFeatureToDisplay( null );
+  setLabelFeature(null)
+}
+
 
   return (
     <div className="w-full h-screen">
@@ -255,7 +260,7 @@ export default function Datasets ()
           style={ { display: "flex", flexDirection: "column", gap: "0px" } }
         >
           <h1 style={ { marginTop: "0", marginBottom: "30px" } }>
-            { datasetName } dataset
+            { datasetUsed?.name } dataset
           </h1>
         </Box>
 
@@ -315,7 +320,7 @@ export default function Datasets ()
                   gap='md'>
                   <h3>Explore the { feature.name } feature</h3>
                   <CloseButton
-                    onClick={ () => setFeatureToDisplay( null ) } />
+                    onClick={handleonClose} />
                 </Flex>
                 <div className="h-96 overflow-auto">
                   { labelFeature ? (

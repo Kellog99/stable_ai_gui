@@ -9,6 +9,7 @@ import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
 import { Flex, Loader } from '@mantine/core';
 
+
 interface OrbitViewState
 {
   target: [ number, number, number ]; // This ensures 'target' has exactly 3 elements
@@ -55,7 +56,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const isDraggingRef = useRef<boolean>( false );
 
   //const [lassoMode, setLassoMode] = useState<boolean>(false);
-
+  
   const [ data, setData ] = useState<Point[] | null>( null );
   const [ isLoading, setIsLoading ] = useState( true );
   const [ viewState, setViewState ] = useState<OrbitViewState>( {
@@ -71,7 +72,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
   const selectedIndexes = useStore( ( state ) => state.selectedIndexes )
+  const hoverIndex = useStore((state) => state.hoverIndex)
 
+  console.log("HOVER ON SCATTER:", hoverIndex)
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
 
@@ -90,7 +93,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       } );
   }, [ props.featureName, props.labelFeatureName ] );
 
-console.log("DATA COLORS", data)
+
   useEffect( () =>
   {
     // Handler for mouse down events
@@ -180,6 +183,61 @@ console.log("DATA COLORS", data)
   }, [ selectedIndexes ] );
 
   // ****************************************************************************************************************************************************
+  const basePointSize = 3.5;
+  const highlightScale = 1.5;
+
+ 
+  const BASE_RADIUS_METERS = 3.5; // Base size of points in meters (if using geospatial coords) or pixels (if view-relative)
+const HIGHLIGHT_RADIUS_METERS = 7.0; // Size of the hovered point
+const HIGHLIGHT_COLOR: [number, number, number, number?] = [255, 255, 0, 255]; // Optional: Distinct color for hovered point (RGBA)
+const TRANSITION_DURATION = 300; // Milliseconds for the size transition
+
+const layer = new ScatterplotLayer<Point>({ // Specify the data type for better type checking
+  id: 'scatterplot-layer-hover-effect',
+  data,
+  pickable: true,
+
+  // --- Style ---
+  stroked: false, // More performant if you don't need outlines
+  filled: true,
+  radiusUnits: 'pixels', // Or 'meters' if your positions are lng/lat and you want real-world size
+  radiusScale: 1,       // If radiusUnits is 'pixels', this is often 1
+  radiusMinPixels: 1,   // Ensure points are always visible
+  radiusMaxPixels: 100, // Cap maximum size
+
+  // --- Accessors ---
+  getPosition: (d: Point) => d.position,
+
+  // Radius accessor: Return larger radius for the hovered point
+  getRadius: (d: Point, { index }: { index: number }) => {
+    return index === hoverIndex ? HIGHLIGHT_RADIUS_METERS : BASE_RADIUS_METERS;
+  },
+
+  // Color accessor: Optionally change color on hover too
+  getFillColor: (d: Point, { index }: { index: number }) => {
+    return index === hoverIndex ? HIGHLIGHT_COLOR : d.color; // Use highlight color or original color
+  },
+
+  // --- Interactivity ---
+  onClick: (info: any) => handlePointClick(info),
+  // Note: The onHover logic to update the hoverIndex state variable itself
+  // should typically be defined on the parent <DeckGL> component, not the layer.
+
+  // --- Transitions! ---
+  // This tells Deck.gl to smoothly animate changes to getRadius and getFillColor
+  
+
+  // --- Updates ---
+  // Tell Deck.gl to re-evaluate accessors when hoverIndex changes
+  updateTriggers: {
+    getRadius: [hoverIndex],
+    getFillColor: [hoverIndex] // Also update color trigger if using getFillColor for highlighting
+  },
+});
+
+// Remember to include this layer in the 'layers' array passed to your <DeckGL> component.
+// Ensure the component re-renders when 'hoverIndex' changes.
+  {/*
   const layer = new PointCloudLayer( {
     id: 'point-cloud-layer',
     data,
@@ -189,6 +247,7 @@ console.log("DATA COLORS", data)
     getColor: ( d: Point ) => d.color,
     onClick: ( info: any ) => handlePointClick( info ),
   } );
+  */}
 
   const isPointInPolygon = ( point: Point, polygon: Point[] ): boolean =>
   {

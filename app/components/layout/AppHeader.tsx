@@ -4,14 +4,20 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from "react";
 import {
- Image, Group, Burger, Button
+ Image, Group, Burger, Button,
+ Tooltip
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDatabase } from "@fortawesome/free-solid-svg-icons";
+import useStore from "@/store/dsStore";
+
 
 function AppHeader() {
     const [opened, { toggle, close }] = useDisclosure(false)
     const pathName = usePathname();
     const isActive = (path: string) => pathName === path;
+    const datasetUsed = useStore( ( state ) => state.datasetUsed )?.name;
 
     const isNNTrust = pathName.includes('/nntrust');
     return (
@@ -36,7 +42,9 @@ function AppHeader() {
                 </Link>
             </Group>
             <Group>
-                {/*Icona utente cliccabile*/}
+            <Tooltip label={`${datasetUsed ? `Dataset: ${datasetUsed}` : "Choose a dataset to start"}`}>
+                    <FontAwesomeIcon icon={ faDatabase }/>
+            </Tooltip>
             </Group>
         </>
     )
