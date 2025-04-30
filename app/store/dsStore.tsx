@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import Dataset, {Configs} from "../interfaces/DatasetInterface"
   
 interface AppState {
@@ -13,8 +13,12 @@ interface AppState {
     featureToDisplay: string | null;
     metricsConfig: Configs[] | [];
     internalConfigs: Object;
-    
+
     addToReport: boolean;
+    isLoadingEmbs : boolean;
+
+    report: Object[] | [];
+
     setSelectedIndexes : (selectedIndexes : number[]) => void;
     setHoverIndex: (hoverIndex: number | null) => void
     setSelectedFeature : (selectedFeature : string) => void;
@@ -27,6 +31,8 @@ interface AppState {
     setInternalConfigs: (internalConfigs: Object) => void;
     
     setAddToReport: (addToReport: boolean) => void;
+    setIsLoadingEmbs: (isLoadingEmbs: boolean) => void;
+    setReport: (report: Object[] | []) => void;
   }
 
   const useStore = create<AppState>()(
@@ -44,6 +50,9 @@ interface AppState {
             internalConfigs: {},
             
             addToReport: false,
+            isLoadingEmbs: true,
+            report: [],
+
             setData: (datasetUsed) => set({ datasetUsed }),
             setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
             setSelectedIndexes: (selectedIndexes: number[]) => set({ selectedIndexes }),
@@ -55,10 +64,13 @@ interface AppState {
             setMetricsConfigs: (metricsConfig: Configs[] | []) => set({metricsConfig}),
             setInternalConfigs: (internalConfigs: Object) => set({internalConfigs}),
             
-            setAddToReport:(addToReport: boolean) => set({addToReport})
+            setAddToReport:(addToReport: boolean) => set({addToReport}),
+            setIsLoadingEmbs:(isLoadingEmbs: boolean) => set({isLoadingEmbs}),
+            setReport:(report: Object[] | []) => set({report})
         }),
         {
           name: "app-storage",
+          storage: createJSONStorage(() => sessionStorage),
           partialize: (state) => ({
               datasets: state.datasets,
               datasetUsed: state.datasetUsed,

@@ -65,7 +65,7 @@ export default function Datasets ()
 
 
   useEffect( () =>
-  {
+  { 
     if ( searchParams.get( "datasetName" ) ) {
       setDatasetName( searchParams.get( "datasetName" ) );
 
@@ -78,6 +78,7 @@ export default function Datasets ()
         setDatasets( null )
       }
     }
+
   }, [ searchParams, datasets, setData, setDatasets ] );
 
   console.log( "datasetUsed:", datasetUsed )

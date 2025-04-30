@@ -12,7 +12,7 @@ import
 {
     faCheck
 } from '@fortawesome/free-solid-svg-icons';
-import { Configs } from "@/interfaces/DatasetInterface";
+import { Configs, ReportMetric } from "@/interfaces/DatasetInterface";
 import { IconInfoCircle } from '@tabler/icons-react';
 import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
 import { useSearchParams } from "next/navigation";
@@ -22,6 +22,7 @@ import metricsFetcher from "../../server/metricsFetcher";
 import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import { DuplicatesDTO, OutliersDTO } from "@/interfaces/metricsInterface";
 import { config } from "process";
+import { truncate } from "lodash";
 
 
 
@@ -40,6 +41,7 @@ export default function Config ( props: ConfigsProps )
     const [ features, setFeatures ] = useState<string[]>( [] )
     const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
     const [ isLoading, setIsLoading ] = useState<boolean>( false )
+    const [computed, setComputed] = useState<boolean>(false)
     const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
     const [ outliers, setOutliers] = useState<OutliersDTO | null>( null )
 
@@ -93,9 +95,19 @@ export default function Config ( props: ConfigsProps )
     const [ clicked, setClicked ] = useState( false );
     const [ isDuplicate, setIsDuplicate ] = useState( false );
     const [ computeNow, setComputeNow ] = useState( false );
+
+    const report = useStore((state) => state.report)
+    const [reportMetric, setReportMetric] = useState<ReportMetric | null>(null)
+    const setReport = useStore((state) => state.setReport)
+
     const setAddToReport = useStore( ( state ) => state.setAddToReport )
 
 
+    useEffect(() => {
+        setComputeNow(false)
+    }, [featureName, outliers_mode, labelFeatureName, configs ])
+
+    {/*
     const handleClickToReport = ( metricName: string ) =>
     {
         setAddToReport( true )
@@ -103,6 +115,7 @@ export default function Config ( props: ConfigsProps )
             metricName: metricName,
             featureName: "",
             internalConfigs: internalConfigs,
+            results: {}
         };
 
         if ( !featureName ) {
@@ -154,30 +167,78 @@ export default function Config ( props: ConfigsProps )
             setIsDuplicate( true )
         }
     };
+    */}
 
-    useEffect(() => {
-        setComputeNow(false)
-    }, [featureName, outliers_mode, labelFeatureName, configs ])
+    const handleClickCompute = async () => {
+        const newReportMetric: ReportMetric = {
+          internalConfigs: internalConfigs,
+          results: {}
+        };
+        
+        let hasValidationErrors = false;
+        
+        if (!featureName) {
+          setShowFeatureError(true);
+          hasValidationErrors = true;
+        }
+        
+        if (props?.labelFeatureReq && !labelFeatureName) {
+          setShowLabelError(true);
+          hasValidationErrors = true;
+        }
 
-    const handleClickCompute = async () =>
-    {
-        setIsLoading(true);
-        setComputeNow(true);
-        try {
-          const data = await metricsFetcher(
-            props.metricName as MetricType, 
-            datasetName as string,
-            featureName,
-            internalConfigs,
-            labelFeatureName,
-            outliers_mode
-          );
-      
-          if (props.metricName === "duplicates") setDuplicates(data);
-          if (props.metricName === "outliers") setOutliers(data);
-        } finally {
-          setIsLoading(false);
-      }};
+        
+        const isDuplicate = report.some( ( metricReport ) =>
+            (props.metricName === "duplicates"
+                ? metricReport.results.name === "uniqueness"
+                : metricReport.results.name === props.metricName) &&
+            metricReport.results.featureName === featureName &&
+            ( !props?.labelFeatureReq || metricReport.results.labelFeatureName === labelFeatureName ) &&
+            JSON.stringify( metricReport.internalConfigs ) === JSON.stringify( newReportMetric.internalConfigs )
+        );
+
+        
+        if (!hasValidationErrors && !isDuplicate) {
+          setIsLoading(true);
+          setComputeNow(true);
+          
+          try {
+            const data = await metricsFetcher(
+              props.metricName as MetricType,
+              datasetName as string,
+              featureName,
+              internalConfigs,
+              labelFeatureName,
+              outliers_mode
+            );
+            
+            if (props.metricName === "duplicates") setDuplicates(data);
+            if (props.metricName === "outliers") setOutliers(data);
+            newReportMetric.results = data;
+            newReportMetric.internalConfigs = internalConfigs;
+
+          } catch (error) {
+            // Handle error appropriately
+            console.error("Error computing metrics:", error);
+          } finally {
+            setIsLoading(false);
+            setComputed(true);
+            setReportMetric(newReportMetric)
+          }
+        } else if (isDuplicate) {
+            console.log("DUPLICATO BECCATO")
+        }
+      };
+
+
+      const handleSaveToReport = () => {
+        if (reportMetric) {
+            setReport( [ ...report, reportMetric ] );
+          }
+        
+      }
+
+      console.log("REPORT:", report)
 
       console.log("OUTLIERS:", outliers)
       console.log("DUPLICATES:", duplicates)
@@ -201,7 +262,10 @@ export default function Config ( props: ConfigsProps )
     const MetricDisplayerComponent = metricDisplayerMap[ props.metricName ];
 
     return (
-        <div>
+        <div style={{
+            marginLeft:"100px",
+            marginRight: "100px"
+        }}>
             <Flex
                 direction="row"
                 align="end"
@@ -316,19 +380,20 @@ export default function Config ( props: ConfigsProps )
                     Configs
                 </Button>
             </Flex>
-
+            <Space h="xl"/>
             <Flex
                 direction="row"
-                justify="end"
+                justify="start"
                 gap="md">
 
                 <Button
-                    onClick={ () => handleClickToReport( props.metricName ) }
+                    onClick={handleSaveToReport}
+                    disabled={!computed}
                 >
                     { clicked && !isDuplicate ? ( <>
                         <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
                         <span>Added</span></> )
-                        : "Add to report" }
+                        : "Save to report" }
                 </Button>
 
                 <Button onClick={ handleClickCompute }>

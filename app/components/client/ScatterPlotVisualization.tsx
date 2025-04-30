@@ -7,7 +7,7 @@ import { log, OrbitView, project } from '@deck.gl/core';
 import getData from '../../functionalities/Utils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Flex, Loader } from '@mantine/core';
+import { Flex, Loader, Menu, MenuDropdown, MenuItem } from '@mantine/core';
 
 
 interface OrbitViewState
@@ -56,9 +56,12 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const isDraggingRef = useRef<boolean>( false );
 
   //const [lassoMode, setLassoMode] = useState<boolean>(false);
-  
+
   const [ data, setData ] = useState<Point[] | null>( null );
-  const [ isLoading, setIsLoading ] = useState( true );
+  //const [ isLoading, setIsLoading ] = useState( true );
+  const isLoading = useStore( ( state ) => state.isLoadingEmbs )
+  const setIsLoading = useStore( ( state ) => state.setIsLoadingEmbs )
+
   const [ viewState, setViewState ] = useState<OrbitViewState>( {
     target: [ 0, 0, 0 ],
     rotationX: 0,
@@ -69,23 +72,24 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ dragStart, setDragStart ] = useState<{ x: number; y: number } | null>( null );
   const [ dragCurrent, setDragCurrent ] = useState<{ x: number; y: number } | null>( [] );
   const [ originalColors, setOriginalColors ] = useState<Map<number, [ number, number, number ]>>( new Map() );
+  const [ contextMenu, setContextMenu ] = useState( { visible: false, x: 0, y: 0 } );
 
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
   const selectedIndexes = useStore( ( state ) => state.selectedIndexes )
-  const hoverIndex = useStore((state) => state.hoverIndex)
+  const hoverIndex = useStore( ( state ) => state.hoverIndex )
 
-  console.log("HOVER ON SCATTER:", hoverIndex)
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
 
   useEffect( () =>
-  { setSelectedIndexes([])
+  {
+    setSelectedIndexes( [] )
     setIsLoading( true )
     getData( props.datasetName, props.featureName, props.labelFeatureName )
       .then( fetchedData =>
       {
         setData( fetchedData );
-        setOriginalColors(new Map(fetchedData.map((item, index) => [index, item.color])));
+        setOriginalColors( new Map( fetchedData.map( ( item, index ) => [ index, item.color ] ) ) );
       } )
       .finally( () =>
       {
@@ -157,16 +161,22 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   useEffect( () =>
   {
     const highlightIndicesSet = new Set<number>( selectedIndexes );
-
     if ( data ) {
       const updatedData = data.map( ( item, index ) =>
       {
         const originalColor = originalColors.get( index ) ?? item.color;
-        if ( highlightIndicesSet.has( index ) ) {
-          return { ...item, color: originalColors.get( index )! };
+
+        // If selectedIndexes is empty, use original colors for all points
+        if ( selectedIndexes.length === 0 ) {
+          return { ...item, color: originalColor };
         }
 
-        // Make color lighter (adjust opacity or lighten color)
+        // If this point is selected, use its original color
+        if ( highlightIndicesSet.has( index ) ) {
+          return { ...item, color: originalColor };
+        }
+
+        // Otherwise fade the non-selected points
         const fadedColor: [ number, number, number ] = originalColor.map(
           ( channel ) => Math.min( 255, Math.floor( channel + ( 255 - channel ) * 0.8 ) )
         ) as [ number, number, number ];
@@ -176,67 +186,70 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           color: fadedColor,
         };
       } );
-
       setData( updatedData );
     }
-
   }, [ selectedIndexes ] );
 
   // ****************************************************************************************************************************************************
-  const basePointSize = 3.5;
-  const highlightScale = 1.5;
 
- 
-  const BASE_RADIUS_METERS = 3.5; // Base size of points in meters (if using geospatial coords) or pixels (if view-relative)
-const HIGHLIGHT_RADIUS_METERS = 7.0; // Size of the hovered point
-const HIGHLIGHT_COLOR: [number, number, number, number?] = [255, 255, 0, 255]; // Optional: Distinct color for hovered point (RGBA)
-const TRANSITION_DURATION = 300; // Milliseconds for the size transition
+  const BASE_RADIUS_METERS = 3.5; // Base size of points in meters or pixels
+  const HIGHLIGHT_RADIUS_METERS = BASE_RADIUS_METERS * 3; // Size of the hovered point
+  const STROKE_WIDTH = 0.8; // Default border width for non-hovered points
+  const HIGHLIGHT_STROKE_WIDTH = 2.5; // Thicker border for hovered point
+  const HIGHLIGHT_STROKE_COLOR = [ 0, 0, 0, 255 ];; // Yellow highlight border (RGBA)
+  const TRANSITION_DURATION = 300; // Milliseconds for the transition
 
-const layer = new ScatterplotLayer<Point>({ // Specify the data type for better type checking
-  id: 'scatterplot-layer-hover-effect',
-  data,
-  pickable: true,
+  const layer = new ScatterplotLayer<Point>( {
+    id: 'scatterplot-layer-hover-effect',
+    data,
+    pickable: true,
+    // --- Style ---
+    stroked: true, // Enable borders
+    filled: true,
+    radiusUnits: 'pixels', // Or 'meters' if your positions are lng/lat
+    radiusScale: 1,
+    radiusMinPixels: 1,
+    radiusMaxPixels: 100,
 
-  // --- Style ---
-  stroked: false, // More performant if you don't need outlines
-  filled: true,
-  radiusUnits: 'pixels', // Or 'meters' if your positions are lng/lat and you want real-world size
-  radiusScale: 1,       // If radiusUnits is 'pixels', this is often 1
-  radiusMinPixels: 1,   // Ensure points are always visible
-  radiusMaxPixels: 100, // Cap maximum size
+    // --- Accessors ---
+    getPosition: ( d: Point ) => d.position,
 
-  // --- Accessors ---
-  getPosition: (d: Point) => d.position,
+    // Keep the size increase behavior
+    getRadius: ( d: Point, { index }: { index: number } ) =>
+      index === hoverIndex ? HIGHLIGHT_RADIUS_METERS : BASE_RADIUS_METERS,
 
-  // Radius accessor: Return larger radius for the hovered point
-  getRadius: (d: Point, { index }: { index: number }) => {
-    return index === hoverIndex ? HIGHLIGHT_RADIUS_METERS : BASE_RADIUS_METERS;
-  },
+    // Color accessor - keep original fill color for all points
+    getFillColor: ( d: Point ) => d.color,
 
-  // Color accessor: Optionally change color on hover too
-  getFillColor: (d: Point, { index }: { index: number }) => {
-    return index === hoverIndex ? HIGHLIGHT_COLOR : d.color; // Use highlight color or original color
-  },
+    // Stroke color accessor - highlight color for hovered point
+    getLineColor: ( d: Point, { index }: { index: number } ) =>
+      index === hoverIndex ? HIGHLIGHT_STROKE_COLOR : d.color,
 
-  // --- Interactivity ---
-  onClick: (info: any) => handlePointClick(info),
-  // Note: The onHover logic to update the hoverIndex state variable itself
-  // should typically be defined on the parent <DeckGL> component, not the layer.
+    // Stroke width accessor - thicker for hovered point
+    getLineWidth: ( d: Point, { index }: { index: number } ) =>
+      index === hoverIndex ? HIGHLIGHT_STROKE_WIDTH : STROKE_WIDTH,
 
-  // --- Transitions! ---
-  // This tells Deck.gl to smoothly animate changes to getRadius and getFillColor
-  
+    // --- Interactivity ---
+    onClick: ( info: any ) => handlePointClick( info ),
 
-  // --- Updates ---
-  // Tell Deck.gl to re-evaluate accessors when hoverIndex changes
-  updateTriggers: {
-    getRadius: [hoverIndex],
-    getFillColor: [hoverIndex] // Also update color trigger if using getFillColor for highlighting
-  },
-});
+    // --- Transitions ---
+    transitions: {
+      getRadius: { duration: TRANSITION_DURATION },
+      getLineWidth: { duration: TRANSITION_DURATION },
+      getLineColor: { duration: TRANSITION_DURATION }
+    },
 
-// Remember to include this layer in the 'layers' array passed to your <DeckGL> component.
-// Ensure the component re-renders when 'hoverIndex' changes.
+    // --- Updates ---
+    updateTriggers: {
+      getRadius: [ hoverIndex ],
+      getLineWidth: [ hoverIndex ],
+      getLineColor: [ hoverIndex ]
+    },
+  } );
+
+  // Remember to include this layer in the 'layers' array passed to your <DeckGL> component.
+  // Ensure the component re-renders when 'hoverIndex' changes.
+
   {/*
   const layer = new PointCloudLayer( {
     id: 'point-cloud-layer',
@@ -341,6 +354,33 @@ const layer = new ScatterplotLayer<Point>({ // Specify the data type for better 
     };
   }
 
+  const handleClick = () =>
+  {
+    if ( contextMenu.visible ) {
+      setContextMenu( { ...contextMenu, visible: false } );
+    }
+  };
+
+  useEffect( () =>
+  {
+    document.addEventListener( 'click', handleClick );
+    return () =>
+    {
+      document.removeEventListener( 'click', handleClick );
+    };
+  }, [ contextMenu.visible ] );
+
+
+  const handleContextMenu = ( e ) =>
+  {
+    e.preventDefault();
+    setContextMenu( { visible: true, x: e.pageX, y: e.pageY } );
+  };
+
+  const menuItems = [
+    { label: 'Clear indexes', action: () => setSelectedIndexes( [] ) }
+  ];
+
   return (
     <>
       { isLoading ? (
@@ -367,14 +407,17 @@ const layer = new ScatterplotLayer<Point>({ // Specify the data type for better 
           style={ { width: '100%' } }
         >No data available</Flex> ) : (
           <Suspense>
-            <div id="deckgl-container" style={ {
-              position: 'relative', // 👈 this is key!
-              width: '1030px',
-              height: '600px',
-              border: '2px solid #9a9a9a',
-              background: 'white',
-              overflow: 'hidden'
-            } }>
+            <div id="deckgl-container"
+              onContextMenu={ handleContextMenu }
+              style={ {
+                position: 'relative',
+                width: '1030px',
+                height: '600px',
+                border: '2px solid #9a9a9a',
+                background: 'white',
+                overflow: 'hidden',
+
+              } } >
               <DeckGL
                 ref={ deckRef }
                 views={ new OrthographicView( { fovy: 50 } ) }
@@ -403,10 +446,41 @@ const layer = new ScatterplotLayer<Point>({ // Specify the data type for better 
             </div>
           </Suspense>
         ) }
+
+        { contextMenu.visible && (
+          <div style={ { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' } }>
+            <div
+              style={ {
+                position: 'absolute',
+                top: contextMenu.y,
+                left: contextMenu.x,
+                zIndex: 1000,
+                pointerEvents: 'auto',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                backgroundColor: 'white',
+                minWidth: '150px',
+              } }
+            >
+              { menuItems.map( ( item, index ) => (
+                <div
+                  key={ index }
+                  onClick={ item.action }
+                  style={ {
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                  } }
+                  onMouseOver={ ( e ) => e.currentTarget.style.backgroundColor = '#f5f5f5' }
+                  onMouseOut={ ( e ) => e.currentTarget.style.backgroundColor = 'transparent' }
+                >
+                  { item.label }
+                </div>
+              ) ) }
+            </div>
+          </div>
+        ) }
       </>
       ) }
-
-
     </>
   );
 }

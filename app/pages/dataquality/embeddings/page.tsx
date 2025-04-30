@@ -3,7 +3,7 @@
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef } from 'react';
-import { Autocomplete, Flex, Button, Box, Space, Select } from '@mantine/core';
+import { Autocomplete, Flex, Button, Text, Box, Space, Select } from '@mantine/core';
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
@@ -44,6 +44,7 @@ function Home ()
   const containerRef = useRef<HTMLDivElement>( null );
   const indexes = useStore( ( state ) => state.selectedIndexes );
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
+  const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
 
   useEffect( () =>
   {
@@ -124,7 +125,7 @@ function Home ()
     }
   }, [ labelFeatureName ] ); // Still keep indexes and featureName in the dependency array
 
-  console.log("LABEL FEATURE:", labelFeature)
+  console.log( "LABEL FEATURE:", labelFeature )
 
   useEffect( () =>
   {
@@ -164,6 +165,8 @@ function Home ()
   console.log( "FEATURE DATA", feature )
   console.log( "FILTERED", featureData )
 
+
+  console.log( "indexes:", indexes )
 
 
 
@@ -206,7 +209,7 @@ function Home ()
               data={ labelFeatures }
               value={ labelFeatureName }
               onChange={ ( value ) => setLabelFeatureName( value as string ) }
-              onClear={()=>setLabelFeatureName("")}
+              onClear={ () => setLabelFeatureName( "" ) }
               clearable={ true }
             />
 
@@ -243,25 +246,27 @@ function Home ()
               </Flex>
             </div>
 
+            { !isLoadingEmbs ? (
+              <Flex
+                mih={ 150 }
+                justify="center"
+                align="center"
+                direction="column"
+                wrap="wrap"
+                style={ { width: '50%', backgroundColor: '#f0f0f0', marginLeft: '30px', borderRadius: '12px' } }
+              >
 
-            <Flex
-              mih={ 150 }
-              justify="center"
-              align="center"
-              direction="column"
-              wrap="wrap"
-              style={ { width: '100%' } }
-            >
-              <div ref={ containerRef } className="h-[600px] overflow-auto">
-                <FeatureDisplayer indexes={indexes} featureData={featureData} featureType={featureType} labelData={labelData} label_dict={labelDict as {[key: number]: string}} columnCount={2}/>
-              </div>
-            </Flex>
+                { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
+                  <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columnCount={ 2 } />
+                </div> ) : ( <Text>Click on a point or draw a lazzo to see the samples</Text> ) }
+              </Flex>
+            ) : null }
+
           </Flex>
         </>
       ) : (
         <p>Select Feature</p>
       ) }
-
 
     </div>
   );

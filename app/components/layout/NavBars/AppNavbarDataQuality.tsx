@@ -11,7 +11,8 @@ import
     Text,
     Box,
     Space, Group,
-    Menu
+    Menu,
+    Divider
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -95,7 +96,9 @@ function AppNavbarDataQuality ()
                     
                 </Box>
 
-                <Space h="xs" />
+               
+                <Divider />
+                
 
                 <Box>
                     <Group gap="xs" mb="xs" mr="xs">
@@ -104,11 +107,18 @@ function AppNavbarDataQuality ()
                     onClick={() => setVisualVisible((prev) => !prev)}
                     rightSection={
                         visualVisible ? (
-                        <IconChevronUp size={18} stroke={1.5} />
+                          <div
+                            style={{
+                              width: '12px',
+                              height: '1px',
+                              backgroundColor: 'currentColor',
+                              borderRadius: '1px',
+                            }}
+                          />
                         ) : (
-                        <IconChevronDown size={18} stroke={1.5} />
+                          <IconChevronDown size={18} stroke={1.5} />
                         )
-                    }
+                      }
                     pr={12}
                     leftSection={
                         <FontAwesomeIcon
@@ -161,7 +171,14 @@ function AppNavbarDataQuality ()
                             onClick={() => setMetricVisible((prev) => !prev)}
                             rightSection={
                                 metricVisible ? (
-                                <IconChevronUp size={18} stroke={1.5} />
+                                    <div
+                                    style={{
+                                      width: '12px',
+                                      height: '1px',
+                                      backgroundColor: 'currentColor',
+                                      borderRadius: '1px',
+                                    }}
+                                  />
                                 ) : (
                                 <IconChevronDown size={18} stroke={1.5} />
                                 )
@@ -188,6 +205,19 @@ function AppNavbarDataQuality ()
                                     </Button>
                                 </RouterButton>
 
+                                <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics/duplicates" }>
+                                    <Button
+                                        radius="xl"
+                                        variant={ isActive( "/pages/dataquality/metrics/duplicates" ) ? "filled" : "subtle" }
+                                        disabled={ isDatasetUndefined }
+                                    >
+                                        <Text size="sm" fw={ 600 } c="dimmed">
+                                            Duplicates
+                                        </Text>
+                                    </Button>
+                                </RouterButton>
+
+                                {/*
                                 <Button
                                     radius="xl"
                                     variant={ isMetricActive( "duplicates" ) ? "filled" : "subtle" }
@@ -209,6 +239,7 @@ function AppNavbarDataQuality ()
                                         Outliers
                                     </Text>
                                 </Button>
+                                */}
                             </Box>
                         </Stack>
                     ) }
@@ -222,7 +253,14 @@ function AppNavbarDataQuality ()
                             onClick={() => setActionVisible((prev) => !prev)}
                             rightSection={
                                 actionVisible ? (
-                                <IconChevronUp size={18} stroke={1.5} />
+                                    <div
+                                    style={{
+                                      width: '12px',
+                                      height: '1px',
+                                      backgroundColor: 'currentColor',
+                                      borderRadius: '1px',
+                                    }}
+                                  />
                                 ) : (
                                 <IconChevronDown size={18} stroke={1.5} />
                                 )

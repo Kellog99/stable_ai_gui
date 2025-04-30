@@ -46,5 +46,11 @@ export interface Configs
   featureName: string,
   outliersMode?: string,
   labelFeatureName?: string,
-  internalConfigs: any
+  internalConfigs: any,
+  results: Object
+}
+
+export interface ReportMetric {
+  internalConfigs: any,
+  results: Object
 }

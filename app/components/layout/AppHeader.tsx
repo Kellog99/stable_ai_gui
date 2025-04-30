@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useState } from "react";
 import {
- Image, Group, Burger, Button,
+ Image, Text, Group, Burger, Button,
  Tooltip
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -18,6 +18,8 @@ function AppHeader() {
     const pathName = usePathname();
     const isActive = (path: string) => pathName === path;
     const datasetUsed = useStore( ( state ) => state.datasetUsed )?.name;
+    console.log("DATASET???", datasetUsed)
+    
 
     const isNNTrust = pathName.includes('/nntrust');
     return (
@@ -42,9 +44,14 @@ function AppHeader() {
                 </Link>
             </Group>
             <Group>
-            <Tooltip label={`${datasetUsed ? `Dataset: ${datasetUsed}` : "Choose a dataset to start"}`}>
-                    <FontAwesomeIcon icon={ faDatabase }/>
+            {datasetUsed ? (
+                <Text><span><FontAwesomeIcon icon={ faDatabase }/></span> Dataset: {datasetUsed}</Text>
+            ) : (<Text><span><FontAwesomeIcon icon={ faDatabase }/></span> No Dataset chosen</Text>)}
+            
+            {/*<Tooltip label={`${datasetUsed ? `Dataset: ${datasetUsed}` : "Choose a dataset to start"}`}>
+                <FontAwesomeIcon icon={ faDatabase }/>
             </Tooltip>
+            */}
             </Group>
         </>
     )

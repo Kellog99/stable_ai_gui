@@ -91,7 +91,7 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   return (
     <div 
       ref={containerRef}
-      style={{ position: 'relative' }}
+      style={{ position: 'relative'}}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
