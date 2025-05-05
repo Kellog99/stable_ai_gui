@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Box, Button, Flex, Loader, Modal, Select, Space, Text } from "@mantine/core";
+import { Alert, Box, Button, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
 import { useEffect, useState } from "react";
 import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
@@ -35,15 +35,15 @@ interface ConfigsProps
 type MetricType = "duplicates" | "outliers";
 
 export default function Config ( props: ConfigsProps )
-{   
+{
     const searchParams = useSearchParams();
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
     const [ features, setFeatures ] = useState<string[]>( [] )
     const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
     const [ isLoading, setIsLoading ] = useState<boolean>( false )
-    const [computed, setComputed] = useState<boolean>(false)
+    const [ computed, setComputed ] = useState<boolean>( false )
     const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
-    const [ outliers, setOutliers] = useState<OutliersDTO | null>( null )
+    const [ outliers, setOutliers ] = useState<OutliersDTO | null>( null )
 
 
     const [ featureName, setFeatureName ] = useState<any>( "" )
@@ -62,12 +62,12 @@ export default function Config ( props: ConfigsProps )
 
 
     useEffect( () =>
-        {
-            if ( searchParams.get( "datasetName" ) ) {
-                setDatasetName( searchParams.get( "datasetName" ) )
-            }
-        }, [ searchParams ] )
-    
+    {
+        if ( searchParams.get( "datasetName" ) ) {
+            setDatasetName( searchParams.get( "datasetName" ) )
+        }
+    }, [ searchParams ] )
+
 
     useEffect( () =>
     {
@@ -96,16 +96,17 @@ export default function Config ( props: ConfigsProps )
     const [ isDuplicate, setIsDuplicate ] = useState( false );
     const [ computeNow, setComputeNow ] = useState( false );
 
-    const report = useStore((state) => state.report)
-    const [reportMetric, setReportMetric] = useState<ReportMetric | null>(null)
-    const setReport = useStore((state) => state.setReport)
+    const report = useStore( ( state ) => state.report )
+    const [ reportMetric, setReportMetric ] = useState<ReportMetric | null>( null )
+    const setReport = useStore( ( state ) => state.setReport )
 
     const setAddToReport = useStore( ( state ) => state.setAddToReport )
 
 
-    useEffect(() => {
-        setComputeNow(false)
-    }, [featureName, outliers_mode, labelFeatureName, configs ])
+    useEffect( () =>
+    {
+        setComputeNow( false )
+    }, [ featureName, outliers_mode, labelFeatureName, configs ] )
 
     {/*
     const handleClickToReport = ( metricName: string ) =>
@@ -169,79 +170,93 @@ export default function Config ( props: ConfigsProps )
     };
     */}
 
-    const handleClickCompute = async () => {
+    const handleClickCompute = async () =>
+    {
         const newReportMetric: ReportMetric = {
-          internalConfigs: internalConfigs,
-          results: {}
+            internalConfigs: internalConfigs,
+            results: {}
         };
-        
+
         let hasValidationErrors = false;
-        
-        if (!featureName) {
-          setShowFeatureError(true);
-          hasValidationErrors = true;
-        }
-        
-        if (props?.labelFeatureReq && !labelFeatureName) {
-          setShowLabelError(true);
-          hasValidationErrors = true;
+
+        if ( !featureName ) {
+            setShowFeatureError( true );
+            hasValidationErrors = true;
         }
 
-        
+        if ( props?.labelFeatureReq && !labelFeatureName ) {
+            setShowLabelError( true );
+            hasValidationErrors = true;
+        }
+
+
         const isDuplicate = report.some( ( metricReport ) =>
-            (props.metricName === "duplicates"
-                ? metricReport.results.name === "uniqueness"
-                : metricReport.results.name === props.metricName) &&
+            (
+                props.metricName === "duplicates"
+                    ? metricReport.results.name === "uniqueness"
+                    : props.metricName === "outliers"
+                        ? metricReport.results.name === "accuracy"
+                        : metricReport.results.name === props.metricName
+            ) &&
             metricReport.results.featureName === featureName &&
             ( !props?.labelFeatureReq || metricReport.results.labelFeatureName === labelFeatureName ) &&
             JSON.stringify( metricReport.internalConfigs ) === JSON.stringify( newReportMetric.internalConfigs )
         );
 
-        
-        if (!hasValidationErrors && !isDuplicate) {
-          setIsLoading(true);
-          setComputeNow(true);
-          
-          try {
-            const data = await metricsFetcher(
-              props.metricName as MetricType,
-              datasetName as string,
-              featureName,
-              internalConfigs,
-              labelFeatureName,
-              outliers_mode
-            );
-            
-            if (props.metricName === "duplicates") setDuplicates(data);
-            if (props.metricName === "outliers") setOutliers(data);
-            newReportMetric.results = data;
-            newReportMetric.internalConfigs = internalConfigs;
 
-          } catch (error) {
-            // Handle error appropriately
-            console.error("Error computing metrics:", error);
-          } finally {
-            setIsLoading(false);
-            setComputed(true);
-            setReportMetric(newReportMetric)
-          }
-        } else if (isDuplicate) {
-            console.log("DUPLICATO BECCATO")
+        if ( !hasValidationErrors && !isDuplicate ) {
+            setIsLoading( true );
+            setComputeNow( true );
+
+            try {
+                const data = await metricsFetcher(
+                    props.metricName as MetricType,
+                    datasetName as string,
+                    featureName,
+                    internalConfigs,
+                    labelFeatureName,
+                    outliers_mode
+                );
+
+                if ( props.metricName === "duplicates" ) setDuplicates( data );
+                if ( props.metricName === "outliers" ) setOutliers( data );
+                newReportMetric.results = data;
+                newReportMetric.internalConfigs = internalConfigs;
+
+            } catch ( error ) {
+                // Handle error appropriately
+                console.error( "Error computing metrics:", error );
+            } finally {
+                setIsLoading( false );
+                setComputed( true );
+                setIsDuplicate( false )
+                setReportMetric( newReportMetric )
+            }
+        } else if ( isDuplicate ) {
+            setIsDuplicate( true )
+            setClicked( false )
+            setComputeNow( false )
+
         }
-      };
+    };
 
 
-      const handleSaveToReport = () => {
-        if (reportMetric) {
+    const handleSaveToReport = () =>
+    {
+        if ( reportMetric ) {
+            setClicked( true )
+            setTimeout( () =>
+            {
+                setClicked( false );
+                setComputed( false )
+            }, 3000 );
+            setIsDuplicate( false )
             setReport( [ ...report, reportMetric ] );
-          }
-        
-      }
+        }
 
-      console.log("REPORT:", report)
+    }
 
-      console.log("OUTLIERS:", outliers)
-      console.log("DUPLICATES:", duplicates)
+    console.log( "REPORT:", report )
 
     const icon = <IconInfoCircle />;
     console.log( "CONFIGS:", configs )
@@ -253,19 +268,19 @@ export default function Config ( props: ConfigsProps )
 
     const MetricConfigComponent = metricComponentMap[ props.metricName ];
 
-    
+
     const metricDisplayerMap: Record<string, React.ComponentType> = {
-        "duplicates": () => <DuplicatesDisplayer duplicates={duplicates as DuplicatesDTO} />,
-        "outliers": () => <OutlierDisplayer outliers={outliers as OutliersDTO} />,
+        "duplicates": () => <DuplicatesDisplayer duplicates={ duplicates as DuplicatesDTO } />,
+        "outliers": () => <OutlierDisplayer outliers={ outliers as OutliersDTO } />,
     };
 
     const MetricDisplayerComponent = metricDisplayerMap[ props.metricName ];
 
     return (
-        <div style={{
-            marginLeft:"100px",
+        <div style={ {
+            marginLeft: "100px",
             marginRight: "100px"
-        }}>
+        } }>
             <Flex
                 direction="row"
                 align="end"
@@ -295,6 +310,7 @@ export default function Config ( props: ConfigsProps )
                             },
                         } ) }
                     />
+
 
                     { showFeatureError && (
                         <Text
@@ -380,19 +396,19 @@ export default function Config ( props: ConfigsProps )
                     Configs
                 </Button>
             </Flex>
-            <Space h="xl"/>
+            <Space h="xl" />
             <Flex
                 direction="row"
                 justify="start"
                 gap="md">
 
                 <Button
-                    onClick={handleSaveToReport}
-                    disabled={!computed}
+                    onClick={ handleSaveToReport }
+                    disabled={ !computed }
                 >
                     { clicked && !isDuplicate ? ( <>
                         <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
-                        <span>Added</span></> )
+                        <span>Saved</span></> )
                         : "Save to report" }
                 </Button>
 
@@ -405,27 +421,32 @@ export default function Config ( props: ConfigsProps )
                 <>
                     <Space h="md" />
                     <Alert variant="light" color="red" withCloseButton onClose={ () => { setIsDuplicate( false ); setClicked( false ) } } title="Attention" icon={ icon }>
-                        A metric with this same configuration has been already added. Please change something or choose another metric.
+                        A metric with this same configuration has been already computed. Please change something or choose another metric.
                     </Alert>
                 </> ) : null }
 
-                {computeNow ? (
-                    isLoading ? (
-                        <Flex
-                            mih={ 150 }
-                            justify="center"
-                            align="center"
-                            direction="column"
-                            wrap="wrap"
-                            style={ { width: '100%' } }
-                            >
-                            <p>Loading...</p>
-                            <Loader />
-                        </Flex>
-                    ) : (
-                         MetricDisplayerComponent ? <MetricDisplayerComponent /> : <div>Unsupported metric</div> 
-                    )
-                    ) : null}
+            { computeNow ? (
+                isLoading ? (
+                    <Flex
+                        mih={ 150 }
+                        justify="center"
+                        align="center"
+                        direction="column"
+                        wrap="wrap"
+                        style={ { width: '100%' } }
+                    >
+                        <p>Loading...</p>
+                        <Loader />
+                    </Flex>
+                ) : (
+
+                    MetricDisplayerComponent ?
+
+                        <MetricDisplayerComponent />
+                        : <div>Unsupported metric</div>
+
+                )
+            ) : null }
         </div >
     )
 }

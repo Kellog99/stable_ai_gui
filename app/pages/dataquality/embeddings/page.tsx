@@ -2,8 +2,8 @@
 
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState, useEffect, useRef } from 'react';
-import { Autocomplete, Flex, Button, Text, Box, Space, Select } from '@mantine/core';
+import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
+import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal } from '@mantine/core';
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
@@ -12,6 +12,7 @@ import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
 import FeatureDisplayer, { FeatureCard } from '@/components/server/FeatureDisplayer';
 import { image_type, label_type, text_type } from '@/properties/types';
+import { useDisclosure } from '@mantine/hooks';
 
 interface Feature
 {
@@ -27,6 +28,7 @@ function Home ()
 {
 
   const searchParams = useSearchParams();
+  const [ opened, { open, close } ] = useDisclosure( false );
   const [ feature, setFeature ] = useState<Feature | null>( null )
   const [ featureData, setFeatureData ] = useState<string[]>( [] )
   const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null )
@@ -36,6 +38,7 @@ function Home ()
   const [ labelFeatureType, setLabelFeatureType ] = useState<any>( "" )
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
+  const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
 
   const [ features, setFeatures ] = useState<string[]>( [] )
   const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
@@ -159,6 +162,14 @@ function Home ()
     }
   }, [ indexes ] ); // Still keep indexes and featureName in the dependency array
 
+  const handleTextareaKeyDown = useCallback( ( event ) =>
+  {
+    // Prevent the keydown event from bubbling up to DeckGL listeners
+    event.stopPropagation();
+    setQueryRetrieve( event.target.value )
+    // You can add other logic here if needed
+    // console.log('Textarea KeyDown:', event.key);
+  }, [] );
 
 
   console.log( "LABEL DATA:", labelData )
@@ -172,48 +183,95 @@ function Home ()
 
   return (
     <div className="w-full h-screen">
-      {/* Centered content section */ }
+
       <div className="max-w-4xl mx-auto px-4">
         <Box className={ classes.title }>
           <h1>Embeddings for { datasetName } dataset</h1>
-          {/*
-          <RouterButton name={ datasetName! } route={ "/pages/dataquality/datasets" }>
-            <Button>Go Back to Dataset Page</Button>
-          </RouterButton>
-          */}
+
         </Box>
         <Space h="md" />
 
 
-        <div style={ { width: '300px', position: 'relative', marginBottom: '20px' } }>
-          <Flex
-            direction="row"
-            gap="xs">
+        <div style={ { width: '1030px', position: 'relative', marginBottom: '20px' } }>
 
-            <Select
-              id="feature"
-              radius="md"
-              label="Feature"
-              placeholder="Choose feature to visualize"
-              data={ features }
-              value={ featureName }
-              onChange={ ( value ) => setFeatureName( value ) }
-              required={ true }
-            />
+          <Flex direction="row" justify="space-between" align="flex-start">
+            <Flex
+              direction="row"
+              gap="xs">
 
-            <Select
-              id="labelFeature"
-              radius="md"
-              label="Label Feature"
-              placeholder="Choose label"
-              data={ labelFeatures }
-              value={ labelFeatureName }
-              onChange={ ( value ) => setLabelFeatureName( value as string ) }
-              onClear={ () => setLabelFeatureName( "" ) }
-              clearable={ true }
-            />
+              <Select
+                id="feature"
+                radius="md"
+                label="Feature"
+                placeholder="Choose feature to visualize"
+                data={ features }
+                value={ featureName }
+                onChange={ ( value ) => setFeatureName( value ) }
+                required={ true }
+              />
 
+              <Select
+                id="labelFeature"
+                radius="md"
+                label="Label Feature"
+                placeholder="Choose label"
+                data={ labelFeatures }
+                value={ labelFeatureName }
+                onChange={ ( value ) => setLabelFeatureName( value as string ) }
+                onClear={ () => setLabelFeatureName( "" ) }
+                clearable={ true }
+              />
+              {/*
+              <Modal opened={ opened } onClose={ close } title="Authentication">
+                <Textarea
+                  radius="md"
+                  label="Retrieve"
+                  placeholder="Write something you're interested in finding"
+                  onKeyDown={ handleTextareaKeyDown }
+                  onKeyUp={ ( e ) => e.stopPropagation() }
+                  onClick={ ( e ) => e.stopPropagation() }
+                  value={ queryRetrieve }
+                  onChange={ ( event ) => setQueryRetrieve( event.target.value ) }
+                  style={ { zIndex: 10 } }
+                />
+              </Modal>
+
+              <Button variant="default" onClick={ open }>
+                Query
+              </Button>
+              */}
+              {/*
+              <Textarea
+                radius="md"
+                label="Retrieve"
+                placeholder="Write something you're interested in finding"
+                onKeyDown={ handleTextareaKeyDown }
+                onKeyUp={ ( e ) => e.stopPropagation() }
+                
+                value={ queryRetrieve }
+                onChange={ ( event ) => setQueryRetrieve( event.target.value ) }
+                style={ { zIndex: 10 } }
+              />
+              */}
+
+            </Flex>
+
+
+            {/*
+            { !isLoadingEmbs ? (
+
+              <Textarea
+                radius="md"
+                label="Retrieve"
+                placeholder="Write something you're interested in finding"
+                value={ queryRetrieve }
+                onChange={ ( event ) => setQueryRetrieve( event.currentTarget.value ) }
+                style={ { width: "400px" } }
+              /> ) : null }
+              */}
           </Flex>
+
+
         </div>
       </div>
 
@@ -225,11 +283,13 @@ function Home ()
 
             <div style={ { position: 'relative', marginBottom: '20px' } }>
               <Suspense>
-                <div>
-                  <LassoDrawer>
-                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } />
-                  </LassoDrawer>
-                </div>
+                <Box style={ { pointerEvents: 'none' } }>
+                  <div style={ { pointerEvents: 'auto' } }>
+                    <LassoDrawer>
+                      <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } />
+                    </LassoDrawer>
+                  </div>
+                </Box>
               </Suspense>
 
               <Flex

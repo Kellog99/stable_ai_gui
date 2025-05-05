@@ -193,6 +193,7 @@ function AppNavbarDataQuality ()
                     { metricVisible && (
                         <Stack mt="sm">
                             <Box>
+                                {/*}
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics" }>
                                     <Button
                                         radius="xl"
@@ -204,6 +205,7 @@ function AppNavbarDataQuality ()
                                         </Text>
                                     </Button>
                                 </RouterButton>
+                                */}
 
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics/duplicates" }>
                                     <Button
@@ -213,6 +215,18 @@ function AppNavbarDataQuality ()
                                     >
                                         <Text size="sm" fw={ 600 } c="dimmed">
                                             Duplicates
+                                        </Text>
+                                    </Button>
+                                </RouterButton>
+
+                                <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics/outliers" }>
+                                    <Button
+                                        radius="xl"
+                                        variant={ isActive( "/pages/dataquality/metrics/outliers" ) ? "filled" : "subtle" }
+                                        disabled={ isDatasetUndefined }
+                                    >
+                                        <Text size="sm" fw={ 600 } c="dimmed">
+                                            Outliers
                                         </Text>
                                     </Button>
                                 </RouterButton>

@@ -370,7 +370,6 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
             <Box 
                 ref={containerRef}
                 style={{
-                    width: '100%',
                     maxWidth: '100%',
                     marginTop: '20px',
                     position: 'relative',
