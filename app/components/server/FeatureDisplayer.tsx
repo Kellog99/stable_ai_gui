@@ -97,6 +97,7 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
         return (
           <div style={ {
             ...style,
+            background: "transparent",
             padding: '8px',
 
           } }>

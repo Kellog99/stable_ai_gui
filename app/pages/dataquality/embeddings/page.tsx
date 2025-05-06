@@ -13,6 +13,8 @@ import classes from './page.module.css'
 import FeatureDisplayer, { FeatureCard } from '@/components/server/FeatureDisplayer';
 import { image_type, label_type, text_type } from '@/properties/types';
 import { useDisclosure } from '@mantine/hooks';
+import { Rnd } from "react-rnd";
+import { MovableWindow } from '@/components/client/MovableWindow';
 
 interface Feature
 {
@@ -275,8 +277,8 @@ function Home ()
       { featureName !== "" ? (
         <>
           <Flex
-            direction="row"
-            align="start">
+            direction="column"
+            align="center">
 
             <div style={ { position: 'relative', marginBottom: '20px' } }>
               <Suspense>
@@ -303,6 +305,7 @@ function Home ()
               </Flex>
             </div>
 
+{/*
             { !isLoadingEmbs ? (
               <Flex
                 mih={ 150 }
@@ -318,8 +321,28 @@ function Home ()
                 </div> ) : ( <Text>Click on a point or draw a lazzo to see the samples</Text> ) }
               </Flex>
             ) : null }
+             */}
 
           </Flex>
+
+          
+
+          {indexes.length > 0 ? (
+          <MovableWindow >
+            
+            <Flex
+              mih={ 150 }
+              justify="center"
+              align="center"
+              direction="column"
+              style={ { marginLeft: '30px', borderRadius: '12px' } }
+            >
+
+              { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
+                <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columnCount={ 2 } />
+              </div> ) : null }
+            </Flex>
+          </MovableWindow>): null } 
         </>
       ) : (
         <p>Select Feature</p>

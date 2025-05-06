@@ -411,7 +411,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               onContextMenu={ handleContextMenu }
               style={ {
                 position: 'relative',
-                width: '1030px',
+                width: '1830px',
                 height: '600px',
                 border: '2px solid #9a9a9a',
                 background: 'white',
@@ -431,12 +431,14 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                       dragRotate: false,
                       dragPan: false,
                       doubleClickZoom: false,
+                      
                     }
                     : {
                       scrollZoom: true,
                       dragRotate: true,
                       dragPan: true,
                       doubleClickZoom: false,
+                      
                     }
                 }
                 onDragStart={ handleDragStart }
