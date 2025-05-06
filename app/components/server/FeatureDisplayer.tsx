@@ -46,7 +46,7 @@ export function FeatureCard ( props: FeatureCardProps )
         ) : null }
       </CardSection>
 
-      { index || index == 0 || label || labelString ? (
+      { index || index == 0 || label || label==0 || labelString ? (
         <>
           <Group justify="space-between" mt="md" mb="xs">
             { labelString != null ? <Text fw={ 700 } size="lg">{ labelString }</Text> : null }

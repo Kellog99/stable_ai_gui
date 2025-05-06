@@ -33,6 +33,7 @@ async function getData ( datasetName: string, featureName: string, labelFeatureN
     if ( !response.ok ) throw new Error( 'Failed to send files to backend' );
 
     const points = await response.json();
+    
     return points
     
   } else {

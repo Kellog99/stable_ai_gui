@@ -185,10 +185,7 @@ function Home ()
     <div className="w-full h-screen">
 
       <div className="max-w-4xl mx-auto px-4">
-        <Box className={ classes.title }>
-          <h1>Embeddings for { datasetName } dataset</h1>
 
-        </Box>
         <Space h="md" />
 
 

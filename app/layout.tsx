@@ -8,7 +8,8 @@ import
     mantineHtmlProps,
     createTheme,
     AppShell, AppShellHeader, AppShellNavbar, AppShellMain, ScrollArea,
-    Container
+    Container,
+    Button
   } from "@mantine/core";
 
 import classes from './page.module.css';
@@ -18,12 +19,21 @@ import { theme } from "../theme";
 import AppHeader from "@/components/layout/AppHeader"
 import AppNavbarNNTrust from "./components/layout/NavBars/AppNavbarNNTrust";
 import { headers } from "next/headers";
+import {extend} from "lodash";
 
 const myTheme = createTheme( {
   defaultRadius: 0,
   fontSmoothing: true,
   fontFamily: 'Roboto, sans-serif',
-  primaryColor: 'dark'
+  primaryColor: 'dark',
+  components: {
+    Select: {
+      defaultProps: {
+        size : "xs"
+      }
+    }
+  }
+    
 } )
 
 

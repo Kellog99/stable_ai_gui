@@ -21,9 +21,10 @@ function ImageDisplayer({ data, alt, className }: {data: string | Uint8Array | U
                 src={source}
                 alt={alt}
                 style={{
+                  paddingTop: "4px",
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover", // 🔥 this makes it fill the space nicely
+                  objectFit: "contain", // 🔥 this makes it fill the space nicely
                   display: "block"
                 }}
             />
