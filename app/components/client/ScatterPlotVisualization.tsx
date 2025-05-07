@@ -62,7 +62,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   const [ data, setData ] = useState<Point[] | null>( null );
   const [ colorMap, setColorMap ] = useState<Object>( {} )
-  const [labelDict, setLabelDict] = useState<Object | null>(null)
+  const [ labelDict, setLabelDict ] = useState<Object | null>( null )
   //const [ isLoading, setIsLoading ] = useState( true );
   const isLoading = useStore( ( state ) => state.isLoadingEmbs )
   const setIsLoading = useStore( ( state ) => state.setIsLoadingEmbs )
@@ -86,6 +86,8 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
   const inputRef = useRef(null);
+  const [filteredLabels, setFilteredLabels] = useState<string[] | null>([])
+
   useEffect( () =>
   {
     setSelectedIndexes( [] );
@@ -105,25 +107,28 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   }, [ props.featureName, props.labelFeatureName ] );
 
 
-useEffect( () =>
+  useEffect( () =>
   {
     if ( props.labelFeatureName ) {
       const loadFeature = async () =>
       {
 
         try {
-            const featureLoaded = await featureLoader( props.datasetName, props.labelFeatureName as string );
-            console.log( "FEATURE LOADED:", featureLoaded );
-                setLabelDict( featureLoaded.label_dict )
+          const featureLoaded = await featureLoader( props.datasetName, props.labelFeatureName as string );
+          console.log( "FEATURE LOADED:", featureLoaded );
+          setLabelDict( featureLoaded.label_dict )
         } catch ( error ) {
           console.error( 'Error loading feature:', error );
         }
       };
       loadFeature();
     }
-  }, [ props.labelFeatureName] );
+  }, [ props.labelFeatureName ] );
 
-  console.log("LABEL DICT", labelDict)
+  console.log( "LABEL DICT", labelDict )
+  console.log("COLORMAP", colorMap)
+
+  const labelsList: string[] = labelDict ? Object.values( labelDict ) : [];
 
   useEffect( () =>
   {
@@ -217,7 +222,6 @@ useEffect( () =>
     }
   }, [ selectedIndexes ] );
 
-  // ****************************************************************************************************************************************************
 
   const BASE_RADIUS_METERS = 3.5; // Base size of points in meters or pixels
   const HIGHLIGHT_RADIUS_METERS = BASE_RADIUS_METERS * 3; // Size of the hovered point
@@ -466,12 +470,18 @@ useEffect( () =>
           style={ { width: '100%' } }
         >No data available</Flex> ) : (
           <>
-            <div style={ { position: 'relative', width: '1830px', height: '600px'} }>
+            <div style={ { position: 'relative', width: '1830px', height: '600px' } }>
               { props.labelFeatureName ? ( <div style={ { position: 'absolute', top: '10px', left: '20px', zIndex: 10 } }>
                 <MultiSelect
+                  radius="md"
+                  size='xs'
                   label="Labels"
                   placeholder="Choose one or more labels to visualize"
-                  data={ [ 'React', 'Angular', 'Vue', 'Svelte' ] }
+                  data={ labelsList }
+                  value={filteredLabels as string[]}
+                  onChange={( value ) => setFilteredLabels( value )}
+                  searchable
+                  clearable
                 />
               </div> ) : null }
 

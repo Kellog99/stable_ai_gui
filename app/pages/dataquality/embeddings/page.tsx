@@ -345,7 +345,7 @@ function Home ()
           </MovableWindow>): null } 
         </>
       ) : (
-        <p>Select Feature</p>
+        <Text size="xs">Select Feature</Text>
       ) }
 
     </div>
