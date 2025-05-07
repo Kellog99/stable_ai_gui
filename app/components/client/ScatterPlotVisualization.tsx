@@ -7,7 +7,8 @@ import { log, OrbitView, project } from '@deck.gl/core';
 import getData from '../../functionalities/Utils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Flex, Loader, Menu, MenuDropdown, MenuItem } from '@mantine/core';
+import { Flex, Loader, Menu, MenuDropdown, MenuItem, MultiSelect } from '@mantine/core';
+import featureLoader from '@/functionalities/FeatureLoader';
 
 
 interface OrbitViewState
@@ -58,6 +59,8 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   //const [lassoMode, setLassoMode] = useState<boolean>(false);
 
   const [ data, setData ] = useState<Point[] | null>( null );
+  const [ colorMap, setColorMap ] = useState<Object>( {} )
+  const [labelDict, setLabelDict] = useState<Object | null>(null)
   //const [ isLoading, setIsLoading ] = useState( true );
   const isLoading = useStore( ( state ) => state.isLoadingEmbs )
   const setIsLoading = useStore( ( state ) => state.setIsLoadingEmbs )
@@ -83,13 +86,15 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   useEffect( () =>
   {
-    setSelectedIndexes( [] )
-    setIsLoading( true )
+    setSelectedIndexes( [] );
+    setIsLoading( true );
+
     getData( props.datasetName, props.featureName, props.labelFeatureName )
-      .then( fetchedData =>
+      .then( ( fetched ) =>
       {
-        setData( fetchedData );
-        setOriginalColors( new Map( fetchedData.map( ( item, index ) => [ index, item.color ] ) ) );
+        setData( fetched.points ); // Only set the points in setData
+        setColorMap( fetched.color_map ); // Set colorMap separately
+        setOriginalColors( new Map( fetched.points.map( ( item, index ) => [ index, item.color ] ) ) );
       } )
       .finally( () =>
       {
@@ -97,6 +102,26 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       } );
   }, [ props.featureName, props.labelFeatureName ] );
 
+
+useEffect( () =>
+  {
+    if ( props.labelFeatureName ) {
+      const loadFeature = async () =>
+      {
+
+        try {
+            const featureLoaded = await featureLoader( props.datasetName, props.labelFeatureName as string );
+            console.log( "FEATURE LOADED:", featureLoaded );
+                setLabelDict( featureLoaded.label_dict )
+        } catch ( error ) {
+          console.error( 'Error loading feature:', error );
+        }
+      };
+      loadFeature();
+    }
+  }, [ props.labelFeatureName] );
+
+  console.log("LABEL DICT", labelDict)
 
   useEffect( () =>
   {
@@ -406,47 +431,59 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           wrap="wrap"
           style={ { width: '100%' } }
         >No data available</Flex> ) : (
-          <Suspense>
-            <div id="deckgl-container"
-              onContextMenu={ handleContextMenu }
-              style={ {
-                position: 'relative',
-                width: '1830px',
-                height: '600px',
-                border: '2px solid #9a9a9a',
-                background: 'white',
-                overflow: 'hidden',
+          <>
+            <div style={ { position: 'relative', width: '1830px', height: '600px'} }>
+              { props.labelFeatureName ? ( <div style={ { position: 'absolute', top: '10px', left: '20px', zIndex: 10 } }>
+                <MultiSelect
+                  label="Labels"
+                  placeholder="Choose one or more labels to visualize"
+                  data={ [ 'React', 'Angular', 'Vue', 'Svelte' ] }
+                />
+              </div> ) : null }
 
-              } } >
-              <DeckGL
-                ref={ deckRef }
-                views={ new OrthographicView( { fovy: 50 } ) }
-                viewState={ viewState }
-                onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
-                layers={ [ layer ] }
-                controller={
-                  lassoMode
-                    ? {
-                      scrollZoom: false,
-                      dragRotate: false,
-                      dragPan: false,
-                      doubleClickZoom: false,
-                      
+              <Suspense>
+                <div
+                  id="deckgl-container"
+                  onContextMenu={ handleContextMenu }
+                  style={ {
+                    position: 'relative',
+                    width: '100%',
+                    height: '100%',
+                    border: '2px solid #9a9a9a',
+                    background: 'white',
+                    overflow: 'hidden',
+                  } }
+                >
+                  <DeckGL
+                    ref={ deckRef }
+                    views={ new OrthographicView( { fovy: 50 } ) }
+                    viewState={ viewState }
+                    onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
+                    layers={ [ layer ] }
+                    controller={
+                      lassoMode
+                        ? {
+                          scrollZoom: false,
+                          dragRotate: false,
+                          dragPan: false,
+                          doubleClickZoom: false,
+                        }
+                        : {
+                          scrollZoom: true,
+                          dragRotate: true,
+                          dragPan: true,
+                          doubleClickZoom: false,
+                        }
                     }
-                    : {
-                      scrollZoom: true,
-                      dragRotate: true,
-                      dragPan: true,
-                      doubleClickZoom: false,
-                      
-                    }
-                }
-                onDragStart={ handleDragStart }
-                onDrag={ handleDrag }
-                onDragEnd={ handleDragEnd }
-              />
+                    onDragStart={ handleDragStart }
+                    onDrag={ handleDrag }
+                    onDragEnd={ handleDragEnd }
+                  />
+                </div>
+              </Suspense>
             </div>
-          </Suspense>
+
+          </>
         ) }
 
         { contextMenu.visible && (

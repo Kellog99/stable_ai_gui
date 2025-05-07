@@ -8,6 +8,7 @@ import
 {
     faMinus, faX
 } from '@fortawesome/free-solid-svg-icons';
+import useStore from "@/store/dsStore";
 
 type MovableWindowProps = {
     children: ReactNode;
@@ -17,6 +18,7 @@ export function MovableWindow ( { children }: MovableWindowProps )
 {
 
     const [ collapsed, setCollapsed ] = useState( false );
+    const setSelectedIndexes = useStore((state) => state.setSelectedIndexes)
 
     return (
         <>
@@ -74,6 +76,7 @@ export function MovableWindow ( { children }: MovableWindowProps )
                             variant="transparent"
                             radius="xl"
                             size="xs"
+                            onClick={() => setSelectedIndexes([])}
                             style={ {
                                 transition: "background-color 0.2s ease",
                             } }
