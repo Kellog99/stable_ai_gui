@@ -71,6 +71,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   //const [ isLoading, setIsLoading ] = useState( true );
   const isLoading = useStore( ( state ) => state.isLoadingEmbs )
   const setIsLoading = useStore( ( state ) => state.setIsLoadingEmbs )
+  const [ isLoadingRetr, setIsLoadingRetr ] = useState<boolean>( false )
 
   const [ viewState, setViewState ] = useState<OrbitViewState>( {
     target: [ 0, 0, 0 ],
@@ -94,12 +95,21 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ filteredLabels, setFilteredLabels ] = useState<string[] | null>( [] )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
 
+
+
+  function getAllKeysByValues(object, valuesList) {
+    return valuesList.flatMap(value => 
+      Object.keys(object).filter(key => object[key] === value)
+    );
+  }
+
+
   useEffect( () =>
   {
     setSelectedIndexes( [] );
     setIsLoading( true );
 
-    getData( props.datasetName, props.featureName, props.labelFeatureName )
+    getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues(labelDict,filteredLabels as string[]) )
       .then( ( fetched ) =>
       {
         setData( fetched.points ); // Only set the points in setData
@@ -110,7 +120,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       {
         setIsLoading( false );
       } );
-  }, [ props.featureName, props.labelFeatureName ] );
+  }, [ props.featureName, props.labelFeatureName, filteredLabels ] );
 
 
   useEffect( () =>
@@ -195,18 +205,25 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
   };
 
-  useEffect( () =>
-  {
-    if(queryRetrieve!=""){
-    setSelectedIndexes( [] );
 
-
-    RetrieveSamples( props.datasetName, props.featureName, queryRetrieve )
-      .then( ( fetched ) =>
-      {
-        setSelectedIndexes( fetched.indexes )
-      } )}
-  }, [ queryRetrieve ] );
+  useEffect(() => {
+    if (queryRetrieve !== "") {
+      setSelectedIndexes([]);
+  
+      let loadingTimeout = setTimeout(() => {
+        setIsLoadingRetr(true);
+      }, 500); // delay threshold in milliseconds
+  
+      RetrieveSamples(props.datasetName, props.featureName, queryRetrieve)
+        .then((fetched) => {
+          setSelectedIndexes(fetched.indexes);
+        })
+        .finally(() => {
+          clearTimeout(loadingTimeout); // prevent setting loading to true if fetch finished quickly
+          setIsLoadingRetr(false);
+        });
+    }
+  }, [queryRetrieve]);
 
   // *******************************************************************************************************************************************
 
@@ -481,7 +498,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }, 500 ); // adjust delay as needed
   }, [ inputValue ] );
 
-  console.log("QUERY RETRIEVE",  queryRetrieve)
+  console.log( "QUERY RETRIEVE", queryRetrieve )
 
 
   useEffect( () =>
@@ -493,9 +510,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   const handleClearSearch = () => 
   {
-    setInputValue("");
-    setSelectedIndexes([])
-    setQueryRetrieve("")
+    setInputValue( "" );
+    setSelectedIndexes( [] )
+    setQueryRetrieve( "" )
   }
 
   return (
@@ -586,32 +603,37 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               </Suspense>
             </div>
 
+            <Flex
+              direction="row"
+              align="center">
 
-            <Textarea
-              id="search-input"
-              ref={ inputRef }
-              label="Semantic Search"
-              placeholder="Write something..."
-              radius="md"
+              <Textarea
+                id="search-input"
+                ref={ inputRef }
+                label="Semantic Search"
+                placeholder="Write something..."
+                radius="md"
 
-              value={ inputValue }
-              onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
-              style={ {
-                width: "400px",
-                pointerEvents: 'auto',
-                paddingRight:"6px",
-                marginTop: "6px"
-              } }
-              onClick={ ( e ) =>
-              {
-                e.stopPropagation();
-                e.target.focus();
-              } }
-              onFocus={ ( e ) => e.stopPropagation() }
-              rightSection={
-                <CloseButton onClick={handleClearSearch}/>
-              }
-            />
+                value={ inputValue }
+                onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
+                style={ {
+                  width: "400px",
+                  pointerEvents: 'auto',
+                  paddingRight: "6px",
+                  marginTop: "6px"
+                } }
+                onClick={ ( e ) =>
+                {
+                  e.stopPropagation();
+                  e.target.focus();
+                } }
+                onFocus={ ( e ) => e.stopPropagation() }
+                rightSection={
+                  <CloseButton onClick={ handleClearSearch } />
+                }
+              />
+              { isLoadingRetr ? ( <Text>Initializing...</Text> ) : null }
+            </Flex>
           </>
         ) }
 

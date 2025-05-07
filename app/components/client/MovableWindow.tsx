@@ -56,7 +56,7 @@ export function MovableWindow ( { children }: MovableWindowProps )
                         alignItems: 'center',
                         cursor: 'move'
                     } }>
-                    <span style={ { fontWeight: 'bold' } }>Selected Images</span>
+                    <span style={ { fontWeight: 'bold' } }>Selected Samples</span>
                     <Flex direction="row" justify="end" style={ { gap: 0 } }>
                         <Button
                             variant="transparent"

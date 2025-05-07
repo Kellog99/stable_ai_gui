@@ -23,12 +23,21 @@ export async function getIndexes ( url: string, indexes: number[] )
 
 
 //async function getData(datasetName: string, featureName: string, labelFeatureName: string) {
-async function getData ( datasetName: string, featureName: string, labelFeatureName?: string )
+async function getData ( datasetName: string, featureName: string, labelFeatureName?: string, label?:string[] )
 {
   if ( labelFeatureName ) {
-    const response = await fetch(
-      `${data_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&labelFeatureName=${encodeURIComponent(labelFeatureName)}`
-    );
+
+    
+    const url = new URL (`${data_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&labelFeatureName=${encodeURIComponent(labelFeatureName)}`)
+    
+    if (label) {
+      label.forEach( lb =>
+        {
+            url.searchParams.append( 'label', lb );
+        } );
+    }
+    
+    const response = await fetch(url);
     
     if ( !response.ok ) throw new Error( 'Failed to send files to backend' );
 
