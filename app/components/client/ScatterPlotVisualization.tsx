@@ -4,13 +4,13 @@ import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
 import { ScatterplotLayer, PointCloudLayer } from '@deck.gl/layers';
 import { log, OrbitView, project } from '@deck.gl/core';
-import getData from '../../functionalities/Utils';
+import getData, { RetrieveSamples } from '../../functionalities/Utils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
 import { Flex, Loader, Menu, MenuDropdown, MenuItem, MultiSelect, Textarea } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
 import style from 'styled-jsx/style';
-import {type} from 'os';
+import { type } from 'os';
 
 
 interface OrbitViewState
@@ -66,7 +66,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   //const [ isLoading, setIsLoading ] = useState( true );
   const isLoading = useStore( ( state ) => state.isLoadingEmbs )
   const setIsLoading = useStore( ( state ) => state.setIsLoadingEmbs )
-  
+
   const [ viewState, setViewState ] = useState<OrbitViewState>( {
     target: [ 0, 0, 0 ],
     rotationX: 0,
@@ -85,8 +85,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
-  const inputRef = useRef(null);
-  const [filteredLabels, setFilteredLabels] = useState<string[] | null>([])
+  const inputRef = useRef( null );
+  const [ filteredLabels, setFilteredLabels ] = useState<string[] | null>( [] )
+  const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
 
   useEffect( () =>
   {
@@ -126,7 +127,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   }, [ props.labelFeatureName ] );
 
   console.log( "LABEL DICT", labelDict )
-  console.log("COLORMAP", colorMap)
+  console.log( "COLORMAP", colorMap )
 
   const labelsList: string[] = labelDict ? Object.values( labelDict ) : [];
 
@@ -188,6 +189,19 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
     }
   };
+
+  useEffect( () =>
+    {
+      setSelectedIndexes( [] );
+      
+  
+      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve )
+        .then( ( fetched ) =>
+        {
+          setSelectedIndexes(fetched.indexes)
+        } )
+    }, [ queryRetrieve ] );
+
   // *******************************************************************************************************************************************
 
   useEffect( () =>
@@ -413,35 +427,39 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   ];
 
 
-  useEffect(() => {
+  useEffect( () =>
+  {
     // Create a container for our input that captures events before they reach deck.gl
-    const setupInputCapture = () => {
-      if (!inputRef.current) return;
-      
+    const setupInputCapture = () =>
+    {
+      if ( !inputRef.current ) return;
+
       // Make sure the input can receive mouse events
       inputRef.current.style.pointerEvents = 'auto';
-      
+
       // Add event listeners that stop propagation to prevent deck.gl from capturing them
-      const stopPropagation = (e) => {
+      const stopPropagation = ( e ) =>
+      {
         e.stopPropagation();
       };
-      
-      inputRef.current.addEventListener('mousedown', stopPropagation);
-      inputRef.current.addEventListener('click', stopPropagation);
-      inputRef.current.addEventListener('touchstart', stopPropagation);
-      
+
+      inputRef.current.addEventListener( 'mousedown', stopPropagation );
+      inputRef.current.addEventListener( 'click', stopPropagation );
+      inputRef.current.addEventListener( 'touchstart', stopPropagation );
+
       // Clean up
-      return () => {
-        if (inputRef.current) {
-          inputRef.current.removeEventListener('mousedown', stopPropagation);
-          inputRef.current.removeEventListener('click', stopPropagation);
-          inputRef.current.removeEventListener('touchstart', stopPropagation);
+      return () =>
+      {
+        if ( inputRef.current ) {
+          inputRef.current.removeEventListener( 'mousedown', stopPropagation );
+          inputRef.current.removeEventListener( 'click', stopPropagation );
+          inputRef.current.removeEventListener( 'touchstart', stopPropagation );
         }
       };
     };
-    
+
     return setupInputCapture();
-  }, []);
+  }, [] );
 
 
   return (
@@ -478,12 +496,16 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                   label="Labels"
                   placeholder="Choose one or more labels to visualize"
                   data={ labelsList }
-                  value={filteredLabels as string[]}
-                  onChange={( value ) => setFilteredLabels( value )}
+                  value={ filteredLabels as string[] }
+                  onChange={ ( value ) => setFilteredLabels( value ) }
                   searchable
                   clearable
                 />
               </div> ) : null }
+
+
+
+
 
               <Suspense>
                 <div
@@ -498,31 +520,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                     overflow: 'hidden',
                   } }
                 >
-                  <div 
-                  style={{
-                    position: 'absolute',
-                    top: '20px',
-                    left: '20px',
-                    zIndex: 100, // High z-index to be above deck.gl
-                    background: 'white',
-                    padding: '15px',
-                    borderRadius: '4px',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.15)'
-                  }}
-                >
-                  <Textarea 
-                    id="search-input"
-                    ref={inputRef}
-                    style={{
-                      pointerEvents: 'auto' // Crucial for accepting mouse events
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.target.focus();
-                    }}
-                    onFocus={(e) => e.stopPropagation()}
-                  /> 
-                </div>
+
                   <DeckGL
                     ref={ deckRef }
                     views={ new OrthographicView( { fovy: 50 } ) }
@@ -552,6 +550,27 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               </Suspense>
             </div>
 
+
+            <Textarea
+              id="search-input"
+              ref={ inputRef }
+              label="Semantic Search"
+              placeholder="Write something you're interested in finding"
+              radius="md"
+              value={ queryRetrieve }
+              onChange={ ( event ) => setQueryRetrieve( event.currentTarget.value ) }
+              style={ {
+                width: "400px",
+                pointerEvents: 'auto',
+                marginTop:"6px"
+              } }
+              onClick={ ( e ) =>
+              {
+                e.stopPropagation();
+                e.target.focus();
+              } }
+              onFocus={ ( e ) => e.stopPropagation() }
+            />
           </>
         ) }
 

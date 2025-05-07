@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { data_get, duplicates_post, outliers_post, prototypes_get } from '../properties/urls';
+import { data_get, duplicates_post, outliers_post, prototypes_get, retrieve_get } from '../properties/urls';
 
 
 export async function postIndexes ( url: string, indexes: number[] )
@@ -90,4 +90,16 @@ export async function getOutliers(datasetName: string, featureName: string, inte
   
   const outliers = await response.json();
     return outliers
+}
+
+
+export async function RetrieveSamples(datasetName: string, featureName: string, query: string){
+  const response = await fetch(
+    `${retrieve_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&query=${encodeURIComponent(query)}`
+  );
+
+  if ( !response.ok ) throw new Error( 'Failed to retrieve samples from the backend' );
+  
+  const samples = await response.json();
+    return samples
 }

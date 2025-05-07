@@ -191,7 +191,7 @@ function Home ()
         <Space h="md" />
 
 
-        <div style={ { width: '1030px', position: 'relative', marginBottom: '20px' } }>
+        <div style={ { width: '1030px', position: 'relative' } }>
 
           <Flex direction="row" justify="space-between" align="flex-start">
             <Flex
@@ -220,54 +220,8 @@ function Home ()
                 onClear={ () => setLabelFeatureName( "" ) }
                 clearable={ true }
               />
-              {/*
-              <Modal opened={ opened } onClose={ close } title="Authentication">
-                <Textarea
-                  radius="md"
-                  label="Retrieve"
-                  placeholder="Write something you're interested in finding"
-                  onKeyDown={ handleTextareaKeyDown }
-                  onKeyUp={ ( e ) => e.stopPropagation() }
-                  onClick={ ( e ) => e.stopPropagation() }
-                  value={ queryRetrieve }
-                  onChange={ ( event ) => setQueryRetrieve( event.target.value ) }
-                  style={ { zIndex: 10 } }
-                />
-              </Modal>
-
-              <Button variant="default" onClick={ open }>
-                Query
-              </Button>
-              */}
-              {/*
-              <Textarea
-                radius="md"
-                label="Retrieve"
-                placeholder="Write something you're interested in finding"
-                onKeyDown={ handleTextareaKeyDown }
-                onKeyUp={ ( e ) => e.stopPropagation() }
-                
-                value={ queryRetrieve }
-                onChange={ ( event ) => setQueryRetrieve( event.target.value ) }
-                style={ { zIndex: 10 } }
-              />
-              */}
 
             </Flex>
-
-
-            {/*
-            { !isLoadingEmbs ? (
-
-              <Textarea
-                radius="md"
-                label="Retrieve"
-                placeholder="Write something you're interested in finding"
-                value={ queryRetrieve }
-                onChange={ ( event ) => setQueryRetrieve( event.currentTarget.value ) }
-                style={ { width: "400px" } }
-              /> ) : null }
-              */}
           </Flex>
 
 
@@ -280,7 +234,20 @@ function Home ()
             direction="column"
             align="center">
 
-            <div style={ { position: 'relative', marginBottom: '20px' } }>
+            <div style={ { position: 'relative' } }>
+              
+              <Flex
+                justify="left"
+                align="center"
+                direction="column"
+                wrap="wrap"
+                style={ { width: '100%' } }
+              >
+                <p>
+                  { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
+                </p>
+              </Flex>
+              
               <Suspense>
                 <Box style={ { pointerEvents: 'none' } }>
                   <div style={ { pointerEvents: 'auto' } }>
@@ -291,18 +258,7 @@ function Home ()
                 </Box>
               </Suspense>
 
-              <Flex
-                mih={ 150 }
-                justify="left"
-                align="center"
-                direction="column"
-                wrap="wrap"
-                style={ { width: '100%', marginTop: '6px' } }
-              >
-                <p className="text-sm font-medium">
-                  { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
-                </p>
-              </Flex>
+              
             </div>
 
 {/*
@@ -345,7 +301,7 @@ function Home ()
           </MovableWindow>): null } 
         </>
       ) : (
-        <Text size="xs">Select Feature</Text>
+        <Text size="sm" style={{marginTop:"20px"}}>Select Feature</Text>
       ) }
 
     </div>
