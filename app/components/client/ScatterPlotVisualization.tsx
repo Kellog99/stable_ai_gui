@@ -7,10 +7,15 @@ import { log, OrbitView, project } from '@deck.gl/core';
 import getData, { RetrieveSamples } from '../../functionalities/Utils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Flex, Loader, Menu, MenuDropdown, MenuItem, MultiSelect, Textarea } from '@mantine/core';
+import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
 import style from 'styled-jsx/style';
 import { type } from 'os';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import
+{
+  faX
+} from '@fortawesome/free-solid-svg-icons';
 
 
 interface OrbitViewState
@@ -191,16 +196,16 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   };
 
   useEffect( () =>
-    {
-      setSelectedIndexes( [] );
-      
-  
-      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve )
-        .then( ( fetched ) =>
-        {
-          setSelectedIndexes(fetched.indexes)
-        } )
-    }, [ queryRetrieve ] );
+  {
+    setSelectedIndexes( [] );
+
+
+    RetrieveSamples( props.datasetName, props.featureName, queryRetrieve )
+      .then( ( fetched ) =>
+      {
+        setSelectedIndexes( fetched.indexes )
+      } )
+  }, [ queryRetrieve ] );
 
   // *******************************************************************************************************************************************
 
@@ -429,38 +434,61 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   useEffect( () =>
   {
-    // Create a container for our input that captures events before they reach deck.gl
     const setupInputCapture = () =>
     {
       if ( !inputRef.current ) return;
 
-      // Make sure the input can receive mouse events
       inputRef.current.style.pointerEvents = 'auto';
 
-      // Add event listeners that stop propagation to prevent deck.gl from capturing them
       const stopPropagation = ( e ) =>
       {
+        // Do not preventDefault — that breaks selection
         e.stopPropagation();
       };
 
-      inputRef.current.addEventListener( 'mousedown', stopPropagation );
-      inputRef.current.addEventListener( 'click', stopPropagation );
-      inputRef.current.addEventListener( 'touchstart', stopPropagation );
+      const ref = inputRef.current;
 
-      // Clean up
+      // Use pointerdown (for wider input device coverage)
+      ref.addEventListener( 'pointerdown', stopPropagation, true );
+      ref.addEventListener( 'click', stopPropagation, true );
+      ref.addEventListener( 'touchstart', stopPropagation, true );
+
       return () =>
       {
-        if ( inputRef.current ) {
-          inputRef.current.removeEventListener( 'mousedown', stopPropagation );
-          inputRef.current.removeEventListener( 'click', stopPropagation );
-          inputRef.current.removeEventListener( 'touchstart', stopPropagation );
-        }
+        ref.removeEventListener( 'pointerdown', stopPropagation, true );
+        ref.removeEventListener( 'click', stopPropagation, true );
+        ref.removeEventListener( 'touchstart', stopPropagation, true );
       };
     };
 
     return setupInputCapture();
   }, [] );
 
+
+  const [ inputValue, setInputValue ] = useState( queryRetrieve );
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>( null );
+
+  // Update queryRetrieve after user stops typing for 500ms
+  useEffect( () =>
+  {
+    if ( typingTimeoutRef.current ) {
+      clearTimeout( typingTimeoutRef.current );
+    }
+    typingTimeoutRef.current = setTimeout( () =>
+    {
+      setQueryRetrieve( inputValue );
+    }, 500 ); // adjust delay as needed
+  }, [ inputValue ] );
+
+  console.log("QUERY RETRIEVE",  queryRetrieve)
+
+
+  useEffect( () =>
+  {
+    if ( queryRetrieve === "" ) {
+      setSelectedIndexes( [] )
+    }
+  }, [ queryRetrieve ] )
 
   return (
     <>
@@ -555,14 +583,16 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               id="search-input"
               ref={ inputRef }
               label="Semantic Search"
-              placeholder="Write something you're interested in finding"
+              placeholder="Write something..."
               radius="md"
-              value={ queryRetrieve }
-              onChange={ ( event ) => setQueryRetrieve( event.currentTarget.value ) }
+
+              value={ inputValue }
+              onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
               style={ {
                 width: "400px",
                 pointerEvents: 'auto',
-                marginTop:"6px"
+                paddingRight:"6px",
+                marginTop: "6px"
               } }
               onClick={ ( e ) =>
               {
@@ -570,6 +600,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                 e.target.focus();
               } }
               onFocus={ ( e ) => e.stopPropagation() }
+              rightSection={
+                <CloseButton onClick={() => setInputValue("")}/>
+              }
             />
           </>
         ) }
