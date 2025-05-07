@@ -197,6 +197,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   useEffect( () =>
   {
+    if(queryRetrieve!=""){
     setSelectedIndexes( [] );
 
 
@@ -204,7 +205,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       .then( ( fetched ) =>
       {
         setSelectedIndexes( fetched.indexes )
-      } )
+      } )}
   }, [ queryRetrieve ] );
 
   // *******************************************************************************************************************************************
@@ -490,6 +491,13 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
   }, [ queryRetrieve ] )
 
+  const handleClearSearch = () => 
+  {
+    setInputValue("");
+    setSelectedIndexes([])
+    setQueryRetrieve("")
+  }
+
   return (
     <>
       { isLoading ? (
@@ -601,7 +609,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               } }
               onFocus={ ( e ) => e.stopPropagation() }
               rightSection={
-                <CloseButton onClick={() => setInputValue("")}/>
+                <CloseButton onClick={handleClearSearch}/>
               }
             />
           </>
