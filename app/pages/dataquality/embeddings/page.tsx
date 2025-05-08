@@ -292,9 +292,10 @@ function Home ()
                 wrap="wrap"
                 style={ { width: '100%' } }
               >
-                <p>
+                {!isLoadingEmbs? (<p>
                   { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
-                </p>
+                </p>): null}
+                
               </Flex>
 
               <Suspense>

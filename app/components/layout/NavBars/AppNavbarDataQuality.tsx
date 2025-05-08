@@ -23,7 +23,8 @@ import
 import
 {
     IconChevronDown,
-    IconChevronUp
+    IconChevronUp,
+    IconChevronRight
 } from '@tabler/icons-react';
 import classes from './AppNavbarDataQuality.module.css';
 import RouterButton from "@/components/client/buttons/RouterButton";
@@ -107,16 +108,10 @@ function AppNavbarDataQuality ()
                     onClick={() => setVisualVisible((prev) => !prev)}
                     rightSection={
                         visualVisible ? (
-                          <div
-                            style={{
-                              width: '12px',
-                              height: '1px',
-                              backgroundColor: 'currentColor',
-                              borderRadius: '1px',
-                            }}
-                          />
+                            <IconChevronDown size={18} stroke={1.5} />
                         ) : (
-                          <IconChevronDown size={18} stroke={1.5} />
+                            <IconChevronRight size={18} stroke={1.5} />
+                          
                         )
                       }
                     pr={12}
@@ -171,16 +166,10 @@ function AppNavbarDataQuality ()
                             onClick={() => setMetricVisible((prev) => !prev)}
                             rightSection={
                                 metricVisible ? (
-                                    <div
-                                    style={{
-                                      width: '12px',
-                                      height: '1px',
-                                      backgroundColor: 'currentColor',
-                                      borderRadius: '1px',
-                                    }}
-                                  />
+                                    <IconChevronDown size={18} stroke={1.5} />
                                 ) : (
-                                <IconChevronDown size={18} stroke={1.5} />
+                                    <IconChevronRight size={18} stroke={1.5} />
+                                  
                                 )
                             } pr={ 12 }
                             leftSection={ <FontAwesomeIcon icon={ faChartLine } size="sm" style={ { opacity: 0.6 } } /> }>
@@ -267,16 +256,10 @@ function AppNavbarDataQuality ()
                             onClick={() => setActionVisible((prev) => !prev)}
                             rightSection={
                                 actionVisible ? (
-                                    <div
-                                    style={{
-                                      width: '12px',
-                                      height: '1px',
-                                      backgroundColor: 'currentColor',
-                                      borderRadius: '1px',
-                                    }}
-                                  />
+                                    <IconChevronDown size={18} stroke={1.5} />
                                 ) : (
-                                <IconChevronDown size={18} stroke={1.5} />
+                                    <IconChevronRight size={18} stroke={1.5} />
+                                  
                                 )
                             }
                             leftSection={ <FontAwesomeIcon icon={ faBolt } size="sm" style={ { opacity: 0.6 } } /> }>

@@ -355,6 +355,7 @@ const handleonClose = () => {
         <h2>
           Description
         </h2>
+        
         <Box style={ { marginBottom: '70px' } }>
           <Text fw={ 600 } component="span">
             { datasetUsed?.name || "" }
