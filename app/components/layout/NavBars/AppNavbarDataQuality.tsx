@@ -289,15 +289,17 @@ function AppNavbarDataQuality ()
                     { actionVisible && (
                         <Stack mt="sm">
                             <Box>
-                                <Link href="/">
+                                <RouterButton name={ datasetName } route={ "/pages/dataquality/actions/embeddings" }>
                                     <Button
                                         radius="xl"
-                                        variant={ isActive( "/" ) ? "filled" : "subtle" }
-                                        disabled
+                                        variant={ isActive( "/pages/dataquality/metrics/outliers" ) ? "filled" : "subtle" }
+                                        disabled={ isDatasetUndefined }
                                     >
-                                        Embeddings
+                                        <Text size="sm" fw={ 600 } c="dimmed">
+                                            Embedder
+                                        </Text>
                                     </Button>
-                                </Link>
+                                </RouterButton>
                             </Box>
                         </Stack>
                     ) }
