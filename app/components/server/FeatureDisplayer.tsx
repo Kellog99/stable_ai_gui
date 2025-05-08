@@ -15,6 +15,7 @@ interface FeatureCardProps
   featureType: string,
   label?: number,
   labelString?: string,
+  labelColor?: [],
   outlier?: string,
   score?: number
 }
@@ -34,7 +35,10 @@ interface FeatureDisplayerProps
 
 export function FeatureCard ( props: FeatureCardProps )
 {
-  const { index, data, featureType, label, labelString, outlier, score } = props
+  const { index, data, featureType, label, labelString, labelColor, outlier, score } = props
+
+
+  console.log("LABEL COLOR:", labelColor)
 
   return (
     <Card className={ classes.card } shadow="sm" padding="lg" radius="md" withBorder>
@@ -50,7 +54,8 @@ export function FeatureCard ( props: FeatureCardProps )
         <>
           <Group justify="space-between" mt="md" mb="xs">
             { labelString != null ? <Text fw={ 700 } size="lg">{ labelString }</Text> : null }
-            { label != null ? <Badge color="#ec777e"> Class ID: { label } </Badge> : null }
+            { label != null ? (labelColor? (<Badge color={`rgb(${labelColor.join(",")})`}> Class ID: { label } </Badge>) : (<Badge color="#ec777e"> Class ID: { label } </Badge> )
+            ): null }
           </Group>
 
           { index || index == 0 ? (
@@ -78,6 +83,9 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
   const ROW_HEIGHT = 290;
   const rowCount = Math.ceil( featureData.length / COLUMN_COUNT );
   const setHoverIndex = useStore( ( state ) => state.setHoverIndex )
+  const colorMap = useStore((state) => state.colorMap)
+  
+  
 
 
   return (
@@ -113,6 +121,7 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
                   { ...( indexes ? { index: indexes[ index ] } : {} ) }
                   { ...( labelData ? { label: labelData[ index ] } : {} ) }
                   { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }
+                  { ...( labelData && colorMap ? { labelColor: colorMap[labelData[ index ]]} : {} ) }
                   { ...( outliers ? { outlier: outliers[ index ] } : {} ) }
                   { ...( scores ? { score: scores[ index ] } : {} ) }
                 />

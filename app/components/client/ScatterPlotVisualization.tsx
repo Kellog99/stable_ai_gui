@@ -7,7 +7,7 @@ import { log, OrbitView, project } from '@deck.gl/core';
 import getData, { RetrieveSamples } from '../../functionalities/Utils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton } from '@mantine/core';
+import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
 import style from 'styled-jsx/style';
 import { type } from 'os';
@@ -66,7 +66,13 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   //const [lassoMode, setLassoMode] = useState<boolean>(false);
 
   const [ data, setData ] = useState<Point[] | null>( null );
-  const [ colorMap, setColorMap ] = useState<Object>( {} )
+  //const [ colorMap, setColorMap ] = useState<Object>( {} )
+  const colorMap = useStore( ( state ) => state.colorMap )
+  const setColorMap = useStore( ( state ) => state.setColorMap )
+
+
+
+
   const [ labelDict, setLabelDict ] = useState<Object | null>( null )
   //const [ isLoading, setIsLoading ] = useState( true );
   const isLoading = useStore( ( state ) => state.isLoadingEmbs )
@@ -92,14 +98,16 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
   const inputRef = useRef( null );
-  const [ filteredLabels, setFilteredLabels ] = useState<string[] | null>( [] )
+  const filteredLabels = useStore((state) => state.filteredLabels)
+  
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
 
 
 
-  function getAllKeysByValues(object, valuesList) {
-    return valuesList.flatMap(value => 
-      Object.keys(object).filter(key => object[key] === value)
+  function getAllKeysByValues ( object, valuesList )
+  {
+    return valuesList.flatMap( value =>
+      Object.keys( object ).filter( key => object[ key ] === value )
     );
   }
 
@@ -109,7 +117,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     setSelectedIndexes( [] );
     setIsLoading( true );
 
-    getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues(labelDict,filteredLabels as string[]) )
+    getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ) )
       .then( ( fetched ) =>
       {
         setData( fetched.points ); // Only set the points in setData
@@ -206,24 +214,28 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   };
 
 
-  useEffect(() => {
-    if (queryRetrieve !== "") {
-      setSelectedIndexes([]);
-  
-      let loadingTimeout = setTimeout(() => {
-        setIsLoadingRetr(true);
-      }, 500); // delay threshold in milliseconds
-  
-      RetrieveSamples(props.datasetName, props.featureName, queryRetrieve)
-        .then((fetched) => {
-          setSelectedIndexes(fetched.indexes);
-        })
-        .finally(() => {
-          clearTimeout(loadingTimeout); // prevent setting loading to true if fetch finished quickly
-          setIsLoadingRetr(false);
-        });
+  useEffect( () =>
+  {
+    if ( queryRetrieve !== "" ) {
+      setSelectedIndexes( [] );
+
+      let loadingTimeout = setTimeout( () =>
+      {
+        setIsLoadingRetr( true );
+      }, 500 ); // delay threshold in milliseconds
+
+      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve )
+        .then( ( fetched ) =>
+        {
+          setSelectedIndexes( fetched.indexes );
+        } )
+        .finally( () =>
+        {
+          clearTimeout( loadingTimeout ); // prevent setting loading to true if fetch finished quickly
+          setIsLoadingRetr( false );
+        } );
     }
-  }, [queryRetrieve]);
+  }, [ queryRetrieve ] );
 
   // *******************************************************************************************************************************************
 
@@ -515,6 +527,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     setQueryRetrieve( "" )
   }
 
+
   return (
     <>
       { isLoading ? (
@@ -541,23 +554,10 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           style={ { width: '100%' } }
         >No data available</Flex> ) : (
           <>
-            <div style={ { position: 'relative', width: '1830px', height: '600px' } }>
-              { props.labelFeatureName ? ( <div style={ { position: 'absolute', top: '10px', left: '20px', zIndex: 10 } }>
-                <MultiSelect
-                  radius="md"
-                  size='xs'
-                  label="Labels"
-                  placeholder="Choose one or more labels to visualize"
-                  data={ labelsList }
-                  value={ filteredLabels as string[] }
-                  onChange={ ( value ) => setFilteredLabels( value ) }
-                  searchable
-                  clearable
-                />
-              </div> ) : null }
+            <div style={ { width: '1830px', height: '600px' } }>
 
 
-
+              
 
 
               <Suspense>
@@ -603,39 +603,46 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               </Suspense>
             </div>
 
+
             <Flex
-              direction="row"
-              align="center">
+              direction="column"
+              align="center"
+              justify="center">
+              <Box>
+                <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
+                <Textarea
+                  id="search-input"
+                  ref={ inputRef }
 
-              <Textarea
-                id="search-input"
-                ref={ inputRef }
-                label="Semantic Search"
-                placeholder="Write something..."
-                radius="md"
+                  placeholder="Write something..."
+                  radius="md"
 
-                value={ inputValue }
-                onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
-                style={ {
-                  width: "400px",
-                  pointerEvents: 'auto',
-                  paddingRight: "6px",
-                  marginTop: "6px"
-                } }
-                onClick={ ( e ) =>
-                {
-                  e.stopPropagation();
-                  e.target.focus();
-                } }
-                onFocus={ ( e ) => e.stopPropagation() }
-                rightSection={
-                  <CloseButton onClick={ handleClearSearch } />
-                }
-              />
-              { isLoadingRetr ? ( <Text>Initializing...</Text> ) : null }
+                  value={ inputValue }
+                  onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
+                  style={ {
+                    width: "400px",
+                    pointerEvents: 'auto',
+                    paddingRight: "6px",
+                    marginTop: "6px",
+
+                  } }
+                  onClick={ ( e ) =>
+                  {
+                    e.stopPropagation();
+                    e.target.focus();
+                  } }
+                  onFocus={ ( e ) => e.stopPropagation() }
+                  rightSection={
+                    <CloseButton onClick={ handleClearSearch } />
+                  }
+                />
+              </Box>
+              { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }
             </Flex>
+
           </>
         ) }
+
 
         { contextMenu.visible && (
           <div style={ { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' } }>

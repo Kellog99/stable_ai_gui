@@ -3,7 +3,7 @@
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal } from '@mantine/core';
+import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group } from '@mantine/core';
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
@@ -41,12 +41,17 @@ function Home ()
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
+  const colorMap = useStore( ( state ) => state.colorMap )
+  
+  const filteredLabels = useStore((state) => state.filteredLabels)
+  const setFilteredLabels = useStore((state) => state.setFilteredLabels)
 
   const [ features, setFeatures ] = useState<string[]>( [] )
   const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
   const containerRef = useRef<HTMLDivElement>( null );
+
   const indexes = useStore( ( state ) => state.selectedIndexes );
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
@@ -182,6 +187,33 @@ function Home ()
   console.log( "indexes:", indexes )
 
 
+  const legendData = labelDict && colorMap
+    ? Object.keys(labelDict).map((key) => ({
+        value: labelDict[key],
+        label: labelDict[key],
+        color: `rgb(${colorMap[key].join(',')})`,
+      }))
+    : [];
+  
+    const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({ option }) => {
+      const item = legendData.find((entry) => entry.value === option.value);
+    
+      return (
+        <Group gap="sm">
+          <Box
+            style={{
+              width: 12,
+              height: 12,
+              borderRadius: '50%',
+              backgroundColor: item?.color ?? 'black',
+            }}
+          />
+          <Text size="sm">{option.label}</Text>
+        </Group>
+      );
+    };
+
+
 
   return (
     <div className="w-full h-screen">
@@ -221,6 +253,23 @@ function Home ()
                 clearable={ true }
               />
 
+              { labelFeatureName && labelDict ? (
+                <>
+                  <MultiSelect
+                    data={ legendData }
+                    renderOption={ renderMultiSelectOption }
+                    maxDropdownHeight={ 300 }
+                    radius="md"
+                    size='xs'
+                    label="Labels"
+                    placeholder="Choose one or more labels to visualize"
+                    value={ filteredLabels as string[] }
+                    onChange={ ( value ) => setFilteredLabels( value ) }
+                    searchable
+                    clearable
+                  />
+                </> ) : null }
+
             </Flex>
           </Flex>
 
@@ -235,7 +284,7 @@ function Home ()
             align="center">
 
             <div style={ { position: 'relative' } }>
-              
+
               <Flex
                 justify="left"
                 align="center"
@@ -247,7 +296,7 @@ function Home ()
                   { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
                 </p>
               </Flex>
-              
+
               <Suspense>
                 <Box style={ { pointerEvents: 'none' } }>
                   <div style={ { pointerEvents: 'auto' } }>
@@ -258,50 +307,32 @@ function Home ()
                 </Box>
               </Suspense>
 
-              
-            </div>
 
-{/*
-            { !isLoadingEmbs ? (
+            </div>
+          </Flex>
+
+
+
+          { indexes.length > 0 ? (
+
+            <MovableWindow >
+
               <Flex
                 mih={ 150 }
                 justify="center"
                 align="center"
                 direction="column"
-                wrap="wrap"
-                style={ { width: '50%', backgroundColor: '#f0f0f0', marginLeft: '30px', borderRadius: '12px' } }
+                style={ { marginLeft: '30px', borderRadius: '12px' } }
               >
 
                 { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
                   <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columnCount={ 2 } />
-                </div> ) : ( <Text>Click on a point or draw a lazzo to see the samples</Text> ) }
+                </div> ) : null }
               </Flex>
-            ) : null }
-             */}
-
-          </Flex>
-
-          
-
-          {indexes.length > 0 ? (
-          <MovableWindow >
-            
-            <Flex
-              mih={ 150 }
-              justify="center"
-              align="center"
-              direction="column"
-              style={ { marginLeft: '30px', borderRadius: '12px' } }
-            >
-
-              { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
-                <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columnCount={ 2 } />
-              </div> ) : null }
-            </Flex>
-          </MovableWindow>): null } 
+            </MovableWindow> ) : null }
         </>
       ) : (
-        <Text size="sm" style={{marginTop:"20px"}}>Select Feature</Text>
+        <Text size="sm" style={ { marginTop: "20px" } }>Select Feature</Text>
       ) }
 
     </div>

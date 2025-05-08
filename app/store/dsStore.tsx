@@ -18,6 +18,9 @@ interface AppState {
     isLoadingEmbs : boolean;
 
     report: Object[] | [];
+    colorMap: Object | {};
+    filteredLabels: string[] | [];
+
 
     setSelectedIndexes : (selectedIndexes : number[]) => void;
     setHoverIndex: (hoverIndex: number | null) => void
@@ -33,6 +36,8 @@ interface AppState {
     setAddToReport: (addToReport: boolean) => void;
     setIsLoadingEmbs: (isLoadingEmbs: boolean) => void;
     setReport: (report: Object[] | []) => void;
+    setColorMap: (colorMap: Object | {}) => void;
+    setFilteredLabels: (filteredLabels: string[]| []) => void;
   }
 
   const useStore = create<AppState>()(
@@ -52,6 +57,8 @@ interface AppState {
             addToReport: false,
             isLoadingEmbs: true,
             report: [],
+            colorMap: {},
+            filteredLabels: [],
 
             setData: (datasetUsed) => set({ datasetUsed }),
             setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
@@ -66,7 +73,9 @@ interface AppState {
             
             setAddToReport:(addToReport: boolean) => set({addToReport}),
             setIsLoadingEmbs:(isLoadingEmbs: boolean) => set({isLoadingEmbs}),
-            setReport:(report: Object[] | []) => set({report})
+            setReport:(report: Object[] | []) => set({report}),
+            setColorMap: (colorMap: Object | {}) => set({colorMap}),
+            setFilteredLabels: (filteredLabels: string[] | []) => set({filteredLabels})
         }),
         {
           name: "app-storage",
