@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, Flex, Textarea } from "@mantine/core";
+import { Box, Button, Flex, Textarea, Text } from "@mantine/core";
 import { ReactNode, useState } from "react";
 import { Rnd } from "react-rnd";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -20,8 +20,38 @@ export function MovableWindow ( { children }: MovableWindowProps )
     const [ collapsed, setCollapsed ] = useState( false );
     const setSelectedIndexes = useStore((state) => state.setSelectedIndexes)
 
+
+const viewportWidth = window.innerWidth;
+const viewportHeight = window.innerHeight;
+
+
+console.log(`Viewport: ${viewportWidth}×${viewportHeight}`);
+
+
     return (
         <>
+        {/*
+       <div style={{ position: "relative", height: "100vh", width: "100vw" }}>
+  <div 
+    style={{
+      position: "absolute", // Important for bottom and left to work
+      width: 300,
+      height: 40,
+      bottom: 20, // 20px from the bottom of the viewport
+      left: "50%",
+      transform: 'translateX(-50%)', // Center horizontally
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      border: "1px solid black" // Optional
+    }}
+  >
+    <Text>
+      Viewport Height: {viewportHeight}px
+    </Text>
+  </div>
+  </div>
+  */}
 
             <Rnd
                 default={ {
