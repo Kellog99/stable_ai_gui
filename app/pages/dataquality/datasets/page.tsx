@@ -1,6 +1,6 @@
 "use client";
 import RouterButton from "@/components/client/buttons/RouterButton";
-import { Box, CloseButton, Flex, Text } from "@mantine/core";
+import { Box, CloseButton, Flex, Text, Textarea } from "@mantine/core";
 import { BarChart } from '@mantine/charts';
 import '@mantine/charts/styles.css';
 import Link from "next/link";
@@ -11,7 +11,7 @@ import useStore from '@/store/dsStore';
 import SchemaShower from "@/components/client/SchemaShower";
 import { FeatureSchema } from "@/interfaces/DatasetInterface";
 import ImageDisplayer from "@/components/server/ImageDisplayer";
-import FeatureDisplayer from "@/components/server/FeatureDisplayer";
+import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { image_type, label_type, text_type } from "@/properties/types";
 import { motion } from 'framer-motion'
@@ -65,7 +65,7 @@ export default function Datasets ()
 
 
   useEffect( () =>
-  { 
+  {
     if ( searchParams.get( "datasetName" ) ) {
       setDatasetName( searchParams.get( "datasetName" ) );
 
@@ -247,10 +247,11 @@ export default function Datasets ()
   }
 */}
 
-const handleonClose = () => {
-  setFeatureToDisplay( null );
-  setLabelFeature(null)
-}
+  const handleonClose = () =>
+  {
+    setFeatureToDisplay( null );
+    setLabelFeature( null )
+  }
 
 
   return (
@@ -321,7 +322,7 @@ const handleonClose = () => {
                   gap='md'>
                   <h3>Explore the { feature.name } feature</h3>
                   <CloseButton
-                    onClick={handleonClose} />
+                    onClick={ handleonClose } />
                 </Flex>
                 <div className="h-96 overflow-auto">
                   { labelFeature ? (
@@ -331,14 +332,14 @@ const handleonClose = () => {
                       featureType={ featureType }
                       labelData={ labelFeature.datas }
                       label_dict={ labelDict as { [ key: number ]: string } }
-                      columnCount={ 2 }
+                      columns={ 2 }
                     />
                   ) : (
                     <FeatureDisplayer
                       indexes={ indexes }
                       featureData={ feature.datas }
                       featureType={ featureType }
-                      columnCount={ 2 }
+                      columns={ 2 }
                     />
                   ) }
                 </div>
@@ -355,19 +356,19 @@ const handleonClose = () => {
         <h2>
           Description
         </h2>
-        
+
         <Box style={ { marginBottom: '70px' } }>
           <Text fw={ 600 } component="span">
             { datasetUsed?.name || "" }
           </Text>{ " " }
           is a dataset for { datasetUsed?.task || "" }.
           { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes. You can check the protoypes{ " " }
-            {<Link
+            { <Link
               href={ {
                 pathname: "/pages/dataquality/prototypes",
                 query: { datasetName: datasetName }
               } }
-              style={{color: 'blue'}}
+              style={ { color: 'blue' } }
             >here</Link> }. { " " }</> : <>{ " " }</> }
           { descriptions?.map( ( description, index ) => (
             <span key={ index }>{ description } </span>

@@ -20,6 +20,7 @@ interface AppState {
     report: Object[] | [];
     colorMap: Object | {};
     filteredLabels: string[] | [];
+    size: { width: number, height: number }
 
 
     setSelectedIndexes : (selectedIndexes : number[]) => void;
@@ -38,6 +39,7 @@ interface AppState {
     setReport: (report: Object[] | []) => void;
     setColorMap: (colorMap: Object | {}) => void;
     setFilteredLabels: (filteredLabels: string[]| []) => void;
+    setSize: (size: { width: number, height: number }) => void;
   }
 
   const useStore = create<AppState>()(
@@ -59,6 +61,8 @@ interface AppState {
             report: [],
             colorMap: {},
             filteredLabels: [],
+            size: { width: 600, height: 500 },
+            
 
             setData: (datasetUsed) => set({ datasetUsed }),
             setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
@@ -75,7 +79,8 @@ interface AppState {
             setIsLoadingEmbs:(isLoadingEmbs: boolean) => set({isLoadingEmbs}),
             setReport:(report: Object[] | []) => set({report}),
             setColorMap: (colorMap: Object | {}) => set({colorMap}),
-            setFilteredLabels: (filteredLabels: string[] | []) => set({filteredLabels})
+            setFilteredLabels: (filteredLabels: string[] | []) => set({filteredLabels}),
+            setSize: (size: { width: number, height: number }) => set({size}),
         }),
         {
           name: "app-storage",

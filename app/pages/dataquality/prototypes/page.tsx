@@ -8,7 +8,7 @@ import classes from './page.module.css'
 import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
 import { getPrototypes } from "@/functionalities/Utils";
-import FeatureDisplayer from "@/components/server/FeatureDisplayer";
+import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 
 interface PrototypesData
 {
@@ -169,7 +169,7 @@ export default function Prototypes ()
                             style={ { width: '100%' } }
                         >
                             <div ref={ containerRef } className="h-[600px] overflow-auto">
-                                <FeatureDisplayer featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columnCount={ 4 } />
+                                <FeatureDisplayer featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columns={ 4 } />
                             </div>
                         </Flex>
 

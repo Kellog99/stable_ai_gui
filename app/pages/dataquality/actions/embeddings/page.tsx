@@ -4,7 +4,7 @@ import {log} from 'console';
 import {type} from 'os';
 import {parse} from 'path';
 import {useState,useRef,useEffect, Suspense} from 'react';
-import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
+import ScatterPlotVisualization from '@/components/client/ScatterPlotVisualization';
 import { Progress, Space, Flex, Select, Text } from '@mantine/core';
 import {color, stagger} from 'framer-motion';
 import {size} from 'lodash';
@@ -16,7 +16,7 @@ import {stringify} from 'querystring';
 
 function Home ()
 {
-  const socketRef = useRef(null);
+  const socketRef = useRef<WebSocket | null>(null);
   
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ modelName, setModelName] = useState<any>("")
@@ -28,7 +28,7 @@ function Home ()
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('Idle');
   const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   
@@ -134,7 +134,7 @@ function Home ()
     }
   }, [ datasetUsed ] )
 
-  const connectAndAssingModel = (model) => {
+  const connectAndAssingModel = (model: any) => {
     connectWebSocket()
     setModelName(model)
   }

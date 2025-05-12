@@ -275,7 +275,7 @@ function AppNavbarDataQuality ()
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/actions/embeddings" }>
                                     <Button
                                         radius="xl"
-                                        variant={ isActive( "/pages/dataquality/metrics/outliers" ) ? "filled" : "subtle" }
+                                        variant={ isActive( "/pages/dataquality/actions/embeddings" ) ? "filled" : "subtle" }
                                         disabled={ isDatasetUndefined }
                                     >
                                         <Text size="sm" fw={ 600 } c="dimmed">

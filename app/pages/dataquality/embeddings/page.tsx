@@ -10,11 +10,11 @@ import useStore from '../../../store/dsStore';
 import LassoDrawer from '@/components/client/Lasso';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
-import FeatureDisplayer, { FeatureCard } from '@/components/server/FeatureDisplayer';
+import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
 import { image_type, label_type, text_type } from '@/properties/types';
 import { useDisclosure } from '@mantine/hooks';
 import { Rnd } from "react-rnd";
-import { MovableWindow } from '@/components/client/MovableWindow';
+import MovableWindow from '@/components/client/MovableWindow';
 
 interface Feature
 {
@@ -42,9 +42,9 @@ function Home ()
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
   const colorMap = useStore( ( state ) => state.colorMap )
-  
-  const filteredLabels = useStore((state) => state.filteredLabels)
-  const setFilteredLabels = useStore((state) => state.setFilteredLabels)
+
+  const filteredLabels = useStore( ( state ) => state.filteredLabels )
+  const setFilteredLabels = useStore( ( state ) => state.setFilteredLabels )
 
   const [ features, setFeatures ] = useState<string[]>( [] )
   const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
@@ -55,6 +55,7 @@ function Home ()
   const indexes = useStore( ( state ) => state.selectedIndexes );
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
+  const dimensions = useStore( ( state ) => state.size )
 
   useEffect( () =>
   {
@@ -169,7 +170,7 @@ function Home ()
     }
   }, [ indexes ] ); // Still keep indexes and featureName in the dependency array
 
-  const handleTextareaKeyDown = useCallback( ( event ) =>
+  const handleTextareaKeyDown = useCallback( ( event: any ) =>
   {
     // Prevent the keydown event from bubbling up to DeckGL listeners
     event.stopPropagation();
@@ -188,30 +189,31 @@ function Home ()
 
 
   const legendData = labelDict && colorMap
-    ? Object.keys(labelDict).map((key) => ({
-        value: labelDict[key],
-        label: labelDict[key],
-        color: `rgb(${colorMap[key].join(',')})`,
-      }))
+    ? Object.keys( labelDict ).map( ( key ) => ( {
+      value: labelDict[ key ],
+      label: labelDict[ key ],
+      color: `rgb(${colorMap[ key ].join( ',' )})`,
+    } ) )
     : [];
-  
-    const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({ option }) => {
-      const item = legendData.find((entry) => entry.value === option.value);
-    
-      return (
-        <Group gap="sm">
-          <Box
-            style={{
-              width: 12,
-              height: 12,
-              borderRadius: '50%',
-              backgroundColor: item?.color ?? 'black',
-            }}
-          />
-          <Text size="sm">{option.label}</Text>
-        </Group>
-      );
-    };
+
+  const renderMultiSelectOption: MultiSelectProps[ 'renderOption' ] = ( { option } ) =>
+  {
+    const item = legendData.find( ( entry ) => entry.value === option.value );
+
+    return (
+      <Group gap="sm">
+        <Box
+          style={ {
+            width: 12,
+            height: 12,
+            borderRadius: '50%',
+            backgroundColor: item?.color ?? 'black',
+          } }
+        />
+        <Text size="sm">{ option.label }</Text>
+      </Group>
+    );
+  };
 
 
 
@@ -292,10 +294,10 @@ function Home ()
                 wrap="wrap"
                 style={ { width: '100%' } }
               >
-                {!isLoadingEmbs? (<p>
+                { !isLoadingEmbs ? ( <p>
                   { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
-                </p>): null}
-                
+                </p> ) : null }
+
               </Flex>
 
               <Suspense>
@@ -327,7 +329,7 @@ function Home ()
               >
 
                 { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
-                  <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columnCount={ 2 } />
+                  <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } dimensions={ dimensions } />
                 </div> ) : null }
               </Flex>
             </MovableWindow> ) : null }

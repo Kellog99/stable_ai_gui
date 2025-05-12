@@ -1,12 +1,13 @@
+"use client";
+
 import { Badge, Card, CardSection, Group, Text } from "@mantine/core";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
-import ImageDisplayer from "./ImageDisplayer";
-import TextDisplayer from "./TextDisplayer";
+import ImageDisplayer from "../server/ImageDisplayer";
+import TextDisplayer from "../server/TextDisplayer";
 import classes from '../../pages/dataquality/embeddings/page.module.css'
 import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
-
-//label_dict?:{[key: number]: string}
+import { useMemo } from "react";
 
 interface FeatureCardProps
 {
@@ -29,16 +30,14 @@ interface FeatureDisplayerProps
   label_dict?: { [ key: number ]: string },
   outliers?: string[],
   scores?: number[],
-  columnCount?: number
+  columns?: number
+  dimensions?: { width: number, height: number }
 }
 
 
 export function FeatureCard ( props: FeatureCardProps )
 {
   const { index, data, featureType, label, labelString, labelColor, outlier, score } = props
-
-
-  console.log("LABEL COLOR:", labelColor)
 
   return (
     <Card className={ classes.card } shadow="sm" padding="lg" radius="md" withBorder>
@@ -50,12 +49,12 @@ export function FeatureCard ( props: FeatureCardProps )
         ) : null }
       </CardSection>
 
-      { index || index == 0 || label || label==0 || labelString ? (
+      { index || index == 0 || label || label == 0 || labelString ? (
         <>
           <Group justify="space-between" mt="md" mb="xs">
             { labelString != null ? <Text fw={ 700 } size="lg">{ labelString }</Text> : null }
-            { label != null ? (labelColor? (<Badge color={`rgb(${labelColor.join(",")})`}> Class ID: { label } </Badge>) : (<Badge color="#ec777e"> Class ID: { label } </Badge> )
-            ): null }
+            { label != null ? ( labelColor ? ( <Badge color={ `rgb(${labelColor.join( "," )})` }> Class ID: { label } </Badge> ) : ( <Badge color="#ec777e"> Class ID: { label } </Badge> )
+            ) : null }
           </Group>
 
           { index || index == 0 ? (
@@ -77,30 +76,56 @@ export function FeatureCard ( props: FeatureCardProps )
 
 export default function FeatureDisplayer ( props: FeatureDisplayerProps )
 {
-  const { indexes, featureData, featureType, labelData, label_dict, outliers, scores, columnCount } = props
-  const COLUMN_COUNT = columnCount ? columnCount : 4;
-  const COLUMN_WIDTH = 260;
-  const ROW_HEIGHT = 290;
-  const rowCount = Math.ceil( featureData.length / COLUMN_COUNT );
-  const setHoverIndex = useStore( ( state ) => state.setHoverIndex )
-  const colorMap = useStore((state) => state.colorMap)
-  
-  
+  const { indexes, featureData, featureType, labelData, label_dict, outliers, scores, columns, dimensions } = props
 
+  const itemSize = 280;
+  const totalItems = featureData.length;
+  const setHoverIndex = useStore( ( state ) => state.setHoverIndex )
+  const colorMap = useStore( ( state ) => state.colorMap )
+
+  const { columnCount, rowCount } = useMemo( () =>
+  {
+    if ( !columns && dimensions ) {
+      const maxPossibleColumns = Math.floor( dimensions.width / itemSize );
+      const maxPossibleRows = Math.floor( dimensions.height / itemSize );
+
+      const targetColumns = Math.ceil( Math.sqrt( totalItems ) );
+
+      let computedColumns = Math.min( maxPossibleColumns, targetColumns );
+      computedColumns = Math.max( 1, computedColumns );
+
+      let computedRows = Math.ceil( totalItems / computedColumns );
+
+      if ( computedRows * itemSize > dimensions.height ) {
+        computedRows = Math.max( 1, maxPossibleRows );
+        computedColumns = Math.ceil( totalItems / computedRows );
+      }
+
+      return { columnCount: computedColumns, rowCount: computedRows };
+
+    } else if ( columns && !dimensions ) {
+      return {
+        columnCount: columns,
+        rowCount: Math.ceil( totalItems / columns )
+      };
+    }
+
+    return { columnCount: 1, rowCount: totalItems };
+  }, [ columns, dimensions, itemSize, totalItems ] );
 
   return (
     <FixedSizeGrid
-      columnCount={ COLUMN_COUNT }
-      columnWidth={ COLUMN_WIDTH }
-      height={ 600 }
+      columnCount={ columnCount }
+      columnWidth={ itemSize }
+      height={ dimensions ? dimensions.height : 600 }
       rowCount={ rowCount }
-      rowHeight={ ROW_HEIGHT }
-      width={ COLUMN_COUNT * COLUMN_WIDTH }
+      rowHeight={ itemSize }
+      width={ dimensions ? dimensions.width : columnCount * itemSize }
       className="mx-auto"
     >
       { ( { columnIndex, rowIndex, style }: GridChildComponentProps ) =>
       {
-        const index = rowIndex * COLUMN_COUNT + columnIndex; // this index goes from zero to featureData.length
+        const index = rowIndex * columnCount + columnIndex;
         if ( index >= featureData.length ) return null;
         return (
           <div style={ {
@@ -121,7 +146,7 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
                   { ...( indexes ? { index: indexes[ index ] } : {} ) }
                   { ...( labelData ? { label: labelData[ index ] } : {} ) }
                   { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }
-                  { ...( labelData && colorMap ? { labelColor: colorMap[labelData[ index ]]} : {} ) }
+                  { ...( labelData && colorMap ? { labelColor: colorMap[ labelData[ index ] ] } : {} ) }
                   { ...( outliers ? { outlier: outliers[ index ] } : {} ) }
                   { ...( scores ? { score: scores[ index ] } : {} ) }
                 />
