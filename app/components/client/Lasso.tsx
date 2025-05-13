@@ -1,6 +1,8 @@
 import path from 'path';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import useStore from "../../store/dsStore";
+import style from 'styled-jsx/style';
+import {fill} from 'three/src/extras/TextureUtils';
 
 interface LassoDrawerProps {
   children: React.ReactNode;
@@ -80,24 +82,22 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   };
 
   const svgStyle: React.CSSProperties = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
     width: '100%',
     height: '100%',
-    pointerEvents: 'none',
-  };
+    };
 
   return (
     <div 
       ref={containerRef}
-      style={{ position: 'relative'}}
+      style={{ position: 'relative', width: '100%', height: '100%' }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
       {children}
+      </div>
       {points.length > 0 && (
         <div style={lassoStyle}>
           <svg style={svgStyle}>
@@ -116,5 +116,4 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
 };
 
 export default LassoDrawer;import {ReactNode,FC,CSSProperties} from 'react';
-import style from 'styled-jsx/style';
-import {fill} from 'three/src/extras/TextureUtils';
+

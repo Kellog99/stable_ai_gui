@@ -303,9 +303,9 @@ function Home ()
               <Suspense>
                 <Box style={ { pointerEvents: 'none' } }>
                   <div style={ { pointerEvents: 'auto' } }>
-                    <LassoDrawer>
-                      <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } />
-                    </LassoDrawer>
+
+                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } />
+
                   </div>
                 </Box>
               </Suspense>

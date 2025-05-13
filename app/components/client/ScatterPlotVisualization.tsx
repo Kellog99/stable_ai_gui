@@ -16,6 +16,8 @@ import
 {
   faX
 } from '@fortawesome/free-solid-svg-icons';
+import { ZoomIn } from 'lucide-react';
+import LassoDrawer from './Lasso';
 
 
 interface OrbitViewState
@@ -66,8 +68,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   //const [lassoMode, setLassoMode] = useState<boolean>(false);
 
   const [ data, setData ] = useState<Point[] | null>( null );
-  //const [ colorMap, setColorMap ] = useState<Object>( {} )
-  const colorMap = useStore( ( state ) => state.colorMap )
+
   const setColorMap = useStore( ( state ) => state.setColorMap )
 
 
@@ -97,9 +98,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
-  const inputRef = useRef( null );
-  const filteredLabels = useStore((state) => state.filteredLabels)
-  
+  const inputRef = useRef<HTMLInputElement>( null );
+  const filteredLabels = useStore( ( state ) => state.filteredLabels )
+
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
 
 
@@ -149,8 +150,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
   }, [ props.labelFeatureName ] );
 
-  console.log( "LABEL DICT", labelDict )
-  console.log( "COLORMAP", colorMap )
 
   const labelsList: string[] = labelDict ? Object.values( labelDict ) : [];
 
@@ -192,6 +191,24 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       document.removeEventListener( 'mouseup', handleMouseUp );
     };
   }, [] ); // Empty dependency array means this effect runs once on mount
+
+
+  const isEventOnTextarea = ( event, textareaRef ) =>
+  {
+    // Support both React synthetic events and DeckGL/Mjolnir.js events
+    const domEvent = event?.srcEvent || event;
+
+    if ( !domEvent || !textareaRef?.current ) {
+      console.log( "l'evento non è sulla text area" );
+      return false;
+    }
+
+    const isInside = textareaRef.current.contains( domEvent.target );
+    console.log( isInside ? "l'evento è sulla text area" : "l'evento non è sulla text area" );
+    return isInside;
+  };
+
+
 
   useEffect( () =>
   {
@@ -434,12 +451,26 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     };
   }
 
-  const handleClick = () =>
+  const handleClick = ( e ) =>
   {
     if ( contextMenu.visible ) {
       setContextMenu( { ...contextMenu, visible: false } );
     }
+    if ( isEventOnTextarea( e, inputRef ) ) {
+      // If the drag started on the textarea, return false.
+      // This tells DeckGL to abort its own drag handling for this event.
+      return;
+    }
   };
+
+
+
+  function handleSelect ( e )
+  {
+    const selection = window.getSelection();
+    const text = selection?.toString();
+    console.log( 'Selected text:', text );
+  }
 
   useEffect( () =>
   {
@@ -464,35 +495,96 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   useEffect( () =>
   {
-    const setupInputCapture = () =>
+    console.log("sono qui")
+    const textarea = inputRef.current;
+    if ( !textarea ) return;
+ 
+    // Ensure the textarea can be a target for pointer events
+    // and set touch-action to allow default touch behaviors like text selection.
+    textarea.style.pointerEvents = 'auto';
+    textarea.style.touchAction = 'auto';
+
+    const handlePointerDown = ( e ) =>
     {
-      if ( !inputRef.current ) return;
+      console.log("pointerDown")
+      // Stop the event from propagating to DeckGL or other higher-level listeners.
+      // This is crucial to prevent DeckGL from initiating map interactions.
+      e.stopPropagation();
 
-      inputRef.current.style.pointerEvents = 'auto';
-
-      const stopPropagation = ( e ) =>
-      {
-        // Do not preventDefault — that breaks selection
-        e.stopPropagation();
-      };
-
-      const ref = inputRef.current;
-
-      // Use pointerdown (for wider input device coverage)
-      ref.addEventListener( 'pointerdown', stopPropagation, true );
-      ref.addEventListener( 'click', stopPropagation, true );
-      ref.addEventListener( 'touchstart', stopPropagation, true );
-
-      return () =>
-      {
-        ref.removeEventListener( 'pointerdown', stopPropagation, true );
-        ref.removeEventListener( 'click', stopPropagation, true );
-        ref.removeEventListener( 'touchstart', stopPropagation, true );
-      };
+      // Attempt to explicitly capture the pointer for the textarea.
+      // This directs subsequent events for this pointer (like pointermove, pointerup)
+      // to this textarea, which is essential for drag-to-select.
+      try {
+        console.log("pointer setted")
+        textarea.setPointerCapture( e.pointerId );
+      } catch ( error ) {
+        // This might fail if another element has already captured the pointer,
+        // or on some older browsers/devices.
+        console.error( "Textarea: Failed to set pointer capture.", error );
+      }
+      // IMPORTANT: Do NOT call e.preventDefault(). That would prevent text selection.
     };
 
-    return setupInputCapture();
-  }, [] );
+    const handlePointerMove = ( e ) =>
+    {
+      console.log("pointer moving")
+      // If pointer capture was successful, pointermove events will be targeted here.
+      // The default action for pointermove (when a button is down and pointer is captured
+      // on a text input) is to extend the text selection.
+      // We still stop propagation to prevent DeckGL from potentially using these
+      // events for map panning if it has global move listeners.
+      console.log("pointer movingggg")
+      e.stopPropagation();
+    };
+    
+    const handlePointerUp = ( e ) =>
+    {
+      console.log("pointer up")
+      // Stop propagation to prevent DeckGL interactions.
+      e.stopPropagation();
+
+      // Release the pointer capture. This is critical.
+      try {
+        console.log("pointer released")
+        textarea.releasePointerCapture( e.pointerId );
+      } catch ( error ) {
+        console.error("Textarea: Failed to release pointer capture.", error);
+      }
+    };
+
+    const handleClick = ( e ) =>
+    {
+      console.log("clicked")
+      // Clicks are usually for cursor placement.
+      // Stopping propagation prevents DeckGL from interpreting this as a map click.
+      e.stopPropagation();
+    };
+
+    // Add event listeners in the capture phase to act before DeckGL
+    textarea.addEventListener( 'pointerdown', handlePointerDown, true );
+    textarea.addEventListener( 'pointermove', handlePointerMove, true );
+    textarea.addEventListener( 'pointerup', handlePointerUp, true );
+    textarea.addEventListener( 'click', handleClick, true ); // For cursor placement
+
+    // Optional: for debugging if capture is being lost unexpectedly
+    const handleLostPointerCapture = ( e ) =>
+    {
+      console.warn( "Textarea: Lost pointer capture.", e );
+      // This might indicate that DeckGL (or another component) forcefully took pointer capture.
+    };
+    textarea.addEventListener( 'lostpointercapture', handleLostPointerCapture, true );
+
+
+    // Cleanup function
+    return () =>
+    {
+      textarea.removeEventListener( 'pointerdown', handlePointerDown, true );
+      textarea.removeEventListener( 'pointermove', handlePointerMove, true );
+      textarea.removeEventListener( 'pointerup', handlePointerUp, true );
+      textarea.removeEventListener( 'click', handleClick, true );
+      textarea.removeEventListener( 'lostpointercapture', handleLostPointerCapture, true );
+    };
+  }, [] ); // Add inputRef to dependencies if it can change: [inputRef]
 
 
   const [ inputValue, setInputValue ] = useState( queryRetrieve );
@@ -510,8 +602,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }, 500 ); // adjust delay as needed
   }, [ inputValue ] );
 
-  console.log( "QUERY RETRIEVE", queryRetrieve )
-
 
   useEffect( () =>
   {
@@ -528,8 +618,14 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   }
 
 
+
   return (
     <>
+      <div
+        onSelect={ handleSelect }>
+        Select this text by clicking and dragging.
+      </div>
+
       { isLoading ? (
         <>
           <Flex
@@ -556,50 +652,45 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           <>
             <div style={ { width: '1830px', height: '600px' } }>
 
-
-              
-
-
               <Suspense>
-                <div
-                  id="deckgl-container"
-                  onContextMenu={ handleContextMenu }
-                  style={ {
-                    position: 'relative',
-                    width: '100%',
-                    height: '100%',
-                    border: '2px solid #9a9a9a',
-                    background: 'white',
-                    overflow: 'hidden',
-                  } }
-                >
-
-                  <DeckGL
-                    ref={ deckRef }
-                    views={ new OrthographicView( { fovy: 50 } ) }
-                    viewState={ viewState }
-                    onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
-                    layers={ [ layer ] }
-                    controller={
-                      lassoMode
-                        ? {
-                          scrollZoom: false,
-                          dragRotate: false,
-                          dragPan: false,
-                          doubleClickZoom: false,
-                        }
-                        : {
-                          scrollZoom: true,
-                          dragRotate: true,
-                          dragPan: true,
-                          doubleClickZoom: false,
-                        }
-                    }
-                    onDragStart={ handleDragStart }
-                    onDrag={ handleDrag }
-                    onDragEnd={ handleDragEnd }
-                  />
-                </div>
+                <LassoDrawer>
+                  <div id="deckgl-container"
+                    onContextMenu={ handleContextMenu }
+                    style={ {
+                      width: '100%',
+                      height: '100%',
+                      border: '2px solid #9a9a9a',
+                      background: 'white',
+                      overflow: 'hidden',
+                      zIndex: 10,
+                      pointerEvents: 'auto',
+                    } }>
+                    <DeckGL
+                      ref={ deckRef }
+                      views={ new OrthographicView( { fovy: 50 } ) }
+                      viewState={ viewState }
+                      onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
+                      layers={ [ layer ] }
+                      controller={
+                        lassoMode ?
+                          {
+                            scrollZoom: false,
+                            dragRotate: false,
+                            dragPan: false,
+                            doubleClickZoom: false,
+                          }
+                          : {
+                            scrollZoom: true,
+                            dragRotate: true,
+                            dragPan: true,
+                            doubleClickZoom: false,
+                          } }
+                      onDragStart={ handleDragStart }
+                      onDrag={ handleDrag }
+                      onDragEnd={ handleDragEnd } 
+                      style={{zIndex: 100}}/>
+                  </div>
+                </LassoDrawer>
               </Suspense>
             </div>
 
@@ -608,7 +699,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               direction="column"
               align="center"
               justify="center">
-              <Box>
+              <Box style={{userSelect: "text"}}>
                 <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
                 <Textarea
                   id="search-input"
@@ -622,12 +713,15 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                   style={ {
                     width: "400px",
                     pointerEvents: 'auto',
+                    touchAction: 'auto',
                     paddingRight: "6px",
                     marginTop: "6px",
+                    zIndex: 1000
 
                   } }
                   onClick={ ( e ) =>
                   {
+                    isEventOnTextarea( e, inputRef )
                     e.stopPropagation();
                     e.target.focus();
                   } }
@@ -651,7 +745,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                 position: 'absolute',
                 top: contextMenu.y,
                 left: contextMenu.x,
-                zIndex: 1000,
+                zIndex: 2000,
                 pointerEvents: 'auto',
                 border: '1px solid #ccc',
                 borderRadius: '4px',
