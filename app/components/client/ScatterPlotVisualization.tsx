@@ -7,7 +7,7 @@ import { log, OrbitView, project } from '@deck.gl/core';
 import getData, { RetrieveSamples } from '../../functionalities/Utils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group } from '@mantine/core';
+import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group, Slider } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
 import style from 'styled-jsx/style';
 import { type } from 'os';
@@ -98,10 +98,11 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
-  const inputRef = useRef<HTMLInputElement>( null );
+  const inputRef = useRef<HTMLTextAreaElement>( null );
   const filteredLabels = useStore( ( state ) => state.filteredLabels )
 
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
+  const [ queryThreshold, setQueryThreshold] = useState<number>(0.3)
 
 
 
@@ -241,7 +242,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
         setIsLoadingRetr( true );
       }, 500 ); // delay threshold in milliseconds
 
-      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve )
+      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve, queryThreshold )
         .then( ( fetched ) =>
         {
           setSelectedIndexes( fetched.indexes );
@@ -252,7 +253,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           setIsLoadingRetr( false );
         } );
     }
-  }, [ queryRetrieve ] );
+  }, [ queryRetrieve, queryThreshold ] );
 
   // *******************************************************************************************************************************************
 
@@ -463,15 +464,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
   };
 
-
-
-  function handleSelect ( e )
-  {
-    const selection = window.getSelection();
-    const text = selection?.toString();
-    console.log( 'Selected text:', text );
-  }
-
   useEffect( () =>
   {
     document.addEventListener( 'click', handleClick );
@@ -588,6 +580,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
 
   const [ inputValue, setInputValue ] = useState( queryRetrieve );
+  const [inputThr, setInputThr] = useState(queryThreshold)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>( null );
 
   // Update queryRetrieve after user stops typing for 500ms
@@ -599,8 +592,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     typingTimeoutRef.current = setTimeout( () =>
     {
       setQueryRetrieve( inputValue );
+      setQueryThreshold(inputThr)
     }, 500 ); // adjust delay as needed
-  }, [ inputValue ] );
+  }, [ inputValue, inputThr ] );
 
 
   useEffect( () =>
@@ -621,11 +615,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   return (
     <>
-      <div
-        onSelect={ handleSelect }>
-        Select this text by clicking and dragging.
-      </div>
-
       { isLoading ? (
         <>
           <Flex
@@ -699,7 +688,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               direction="column"
               align="center"
               justify="center">
-              <Box style={{userSelect: "text"}}>
+              <Box style={{ width: "400px", marginTop: "12px" }}>
                 <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
                 <Textarea
                   id="search-input"
@@ -730,7 +719,21 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                     <CloseButton onClick={ handleClearSearch } />
                   }
                 />
-              </Box>
+              
+              <Text size="sm" style={ { marginBottom: 0 } }>Threshold</Text>
+              <Slider
+                defaultValue={ 0.3 }
+                min={ 0 }
+                max={ 1 }
+                step={0.01}
+                marks={ [
+                    { value: 0, label: '0' },
+                    { value: 1, label: '1' },
+                ] }
+                value = {inputThr}
+                onChange={ ( value ) => setInputThr( value ) }
+              />
+               </Box>
               { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }
             </Flex>
 
