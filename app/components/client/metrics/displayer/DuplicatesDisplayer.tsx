@@ -2,6 +2,7 @@
 
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
+import { getScoreColor } from "@/functionalities/Utils";
 import { FeatureDTO } from "@/interfaces/DatasetInterface";
 import { DuplicatesDTO } from "@/interfaces/metricsInterface"
 import { image_type, text_type } from "@/properties/types";
@@ -20,9 +21,6 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
   const [ type, setType ] = useState( "" )
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
-
-  console.log( "INDEXES:", indexes.flat() )
-
   useEffect( () =>
   {
     if ( searchParams.get( "datasetName" ) ) {
@@ -38,7 +36,6 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
       {
         try {
           const featureLoaded = await featureLoader( datasetName, featureName );
-          console.log( "FEATURE LOADED:", featureLoaded );
           if ( featureLoaded.type === image_type || featureLoaded.type === text_type ) {
             setFeature( featureLoaded );
             setType( featureLoaded.type )
@@ -51,7 +48,6 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
     }
   }, [ datasetName ] );
 
-  console.log( "LOADED:", feature?.datas )
   const indicesFlat = indexes.flat()
   const duplicatesImages: string[] = indicesFlat.map( i => feature?.datas[ i ] ).filter( Boolean );
 
@@ -67,11 +63,10 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
             <RingProgress
               size={ 180 }
               roundCaps
-              sections={ [ { value: score * 100, color: 'green' } ] }
+              sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
               transitionDuration={ 1000 }
               label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
             />
-
             <FeatureDisplayer indexes={ indicesFlat } featureData={ duplicatesImages } featureType={ type } columns={ 2 } />
           </> ) : null
         }

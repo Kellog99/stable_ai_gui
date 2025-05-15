@@ -24,6 +24,7 @@ import { DuplicatesDTO, OutliersDTO } from "@/interfaces/metricsInterface";
 import { config } from "process";
 import { truncate } from "lodash";
 import CompletenessConfig from "./CompletenessConfig";
+import CompletenessDisplayer from "./displayer/CompletenessDisplayer";
 
 
 
@@ -189,8 +190,14 @@ export default function Config ( props: ConfigsProps )
     };
     */}
 
+    const [triggerCompl, setTriggerCompl] = useState<boolean>(false)
     const handleClickCompute = async () =>
     {
+
+        if (props.metricName == "completeness") {
+            setTriggerCompl(true)
+        }
+        
         const newReportMetric: ReportMetric = {
             internalConfigs: internalConfigs,
             results: {}
@@ -469,6 +476,10 @@ export default function Config ( props: ConfigsProps )
                         A metric with this same configuration has been already computed. Please change something or choose another metric.
                     </Alert>
                 </> ) : null }
+
+            {triggerCompl ? (
+                <CompletenessDisplayer/>
+            ) : null}
 
             { computeNow ? (
                 isLoading ? (

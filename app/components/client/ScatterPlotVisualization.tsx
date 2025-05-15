@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
 import { ScatterplotLayer, PointCloudLayer } from '@deck.gl/layers';
 import { log, OrbitView, project } from '@deck.gl/core';
-import getData, { RetrieveSamples } from '../../functionalities/Utils';
+import getData, { RetrieveSamples } from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
 import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group, Slider } from '@mantine/core';
@@ -719,22 +719,22 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                     <CloseButton onClick={ handleClearSearch } />
                   }
                 />
-                { queryRetrieve !== "" ? 
+                { queryRetrieve !== "" ?
 
-                ( <>
-                  <Text size="sm" style={ { marginBottom: 0 } }>Number of best guesses</Text>
-                  <Slider
-                    defaultValue={ 10 }
-                    min={ 0 }
-                    max={data.length }
-                    step={ 1 }
-                    marks={ [
-                      { value: 0, label: '0' },
-                      { value: data.length, label: `${data.length}` },
-                    ] }
-                    value={ inputTopK }
-                    onChange={ ( value ) => setInputTopK( value ) }
-                  /> </> ) : null }
+                  ( <>
+                    <Text size="sm" style={ { marginBottom: 0 } }>Number of best guesses</Text>
+                    <Slider
+                      defaultValue={ 10 }
+                      min={ 0 }
+                      max={ data.length }
+                      step={ 1 }
+                      marks={ [
+                        { value: 0, label: '0' },
+                        { value: data.length, label: `${data.length}` },
+                      ] }
+                      value={ inputTopK }
+                      onChange={ ( value ) => setInputTopK( value ) }
+                    /> </> ) : null }
 
               </Box>
               { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }

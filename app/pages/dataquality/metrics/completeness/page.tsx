@@ -22,10 +22,7 @@ export default function Completeness ()
         <div style={{
             marginTop:"50px"
         }}>
-            
             <Config metricName="completeness" />
-            
-            
         </div>
     )
 }

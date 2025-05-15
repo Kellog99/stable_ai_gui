@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import classes from './page.module.css'
 import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
-import { getPrototypes } from "@/functionalities/Utils";
+import { getPrototypes } from "@/functionalities/BackendUtils";
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 
 interface PrototypesData

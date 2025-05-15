@@ -3,17 +3,17 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import
-    {
-        Chart as ChartJS,
-        LinearScale,
-        PointElement,
-        LineElement,
-        Tooltip,
-        Legend,
-        ChartOptions,
-        ChartData,
-        InteractionItem,
-    } from 'chart.js';
+{
+    Chart as ChartJS,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Tooltip,
+    Legend,
+    ChartOptions,
+    ChartData,
+    InteractionItem,
+} from 'chart.js';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 import { Flex, RingProgress, Text, Image, Box, Card, Group, Badge, Button, CloseButton } from "@mantine/core";
 
@@ -22,6 +22,7 @@ import { FeatureDTO } from "@/interfaces/DatasetInterface";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { image_type, text_type } from "@/properties/types";
 import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
+import { getScoreColor } from '@/functionalities/Utils';
 
 
 ChartJS.register( LinearScale, PointElement, LineElement, Tooltip, Legend );
@@ -360,7 +361,7 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
             <RingProgress
                 size={ 180 }
                 roundCaps
-                sections={ [ { value: score * 100, color: 'green' } ] }
+                sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
                 transitionDuration={ 1000 }
                 label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
             />

@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
 import { PointCloudLayer } from '@deck.gl/layers';
 import { OrbitView, project } from '@deck.gl/core';
-import getData from '../../functionalities/Utils';
+import getData from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
 import LassoOverlay, { LassoDrawing } from './Lasso';
 import LassoDrawer from './Lasso';
