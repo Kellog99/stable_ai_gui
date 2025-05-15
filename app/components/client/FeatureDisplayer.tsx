@@ -83,35 +83,35 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
   const setHoverIndex = useStore( ( state ) => state.setHoverIndex )
   const colorMap = useStore( ( state ) => state.colorMap )
 
-  const { columnCount, rowCount } = useMemo( () =>
-  {
-    if ( !columns && dimensions ) {
-      const maxPossibleColumns = Math.floor( dimensions.width / itemSize );
-      const maxPossibleRows = Math.floor( dimensions.height / itemSize );
+  const { columnCount, rowCount } = useMemo(() => {
+  if (!columns && dimensions) {
+    const maxPossibleColumns = Math.floor(dimensions.width / itemSize);
+    const maxPossibleRows = Math.floor(dimensions.height / itemSize);
 
-      const targetColumns = Math.ceil( Math.sqrt( totalItems ) );
+    const targetRows = Math.ceil(Math.sqrt(totalItems)); // key change: target row count
 
-      let computedColumns = Math.min( maxPossibleColumns, targetColumns );
-      computedColumns = Math.max( 1, computedColumns );
+    let computedRows = Math.min(maxPossibleRows, targetRows);
+    computedRows = Math.max(1, computedRows);
 
-      let computedRows = Math.ceil( totalItems / computedColumns );
+    let computedColumns = Math.ceil(totalItems / computedRows);
 
-      if ( computedRows * itemSize > dimensions.height ) {
-        computedRows = Math.max( 1, maxPossibleRows );
-        computedColumns = Math.ceil( totalItems / computedRows );
-      }
-
-      return { columnCount: computedColumns, rowCount: computedRows };
-
-    } else if ( columns && !dimensions ) {
-      return {
-        columnCount: columns,
-        rowCount: Math.ceil( totalItems / columns )
-      };
+    // If columns are too wide to fit, fallback
+    if (computedColumns * itemSize > dimensions.width) {
+      computedColumns = Math.max(1, maxPossibleColumns);
+      computedRows = Math.ceil(totalItems / computedColumns);
     }
+
+    return { columnCount: computedColumns, rowCount: computedRows };
+  } else if (columns && !dimensions) {
+    return {
+      columnCount: columns,
+      rowCount: Math.ceil(totalItems / columns)
+    };
+  }
 
     return { columnCount: 1, rowCount: totalItems };
   }, [ columns, dimensions, itemSize, totalItems ] );
+
 
   return (
     <FixedSizeGrid
@@ -120,8 +120,8 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
       height={ dimensions ? dimensions.height : 600 }
       rowCount={ rowCount }
       rowHeight={ itemSize }
-      width={ dimensions ? dimensions.width : columnCount * itemSize }
-      className="mx-auto"
+      width={ dimensions ? dimensions.width - dimensions.width*0.08 : columnCount * itemSize }
+     
     >
       { ( { columnIndex, rowIndex, style }: GridChildComponentProps ) =>
       {

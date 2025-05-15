@@ -102,7 +102,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const filteredLabels = useStore( ( state ) => state.filteredLabels )
 
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
-  const [ queryThreshold, setQueryThreshold] = useState<number>(0.3)
+  const [ queryTop_k, setQueryTop_k ] = useState<number>( 10 )
 
 
 
@@ -242,7 +242,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
         setIsLoadingRetr( true );
       }, 500 ); // delay threshold in milliseconds
 
-      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve, queryThreshold )
+      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve, queryTop_k )
         .then( ( fetched ) =>
         {
           setSelectedIndexes( fetched.indexes );
@@ -253,7 +253,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           setIsLoadingRetr( false );
         } );
     }
-  }, [ queryRetrieve, queryThreshold ] );
+  }, [ queryRetrieve, queryTop_k ] );
 
   // *******************************************************************************************************************************************
 
@@ -487,10 +487,10 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   useEffect( () =>
   {
-    console.log("sono qui")
+    console.log( "sono qui" )
     const textarea = inputRef.current;
     if ( !textarea ) return;
- 
+
     // Ensure the textarea can be a target for pointer events
     // and set touch-action to allow default touch behaviors like text selection.
     textarea.style.pointerEvents = 'auto';
@@ -498,7 +498,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
     const handlePointerDown = ( e ) =>
     {
-      console.log("pointerDown")
+      console.log( "pointerDown" )
       // Stop the event from propagating to DeckGL or other higher-level listeners.
       // This is crucial to prevent DeckGL from initiating map interactions.
       e.stopPropagation();
@@ -507,7 +507,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       // This directs subsequent events for this pointer (like pointermove, pointerup)
       // to this textarea, which is essential for drag-to-select.
       try {
-        console.log("pointer setted")
+        console.log( "pointer setted" )
         textarea.setPointerCapture( e.pointerId );
       } catch ( error ) {
         // This might fail if another element has already captured the pointer,
@@ -519,34 +519,34 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
     const handlePointerMove = ( e ) =>
     {
-      console.log("pointer moving")
+      console.log( "pointer moving" )
       // If pointer capture was successful, pointermove events will be targeted here.
       // The default action for pointermove (when a button is down and pointer is captured
       // on a text input) is to extend the text selection.
       // We still stop propagation to prevent DeckGL from potentially using these
       // events for map panning if it has global move listeners.
-      console.log("pointer movingggg")
+      console.log( "pointer movingggg" )
       e.stopPropagation();
     };
-    
+
     const handlePointerUp = ( e ) =>
     {
-      console.log("pointer up")
+      console.log( "pointer up" )
       // Stop propagation to prevent DeckGL interactions.
       e.stopPropagation();
 
       // Release the pointer capture. This is critical.
       try {
-        console.log("pointer released")
+        console.log( "pointer released" )
         textarea.releasePointerCapture( e.pointerId );
       } catch ( error ) {
-        console.error("Textarea: Failed to release pointer capture.", error);
+        console.error( "Textarea: Failed to release pointer capture.", error );
       }
     };
 
     const handleClick = ( e ) =>
     {
-      console.log("clicked")
+      console.log( "clicked" )
       // Clicks are usually for cursor placement.
       // Stopping propagation prevents DeckGL from interpreting this as a map click.
       e.stopPropagation();
@@ -580,7 +580,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
 
   const [ inputValue, setInputValue ] = useState( queryRetrieve );
-  const [inputThr, setInputThr] = useState(queryThreshold)
+  const [ inputTopK, setInputTopK ] = useState( queryTop_k )
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>( null );
 
   // Update queryRetrieve after user stops typing for 500ms
@@ -592,9 +592,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     typingTimeoutRef.current = setTimeout( () =>
     {
       setQueryRetrieve( inputValue );
-      setQueryThreshold(inputThr)
+      setQueryTop_k( inputTopK )
     }, 500 ); // adjust delay as needed
-  }, [ inputValue, inputThr ] );
+  }, [ inputValue, inputTopK ] );
 
 
   useEffect( () =>
@@ -676,8 +676,8 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                           } }
                       onDragStart={ handleDragStart }
                       onDrag={ handleDrag }
-                      onDragEnd={ handleDragEnd } 
-                      style={{zIndex: 100}}/>
+                      onDragEnd={ handleDragEnd }
+                      style={ { zIndex: 100 } } />
                   </div>
                 </LassoDrawer>
               </Suspense>
@@ -688,7 +688,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               direction="column"
               align="center"
               justify="center">
-              <Box style={{ width: "400px", marginTop: "12px" }}>
+              <Box style={ { width: "400px", marginTop: "12px" } }>
                 <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
                 <Textarea
                   id="search-input"
@@ -719,21 +719,24 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                     <CloseButton onClick={ handleClearSearch } />
                   }
                 />
-              
-              <Text size="sm" style={ { marginBottom: 0 } }>Threshold</Text>
-              <Slider
-                defaultValue={ 0.3 }
-                min={ 0 }
-                max={ 1 }
-                step={0.01}
-                marks={ [
-                    { value: 0, label: '0' },
-                    { value: 1, label: '1' },
-                ] }
-                value = {inputThr}
-                onChange={ ( value ) => setInputThr( value ) }
-              />
-               </Box>
+                { queryRetrieve !== "" ? 
+
+                ( <>
+                  <Text size="sm" style={ { marginBottom: 0 } }>Number of best guesses</Text>
+                  <Slider
+                    defaultValue={ 10 }
+                    min={ 0 }
+                    max={data.length }
+                    step={ 1 }
+                    marks={ [
+                      { value: 0, label: '0' },
+                      { value: data.length, label: `${data.length}` },
+                    ] }
+                    value={ inputTopK }
+                    onChange={ ( value ) => setInputTopK( value ) }
+                  /> </> ) : null }
+
+              </Box>
               { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }
             </Flex>
 

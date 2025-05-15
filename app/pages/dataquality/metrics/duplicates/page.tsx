@@ -19,10 +19,14 @@ export default function Duplicates ()
     }, [ searchParams ] )
 
     return (
-        <div className="max-w-4xl mx-auto px-4">
+        <div style={{
+            marginTop:"50px"
+        }}>
+            {/*
             <Box className={ classes.title }>
                 <h1>Duplicates evaluation for { datasetName } dataset</h1>
             </Box>
+            */}
             <Config metricName="duplicates" />
         </div>
     )

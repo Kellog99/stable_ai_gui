@@ -15,15 +15,15 @@ export default function IForestConfig ()
     const form = useForm( {
         mode: 'uncontrolled',
         initialValues: {
-            model_type: "WEIGHT",
-            n_neighbours: 5,
-            negative_sampling: "MIXED",
-            val_size: 0.1,
-            epsilon: 0.1,
-            proportion: 1,
+            //model_type: "WEIGHT",
+            //n_neighbours: 5,
+            //negative_sampling: "MIXED",
+            //val_size: 0.1,
+            //epsilon: 0.1,
+            //proportion: 1,
             n_epochs: 200,
-            lr: 0.001,
-            wd: 0.1,
+            //lr: 0.001,
+            //wd: 0.1,
             contamination: 0.1
 
 
@@ -49,10 +49,12 @@ export default function IForestConfig ()
 
     return (
         <form onSubmit={ form.onSubmit( handleSubmit ) }>
+            <Box style={ { margin: "10px" } }>
             <Flex
                 direction="column"
                 gap="xl"
             >
+                {/*
                 <Select
                     id="modelType"
                     radius="md"
@@ -110,7 +112,7 @@ export default function IForestConfig ()
                     defaultValue={ 1 }
                     { ...form.getInputProps( 'proportion' ) }
                 />
-
+*/}
                 <NumberInput
                     variant="filled"
                     label="Number of epochs"
@@ -118,6 +120,7 @@ export default function IForestConfig ()
                     { ...form.getInputProps( 'n_epochs' ) }
                 />
 
+{/*
                 <NumberInput
                     variant="filled"
                     label="Learning rate"
@@ -131,6 +134,7 @@ export default function IForestConfig ()
                     defaultValue={ 0.1 }
                     { ...form.getInputProps( 'wd' ) }
                 />
+            */}
 
                 <Flex
                     direction="column"
@@ -151,6 +155,7 @@ export default function IForestConfig ()
                 </Flex>
 
             </Flex>
+            </Box>
             <Button type="submit" mt="md">
                 { clicked ? ( <>
                     <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />

@@ -61,7 +61,7 @@ interface AppState {
             report: [],
             colorMap: {},
             filteredLabels: [],
-            size: { width: 600, height: 500 },
+            size: { width: 630, height: 500 },
             
 
             setData: (datasetUsed) => set({ datasetUsed }),

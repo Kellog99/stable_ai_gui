@@ -14,14 +14,14 @@ export default function IForestConfig ()
     const form = useForm( {
         mode: 'uncontrolled',
         initialValues: {
-            n_estimators: 100,
-            max_samples: "auto",
+            //n_estimators: 100,
+            //max_samples: "auto",
             contamination: 0.1,
-            max_features: 1,
-            bootstrap: false,
-            n_jobs: 1,
-            n_iterations: null,
-            random_state: null
+            //max_features: 1,
+            //bootstrap: false,
+            //n_jobs: 1,
+            //n_iterations: null,
+            //random_state: null
         },
     } );
 
@@ -43,10 +43,12 @@ export default function IForestConfig ()
 
     return (
         <form onSubmit={ form.onSubmit( handleSubmit ) }>
+            <Box style={ { margin: "10px" } }>
             <Flex
                 direction="column"
                 gap="xl"
             >
+                {/*
                 <NumberInput
                     variant="filled"
                     label="Number of estimators"
@@ -71,7 +73,7 @@ export default function IForestConfig ()
                         />
                     ) }
                 </Flex>
-
+*/}
                 <Flex
                     direction="column"
                     gap="xs">
@@ -90,6 +92,7 @@ export default function IForestConfig ()
                     />
                 </Flex>
 
+{/*
                 <Flex
                     direction="column"
                     gap="xs">
@@ -126,8 +129,10 @@ export default function IForestConfig ()
                     defaultValue={ 0 }
                     { ...form.getInputProps( 'random_state' ) }
                 />
-
+ */}
             </Flex>
+            </Box>
+           
             
             <Button type="submit" mt="md">
                 { clicked ? ( <>

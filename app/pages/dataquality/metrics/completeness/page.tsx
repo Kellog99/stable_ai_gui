@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 
-export default function Duplicates ()
+export default function Completeness ()
 {
     const searchParams = useSearchParams();
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
@@ -22,12 +22,10 @@ export default function Duplicates ()
         <div style={{
             marginTop:"50px"
         }}>
-            {/*
-            <Box className={ classes.title }>
-                <h1>Outliers evaluation for { datasetName } dataset</h1>
-            </Box>
-            */}
-            <Config metricName="outliers" />
+            
+            <Config metricName="completeness" />
+            
+            
         </div>
     )
 }

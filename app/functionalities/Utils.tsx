@@ -102,9 +102,9 @@ export async function getOutliers(datasetName: string, featureName: string, inte
 }
 
 
-export async function RetrieveSamples(datasetName: string, featureName: string, query: string, queryThreshold: number){
+export async function RetrieveSamples(datasetName: string, featureName: string, query: string, queryTop_K: number){
   const response = await fetch(
-    `${retrieve_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&query=${encodeURIComponent(query)}&top_k=${encodeURIComponent(queryThreshold)}`
+    `${retrieve_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&query=${encodeURIComponent(query)}&top_k=${encodeURIComponent(queryTop_K)}`
   );
 
   if ( !response.ok ) throw new Error( 'Failed to retrieve samples from the backend' );

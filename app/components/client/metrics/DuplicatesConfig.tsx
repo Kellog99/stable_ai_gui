@@ -15,7 +15,7 @@ import { backend_duplicates, metric_duplicates } from './utils';
 
 
 
-function DuplicatesConfigs ()
+function DuplicatesConfig ()
 {
 
     const form = useForm( {
@@ -97,5 +97,5 @@ function DuplicatesConfigs ()
     );
 }
 
-export default React.memo(DuplicatesConfigs);
+export default React.memo(DuplicatesConfig);
 

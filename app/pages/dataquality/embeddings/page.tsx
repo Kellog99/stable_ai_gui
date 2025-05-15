@@ -220,7 +220,10 @@ function Home ()
   return (
     <div className="w-full h-screen">
 
-      <div className="max-w-4xl mx-auto px-4">
+      <div style={{
+            marginTop:"50px",
+            marginLeft: "100px"
+        }}>
 
         <Space h="md" />
 
@@ -319,7 +322,6 @@ function Home ()
           { indexes.length > 0 ? (
 
             <MovableWindow >
-
               <Flex
                 mih={ 150 }
                 justify="center"
@@ -327,7 +329,6 @@ function Home ()
                 direction="column"
                 style={ { marginLeft: '30px', borderRadius: '12px' } }
               >
-
                 { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
                   <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } dimensions={ dimensions } />
                 </div> ) : null }
@@ -335,7 +336,7 @@ function Home ()
             </MovableWindow> ) : null }
         </>
       ) : (
-        <Text size="sm" style={ { marginTop: "20px" } }>Select Feature</Text>
+        <Text size="sm" style={ { marginTop: "20px", marginLeft:"100px" } }>Select Feature</Text>
       ) }
 
     </div>

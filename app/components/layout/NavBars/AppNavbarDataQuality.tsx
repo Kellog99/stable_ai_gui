@@ -220,6 +220,18 @@ function AppNavbarDataQuality ()
                                     </Button>
                                 </RouterButton>
 
+                                <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics/completeness" }>
+                                    <Button
+                                        radius="xl"
+                                        variant={ isActive( "/pages/dataquality/metrics/completeness" ) ? "filled" : "subtle" }
+                                        disabled={ isDatasetUndefined }
+                                    >
+                                        <Text size="sm" fw={ 600 } c="dimmed">
+                                            Completeness
+                                        </Text>
+                                    </Button>
+                                </RouterButton>
+
                                 {/*
                                 <Button
                                     radius="xl"

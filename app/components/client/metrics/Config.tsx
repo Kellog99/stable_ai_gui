@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
 import { useDisclosure } from "@mantine/hooks";
-import DuplicatesConfigs from "./DuplicatesConfigs";
+import DuplicatesConfigs from "./DuplicatesConfig";
 import OutliersConfig from "./OutliersConfig";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
@@ -23,6 +23,7 @@ import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import { DuplicatesDTO, OutliersDTO } from "@/interfaces/metricsInterface";
 import { config } from "process";
 import { truncate } from "lodash";
+import CompletenessConfig from "./CompletenessConfig";
 
 
 
@@ -59,7 +60,25 @@ export default function Config ( props: ConfigsProps )
     const configs = useStore( ( state ) => state.metricsConfig )
     const setConfigs = useStore( ( state ) => state.setMetricsConfigs )
     const internalConfigs = useStore.getState().internalConfigs;
+    const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
 
+
+    const [ inputReq, setInputReq ] = useState( '' );
+    const handleRequirements = ( event: React.ChangeEvent<HTMLTextAreaElement> ) =>
+    {
+        const inputValue = event.target.value;
+        setInputReq( inputValue );
+
+        const lines = inputValue
+            .split( '\n' )
+            .map( line => line.trim() )
+            .filter( line => line !== '' );
+
+        setInternalConfigs( { requirements: lines } );
+    };
+
+
+    console.log("INTERNAL CONFIGS:", internalConfigs)
 
     useEffect( () =>
     {
@@ -264,6 +283,7 @@ export default function Config ( props: ConfigsProps )
     const metricComponentMap: Record<string, React.ComponentType> = {
         "duplicates": () => <DuplicatesConfigs />,
         "outliers": () => <OutliersConfig mode={ outliers_mode } />,
+        "completeness": () => <CompletenessConfig />
     };
 
     const MetricConfigComponent = metricComponentMap[ props.metricName ];
@@ -283,7 +303,7 @@ export default function Config ( props: ConfigsProps )
         } }>
             <Flex
                 direction="row"
-                align="end"
+                align="flex-end"
                 gap="md"
             >
 
@@ -388,13 +408,38 @@ export default function Config ( props: ConfigsProps )
                     /> ) : null }
 
                 </Box>
+                { props.metricName == "completeness" ? (
+                    <Box style={ { position: "relative" } }>
+                        <Textarea
+                            label="Requirements"
+                            radius="md"
+                            size="xs"
+                            placeholder="Write each requirement in a different line."
+                            autosize
+                            required={ true }
+                            value={ inputReq }
+                            onChange={ handleRequirements }
+                            style={ {
+                                width: "400px",
+                                pointerEvents: 'auto',
+                                touchAction: 'auto',
+                                paddingRight: "6px",
+                                marginTop: "6px",
+                                zIndex: 1000
 
-                <Modal opened={ opened } onClose={ close } title="Configurations">
-                    { MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div> }
-                </Modal>
-                <Button variant="default" onClick={ open } radius="md" disabled={ props.metricName == "outliers" && showOutliersConfig == false }>
-                    Configs
-                </Button>
+                            } } />
+                    </Box>
+                ) :
+                    ( <>
+                        <Modal opened={ opened } onClose={ close } title="Configurations">
+                            { MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div> }
+                        </Modal>
+
+                        <Button variant="default" onClick={ open } size="xs" radius="md" disabled={ props.metricName == "outliers" && showOutliersConfig == false }>
+                            Configs
+                        </Button>
+                    </> )
+                }
             </Flex>
             <Space h="xl" />
             <Flex
