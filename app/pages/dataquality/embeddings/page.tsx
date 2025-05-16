@@ -113,7 +113,7 @@ function Home ()
 
   useEffect( () =>
   {
-    // Only proceed if featureName is not an empty string
+    // Only proceed if labelFeatureName is not an empty string
     if ( labelFeatureName != "" ) {
       const loadFeature = async () =>
       {
@@ -228,7 +228,7 @@ function Home ()
         <Space h="md" />
 
 
-        <div style={ { width: '1030px', position: 'relative' } }>
+        <div style={ { width: '100%', position: 'relative' } }>
 
           <Flex direction="row" justify="space-between" align="flex-start">
             <Flex

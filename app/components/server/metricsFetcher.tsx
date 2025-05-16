@@ -1,8 +1,8 @@
 "use server"
 
-import { getDuplicates, getOutliers } from "@/functionalities/BackendUtils";
+import { getCompleteness, getDuplicates, getOutliers } from "@/functionalities/BackendUtils";
+import { MetricType } from "@/interfaces/metricsInterface";
 
-type MetricType = "duplicates" | "outliers";
 
 export default async function metricsFetcher (
     metric: MetricType,
@@ -18,11 +18,11 @@ export default async function metricsFetcher (
         outliers_mode = "iforest"
     }
 
-    console.log( "OUTLIER MODE:", metric )
-
     const analysisMap = {
         "duplicates": () => getDuplicates( datasetName as string, featureName, internalConfigs ),
         "outliers": () => getOutliers( datasetName as string, featureName, internalConfigs, outliers_mode! ),
+        "completeness": () => getCompleteness(datasetName as string, featureName, internalConfigs)
+
     };
 
     try {

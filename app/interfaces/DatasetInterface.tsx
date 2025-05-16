@@ -16,7 +16,7 @@ export default interface Dataset
   name: string;
   n_samples: number;
   task: string;
-  features: FeatureDTO;
+  features: FeatureDTO[];
   prototype: {
     type: string;
     name: string;

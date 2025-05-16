@@ -20,7 +20,7 @@ import internal from "stream";
 import { outliers_modes } from "./utils";
 import metricsFetcher from "../../server/metricsFetcher";
 import OutlierDisplayer from "./displayer/OutlierDisplayer";
-import { DuplicatesDTO, OutliersDTO } from "@/interfaces/metricsInterface";
+import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
 import { config } from "process";
 import { truncate } from "lodash";
 import CompletenessConfig from "./CompletenessConfig";
@@ -34,8 +34,6 @@ interface ConfigsProps
     labelFeatureReq?: boolean
 }
 
-type MetricType = "duplicates" | "outliers";
-
 export default function Config ( props: ConfigsProps )
 {
     const searchParams = useSearchParams();
@@ -46,6 +44,7 @@ export default function Config ( props: ConfigsProps )
     const [ computed, setComputed ] = useState<boolean>( false )
     const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
     const [ outliers, setOutliers ] = useState<OutliersDTO | null>( null )
+    const [completeness, setCompleteness] = useState<CompletenessDTO | null> (null)
 
 
     const [ featureName, setFeatureName ] = useState<any>( "" )
@@ -76,6 +75,7 @@ export default function Config ( props: ConfigsProps )
             .filter( line => line !== '' );
 
         setInternalConfigs( { requirements: lines } );
+        if ( showRequirementsError ) setShowRequirementsError( false );
     };
 
 
@@ -111,6 +111,7 @@ export default function Config ( props: ConfigsProps )
 
     const [ showFeatureError, setShowFeatureError ] = useState( false );
     const [ showLabelError, setShowLabelError ] = useState( false );
+    const [ showRequirementsError, setShowRequirementsError] = useState (false);
     const [ showOutliersConfig, setShowOutliersConfig ] = useState( false );
     const [ clicked, setClicked ] = useState( false );
     const [ isDuplicate, setIsDuplicate ] = useState( false );
@@ -190,13 +191,8 @@ export default function Config ( props: ConfigsProps )
     };
     */}
 
-    const [triggerCompl, setTriggerCompl] = useState<boolean>(false)
     const handleClickCompute = async () =>
     {
-
-        if (props.metricName == "completeness") {
-            setTriggerCompl(true)
-        }
         
         const newReportMetric: ReportMetric = {
             internalConfigs: internalConfigs,
@@ -212,6 +208,11 @@ export default function Config ( props: ConfigsProps )
 
         if ( props?.labelFeatureReq && !labelFeatureName ) {
             setShowLabelError( true );
+            hasValidationErrors = true;
+        }
+
+        if (props.metricName === "completeness" && !inputReq) {
+            setShowRequirementsError(true);
             hasValidationErrors = true;
         }
 
@@ -243,9 +244,11 @@ export default function Config ( props: ConfigsProps )
                     labelFeatureName,
                     outliers_mode
                 );
-
+                
                 if ( props.metricName === "duplicates" ) setDuplicates( data );
                 if ( props.metricName === "outliers" ) setOutliers( data );
+                if (props.metricName === "completeness") setCompleteness( data );
+                
                 newReportMetric.results = data;
                 newReportMetric.internalConfigs = internalConfigs;
 
@@ -266,7 +269,7 @@ export default function Config ( props: ConfigsProps )
         }
     };
 
-
+   
     const handleSaveToReport = () =>
     {
         if ( reportMetric ) {
@@ -299,6 +302,7 @@ export default function Config ( props: ConfigsProps )
     const metricDisplayerMap: Record<string, React.ComponentType> = {
         "duplicates": () => <DuplicatesDisplayer duplicates={ duplicates as DuplicatesDTO } />,
         "outliers": () => <OutlierDisplayer outliers={ outliers as OutliersDTO } />,
+        "completeness" : () => <CompletenessDisplayer completeness={completeness as CompletenessDTO} requirements={internalConfigs.requirements}/>
     };
 
     const MetricDisplayerComponent = metricDisplayerMap[ props.metricName ];
@@ -337,7 +341,6 @@ export default function Config ( props: ConfigsProps )
                             },
                         } ) }
                     />
-
 
                     { showFeatureError && (
                         <Text
@@ -426,15 +429,23 @@ export default function Config ( props: ConfigsProps )
                             required={ true }
                             value={ inputReq }
                             onChange={ handleRequirements }
-                            style={ {
+                            styles={ ( theme ) => ( {
+                            input: {
                                 width: "400px",
-                                pointerEvents: 'auto',
-                                touchAction: 'auto',
-                                paddingRight: "6px",
-                                marginTop: "6px",
-                                zIndex: 1000
-
-                            } } />
+                                borderColor: showRequirementsError ? theme.colors.red[ 6 ] : undefined,
+                                '&:hover': {
+                                    borderColor: showRequirementsError ? theme.colors.red[ 6 ] : undefined,
+                                },
+                            },
+                        } ) } />
+                        { showRequirementsError && (
+                        <Text
+                            size="xs"
+                            style={ { position: "absolute", top: "100%", marginTop: 4, color: "red" } }
+                        >
+                            Write at least one requirement to continue
+                        </Text>
+                    ) }
                     </Box>
                 ) :
                     ( <>
@@ -476,10 +487,6 @@ export default function Config ( props: ConfigsProps )
                         A metric with this same configuration has been already computed. Please change something or choose another metric.
                     </Alert>
                 </> ) : null }
-
-            {triggerCompl ? (
-                <CompletenessDisplayer/>
-            ) : null}
 
             { computeNow ? (
                 isLoading ? (

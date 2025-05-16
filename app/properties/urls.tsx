@@ -5,6 +5,7 @@ export const datasets_get = "http://localhost:8000/getDatasets"
 export const prototypes_get= "http://localhost:8000/metrics/getPrototypes"
 export const duplicates_post = "http://localhost:8000/metrics/getDuplicates"
 export const outliers_post = "http://localhost:8000/metrics/getOutliers"
+export const completeness_post = "http://localhost:8000/metrics/getCompleteness"
 export const retrieve_get = "http://localhost:8000/embeddings/retrieve"
 
 //export const dataset_post = 'http://10.125.34.229:5003/process'

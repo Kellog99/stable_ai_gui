@@ -1,3 +1,5 @@
+import Dataset from "@/interfaces/DatasetInterface";
+
 export function getScoreColor(score: number) {
   if (score >= 0.8) {
     return 'green';
@@ -7,3 +9,30 @@ export function getScoreColor(score: number) {
     return 'red';
   }
 }
+
+export function IsFeatureBond(
+    dataset: Dataset,
+    nameFeature1: string,
+    typeFeature2: string,
+    nameFeature2?: string
+    ): boolean | string {
+    const getFeatureType = (name: string): string | undefined => {
+        const feature = dataset.features.find((f) => f.name === name);
+        return feature?.type;
+    };
+
+    for (const [from, to] of dataset.edges) {
+        if (from === nameFeature1) {
+        const targetType = getFeatureType(to);
+
+        if (targetType === typeFeature2) {
+            if (nameFeature2 === undefined) {
+            return to;
+            } else if (to === nameFeature2) {
+            return true; 
+            }
+        }
+        }
+    }
+    return false;
+    }
