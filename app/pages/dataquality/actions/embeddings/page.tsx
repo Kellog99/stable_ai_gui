@@ -31,93 +31,68 @@ function Home ()
   const [error, setError] = useState<string | null>(null);
   
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
+  const setData = useStore( ( state ) => ( state.setData ) );
   
 
-  const connectWebSocket = () => {
-    // Reset states
-    setProgress(0);
-    setResult(null);
-    setError(null);
-    setStatus('Connecting...');
+  async function prova(model) {
+    const baseUrl = "http://localhost:80/actions/embedder"
+    
+    const url = new URL(baseUrl);
+        
+        // Option 1: Pass datasets as a single comma-separated list
+    url.searchParams.append('featureName', featureName);
+    url.searchParams.append('datasetName', datasetUsed?.name);
+    url.searchParams.append('modelName',model)
+    const response = await fetch(url);
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
 
-    // Create WebSocket connection
-    const socket = new WebSocket('ws://localhost:5003/actions/embed');
-    socketRef.current = socket;
-
-    // Connection opened
-    socket.addEventListener('open', (event) => {
-      setIsConnected(true);
-      setStatus('Connected, processing starting...');
-    });
-
-    //if (isConnected===true) {
-    //  socket.current.send(JSON.stringify({ 
-    //    datasetName: datasetName, 
-    //    featureName: featureName,
-    //    modelName : modelName
-    //  }))
-    //}
-
-    // Listen for messages
-    socket.addEventListener('message', (event) => {
-      const data = JSON.parse(event.data);
-      
-      switch(data.type) {
-        case 'progress':
-          setProgress(data.progress);
-          setStatus(data.message);
+    try {
+      while (true) {
+        // Read a chunk from the stream
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          console.log("Stream complete");
           break;
-        case 'complete':
-          setProgress(100);
-          setStatus('Task completed!');
-          setResult(data.result);
-          // Note: We don't need to manually close here as the server will close the connection
-          break;
-        case 'error':
-          setError(data.message);
-          setStatus('Error occurred');
-          break;
-        default:
-          console.log('Unknown message type:', data);
+        }
+        
+        // Decode the bytes to string
+        const text = decoder.decode(value, { stream: true });
+        console.log(text)
+        // Process the SSE format (data: {...})
+        const lines = text.split('\n\n');
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const jsonData = JSON.parse(line.substring(6));
+              console.log('Received progress update:', jsonData);
+              
+              // Handle the progress update
+              if (jsonData.status === "complete") {
+                console.log("Process completed:", jsonData.result);
+                if(jsonData.dataset!==null){
+                  setData(jsonData.dataset)
+                }
+                setResult(jsonData.result)
+              } else if (jsonData.progress !== undefined) {
+                // Update progress if available
+                console.log(`Progress: ${jsonData.progress}%`);
+                setProgress(jsonData.progress)
+              }
+            } catch (e) {
+              // Handle potential JSON parsing errors
+              console.error('Error parsing SSE data:', e);
+            }
+          }
+        }
       }
-    });
-
-    // Connection closed
-    socket.addEventListener('close', (event) => {
-      setIsConnected(false);
-      if (event.code === 1000) {
-        setStatus('Connection closed: Task completed');
-      } else if (event.code === 1011) {
-        setStatus(`Connection closed: ${event.reason}`);
-      } else {
-        setStatus(`Connection closed (code: ${event.code})`);
-      }
-    });
-
-    // Connection error
-    socket.addEventListener('error', (event) => {
-      setIsConnected(false);
-      setError('WebSocket connection error');
-      setStatus('Connection error');
-    });
-  };
-
-  const disconnectWebSocket = () => {
-    if (socketRef.current) {
-      socketRef.current.close();
-      socketRef.current = null;
-      setStatus('Disconnected');
+    } catch (error) {
+      console.error('Error reading stream:', error);
+    } finally {
+      reader.releaseLock(); // Always release the lock when done
     }
-  };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
-      }
-    };
-  }, []);
+  }
 
   useEffect( () =>
   {
@@ -135,8 +110,8 @@ function Home ()
   }, [ datasetUsed ] )
 
   const connectAndAssingModel = (model: any) => {
-    connectWebSocket()
     setModelName(model)
+    prova(model)
   }
 
   return (
@@ -172,7 +147,7 @@ function Home ()
                 radius="md"
                 label="Model name"
                 placeholder="Choose model to use"
-                data={ ["hf-hub:apple/DFN5B-CLIP-ViT-H-14"] }
+                data={ ["nomic-ai/nomic-embed-vision-v1.5"] }
                 value={ modelName }
                 onChange={( value ) => connectAndAssingModel( value )}
                 allowDeselect ={false}
@@ -193,7 +168,7 @@ function Home ()
           <Progress color="red" radius="xl" size="xl" value={progress} striped animated style={{ marginTop: '60px' }}/>
         </div>
       ) : result!==null ? (
-        <Text size="sm" style={{marginTop:"20px"}}>Embeddings done! </Text>
+        <Text size="sm" style={{marginTop:"20px"}}>{result} </Text>
       ) :
       (
         <Text size="sm" style={{marginTop:"20px"}}>Select a feature and the model to compute embeddings </Text>
