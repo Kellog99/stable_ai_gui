@@ -22,6 +22,7 @@ export function IsFeatureBond(
     };
 
     for (const [from, to] of dataset.edges) {
+        
         if (from === nameFeature1) {
         const targetType = getFeatureType(to);
 
@@ -36,3 +37,16 @@ export function IsFeatureBond(
     }
     return false;
     }
+
+export function IsFeaturePresent(
+  dataset: Dataset, 
+  featureType: string
+) : boolean {
+
+  if (dataset.features.some((f) => f.type === featureType)) {
+    return true
+  } else {
+    return false
+  };
+  
+}

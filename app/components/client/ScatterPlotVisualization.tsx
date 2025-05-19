@@ -95,6 +95,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
   const selectedIndexes = useStore( ( state ) => state.selectedIndexes )
   const hoverIndex = useStore( ( state ) => state.hoverIndex )
+  const datasetUsed = useStore((state) => state.datasetUsed)
 
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
@@ -130,7 +131,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       {
         setIsLoading( false );
       } );
-  }, [ props.featureName, props.labelFeatureName, filteredLabels ] );
+  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels ] );
 
 
   useEffect( () =>

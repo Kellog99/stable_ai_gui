@@ -37,6 +37,8 @@ export default function CompletenessDisplayer (props: { completeness: Completene
         setIndexesRetrieved(indexes_per_requirement[index])
     }
 
+    
+
     useEffect( () =>
       {
           const loadFeature = async () =>

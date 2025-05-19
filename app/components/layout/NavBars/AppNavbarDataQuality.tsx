@@ -12,7 +12,8 @@ import
     Box,
     Space, Group,
     Menu,
-    Divider
+    Divider,
+    Tooltip
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -29,6 +30,9 @@ import
 import classes from './AppNavbarDataQuality.module.css';
 import RouterButton from "@/components/client/buttons/RouterButton";
 import useStore from "@/store/dsStore";
+import { IsFeaturePresent } from "@/functionalities/Utils";
+import Dataset from "@/interfaces/DatasetInterface";
+import { embedding_type } from "@/properties/types";
 
 
 function AppNavbarDataQuality ()
@@ -40,7 +44,7 @@ function AppNavbarDataQuality ()
     const pathName = usePathname();
     const isActive = ( path: string ) => pathName === path;
 
-    const datasetUsed = useStore( ( state ) => state.datasetUsed ) 
+    const datasetUsed = useStore( ( state ) => state.datasetUsed )
     const isDatasetUndefined = datasetUsed == undefined;
 
     const [ visualVisible, setVisualVisible ] = useState( false );
@@ -49,6 +53,15 @@ function AppNavbarDataQuality ()
 
     const searchParams = useSearchParams();
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
+    const [ areEmbeddings, setAreEmbeddings ] = useState<boolean>( false )
+
+    useEffect( () =>
+    {
+        if ( datasetUsed ) {
+            const embeddings = IsFeaturePresent( datasetUsed as Dataset, embedding_type )
+            setAreEmbeddings( embeddings )
+        }
+    }, [ datasetUsed ] )
 
     useEffect( () =>
     {
@@ -83,76 +96,165 @@ function AppNavbarDataQuality ()
                         </Button>
                     </Link>
                     <Space h="xs" />
-                   
-                    <RouterButton name={datasetUsed?.name} route={"/pages/dataquality/datasets"}>
-                        <Button
-                            leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
-                            radius="xl"
-                            variant={ isActive( "/pages/dataquality/datasets" ) ? "filled" : "subtle" }
-                            disabled={ isDatasetUndefined }
-                        >
-                            Dataset Description
-                        </Button>
+
+                    <RouterButton name={ datasetUsed?.name } route={ "/pages/dataquality/datasets" }>
+                        <div style={ { position: 'relative', display: 'inline-block' } }>
+                            <Button
+                                leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
+                                radius="xl"
+                                variant={ isActive( "/pages/dataquality/datasets" ) ? "filled" : "subtle" }
+                                disabled={ isDatasetUndefined }
+                            >
+                                Dataset Description
+                            </Button>
+                            {isDatasetUndefined ? (
+                                <Tooltip
+                                label="Choose a dataset"
+                                withArrow
+                                position="top"
+                                multiline
+                                styles={ {
+                                    tooltip: {
+                                        width: "200px",
+                                        textAlign: 'center',
+                                        lineHeight: 1.3,
+                                    }
+                                } }
+                            >
+                                <div
+                                    style={ {
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        cursor: "not-allowed"
+                                    } }
+                                    aria-hidden="true"
+                                />
+                            </Tooltip>) : null}
+                            
+                        </div>
                     </RouterButton>
-                    
+
                 </Box>
 
-               
+
                 <Divider />
-                
+
 
                 <Box>
                     <Group gap="xs" mb="xs" mr="xs">
-                    <Button
-                    className={classes.navbar}
-                    onClick={() => setVisualVisible((prev) => !prev)}
-                    rightSection={
-                        visualVisible ? (
-                            <IconChevronDown size={18} stroke={1.5} />
-                        ) : (
-                            <IconChevronRight size={18} stroke={1.5} />
-                          
-                        )
-                      }
-                    pr={12}
-                    leftSection={
-                        <FontAwesomeIcon
-                        icon={faImage}
-                        size="sm"
-                        style={{ opacity: 0.6 }}
-                        />
-                    }
-                    >
-                    <Text size="sm" fw={600} c="dimmed">
-                        Visualization
-                    </Text>
-                    </Button>
+                        <Button
+                            className={ classes.navbar }
+                            onClick={ () => setVisualVisible( ( prev ) => !prev ) }
+                            rightSection={
+                                visualVisible ? (
+                                    <IconChevronDown size={ 18 } stroke={ 1.5 } />
+                                ) : (
+                                    <IconChevronRight size={ 18 } stroke={ 1.5 } />
+
+                                )
+                            }
+                            pr={ 12 }
+                            leftSection={
+                                <FontAwesomeIcon
+                                    icon={ faImage }
+                                    size="sm"
+                                    style={ { opacity: 0.6 } }
+                                />
+                            }
+                        >
+                            <Text size="sm" fw={ 600 } c="dimmed">
+                                Visualization
+                            </Text>
+                        </Button>
                     </Group>
 
                     { visualVisible && (
                         <Stack mt="sm">
                             <Box >
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/embeddings" }>
-                                    <Button
-                                        radius="xl"
-                                        variant={ isActive( "/pages/dataquality/embeddings" ) ? "filled" : "subtle" }
-                                        disabled={ isDatasetUndefined }
-                                    >
-                                        <Text size="sm" fw={ 600 } c="dimmed">
-                                            Embeddings
-                                        </Text>
-                                    </Button>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/embeddings" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Embeddings
+                                            </Text>
+                                        </Button>
+                                        {isDatasetUndefined || !areEmbeddings ? (
+                                            <Tooltip
+                                            label="Choose a dataset or provide the embeddings"
+                                            withArrow
+                                            position="top"
+                                            multiline
+                                            styles={ {
+                                                tooltip: {
+                                                    width: "200px",
+                                                    textAlign: 'center',
+                                                    lineHeight: 1.3,
+                                                }
+                                            } }
+                                        >
+                                            <div
+                                                style={ {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    cursor: "not-allowed"
+                                                } }
+                                                aria-hidden="true"
+                                            />
+                                        </Tooltip>) : null }
+                                        
+                                    </div>
+
+
                                 </RouterButton>
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/prototypes" }>
-                                    <Button
-                                        radius="xl"
-                                        variant={ isActive( "/pages/dataquality/prototypes" ) ? "filled" : "subtle" }
-                                        disabled={ isDatasetUndefined }
-                                    >
-                                        <Text size="sm" fw={ 600 } c="dimmed">
-                                            Prototypes
-                                        </Text>
-                                    </Button>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/prototypes" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Prototypes
+                                            </Text>
+                                        </Button>
+                                        {isDatasetUndefined || !areEmbeddings ? (
+                                        <Tooltip
+                                            label="Choose a dataset or provide the embeddings"
+                                            withArrow
+                                            position="top"
+                                            multiline
+                                            styles={ {
+                                                tooltip: {
+                                                    width: "200px",
+                                                    textAlign: 'center',
+                                                    lineHeight: 1.3,
+                                                }
+                                            } }
+                                        >
+                                            <div
+                                                style={ {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    cursor: "not-allowed"
+                                                } }
+                                                aria-hidden="true"
+                                            />
+                                        </Tooltip> ): null }
+                                    </div>
+
                                 </RouterButton>
                             </Box>
                         </Stack>
@@ -163,13 +265,13 @@ function AppNavbarDataQuality ()
                     <Group gap="xs" mb="xs" mr="xs">
                         <Button
                             className={ classes.navbar }
-                            onClick={() => setMetricVisible((prev) => !prev)}
+                            onClick={ () => setMetricVisible( ( prev ) => !prev ) }
                             rightSection={
                                 metricVisible ? (
-                                    <IconChevronDown size={18} stroke={1.5} />
+                                    <IconChevronDown size={ 18 } stroke={ 1.5 } />
                                 ) : (
-                                    <IconChevronRight size={18} stroke={1.5} />
-                                  
+                                    <IconChevronRight size={ 18 } stroke={ 1.5 } />
+
                                 )
                             } pr={ 12 }
                             leftSection={ <FontAwesomeIcon icon={ faChartLine } size="sm" style={ { opacity: 0.6 } } /> }>
@@ -197,39 +299,125 @@ function AppNavbarDataQuality ()
                                 */}
 
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics/duplicates" }>
-                                    <Button
-                                        radius="xl"
-                                        variant={ isActive( "/pages/dataquality/metrics/duplicates" ) ? "filled" : "subtle" }
-                                        disabled={ isDatasetUndefined }
-                                    >
-                                        <Text size="sm" fw={ 600 } c="dimmed">
-                                            Duplicates
-                                        </Text>
-                                    </Button>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/metrics/duplicates" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Duplicates
+                                            </Text>
+                                        </Button>
+                                        {isDatasetUndefined || !areEmbeddings ? ( 
+                                        <Tooltip
+                                            label="Choose a dataset or provide the embeddings"
+                                            withArrow
+                                            position="top"
+                                            multiline
+                                            styles={ {
+                                                tooltip: {
+                                                    width: "200px",
+                                                    textAlign: 'center',
+                                                    lineHeight: 1.3,
+                                                }
+                                            } }
+                                        >
+                                            <div
+                                                style={ {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    cursor: "not-allowed"
+                                                } }
+                                                aria-hidden="true"
+                                            />
+                                        </Tooltip>) : null }
+                                    </div>
+
                                 </RouterButton>
 
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics/outliers" }>
-                                    <Button
-                                        radius="xl"
-                                        variant={ isActive( "/pages/dataquality/metrics/outliers" ) ? "filled" : "subtle" }
-                                        disabled={ isDatasetUndefined }
-                                    >
-                                        <Text size="sm" fw={ 600 } c="dimmed">
-                                            Outliers
-                                        </Text>
-                                    </Button>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/metrics/outliers" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Outliers
+                                            </Text>
+                                        </Button>
+                                        {isDatasetUndefined || !areEmbeddings ? (
+                                        <Tooltip
+                                            label="Choose a dataset or provide the embeddings"
+                                            withArrow
+                                            position="top"
+                                            multiline
+                                            styles={ {
+                                                tooltip: {
+                                                    width: "200px",
+                                                    textAlign: 'center',
+                                                    lineHeight: 1.3,
+                                                }
+                                            } }
+                                        >
+                                            <div
+                                                style={ {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    cursor: "not-allowed"
+                                                } }
+                                                aria-hidden="true"
+                                            />
+                                        </Tooltip> ) : null}
+                                    </div>
                                 </RouterButton>
 
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/metrics/completeness" }>
-                                    <Button
-                                        radius="xl"
-                                        variant={ isActive( "/pages/dataquality/metrics/completeness" ) ? "filled" : "subtle" }
-                                        disabled={ isDatasetUndefined }
-                                    >
-                                        <Text size="sm" fw={ 600 } c="dimmed">
-                                            Completeness
-                                        </Text>
-                                    </Button>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/metrics/completeness" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Completeness
+                                            </Text>
+                                        </Button>
+                                        {isDatasetUndefined || !areEmbeddings ? (
+                                        <Tooltip
+                                            label="Choose a dataset or provide the embeddings"
+                                            withArrow
+                                            position="top"
+                                            multiline
+                                            styles={ {
+                                                tooltip: {
+                                                    width: "200px",
+                                                    textAlign: 'center',
+                                                    lineHeight: 1.3,
+                                                }
+                                            } }
+                                        >
+                                            <div
+                                                style={ {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    cursor: "not-allowed"
+                                                } }
+                                                aria-hidden="true"
+                                            />
+                                        </Tooltip>
+                                        ) : null }
+                                    </div>
                                 </RouterButton>
 
                                 {/*
@@ -265,13 +453,13 @@ function AppNavbarDataQuality ()
                     <Group gap="xs" mb="xs" mr="xs">
                         <Button
                             className={ classes.navbar }
-                            onClick={() => setActionVisible((prev) => !prev)}
+                            onClick={ () => setActionVisible( ( prev ) => !prev ) }
                             rightSection={
                                 actionVisible ? (
-                                    <IconChevronDown size={18} stroke={1.5} />
+                                    <IconChevronDown size={ 18 } stroke={ 1.5 } />
                                 ) : (
-                                    <IconChevronRight size={18} stroke={1.5} />
-                                  
+                                    <IconChevronRight size={ 18 } stroke={ 1.5 } />
+
                                 )
                             }
                             leftSection={ <FontAwesomeIcon icon={ faBolt } size="sm" style={ { opacity: 0.6 } } /> }>
@@ -285,15 +473,43 @@ function AppNavbarDataQuality ()
                         <Stack mt="sm">
                             <Box>
                                 <RouterButton name={ datasetName } route={ "/pages/dataquality/actions/embeddings" }>
-                                    <Button
-                                        radius="xl"
-                                        variant={ isActive( "/pages/dataquality/actions/embeddings" ) ? "filled" : "subtle" }
-                                        disabled={ isDatasetUndefined }
-                                    >
-                                        <Text size="sm" fw={ 600 } c="dimmed">
-                                            Embedder
-                                        </Text>
-                                    </Button>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/actions/embeddings" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Embedder
+                                            </Text>
+                                        </Button>
+                                        {isDatasetUndefined ? (
+                                        <Tooltip
+                                            label="Choose a dataset"
+                                            withArrow
+                                            position="top"
+                                            multiline
+                                            styles={ {
+                                                tooltip: {
+                                                    width: "200px",
+                                                    textAlign: 'center',
+                                                    lineHeight: 1.3,
+                                                }
+                                            } }
+                                        >
+                                            <div
+                                                style={ {
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    cursor: "not-allowed"
+                                                } }
+                                                aria-hidden="true"
+                                            />
+                                        </Tooltip> ) : null }
+                                    </div>
                                 </RouterButton>
                             </Box>
                         </Stack>

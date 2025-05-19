@@ -64,6 +64,7 @@ export default function Config ( props: ConfigsProps )
 
 
     const [ inputReq, setInputReq ] = useState( '' );
+
     const handleRequirements = ( event: React.ChangeEvent<HTMLTextAreaElement> ) =>
     {
         const inputValue = event.target.value;
@@ -80,6 +81,15 @@ export default function Config ( props: ConfigsProps )
 
 
     console.log("INTERNAL CONFIGS:", internalConfigs)
+
+
+    useEffect(() => 
+    {
+        setComputeNow(false)
+        setComputed(false)
+
+    }, [inputReq])
+
 
     useEffect( () =>
     {

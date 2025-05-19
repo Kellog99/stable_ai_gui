@@ -3,7 +3,7 @@
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group } from '@mantine/core';
+import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group, Checkbox } from '@mantine/core';
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
@@ -11,10 +11,13 @@ import LassoDrawer from '@/components/client/Lasso';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
 import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
-import { image_type, label_type, text_type } from '@/properties/types';
+import { embedding_type, image_type, label_type, text_type } from '@/properties/types';
 import { useDisclosure } from '@mantine/hooks';
 import { Rnd } from "react-rnd";
 import MovableWindow from '@/components/client/MovableWindow';
+import { Shovel } from 'lucide-react';
+import { IsFeatureBond } from '@/functionalities/Utils';
+import Dataset from '@/interfaces/DatasetInterface';
 
 interface Feature
 {
@@ -56,6 +59,9 @@ function Home ()
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
   const dimensions = useStore( ( state ) => state.size )
+
+  const [ showUncertanties, setShowUncertanties ] = useState<boolean>( false )
+  const [ areUncertanties, setAreUncertanties ] = useState<boolean>( false )
 
   useEffect( () =>
   {
@@ -109,7 +115,7 @@ function Home ()
       loadFeature();
 
     }
-  }, [ featureName ] ); // Still keep indexes and featureName in the dependency array
+  }, [ featureName ] );
 
   useEffect( () =>
   {
@@ -187,6 +193,15 @@ function Home ()
 
   console.log( "indexes:", indexes )
 
+  useEffect( () =>
+  {
+
+    if ( datasetUsed ) {
+      const uncertanties = IsFeatureBond( datasetUsed as Dataset, featureName, embedding_type, "image_embeddings_umap" )
+      setAreUncertanties( uncertanties as boolean )
+    }
+  }, [ featureName ] )
+
 
   const legendData = labelDict && colorMap
     ? Object.keys( labelDict ).map( ( key ) => ( {
@@ -220,20 +235,21 @@ function Home ()
   return (
     <div className="w-full h-screen">
 
-      <div style={{
-            marginTop:"50px",
-            marginLeft: "100px"
-        }}>
+      <div style={ {
+        marginTop: "50px",
+        marginLeft: "100px"
+      } }>
 
         <Space h="md" />
 
 
         <div style={ { width: '100%', position: 'relative' } }>
 
-          <Flex direction="row" justify="space-between" align="flex-start">
+          <Flex direction="row" justify="space-between">
             <Flex
               direction="row"
-              gap="xs">
+              gap="xs"
+              align="flex-end">
 
               <Select
                 id="feature"
@@ -275,7 +291,31 @@ function Home ()
                   />
                 </> ) : null }
 
+              { areUncertanties ? ( <Checkbox
+                radius="sm"
+                label="Show Uncertanties"
+                style={ { marginBottom: "6px" } }
+                checked={ showUncertanties }
+                onChange={ ( event ) => setShowUncertanties( event.currentTarget.checked ) }
+              /> ) : null }
+
+
             </Flex>
+
+            { showUncertanties ? ( <Box>
+              <Text size="sm" mb={ 4 }>
+                Legend
+              </Text>
+              <Box
+                h={ 20 }
+                style={ {
+                  background: 'linear-gradient(to right, blue, red)',
+                  borderRadius: 4,
+                  width: "200px"
+                } }
+              />
+            </Box> ) : null }
+
           </Flex>
 
 
@@ -336,7 +376,7 @@ function Home ()
             </MovableWindow> ) : null }
         </>
       ) : (
-        <Text size="sm" style={ { marginTop: "20px", marginLeft:"100px" } }>Select Feature</Text>
+        <Text size="sm" style={ { marginTop: "20px", marginLeft: "100px" } }>Select Feature</Text>
       ) }
 
     </div>

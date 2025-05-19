@@ -62,10 +62,10 @@ const MovableWindow: React.FC<MovableWindowProps> = ( {
           
           return { 
             x: position.x, 
-            y: viewportSize.height - 135 // 40px is the header height
+            y: viewportSize.height - 190 // 40px is the header height
           };
         }
-        return { x: position.x, y: viewportSize.height - 135 };
+        return { x: position.x, y: viewportSize.height - 190 };
       };
 
     const toggleCollapse = () =>
