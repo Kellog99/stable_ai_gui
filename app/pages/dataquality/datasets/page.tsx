@@ -132,10 +132,13 @@ export default function Datasets ()
         try {
           if ( datasetName && featureToDisplay ) {
             const featureLoaded = await featureLoader( datasetName, featureToDisplay );
-            console.log( "FEATURE LOADED:", featureLoaded );
+            
             if ( featureLoaded.type === image_type || featureLoaded.type === text_type ) {
               setFeature( featureLoaded );
               setFeatureType( featureLoaded.type )
+              if (labelFeature && !IsFeatureBond(datasetUsed as Dataset, featureLoaded?.name as string, labelFeature.type, labelFeature.name)) {
+                setLabelFeature(null)
+              }
             } else if ( featureLoaded.type === label_type ) {
                if (IsFeatureBond(datasetUsed as Dataset, feature?.name as string, featureLoaded.type, featureLoaded.name)) {
                 setLabelFeature( featureLoaded )
