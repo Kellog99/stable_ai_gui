@@ -4,7 +4,7 @@ import path, { join } from 'path';
 import { datasets_get } from '../properties/urls';
 
 
-async function getDatasetFolders (): Promise<string[]>
+export async function getDatasetFolders (): Promise<string[]>
 {
     const datasetsPath = path.join( process.cwd(), 'public', 'datasets' );
 
