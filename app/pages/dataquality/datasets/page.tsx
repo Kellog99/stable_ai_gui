@@ -9,12 +9,13 @@ import { useEffect, useRef, useState } from "react"
 import classes from './page.module.css'
 import useStore from '@/store/dsStore';
 import SchemaShower from "@/components/client/SchemaShower";
-import { FeatureSchema } from "@/interfaces/DatasetInterface";
+import Dataset, { FeatureSchema } from "@/interfaces/DatasetInterface";
 import ImageDisplayer from "@/components/server/ImageDisplayer";
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { image_type, label_type, text_type } from "@/properties/types";
 import { motion } from 'framer-motion'
+import { IsFeatureBond } from "@/functionalities/Utils";
 
 
 
@@ -136,11 +137,12 @@ export default function Datasets ()
               setFeature( featureLoaded );
               setFeatureType( featureLoaded.type )
             } else if ( featureLoaded.type === label_type ) {
-              setLabelFeature( featureLoaded )
-
-              if ( featureLoaded && featureLoaded.label_dict ) {
+               if (IsFeatureBond(datasetUsed as Dataset, feature?.name as string, featureLoaded.type, featureLoaded.name)) {
+                setLabelFeature( featureLoaded )
+                if ( featureLoaded && featureLoaded.label_dict ) {
                 setLabelDict( featureLoaded.label_dict )
               }
+               }
             }
           }
         } catch ( error ) {
