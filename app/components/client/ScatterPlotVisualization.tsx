@@ -689,7 +689,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               direction="column"
               align="center"
               justify="center">
-              <Box style={ { width: "400px", marginTop: "12px" } }>
+              <Box style={ { width: "600px", marginTop: "12px" } }>
                 <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
                 <Textarea
                   id="search-input"
@@ -701,7 +701,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                   value={ inputValue }
                   onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
                   style={ {
-                    width: "400px",
+                    width: "100%",
                     pointerEvents: 'auto',
                     touchAction: 'auto',
                     paddingRight: "6px",
