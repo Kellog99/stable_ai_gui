@@ -5,7 +5,7 @@ import { type } from 'os';
 import { parse } from 'path';
 import { useState, useRef, useEffect, Suspense } from 'react';
 import ScatterPlotVisualization from '@/components/client/ScatterPlotVisualization';
-import { Progress, Space, Flex, Select, Text } from '@mantine/core';
+import { Progress, Space, Flex, Select, Text, Box } from '@mantine/core';
 import { color, stagger } from 'framer-motion';
 import { size } from 'lodash';
 import useStore from '../../../../store/dsStore';
@@ -171,7 +171,33 @@ function Home ()
       { featureName !== "" && result === null && modelName !== "" ? (
         <div className="my-animation-container w-full md:w-3/4 lg:w-1/2 mx-auto p-4 bg-gray-200 rounded-lg">
           <Text size="sm" style={ { marginTop: "60px" } }>Embeddings...</Text>
-          <Progress color="red" radius="xl" size="xl" value={ progress } striped animated style={ { marginTop: '60px' } } />
+          <Box style={ { position: 'relative', marginTop: 60 } }>
+            <Progress
+              value={ progress }
+              size="xl"
+              radius="xl"
+              color="red"
+              striped
+              animated
+              style = {{
+                height: "30px"
+              }}
+            />
+            <Text
+              size="sm"
+              fw={ 700 }
+              c="black"
+              style={ {
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                pointerEvents: 'none',
+              } }
+            >
+              { progress }%
+            </Text>
+          </Box>
         </div>
       ) : result !== null ? (
         <Text size="sm" style={ { marginTop: "20px" } }>{ result } </Text>
