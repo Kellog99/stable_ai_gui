@@ -70,16 +70,21 @@ function Home ()
         .filter( ( { type } ) => type === image_type || type === text_type )
         .map( ( { name } ) => name );
 
-      const extractedlabelFeatures = datasetUsed.features
-        .filter( ( { type } ) => type === label_type )
-        .map( ( { name } ) => name );
+      //const extractedlabelFeatures = datasetUsed.features
+      //  .filter( ( { type } ) => type === label_type )
+      //  .map( ( { name } ) => name );
+
+      if ( featureName !== "" ) {
+        const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
+        setLabelFeatures( labelFeatures as string[] )
+      }
 
       setFeatures( extractedFeatures );
-      setLabelFeatures( extractedlabelFeatures )
+      //setLabelFeatures( extractedlabelFeatures )
       console.log( features )
-      console.log( labelFeatures )
+      //console.log( labelFeatures )
     }
-  }, [ datasetUsed ] )
+  }, [ datasetUsed, featureName ] )
 
   console.log( "PAGE", datasetUsed )
   console.log( "PAGE", features )
@@ -157,13 +162,13 @@ function Home ()
           indexes.forEach( index =>
           {
             filteredArr.push( feature.datas[ index ] );
-            if ( labelFeature != null ) {
+            if ( labelFeature != null && labelFeatureName !== "" ) {
               filteredLabel.push( labelFeature.datas[ index ] )
             }
           } );
           console.log( "DATA", feature.datas )
           setFeatureData( filteredArr )
-          if ( labelFeature != null ) {
+          if ( labelFeature != null && labelFeatureName !== "" ) {
             setLabelData( filteredLabel )
           }
 
@@ -174,7 +179,7 @@ function Home ()
 
       filterFeature();
     }
-  }, [ indexes ] ); // Still keep indexes and featureName in the dependency array
+  }, [ indexes, labelFeatureName ] ); // Still keep indexes and featureName in the dependency array
 
   const handleTextareaKeyDown = useCallback( ( event: any ) =>
   {
@@ -231,7 +236,7 @@ function Home ()
   };
 
 
-
+  console.log("featureName", featureName)
   return (
     <div className="w-full h-screen">
 
@@ -262,7 +267,7 @@ function Home ()
                 required={ true }
               />
 
-              <Select
+              { featureName ? ( <Select
                 id="labelFeature"
                 radius="md"
                 label="Label Feature"
@@ -273,6 +278,7 @@ function Home ()
                 onClear={ () => setLabelFeatureName( "" ) }
                 clearable={ true }
               />
+              ) : null }
 
               { labelFeatureName && labelDict ? (
                 <>
@@ -322,7 +328,7 @@ function Home ()
         </div>
       </div>
 
-      { featureName !== "" ? (
+      { featureName ? (
         <>
           <Flex
             direction="column"

@@ -15,11 +15,14 @@ export function IsFeatureBond(
     nameFeature1: string,
     typeFeature2: string,
     nameFeature2?: string
-    ): boolean | string {
+    ): boolean | string | string[] {
+
     const getFeatureType = (name: string): string | undefined => {
         const feature = dataset.features.find((f) => f.name === name);
         return feature?.type;
     };
+
+    const matches: string[] = [];
 
     for (const [from, to] of dataset.edges) {
         
@@ -28,7 +31,8 @@ export function IsFeatureBond(
 
         if (targetType === typeFeature2) {
             if (nameFeature2 === undefined) {
-            return to;
+             matches.push(to);
+             return matches;
             } else if (to === nameFeature2) {
             return true; 
             }
