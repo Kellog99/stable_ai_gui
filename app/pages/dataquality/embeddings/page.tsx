@@ -81,7 +81,6 @@ function Home ()
 
       setFeatures( extractedFeatures );
       //setLabelFeatures( extractedlabelFeatures )
-      console.log( features )
       //console.log( labelFeatures )
     }
   }, [ datasetUsed, featureName ] )

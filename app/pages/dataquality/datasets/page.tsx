@@ -414,7 +414,7 @@ export default function Datasets ()
                       console.log( 'Clicked bar data:', bar.label );
                     }
                   } }
-                  style={ { paddingRight: barSpacing / 2 } }
+                  style={ { paddingRight: barSpacing / 2, paddingBottom: "20px"} }
                 />
               </Box>
             </Flex>

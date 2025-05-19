@@ -1,7 +1,7 @@
 "use client";
 
 import RouterButton from "@/components/client/buttons/RouterButton";
-import { Box, Button, Flex, Loader, Select, Space } from "@mantine/core";
+import { Box, Button, Flex, Loader, Select, Space, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import classes from './page.module.css'
@@ -9,6 +9,8 @@ import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
 import { getPrototypes } from "@/functionalities/BackendUtils";
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
+import { IsFeatureBond } from "@/functionalities/Utils";
+import Dataset from "@/interfaces/DatasetInterface";
 
 interface PrototypesData
 {
@@ -55,20 +57,26 @@ export default function Prototypes ()
                 .filter( ( { type } ) => type === image_type || type === text_type )
                 .map( ( { name } ) => name );
 
-            const extractedlabelFeatures = datasetUsed.features
-                .filter( ( { type } ) => type === label_type )
-                .map( ( { name } ) => name );
+            //const extractedlabelFeatures = datasetUsed.features
+            //    .filter( ( { type } ) => type === label_type )
+            //    .map( ( { name } ) => name );
 
-            setFeatures( extractedFeatures );
-            setLabelFeatures( extractedlabelFeatures )
+            if ( featureName !== "" ) {
+                const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
+                setLabelFeatures( labelFeatures as string[] )
+                const labelFeature = datasetUsed.features.find( feature => feature.type === label_type );
+                if ( labelFeature?.label_dict ) {
+                    setLabelDict( labelFeature.label_dict )
+                }
 
-            const labelFeature = datasetUsed.features.find( feature => feature.type === label_type );
-            if ( labelFeature.label_dict ) {
-                setLabelDict( labelFeature.label_dict )
             }
 
+            setFeatures( extractedFeatures );
+            //setLabelFeatures( extractedlabelFeatures )
+
+
         }
-    }, [ datasetUsed ] )
+    }, [ datasetUsed, featureName ] )
 
 
     useEffect( () =>
@@ -131,6 +139,7 @@ export default function Prototypes ()
                         required={ true }
                     />
 
+                    { featureName ? (
                     <Select
                         id="labelFeature"
                         radius="md"
@@ -140,7 +149,8 @@ export default function Prototypes ()
                         value={ labelFeatureName }
                         onChange={ ( value ) => setLabelFeatureName( value as string ) }
                         required={ true }
-                    />
+                    />) : null}
+
                 </Flex>
             </div>
             { isLoading ? (
@@ -175,7 +185,7 @@ export default function Prototypes ()
 
                     </>
                 ) : (
-                    <p>Select Feature and Label</p>
+                    <Text size="xs">Select Feature and Label</Text>
                 ) }
             </> ) }
 
