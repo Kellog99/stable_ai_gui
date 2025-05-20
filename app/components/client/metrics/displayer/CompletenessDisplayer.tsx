@@ -110,7 +110,7 @@ export default function CompletenessDisplayer (props: { completeness: Completene
                 align="center"
             >
                 {/*
-                <h3>Score on the { featureName } feature</h3>*/}
+                <h3>Score on the { featureName } feature</h3>
 
                 <RingProgress
                     size={ 180 }
@@ -118,18 +118,19 @@ export default function CompletenessDisplayer (props: { completeness: Completene
                     sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
                     transitionDuration={ 1000 }
                     label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
-                />
+                />*/}
 
                 <BarChart
                     h={ 300 }
                     data={ data }
                     orientation="vertical"
                     dataKey="requirement"
-                    getBarColor={ ( value ) => ( value > 0.1 ? 'teal.8' : 'red.8' ) }
-                    series={ [ { name: 'score', color: 'gray.6' } ] }
+                    //getBarColor={ ( value ) => ( value > 0.1 ? 'teal.8' : 'red.8' ) }
+                    series={ [ { name: 'score', color: 'red.8' } ] }
                     barProps={ {
                     onClick: RetrieveSamples
                   } }
+                  style={{marginTop:"50px"}}
                 />
                 {samplesRetrieved && (<>
             

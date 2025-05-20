@@ -15,7 +15,7 @@ export default function AppNavbar() {
     
     return (
         <>
-        <Burger opened={opened} onClick={toggle}/>
+        {/*<Burger opened={opened} onClick={toggle}/>*/}
         {isNNTrust ? <AppNavbarNNTrust /> : <AppNavbarDataQuality/>}
         </>
     )

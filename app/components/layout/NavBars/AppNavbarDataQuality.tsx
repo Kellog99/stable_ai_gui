@@ -2,7 +2,7 @@
 
 import "@mantine/core/styles.css";
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from 'next/link'
 import
 {
@@ -13,7 +13,8 @@ import
     Space, Group,
     Menu,
     Divider,
-    Tooltip
+    Tooltip,
+    Indicator
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -55,6 +56,9 @@ function AppNavbarDataQuality ()
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
     const [ areEmbeddings, setAreEmbeddings ] = useState<boolean>( false )
 
+    const [ showNotification, setShowNotification ] = useState<boolean>( false )
+    const previousValue = useRef( datasetUsed );
+
     useEffect( () =>
     {
         if ( datasetUsed ) {
@@ -82,6 +86,41 @@ function AppNavbarDataQuality ()
         router.push( `/pages/dataquality/metrics?${params.toString()}` );
     };
 
+    useEffect( () =>
+    {
+        console.log( "previous:", previousValue.current )
+        console.log( "current:", datasetUsed )
+        console.log( "equals??", previousValue.current !== datasetUsed )
+        if ( previousValue.current !== datasetUsed ) {
+            if ( !previousValue.current )
+                console.log( "sono qui " )
+            setShowNotification( false )
+            setShowNotification( true );
+            previousValue.current = datasetUsed;
+            // Optionally auto-hide after some time
+            setTimeout( () => setShowNotification( false ), 5000 ); // hide after 3s
+        }
+    }, [ datasetUsed ] );
+
+    console.log( "shownotification", showNotification )
+
+    useEffect( () =>
+    {
+        if ( pathName === '/pages/dataquality/embeddings'
+            || pathName === '/pages/dataquality/prototypes' ) {
+            setVisualVisible( true );
+        } else if ( pathName === '/pages/dataquality/metrics/duplicates'
+            || pathName === '/pages/dataquality/metrics/outliers'
+            || pathName === '/pages/dataquality/metrics/completeness'
+        ) {
+            setMetricVisible( true )
+        } else if ( pathName === '/pages/dataquality/actions/embeddings'
+            || pathName === '/pages/dataquality/actions/cleanDuplicates' ) {
+            setActionVisible( true )
+        }
+
+    }, [ pathName ] );
+
     return (
         <Box p="md" style={ { height: '100%' } }>
             <Stack h="100%" gap="md">
@@ -99,41 +138,44 @@ function AppNavbarDataQuality ()
 
                     <RouterButton name={ datasetUsed?.name } route={ "/pages/dataquality/datasets" }>
                         <div style={ { position: 'relative', display: 'inline-block' } }>
-                            <Button
-                                leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
-                                radius="xl"
-                                variant={ isActive( "/pages/dataquality/datasets" ) ? "filled" : "subtle" }
-                                disabled={ isDatasetUndefined }
-                            >
-                                Dataset Description
-                            </Button>
-                            {isDatasetUndefined ? (
+                            <Indicator disabled={ !showNotification } inline color="red" offset={ 6 } size={ 11 }>
+                                <Button
+                                    leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
+                                    radius="xl"
+                                    variant={ isActive( "/pages/dataquality/datasets" ) ? "filled" : "subtle" }
+                                    disabled={ isDatasetUndefined }
+                                >
+                                    Dataset Description
+                                </Button>
+                            </Indicator>
+                            { isDatasetUndefined ? (
                                 <Tooltip
-                                label="Choose a dataset"
-                                withArrow
-                                position="top"
-                                multiline
-                                styles={ {
-                                    tooltip: {
-                                        width: "200px",
-                                        textAlign: 'center',
-                                        lineHeight: 1.3,
-                                    }
-                                } }
-                            >
-                                <div
-                                    style={ {
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        bottom: 0,
-                                        cursor: "not-allowed"
+                                    label="Choose a dataset"
+                                    radius="md"
+                                    withArrow
+                                    position="top"
+                                    multiline
+                                    styles={ {
+                                        tooltip: {
+                                            width: "200px",
+                                            textAlign: 'center',
+                                            lineHeight: 1.3,
+                                        }
                                     } }
-                                    aria-hidden="true"
-                                />
-                            </Tooltip>) : null}
-                            
+                                >
+                                    <div
+                                        style={ {
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            cursor: "not-allowed"
+                                        } }
+                                        aria-hidden="true"
+                                    />
+                                </Tooltip> ) : null }
+
                         </div>
                     </RouterButton>
 
@@ -185,33 +227,34 @@ function AppNavbarDataQuality ()
                                                 Embeddings
                                             </Text>
                                         </Button>
-                                        {isDatasetUndefined || !areEmbeddings ? (
+                                        { isDatasetUndefined || !areEmbeddings ? (
                                             <Tooltip
-                                            label="Choose a dataset or provide the embeddings"
-                                            withArrow
-                                            position="top"
-                                            multiline
-                                            styles={ {
-                                                tooltip: {
-                                                    width: "200px",
-                                                    textAlign: 'center',
-                                                    lineHeight: 1.3,
-                                                }
-                                            } }
-                                        >
-                                            <div
-                                                style={ {
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    cursor: "not-allowed"
+                                                label="Choose a dataset or provide the embeddings"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
                                                 } }
-                                                aria-hidden="true"
-                                            />
-                                        </Tooltip>) : null }
-                                        
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip> ) : null }
+
                                     </div>
 
 
@@ -227,32 +270,33 @@ function AppNavbarDataQuality ()
                                                 Prototypes
                                             </Text>
                                         </Button>
-                                        {isDatasetUndefined || !areEmbeddings ? (
-                                        <Tooltip
-                                            label="Choose a dataset or provide the embeddings"
-                                            withArrow
-                                            position="top"
-                                            multiline
-                                            styles={ {
-                                                tooltip: {
-                                                    width: "200px",
-                                                    textAlign: 'center',
-                                                    lineHeight: 1.3,
-                                                }
-                                            } }
-                                        >
-                                            <div
-                                                style={ {
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    cursor: "not-allowed"
+                                        { isDatasetUndefined || !areEmbeddings ? (
+                                            <Tooltip
+                                                label="Choose a dataset or provide the embeddings"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
                                                 } }
-                                                aria-hidden="true"
-                                            />
-                                        </Tooltip> ): null }
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip> ) : null }
                                     </div>
 
                                 </RouterButton>
@@ -309,32 +353,33 @@ function AppNavbarDataQuality ()
                                                 Duplicates
                                             </Text>
                                         </Button>
-                                        {isDatasetUndefined || !areEmbeddings ? ( 
-                                        <Tooltip
-                                            label="Choose a dataset or provide the embeddings"
-                                            withArrow
-                                            position="top"
-                                            multiline
-                                            styles={ {
-                                                tooltip: {
-                                                    width: "200px",
-                                                    textAlign: 'center',
-                                                    lineHeight: 1.3,
-                                                }
-                                            } }
-                                        >
-                                            <div
-                                                style={ {
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    cursor: "not-allowed"
+                                        { isDatasetUndefined || !areEmbeddings ? (
+                                            <Tooltip
+                                                label="Choose a dataset or provide the embeddings"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
                                                 } }
-                                                aria-hidden="true"
-                                            />
-                                        </Tooltip>) : null }
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip> ) : null }
                                     </div>
 
                                 </RouterButton>
@@ -350,32 +395,33 @@ function AppNavbarDataQuality ()
                                                 Outliers
                                             </Text>
                                         </Button>
-                                        {isDatasetUndefined || !areEmbeddings ? (
-                                        <Tooltip
-                                            label="Choose a dataset or provide the embeddings"
-                                            withArrow
-                                            position="top"
-                                            multiline
-                                            styles={ {
-                                                tooltip: {
-                                                    width: "200px",
-                                                    textAlign: 'center',
-                                                    lineHeight: 1.3,
-                                                }
-                                            } }
-                                        >
-                                            <div
-                                                style={ {
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    cursor: "not-allowed"
+                                        { isDatasetUndefined || !areEmbeddings ? (
+                                            <Tooltip
+                                                label="Choose a dataset or provide the embeddings"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
                                                 } }
-                                                aria-hidden="true"
-                                            />
-                                        </Tooltip> ) : null}
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip> ) : null }
                                     </div>
                                 </RouterButton>
 
@@ -390,32 +436,33 @@ function AppNavbarDataQuality ()
                                                 Completeness
                                             </Text>
                                         </Button>
-                                        {isDatasetUndefined || !areEmbeddings ? (
-                                        <Tooltip
-                                            label="Choose a dataset or provide the embeddings"
-                                            withArrow
-                                            position="top"
-                                            multiline
-                                            styles={ {
-                                                tooltip: {
-                                                    width: "200px",
-                                                    textAlign: 'center',
-                                                    lineHeight: 1.3,
-                                                }
-                                            } }
-                                        >
-                                            <div
-                                                style={ {
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    cursor: "not-allowed"
+                                        { isDatasetUndefined || !areEmbeddings ? (
+                                            <Tooltip
+                                                label="Choose a dataset or provide the embeddings"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
                                                 } }
-                                                aria-hidden="true"
-                                            />
-                                        </Tooltip>
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip>
                                         ) : null }
                                     </div>
                                 </RouterButton>
@@ -483,32 +530,74 @@ function AppNavbarDataQuality ()
                                                 Embedder
                                             </Text>
                                         </Button>
-                                        {isDatasetUndefined ? (
-                                        <Tooltip
-                                            label="Choose a dataset"
-                                            withArrow
-                                            position="top"
-                                            multiline
-                                            styles={ {
-                                                tooltip: {
-                                                    width: "200px",
-                                                    textAlign: 'center',
-                                                    lineHeight: 1.3,
-                                                }
-                                            } }
-                                        >
-                                            <div
-                                                style={ {
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    bottom: 0,
-                                                    cursor: "not-allowed"
+                                        { isDatasetUndefined ? (
+                                            <Tooltip
+                                                label="Choose a dataset"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
                                                 } }
-                                                aria-hidden="true"
-                                            />
-                                        </Tooltip> ) : null }
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip> ) : null }
+                                    </div>
+                                </RouterButton>
+
+                                <RouterButton name={ datasetName } route={ "/pages/dataquality/actions/cleanDuplicates" }>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/actions/cleanDuplicates" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Clean Duplicates
+                                            </Text>
+                                        </Button>
+                                        { isDatasetUndefined ? (
+                                            <Tooltip
+                                                label="Choose a dataset or provide the embeddings"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
+                                                } }
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip> ) : null }
                                     </div>
                                 </RouterButton>
                             </Box>

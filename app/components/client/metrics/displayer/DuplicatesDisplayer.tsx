@@ -6,9 +6,14 @@ import { getScoreColor } from "@/functionalities/Utils";
 import { FeatureDTO } from "@/interfaces/DatasetInterface";
 import { DuplicatesDTO } from "@/interfaces/metricsInterface"
 import { image_type, text_type } from "@/properties/types";
-import { Flex, RingProgress, Text } from "@mantine/core"
+import { Alert, Flex, RingProgress, Text } from "@mantine/core"
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import
+{
+  faCheck
+} from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -58,7 +63,7 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
         align="center"
       >
         <h3>Score on the { featureName } feature</h3>
-        { feature ? (
+        { feature && duplicatesImages.length > 0 ? (
           <>
             <RingProgress
               size={ 180 }
@@ -68,8 +73,28 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
               label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
             />
             <FeatureDisplayer indexes={ indicesFlat } featureData={ duplicatesImages } featureType={ type } columns={ 2 } />
-          </> ) : null
-        }
+          </> ) : feature && duplicatesImages.length === 0 ? (
+            <>
+              <RingProgress
+                size={ 180 }
+                roundCaps
+                sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
+                transitionDuration={ 1000 }
+                label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
+              />
+              <Alert
+                variant="light"
+                color="green"
+                radius="md"
+                title="Perfect!"
+                icon={ <FontAwesomeIcon icon={ faCheck } /> }
+                style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
+              >
+                The { featureName } feature has 0 duplicates.
+              </Alert>
+            </>
+          )
+          : null }
       </Flex>
     </>
   )

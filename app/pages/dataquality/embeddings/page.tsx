@@ -235,7 +235,7 @@ function Home ()
   };
 
 
-  console.log("featureName", featureName)
+  console.log( "featureName", featureName )
   return (
     <div className="w-full h-screen">
 
@@ -307,19 +307,20 @@ function Home ()
 
             </Flex>
 
-            { showUncertanties ? ( <Box>
-              <Text size="sm" mb={ 4 }>
-                Legend
-              </Text>
-              <Box
-                h={ 20 }
-                style={ {
-                  background: 'linear-gradient(to right, blue, red)',
-                  borderRadius: 4,
-                  width: "200px"
-                } }
-              />
-            </Box> ) : null }
+            { showUncertanties ? (
+              <Box>
+                <Text size="sm" mb={ 4 }>
+                  Legend
+                </Text>
+                <Box
+                  h={ 20 }
+                  style={ {
+                    background: 'linear-gradient(to right, blue, red)',
+                    borderRadius: 4,
+                    width: "200px"
+                  } }
+                />
+              </Box> ) : null }
 
           </Flex>
 
@@ -335,22 +336,22 @@ function Home ()
 
             <div style={ { position: 'relative' } }>
 
-              <Flex
-                justify="left"
-                align="center"
-                direction="column"
-                wrap="wrap"
-                style={ { width: '100%' } }
-              >
-                { !isLoadingEmbs ? ( <p>
-                  { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
-                </p> ) : null }
-
-              </Flex>
 
               <Suspense>
                 <Box style={ { pointerEvents: 'none' } }>
                   <div style={ { pointerEvents: 'auto' } }>
+                    <Flex
+                      justify="left"
+                      align="center"
+                      direction="column"
+                      wrap="wrap"
+                      style={ { width: '100%' } }
+                    >
+                      { !isLoadingEmbs ? ( <p>
+                        { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
+                      </p> ) : null }
+
+                    </Flex>
 
                     <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } />
 

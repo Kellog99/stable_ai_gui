@@ -262,6 +262,7 @@ export default function Datasets ()
   return (
     <div className="w-full h-screen">
       <div className="max-w-4xl mx-auto px-4">
+        
         <Box
           className={ classes.title }
           style={ { display: "flex", flexDirection: "column", gap: "0px" } }
@@ -270,6 +271,7 @@ export default function Datasets ()
             { datasetUsed?.name } dataset
           </h1>
         </Box>
+        
 
         <div style={ { display: 'flex', alignItems: 'flex-start' } }>
 
@@ -355,9 +357,6 @@ export default function Datasets ()
           ) }
         </div>
 
-
-
-
         <h2>
           Description
         </h2>
@@ -367,14 +366,15 @@ export default function Datasets ()
             { datasetUsed?.name || "" }
           </Text>{ " " }
           is a dataset for { datasetUsed?.task || "" }.
-          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes. You can check the protoypes{ " " }
+          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes and {datasetUsed?.n_samples} samples. You can check the protoypes{ " " }
             { <Link
               href={ {
                 pathname: "/pages/dataquality/prototypes",
                 query: { datasetName: datasetName }
               } }
               style={ { color: 'blue' } }
-            >here</Link> }. { " " }</> : <>{ " " }</> }
+            >here</Link> }. { " " }</> : <>It has {datasetUsed?.n_samples}{ " " }</> }
+            
           { descriptions?.map( ( description, index ) => (
             <span key={ index }>{ description } </span>
           ) ) }

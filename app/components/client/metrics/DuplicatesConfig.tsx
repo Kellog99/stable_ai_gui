@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { Button, Flex, NativeSelect, NumberInput, Slider, Switch, Text } from '@mantine/core';
+import { Box, Button, Flex, NativeSelect, NumberInput, Slider, Switch, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import useStore from '../../../store/dsStore';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -23,9 +23,9 @@ function DuplicatesConfig ()
         initialValues: {
             k: 6,
             thr: 0.05,
-            backend: 'faiss',
-            metric: 'euclidean',
-            normalize: true
+            //backend: 'faiss',
+            //metric: 'euclidean',
+            //normalize: true
         },
     } );
 
@@ -47,6 +47,7 @@ function DuplicatesConfig ()
 
     return (
         <form onSubmit={ form.onSubmit(handleSubmit) }>
+            <Box style={ { margin: "10px" } }>
             <Flex
                 direction="column"
                 gap="xl"
@@ -75,7 +76,8 @@ function DuplicatesConfig ()
                         { ...form.getInputProps( 'thr' ) }
                     />
                 </Flex>
-
+               
+            {/*
                 <NativeSelect variant="filled" radius="md" label="Backend" data={backend_duplicates} { ...form.getInputProps( 'backend' ) } />
                 <NativeSelect variant="filled" radius="md" label="Metric" data={metric_duplicates} { ...form.getInputProps( 'metric' ) } />
 
@@ -84,7 +86,9 @@ function DuplicatesConfig ()
                     label="Normalize Embeddings"
                     { ...form.getInputProps( 'normalize' ) }
                 />
-            </Flex>
+            */}
+            </Flex> 
+            </Box>
 
             <Button type="submit" mt="md" >
                 { clicked ? ( <>

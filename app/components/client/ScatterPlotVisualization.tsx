@@ -7,16 +7,16 @@ import { log, OrbitView, project } from '@deck.gl/core';
 import getData, { RetrieveSamples } from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group, Slider } from '@mantine/core';
+import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group, Slider, Alert } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
 import style from 'styled-jsx/style';
 import { type } from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
-  faX
+  faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
-import { ZoomIn } from 'lucide-react';
+import Link from "next/link";
 import LassoDrawer from './Lasso';
 
 
@@ -95,7 +95,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
   const selectedIndexes = useStore( ( state ) => state.selectedIndexes )
   const hoverIndex = useStore( ( state ) => state.hoverIndex )
-  const datasetUsed = useStore((state) => state.datasetUsed)
+  const datasetUsed = useStore( ( state ) => state.datasetUsed )
 
   const lassoMode = useStore( ( state ) => state.lazoMode );
   const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
@@ -119,18 +119,22 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   {
     setSelectedIndexes( [] );
     setIsLoading( true );
-
-    getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ) )
-      .then( ( fetched ) =>
-      {
-        setData( fetched.points ); // Only set the points in setData
-        setColorMap( fetched.color_map ); // Set colorMap separately
-        setOriginalColors( new Map( fetched.points.map( ( item, index ) => [ index, item.color ] ) ) );
-      } )
-      .finally( () =>
-      {
-        setIsLoading( false );
-      } );
+    try {
+      getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ) )
+        .then( ( fetched ) =>
+        {
+          setData( fetched.points ); // Only set the points in setData
+          setColorMap( fetched.color_map ); // Set colorMap separately
+          setOriginalColors( new Map( fetched.points.map( ( item, index ) => [ index, item.color ] ) ) );
+        } )
+        .finally( () =>
+        {
+          setIsLoading( false );
+        } )
+    }
+    catch ( error ) {
+      console.log( "Failed to get data from backend" )
+    }
   }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels ] );
 
 
@@ -638,7 +642,26 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           direction="column"
           wrap="wrap"
           style={ { width: '100%' } }
-        >No data available</Flex> ) : (
+        ><Alert
+          variant="light"
+          color="red"
+          radius="md"
+          title="Ops!"
+          icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
+          style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
+        >
+            Something occured while trying to get the data. Check if the embeddings are correctly loaded to the dataset. Otherwise you can compute them {" "}
+            <Link
+              href={ {
+                pathname: "/pages/dataquality/actions/embeddings",
+                query: { datasetName: datasetUsed?.name }
+              } }
+              style={ { color: 'blue' } }
+            >
+              here
+            </Link>.
+          </Alert>
+        </Flex> ) : (
           <>
             <div style={ { width: '1830px', height: '600px' } }>
 

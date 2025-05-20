@@ -113,62 +113,45 @@ export default function Prototypes ()
 
     return (
         <div className="w-full h-screen">
-            <div className="max-w-4xl mx-auto px-4">
-                <Box className={ classes.title }>
-                    <h1>Prototypes for { datasetName } dataset</h1>
-                    <RouterButton name={ datasetName! } route={ "/pages/dataquality/datasets" }>
-                        <Button>Go Back to Dataset Page</Button>
-                    </RouterButton>
-                </Box>
-                <Space h="md" />
-            </div>
+            <div style={ {
+                marginTop: "50px",
+                marginLeft: "100px",
+                marginRight: "100px",
+            } }>
 
-            <div style={ { width: '300px', position: 'relative', marginBottom: '20px' } }>
-                <Flex
-                    direction="row"
-                    gap="xs">
 
-                    <Select
-                        id="feature"
-                        radius="md"
-                        label="Feature"
-                        placeholder="Choose feature to visualize"
-                        data={ features }
-                        value={ featureName }
-                        onChange={ ( value ) => setFeatureName( value ) }
-                        required={ true }
-                    />
 
-                    { featureName ? (
-                    <Select
-                        id="labelFeature"
-                        radius="md"
-                        label="Label Feature"
-                        placeholder="Choose label"
-                        data={ labelFeatures }
-                        value={ labelFeatureName }
-                        onChange={ ( value ) => setLabelFeatureName( value as string ) }
-                        required={ true }
-                    />) : null}
-
-                </Flex>
-            </div>
-            { isLoading ? (
-                <>
+                <div style={ { width: '300px', position: 'relative', marginBottom: '20px' } }>
                     <Flex
-                        mih={ 150 }
-                        justify="center"
-                        align="center"
-                        direction="column"
-                        wrap="wrap"
-                        style={ { width: '100%' } }
-                    >
-                        <p>Loading...</p>
-                        <Loader />
+                        direction="row"
+                        gap="xs">
+
+                        <Select
+                            id="feature"
+                            radius="md"
+                            label="Feature"
+                            placeholder="Choose feature to visualize"
+                            data={ features }
+                            value={ featureName }
+                            onChange={ ( value ) => setFeatureName( value ) }
+                            required={ true }
+                        />
+
+                        { featureName ? (
+                            <Select
+                                id="labelFeature"
+                                radius="md"
+                                label="Label Feature"
+                                placeholder="Choose label"
+                                data={ labelFeatures }
+                                value={ labelFeatureName }
+                                onChange={ ( value ) => setLabelFeatureName( value as string ) }
+                                required={ true }
+                            /> ) : null }
+
                     </Flex>
-                </>
-            ) : ( <>
-                { prototypes && featureData && labelData ? (
+                </div>
+                { isLoading ? (
                     <>
                         <Flex
                             mih={ 150 }
@@ -178,17 +161,33 @@ export default function Prototypes ()
                             wrap="wrap"
                             style={ { width: '100%' } }
                         >
-                            <div ref={ containerRef } className="h-[600px] overflow-auto">
-                                <FeatureDisplayer featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columns={ 4 } />
-                            </div>
+                            <p>Loading...</p>
+                            <Loader />
                         </Flex>
-
                     </>
-                ) : (
-                    <Text size="xs">Select Feature and Label</Text>
-                ) }
-            </> ) }
+                ) : ( <>
+                    { prototypes && featureData && labelData ? (
+                        <>
+                            <Flex
+                                mih={ 150 }
+                                justify="center"
+                                align="center"
+                                direction="column"
+                                wrap="wrap"
+                                style={ { width: '100%' } }
+                            >
+                                <div ref={ containerRef } className="h-[600px] overflow-auto">
+                                    <FeatureDisplayer featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } columns={ 4 } />
+                                </div>
+                            </Flex>
 
+                        </>
+                    ) : (
+                        <Text size="xs">Select Feature and Label</Text>
+                    ) }
+                </> ) }
+
+            </div>
         </div>
     )
 }

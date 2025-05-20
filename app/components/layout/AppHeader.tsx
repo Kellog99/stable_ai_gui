@@ -18,14 +18,13 @@ function AppHeader() {
     const pathName = usePathname();
     const isActive = (path: string) => pathName === path;
     const datasetUsed = useStore( ( state ) => state.datasetUsed )?.name;
-    console.log("DATASET???", datasetUsed)
     
 
     const isNNTrust = pathName.includes('/nntrust');
     return (
         <>
             <Group>
-                <Burger opened={opened} onClick={toggle} hiddenFrom="sm" />
+                {/*<Burger opened={opened} onClick={toggle} hiddenFrom="sm" />*/}
                 <Link href="/">
                     <Image
                         src="/logo_leonardo.png"
@@ -39,9 +38,11 @@ function AppHeader() {
                 <Link href="/">
                     <Button radius={50} variant={isNNTrust ? "subtle" : "filled"}>Data Quality</Button>
                 </Link>
+                {/*
                 <Link href="/pages/nntrust">
                     <Button radius={50} variant={isNNTrust ? "filled" : "subtle"}>NN Trust</Button>
                 </Link>
+                */}
             </Group>
             <Group>
             {datasetUsed ? (
