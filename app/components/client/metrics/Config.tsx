@@ -474,7 +474,7 @@ export default function Config ( props: ConfigsProps )
                 direction="row"
                 justify="start"
                 gap="md">
-
+                {/*
                 <Button
                     onClick={ handleSaveToReport }
                     disabled={ !computed }
@@ -484,6 +484,7 @@ export default function Config ( props: ConfigsProps )
                         <span>Saved</span></> )
                         : "Save to report" }
                 </Button>
+                */}
 
                 <Button onClick={ handleClickCompute }>
                     Compute now
