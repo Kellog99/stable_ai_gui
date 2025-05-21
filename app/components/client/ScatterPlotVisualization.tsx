@@ -729,7 +729,7 @@ console.log("POINTS:", selectedPoints)
               </Suspense>
             </div>
 
-          {datasetUsed?.name !== "military" && datasetUsed?.name !== "ships" ? (
+          {datasetUsed?.name !== "military" ? (
             <Flex
               direction="column"
               align="center"
