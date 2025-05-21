@@ -449,7 +449,7 @@ function AppNavbarDataQuality ()
                                         <Button
                                             radius="xl"
                                             variant={ isActive( "/pages/dataquality/metrics/completeness" ) ? "filled" : "subtle" }
-                                            disabled={ isDatasetUndefined || !areEmbeddings || isMilitaryDataset }
+                                            disabled={ isDatasetUndefined || !areEmbeddings || isUQDataset }
                                         >
                                             <Text size="sm" fw={ 600 } c="dimmed">
                                                 Completeness
