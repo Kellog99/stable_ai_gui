@@ -43,7 +43,7 @@ function Home ()
   const [ labelFeatureType, setLabelFeatureType ] = useState<any>( "" )
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
-  const [ numericFeature, setNumericFeature ] = useState<FeatureDTO | null>(null )
+  const [ numericFeature, setNumericFeature ] = useState<FeatureDTO | null>( null )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
   const colorMap = useStore( ( state ) => state.colorMap )
 
@@ -57,14 +57,17 @@ function Home ()
   const containerRef = useRef<HTMLDivElement>( null );
 
   const indexes = useStore( ( state ) => state.selectedIndexes );
+
+
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
+
 
   const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
   const dimensions = useStore( ( state ) => state.size )
 
   const [ showUncertanties, setShowUncertanties ] = useState<boolean>( false )
   const [ areUncertanties, setAreUncertanties ] = useState<boolean>( false )
-  const [uqScores, setUqScores] = useState<number[]>([])
+  const [ uqScores, setUqScores ] = useState<number[]>( [] )
   const [ disableLabelFeature, setDisableLabelFeature ] = useState<boolean>( false )
 
 
@@ -110,10 +113,10 @@ function Home ()
         try {
           if ( datasetName ) {
             const feature = await featureLoader( datasetName, "image_uq" );
-            console.log( "LOADING",feature );
+            console.log( "LOADING", feature );
             setNumericFeature( feature );
             const scores: number[] = feature.datas;
-            setUqScores(scores)
+            setUqScores( scores )
           }
         } catch ( error ) {
           console.error( 'Error loading feature:', error );
@@ -121,9 +124,8 @@ function Home ()
       };
       loadFeature();
     }
-  }, [showUncertanties] )
+  }, [ showUncertanties ] )
 
-  console.log("score extracted:", uqScores)
 
 
   useEffect( () =>
@@ -173,8 +175,6 @@ function Home ()
     }
   }, [ labelFeatureName ] ); // Still keep indexes and featureName in the dependency array
 
-  console.log( "LABEL FEATURE:", labelFeature )
-
   useEffect( () =>
   {
     // Only proceed if indexes is not null
@@ -220,7 +220,6 @@ function Home ()
   console.log( "LABEL DATA:", labelData )
   console.log( "FEATURE DATA", feature )
   console.log( "FILTERED", featureData )
-  console.log( "UQQQQ2", showUncertanties )
 
   console.log( "indexes:", indexes )
 
@@ -247,19 +246,36 @@ function Home ()
     const item = legendData.find( ( entry ) => entry.value === option.value );
 
     return (
-      <Group gap="sm">
+      <Group
+        gap="sm"
+        align="flex-start"
+        wrap="nowrap"
+        style={ { flexWrap: 'nowrap', alignItems: 'flex-start' } }
+      >
         <Box
           style={ {
-            width: 12,
+            minWidth: 12,
             height: 12,
             borderRadius: '50%',
             backgroundColor: item?.color ?? 'black',
+            marginTop: 4, // optional: align with text baseline
           } }
         />
-        <Text size="sm">{ option.label }</Text>
+        <Text
+          size="sm"
+          style={ {
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
+            overflowWrap: 'break-word',
+            lineHeight: 1.2,
+          } }
+        >
+          { option.label }
+        </Text>
       </Group>
     );
   };
+
 
   const handleShowUncertanties = ( event ) =>
   {
@@ -422,15 +438,15 @@ function Home ()
                 style={ { marginLeft: '30px', borderRadius: '12px' } }
               >
                 { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
-                  <FeatureDisplayer 
-                    indexes={ indexes } 
-                    featureData={ featureData } 
-                    featureType={ featureType } 
-                    labelData={ labelData } 
-                    label_dict={ labelDict as { [ key: number ]: string } } 
-                    dimensions={ dimensions } 
-                    {...(showUncertanties ? { scores: uqScores } : {})}
-                    uncertainty={showUncertanties ? true : false} />
+                  <FeatureDisplayer
+                    indexes={ indexes }
+                    featureData={ featureData }
+                    featureType={ featureType }
+                    labelData={ labelData }
+                    label_dict={ labelDict as { [ key: number ]: string } }
+                    dimensions={ dimensions }
+                    { ...( showUncertanties ? { scores: uqScores } : {} ) }
+                    uncertainty={ showUncertanties ? true : false } />
                 </div> ) : null }
               </Flex>
             </MovableWindow> ) : null }

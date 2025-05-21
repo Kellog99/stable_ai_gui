@@ -27,6 +27,7 @@ const MovableWindow: React.FC<MovableWindowProps> = ( {
     const [isResizing, setIsResizing] = useState(false)
     const rndRef = useRef<Rnd>( null );
     const setSelectedIndexes = useStore((state) => state.setSelectedIndexes)
+    const setSelectedPoints = useStore((state) => state.setSelectedPoints)
 
 
     const [ viewportSize, setViewportSize ] = useState( {
@@ -195,7 +196,7 @@ const MovableWindow: React.FC<MovableWindowProps> = ( {
                             radius="xl"
                             size="xs"
                             onMouseDown={(e) => e.stopPropagation()}
-                            onClick={() => setSelectedIndexes([])}
+                            onClick={() => {setSelectedIndexes([]); setSelectedPoints([])}}
                             style={ {
                                 transition: "background-color 0.2s ease",
                             } }

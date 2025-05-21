@@ -62,7 +62,6 @@ interface propsTypes
 export default function ScatterPlotVisualization ( props: propsTypes )
 {
 
-  console.log("UQQQQQQ",props.show_uq)
   const deckRef = useRef<any>( null );
   const isDraggingRef = useRef<boolean>( false );
 
@@ -87,7 +86,10 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     rotationOrbit: 0,
     zoom: -5,
   } );
-  const [ selectedPoints, setSelectedPoints ] = useState<number[]>( [] );
+  //const [ selectedPoints, setSelectedPoints ] = useState<number[]>( [] );
+  const selectedPoints = useStore((state) => state.selectedPoints)
+  const setSelectedPoints = useStore((state) => state.setSelectedPoints)
+
   const [ dragStart, setDragStart ] = useState<{ x: number; y: number } | null>( null );
   const [ dragCurrent, setDragCurrent ] = useState<{ x: number; y: number } | null>( [] );
   const [ originalColors, setOriginalColors ] = useState<Map<number, [ number, number, number ]>>( new Map() );
@@ -122,6 +124,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   useEffect( () =>
   {
     setSelectedIndexes( [] );
+    setSelectedPoints([])
     setIsLoading( true );
     try {
       getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ), props.show_uq )
@@ -143,7 +146,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
   }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels , props.show_uq] );
 
-  console.log("colorsssss", uqColors)
 
   useEffect( () =>
   {
@@ -244,10 +246,12 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   };
 
 
+
   useEffect( () =>
   {
     if ( queryRetrieve !== "" ) {
       setSelectedIndexes( [] );
+      setSelectedPoints([])
 
       let loadingTimeout = setTimeout( () =>
       {
@@ -440,6 +444,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     setSelectedPoints( selected );
     setSelectedIndexes( selected );
 
+    
     setDragStart( null );
     setDragCurrent( [] );
     isDraggingRef.current = false;
@@ -493,8 +498,14 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   };
 
   const menuItems = [
-    { label: 'Clear indexes', action: () => setSelectedIndexes( [] ) }
-  ];
+  {
+    label: 'Clear indexes',
+    action: () => {
+      setSelectedIndexes([]);
+      setSelectedPoints([]);
+    }
+  }
+];
 
 
   useEffect( () =>
@@ -613,6 +624,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   {
     if ( queryRetrieve === "" ) {
       setSelectedIndexes( [] )
+      setSelectedPoints([])
     }
   }, [ queryRetrieve ] )
 
@@ -620,10 +632,13 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   {
     setInputValue( "" );
     setSelectedIndexes( [] )
+    setSelectedPoints([])
     setQueryRetrieve( "" )
   }
 
 
+console.log("INDEXES:", selectedIndexes)
+console.log("POINTS:", selectedPoints)
 
   return (
     <>
@@ -714,7 +729,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               </Suspense>
             </div>
 
-
+          {datasetUsed?.name !== "military" && datasetUsed?.name !== "ships" ? (
             <Flex
               direction="column"
               align="center"
@@ -770,6 +785,8 @@ export default function ScatterPlotVisualization ( props: propsTypes )
               </Box>
               { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }
             </Flex>
+          ) : null }
+            
 
           </>
         ) }

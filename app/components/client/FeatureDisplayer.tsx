@@ -41,8 +41,6 @@ export function FeatureCard ( props: FeatureCardProps )
 {
   const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty } = props
 
-  console.log("uncertainy featureCard", uncertainty)
-  console.log("score featureCard", score)
   return (
     <Card className={ classes.card } shadow="sm" padding="lg" radius="md" withBorder>
       <CardSection className={ classes.cardsection }>
@@ -87,10 +85,7 @@ export function FeatureCard ( props: FeatureCardProps )
 export default function FeatureDisplayer ( props: FeatureDisplayerProps )
 {
   const { indexes, featureData, featureType, labelData, label_dict, outliers, scores, uncertainty, columns, dimensions } = props
-
-
-  console.log("scores:", scores)
-  console.log("uq", uncertainty)
+  
   const itemSize = 310;
   const totalItems = featureData.length;
   const setHoverIndex = useStore( ( state ) => state.setHoverIndex )

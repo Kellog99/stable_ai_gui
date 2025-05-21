@@ -55,6 +55,7 @@ function AppNavbarDataQuality ()
     const searchParams = useSearchParams();
     const [ datasetName, setDatasetName ] = useState<string | null>( "" )
     const [ areEmbeddings, setAreEmbeddings ] = useState<boolean>( false )
+    const isUQDataset = datasetUsed?.name === "military" || datasetUsed?.name === "ships"
 
     const [ showNotification, setShowNotification ] = useState<boolean>( false )
     const previousValue = useRef( datasetUsed );
@@ -448,7 +449,7 @@ function AppNavbarDataQuality ()
                                         <Button
                                             radius="xl"
                                             variant={ isActive( "/pages/dataquality/metrics/completeness" ) ? "filled" : "subtle" }
-                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                            disabled={ isDatasetUndefined || !areEmbeddings || isMilitaryDataset }
                                         >
                                             <Text size="sm" fw={ 600 } c="dimmed">
                                                 Completeness

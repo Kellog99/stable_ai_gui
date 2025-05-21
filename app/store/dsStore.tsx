@@ -7,6 +7,8 @@ interface AppState {
     datasetUsed: Dataset | null;
     queryDataset: string | '';
     selectedIndexes : number[] | [];
+    selectedPoints: number[] | [];
+
     hoverIndex: number | null;
     selectedFeature : string | null;
     lazoMode : boolean;
@@ -26,6 +28,7 @@ interface AppState {
 
 
     setSelectedIndexes : (selectedIndexes : number[]) => void;
+    setSelectedPoints: (selectedPoints : number[]) => void;
     setHoverIndex: (hoverIndex: number | null) => void
     setSelectedFeature : (selectedFeature : string) => void;
     setData: (datasetUsed: Dataset) => void;
@@ -54,6 +57,7 @@ interface AppState {
             datasetUsed: null,
             queryDataset: "",
             selectedIndexes: [],
+            selectedPoints: [],
             hoverIndex: null,
             selectedFeature: null,
             lazoMode: false,
@@ -73,6 +77,7 @@ interface AppState {
             setData: (datasetUsed) => set({ datasetUsed }),
             setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
             setSelectedIndexes: (selectedIndexes: number[]) => set({ selectedIndexes }),
+            setSelectedPoints: (selectedPoints: number[]) => set({ selectedPoints }),
             setHoverIndex: (hoverIndex: number | null ) => set ({hoverIndex}),
             setSelectedFeature: (selectedFeature: string) => set({ selectedFeature }),
             setLazoMode: (lazoMode: boolean) => set({ lazoMode }),
