@@ -11,7 +11,7 @@ import LassoDrawer from '@/components/client/Lasso';
 import RouterButton from '@/components/client/buttons/RouterButton';
 import classes from './page.module.css'
 import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
-import { embedding_type, image_type, label_type, text_type } from '@/properties/types';
+import { embedding_type, image_type, label_type, numberic_type, text_type } from '@/properties/types';
 import { useDisclosure } from '@mantine/hooks';
 import { Rnd } from "react-rnd";
 import MovableWindow from '@/components/client/MovableWindow';
@@ -62,7 +62,8 @@ function Home ()
 
   const [ showUncertanties, setShowUncertanties ] = useState<boolean>( false )
   const [ areUncertanties, setAreUncertanties ] = useState<boolean>( false )
-  
+  const [disableLabelFeature, setDisableLabelFeature] = useState<boolean>(false)
+
   useEffect( () =>
   {
     if ( Array.isArray( datasetUsed?.features ) ) {
@@ -201,7 +202,7 @@ function Home ()
   {
 
     if ( datasetUsed ) {
-      const uncertanties = IsFeatureBond( datasetUsed as Dataset, featureName, embedding_type, "image_embeddings_umap" )
+      const uncertanties = IsFeatureBond( datasetUsed as Dataset, featureName, numberic_type, "image_uq" )
       setAreUncertanties( uncertanties as boolean )
     }
   }, [ featureName ] )
@@ -234,8 +235,16 @@ function Home ()
     );
   };
 
-
-  console.log( "featureName", featureName )
+  const handleShowUncertanties = (event) => {
+    setShowUncertanties( event.currentTarget.checked )
+    if (event.currentTarget.checked == true) {
+      setLabelFeatureName("")
+    setDisableLabelFeature(true)
+    } else {
+      setDisableLabelFeature(false)
+    }
+  }
+  
   return (
     <div className="w-full h-screen">
 
@@ -276,6 +285,7 @@ function Home ()
                 onChange={ ( value ) => setLabelFeatureName( value as string ) }
                 onClear={ () => setLabelFeatureName( "" ) }
                 clearable={ true }
+                disabled = {disableLabelFeature}
               />
               ) : null }
 
@@ -301,7 +311,7 @@ function Home ()
                 label="Show Uncertanties"
                 style={ { marginBottom: "6px" } }
                 checked={ showUncertanties }
-                onChange={ ( event ) => setShowUncertanties( event.currentTarget.checked ) }
+                onChange={ ( event ) => handleShowUncertanties(event) }
               /> ) : null }
 
 

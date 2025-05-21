@@ -78,7 +78,7 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
 {
   const { indexes, featureData, featureType, labelData, label_dict, outliers, scores, columns, dimensions } = props
 
-  const itemSize = 280;
+  const itemSize = 310;
   const totalItems = featureData.length;
   const setHoverIndex = useStore( ( state ) => state.setHoverIndex )
   const colorMap = useStore( ( state ) => state.colorMap )
@@ -119,7 +119,7 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
       columnWidth={ itemSize }
       height={ dimensions ? dimensions.height : 600 }
       rowCount={ rowCount }
-      rowHeight={ itemSize }
+      rowHeight={ itemSize + itemSize * 0.08}
       width={ dimensions ? dimensions.width - dimensions.width*0.08 : columnCount * itemSize }
      
     >

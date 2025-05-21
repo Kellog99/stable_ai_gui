@@ -32,7 +32,7 @@ import classes from './AppNavbarDataQuality.module.css';
 import RouterButton from "@/components/client/buttons/RouterButton";
 import useStore from "@/store/dsStore";
 import { IsFeaturePresent } from "@/functionalities/Utils";
-import Dataset from "@/interfaces/DatasetInterface";
+import Dataset, { FeatureDTO } from "@/interfaces/DatasetInterface";
 import { embedding_type } from "@/properties/types";
 
 
@@ -86,21 +86,39 @@ function AppNavbarDataQuality ()
         router.push( `/pages/dataquality/metrics?${params.toString()}` );
     };
 
+    const usePrevious = ( value: FeatureDTO[] | null ) =>
+    {
+        const ref = React.useRef( value );
+        React.useEffect( () =>
+        {
+            ref.current = value;
+        } );
+        return ref.current;
+    };
+
+    const previousFeatures = usePrevious( datasetUsed?.features as FeatureDTO[] );
+
+
     useEffect( () =>
     {
-        console.log( "previous:", previousValue.current )
+        console.log( "previous:", previousFeatures )
         console.log( "current:", datasetUsed )
-        console.log( "equals??", previousValue.current !== datasetUsed )
-        if ( previousValue.current !== datasetUsed ) {
-            if ( !previousValue.current )
-                console.log( "sono qui " )
-            setShowNotification( false )
-            setShowNotification( true );
-            previousValue.current = datasetUsed;
-            // Optionally auto-hide after some time
-            setTimeout( () => setShowNotification( false ), 5000 ); // hide after 3s
+        console.log( "equals??", previousFeatures !== datasetUsed?.features )
+
+        if ( datasetUsed ) {
+            if ( previousFeatures !== datasetUsed.features ) {
+                if ( previousFeatures == undefined ) {
+                    console.log( "sono qui " )
+                    return
+                }
+
+                setShowNotification( true );
+
+                setTimeout( () => setShowNotification( false ), 5000 ); // hide after 3s
+            }
         }
-    }, [ datasetUsed ] );
+
+    }, [ datasetUsed?.features ] );
 
     console.log( "shownotification", showNotification )
 
@@ -138,7 +156,7 @@ function AppNavbarDataQuality ()
 
                     <RouterButton name={ datasetUsed?.name } route={ "/pages/dataquality/datasets" }>
                         <div style={ { position: 'relative', display: 'inline-block' } }>
-                            <Indicator disabled={ !showNotification } inline color="red" offset={ 6 } size={ 11 }>
+                            {/*<Indicator disabled={ !showNotification } inline color="red" offset={ 6 } size={ 11 }>*/}
                                 <Button
                                     leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
                                     radius="xl"
@@ -147,7 +165,7 @@ function AppNavbarDataQuality ()
                                 >
                                     Dataset Description
                                 </Button>
-                            </Indicator>
+                            {/*</Indicator>*/}
                             { isDatasetUndefined ? (
                                 <Tooltip
                                     label="Choose a dataset"
