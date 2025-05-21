@@ -62,7 +62,7 @@ function Home ()
 
   const [ showUncertanties, setShowUncertanties ] = useState<boolean>( false )
   const [ areUncertanties, setAreUncertanties ] = useState<boolean>( false )
-
+  
   useEffect( () =>
   {
     if ( Array.isArray( datasetUsed?.features ) ) {
@@ -193,7 +193,7 @@ function Home ()
   console.log( "LABEL DATA:", labelData )
   console.log( "FEATURE DATA", feature )
   console.log( "FILTERED", featureData )
-
+  console.log( "UQQQQ2", showUncertanties)
 
   console.log( "indexes:", indexes )
 
@@ -353,7 +353,7 @@ function Home ()
 
                     </Flex>
 
-                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } />
+                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } show_uq={showUncertanties}/>
 
                   </div>
                 </Box>

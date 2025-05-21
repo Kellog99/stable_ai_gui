@@ -55,13 +55,14 @@ interface propsTypes
 {
   datasetName: string,
   featureName: string,
-  labelFeatureName?: string
+  labelFeatureName?: string,
+  show_uq : boolean
 }
 
 export default function ScatterPlotVisualization ( props: propsTypes )
 {
 
-
+  console.log("UQQQQQQ",props.show_uq)
   const deckRef = useRef<any>( null );
   const isDraggingRef = useRef<boolean>( false );
 
@@ -120,7 +121,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     setSelectedIndexes( [] );
     setIsLoading( true );
     try {
-      getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ) )
+      getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ), props.show_uq )
         .then( ( fetched ) =>
         {
           setData( fetched.points ); // Only set the points in setData
@@ -135,7 +136,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     catch ( error ) {
       console.log( "Failed to get data from backend" )
     }
-  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels ] );
+  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels , props.show_uq] );
 
 
   useEffect( () =>
