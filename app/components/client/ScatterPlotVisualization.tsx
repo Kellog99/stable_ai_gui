@@ -91,6 +91,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ dragStart, setDragStart ] = useState<{ x: number; y: number } | null>( null );
   const [ dragCurrent, setDragCurrent ] = useState<{ x: number; y: number } | null>( [] );
   const [ originalColors, setOriginalColors ] = useState<Map<number, [ number, number, number ]>>( new Map() );
+  const setUqColors = useStore((state) => state.setUqColors)
+  const uqColors = useStore((state) => state.uqColors)
+
   const [ contextMenu, setContextMenu ] = useState( { visible: false, x: 0, y: 0 } );
 
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
@@ -127,6 +130,8 @@ export default function ScatterPlotVisualization ( props: propsTypes )
           setData( fetched.points ); // Only set the points in setData
           setColorMap( fetched.color_map ); // Set colorMap separately
           setOriginalColors( new Map( fetched.points.map( ( item, index ) => [ index, item.color ] ) ) );
+          const colors = fetched.points.map(item => item.color)
+          setUqColors(colors)
         } )
         .finally( () =>
         {
@@ -138,6 +143,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
   }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels , props.show_uq] );
 
+  console.log("colorsssss", uqColors)
 
   useEffect( () =>
   {

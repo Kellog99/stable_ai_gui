@@ -3,7 +3,7 @@
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group, Checkbox } from '@mantine/core';
+import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group, Checkbox, Center } from '@mantine/core';
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
@@ -17,7 +17,7 @@ import { Rnd } from "react-rnd";
 import MovableWindow from '@/components/client/MovableWindow';
 import { Shovel } from 'lucide-react';
 import { IsFeatureBond } from '@/functionalities/Utils';
-import Dataset from '@/interfaces/DatasetInterface';
+import Dataset, { FeatureDTO } from '@/interfaces/DatasetInterface';
 
 interface Feature
 {
@@ -43,6 +43,7 @@ function Home ()
   const [ labelFeatureType, setLabelFeatureType ] = useState<any>( "" )
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
+  const [ numericFeature, setNumericFeature ] = useState<FeatureDTO | null>(null )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
   const colorMap = useStore( ( state ) => state.colorMap )
 
@@ -57,12 +58,15 @@ function Home ()
 
   const indexes = useStore( ( state ) => state.selectedIndexes );
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
+
   const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
   const dimensions = useStore( ( state ) => state.size )
 
   const [ showUncertanties, setShowUncertanties ] = useState<boolean>( false )
   const [ areUncertanties, setAreUncertanties ] = useState<boolean>( false )
-  const [disableLabelFeature, setDisableLabelFeature] = useState<boolean>(false)
+  const [uqScores, setUqScores] = useState<number[]>([])
+  const [ disableLabelFeature, setDisableLabelFeature ] = useState<boolean>( false )
+
 
   useEffect( () =>
   {
@@ -98,6 +102,28 @@ function Home ()
   }, [ searchParams ] )
 
 
+  useEffect( () => 
+  {
+    if ( showUncertanties == true ) {
+      const loadFeature = async () =>
+      {
+        try {
+          if ( datasetName ) {
+            const feature = await featureLoader( datasetName, "image_uq" );
+            console.log( "LOADING",feature );
+            setNumericFeature( feature );
+            const scores: number[] = feature.datas;
+            setUqScores(scores)
+          }
+        } catch ( error ) {
+          console.error( 'Error loading feature:', error );
+        }
+      };
+      loadFeature();
+    }
+  }, [showUncertanties] )
+
+  console.log("score extracted:", uqScores)
 
 
   useEffect( () =>
@@ -194,7 +220,7 @@ function Home ()
   console.log( "LABEL DATA:", labelData )
   console.log( "FEATURE DATA", feature )
   console.log( "FILTERED", featureData )
-  console.log( "UQQQQ2", showUncertanties)
+  console.log( "UQQQQ2", showUncertanties )
 
   console.log( "indexes:", indexes )
 
@@ -235,16 +261,17 @@ function Home ()
     );
   };
 
-  const handleShowUncertanties = (event) => {
+  const handleShowUncertanties = ( event ) =>
+  {
     setShowUncertanties( event.currentTarget.checked )
-    if (event.currentTarget.checked == true) {
-      setLabelFeatureName("")
-    setDisableLabelFeature(true)
+    if ( event.currentTarget.checked == true ) {
+      setLabelFeatureName( "" )
+      setDisableLabelFeature( true )
     } else {
-      setDisableLabelFeature(false)
+      setDisableLabelFeature( false )
     }
   }
-  
+
   return (
     <div className="w-full h-screen">
 
@@ -285,7 +312,7 @@ function Home ()
                 onChange={ ( value ) => setLabelFeatureName( value as string ) }
                 onClear={ () => setLabelFeatureName( "" ) }
                 clearable={ true }
-                disabled = {disableLabelFeature}
+                disabled={ disableLabelFeature }
               />
               ) : null }
 
@@ -311,7 +338,7 @@ function Home ()
                 label="Show Uncertanties"
                 style={ { marginBottom: "6px" } }
                 checked={ showUncertanties }
-                onChange={ ( event ) => handleShowUncertanties(event) }
+                onChange={ ( event ) => handleShowUncertanties( event ) }
               /> ) : null }
 
 
@@ -319,17 +346,26 @@ function Home ()
 
             { showUncertanties ? (
               <Box>
-                <Text size="sm" mb={ 4 }>
-                  Legend
-                </Text>
-                <Box
-                  h={ 20 }
-                  style={ {
-                    background: 'linear-gradient(to right, blue, red)',
-                    borderRadius: 4,
-                    width: "200px"
-                  } }
-                />
+                <Center>
+                  <Text size="sm" mb={ 4 }>
+                    Uncertainty
+                  </Text>
+                </Center>
+                <Box>
+                  <Box
+                    h={ 20 }
+                    mb={ 1 }
+                    style={ {
+                      background: 'linear-gradient(to right, blue, red)',
+                      borderRadius: 4,
+                      width: "200px"
+                    } }
+                  />
+                  <Flex justify="space-between" style={ { width: "200px" } }>
+                    <Text size="xs" style={ { color: "gray.600" } }>Low</Text>
+                    <Text size="xs" style={ { color: "gray.600" } }>High</Text>
+                  </Flex>
+                </Box>
               </Box> ) : null }
 
           </Flex>
@@ -363,7 +399,7 @@ function Home ()
 
                     </Flex>
 
-                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } show_uq={showUncertanties}/>
+                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } show_uq={ showUncertanties } />
 
                   </div>
                 </Box>
@@ -386,7 +422,15 @@ function Home ()
                 style={ { marginLeft: '30px', borderRadius: '12px' } }
               >
                 { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
-                  <FeatureDisplayer indexes={ indexes } featureData={ featureData } featureType={ featureType } labelData={ labelData } label_dict={ labelDict as { [ key: number ]: string } } dimensions={ dimensions } />
+                  <FeatureDisplayer 
+                    indexes={ indexes } 
+                    featureData={ featureData } 
+                    featureType={ featureType } 
+                    labelData={ labelData } 
+                    label_dict={ labelDict as { [ key: number ]: string } } 
+                    dimensions={ dimensions } 
+                    {...(showUncertanties ? { scores: uqScores } : {})}
+                    uncertainty={showUncertanties ? true : false} />
                 </div> ) : null }
               </Flex>
             </MovableWindow> ) : null }

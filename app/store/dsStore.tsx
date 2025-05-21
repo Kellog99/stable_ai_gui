@@ -19,6 +19,8 @@ interface AppState {
 
     report: Object[] | [];
     colorMap: Object | {};
+    uqColors: [number, number, number][] | null;
+
     filteredLabels: string[] | [];
     size: { width: number, height: number }
 
@@ -38,8 +40,11 @@ interface AppState {
     setIsLoadingEmbs: (isLoadingEmbs: boolean) => void;
     setReport: (report: Object[] | []) => void;
     setColorMap: (colorMap: Object | {}) => void;
+    setUqColors: (uqColors: [number, number, number][] | null) => void;
+
     setFilteredLabels: (filteredLabels: string[]| []) => void;
     setSize: (size: { width: number, height: number }) => void;
+    
   }
 
   const useStore = create<AppState>()(
@@ -62,6 +67,7 @@ interface AppState {
             colorMap: {},
             filteredLabels: [],
             size: { width: 630, height: 500 },
+            uqColors: null,
             
 
             setData: (datasetUsed) => set({ datasetUsed }),
@@ -79,6 +85,8 @@ interface AppState {
             setIsLoadingEmbs:(isLoadingEmbs: boolean) => set({isLoadingEmbs}),
             setReport:(report: Object[] | []) => set({report}),
             setColorMap: (colorMap: Object | {}) => set({colorMap}),
+            setUqColors: (uqColors: [number, number, number][] | null) => set({uqColors}),
+
             setFilteredLabels: (filteredLabels: string[] | []) => set({filteredLabels}),
             setSize: (size: { width: number, height: number }) => set({size}),
         }),
