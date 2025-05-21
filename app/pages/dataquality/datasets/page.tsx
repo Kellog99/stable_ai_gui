@@ -13,9 +13,9 @@ import Dataset, { FeatureSchema } from "@/interfaces/DatasetInterface";
 import ImageDisplayer from "@/components/server/ImageDisplayer";
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
-import { image_type, label_type, text_type } from "@/properties/types";
+import { embedding_type, image_type, label_type, text_type } from "@/properties/types";
 import { motion } from 'framer-motion'
-import { IsFeatureBond } from "@/functionalities/Utils";
+import { IsFeatureBond, IsFeaturePresent } from "@/functionalities/Utils";
 
 
 
@@ -46,6 +46,7 @@ export default function Datasets ()
   const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
   const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null )
   const [ labelDict, setLabelDict ] = useState<{ [ key: number ]: string } | null>( null )
+  const [areEmbeddings, setAreEmbeddings] = useState<boolean>(false)
 
   const barSize = 60;            // Width of each bar
   const barSpacing = 30;         // Space between each bar
@@ -190,6 +191,13 @@ export default function Datasets ()
       }
     }
   }, [ datasetUsed ] );
+
+  useEffect(() => {
+    if (datasetUsed) {
+    const embs = IsFeaturePresent(datasetUsed,embedding_type)
+    setAreEmbeddings(embs)
+    }
+  }, [datasetUsed])
 
 
   // *********************************************************************************************************************
@@ -366,16 +374,7 @@ export default function Datasets ()
             { datasetUsed?.name || "" }
           </Text>{ " " }
           is a dataset for { datasetUsed?.task || "" }.
-          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes and {datasetUsed?.n_samples} samples. You can check the protoypes{ " " }
-            { <Link
-              href={ {
-                pathname: "/pages/dataquality/prototypes",
-                query: { datasetName: datasetName }
-              } }
-              style={ { color: 'blue' } }
-            >here</Link> }. { " " }</> : <>It has {datasetUsed?.n_samples}{ " " }</> }
-            
-          { descriptions?.map( ( description, index ) => (
+          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes and {datasetUsed?.n_samples} samples.{ " " }</> : <>It has {datasetUsed?.n_samples}{ " " }</> }{ descriptions?.map( ( description, index ) => (
             <span key={ index }>{ description } </span>
           ) ) }
         </Box>

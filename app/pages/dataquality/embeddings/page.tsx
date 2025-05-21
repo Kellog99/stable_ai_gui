@@ -3,7 +3,7 @@
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group, Checkbox, Center } from '@mantine/core';
+import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group, Checkbox, Center, Paper, RingProgress } from '@mantine/core';
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
@@ -292,97 +292,191 @@ function Home ()
     <div className="w-full h-screen">
 
       <div style={ {
-        marginTop: "50px",
-        marginLeft: "100px"
+        marginTop: "30px",
+        marginLeft: "100px",
       } }>
 
         <Space h="md" />
 
 
-        <div style={ { width: '100%', position: 'relative' } }>
-
+        <div style={ { width: '100%', position: 'relative', marginBottom:"10px" } }>
           <Flex direction="row" justify="space-between">
-            <Flex
-              direction="row"
-              gap="xs"
-              align="flex-end">
+            <Group>
+              <Flex
+                direction="row"
+                gap="xs"
+                align="flex-end">
 
-              <Select
-                id="feature"
-                radius="md"
-                label="Feature"
-                placeholder="Choose feature to visualize"
-                data={ features }
-                value={ featureName }
-                onChange={ ( value ) => setFeatureName( value ) }
-                required={ true }
-              />
+                <Select
+                  id="feature"
+                  radius="md"
+                  label="Feature"
+                  placeholder="Choose feature to visualize"
+                  data={ features }
+                  value={ featureName }
+                  onChange={ ( value ) => setFeatureName( value ) }
+                  required={ true }
+                />
 
-              { featureName ? ( <Select
-                id="labelFeature"
-                radius="md"
-                label="Label Feature"
-                placeholder="Choose label"
-                data={ labelFeatures }
-                value={ labelFeatureName }
-                onChange={ ( value ) => setLabelFeatureName( value as string ) }
-                onClear={ () => setLabelFeatureName( "" ) }
-                clearable={ true }
-                disabled={ disableLabelFeature }
-              />
-              ) : null }
+                { featureName ? ( <Select
+                  id="labelFeature"
+                  radius="md"
+                  label="Label Feature"
+                  placeholder="Choose label"
+                  data={ labelFeatures }
+                  value={ labelFeatureName }
+                  onChange={ ( value ) => setLabelFeatureName( value as string ) }
+                  onClear={ () => setLabelFeatureName( "" ) }
+                  clearable={ true }
+                  disabled={ disableLabelFeature }
+                />
+                ) : null }
 
-              { labelFeatureName && labelDict ? (
+                { labelFeatureName && labelDict ? (
+                  <>
+                    <MultiSelect
+                      data={ legendData }
+                      renderOption={ renderMultiSelectOption }
+                      maxDropdownHeight={ 300 }
+                      radius="md"
+                      size='xs'
+                      label="Labels"
+                      placeholder="Choose one or more labels to visualize"
+                      value={ filteredLabels as string[] }
+                      onChange={ ( value ) => setFilteredLabels( value ) }
+                      searchable
+                      clearable
+                    />
+                  </> ) : null }
+
+                { areUncertanties ? ( <Checkbox
+                  radius="sm"
+                  label="Show Uncertanties"
+                  style={ { marginBottom: "6px" } }
+                  checked={ showUncertanties }
+                  onChange={ ( event ) => handleShowUncertanties( event ) }
+                /> ) : null }
+
+              </Flex>
+            </Group>
+
+            <Group>
+              { feature && showUncertanties ? (
                 <>
-                  <MultiSelect
-                    data={ legendData }
-                    renderOption={ renderMultiSelectOption }
-                    maxDropdownHeight={ 300 }
-                    radius="md"
-                    size='xs'
-                    label="Labels"
-                    placeholder="Choose one or more labels to visualize"
-                    value={ filteredLabels as string[] }
-                    onChange={ ( value ) => setFilteredLabels( value ) }
-                    searchable
-                    clearable
-                  />
-                </> ) : null }
+                  <Paper withBorder radius="md" p="xs">
+                    <Center style={ { marginBottom: "10px" } }>
+                      <Text fw={ 700 } size ="sm">
+                        {datasetName == "military" ? "Misclassification Task" : "Outliers Detection"}
+                      </Text>
+                    </Center>
+                    <Flex direction="row" gap="md">
+                      <Paper withBorder radius="md" p="xs">
+                        <Group>
+                          <RingProgress
+                            size={ 80 }
+                            roundCaps
+                            thickness={ 5 }
+                            sections={ [
+                              {
+                                value: datasetUsed?.name === "military" ? 94.7 : 95.5,
+                                color: "green",
+                              },
+                            ] }
+                            transitionDuration={ 1000 }
+                            label={
+                              <Text ta="center" fw={ 700 } size="sx">
+                                { datasetUsed?.name === "military" ? "94.7" : "95.5" }%
+                              </Text>
+                            }
+                          />
 
-              { areUncertanties ? ( <Checkbox
-                radius="sm"
-                label="Show Uncertanties"
-                style={ { marginBottom: "6px" } }
-                checked={ showUncertanties }
-                onChange={ ( event ) => handleShowUncertanties( event ) }
-              /> ) : null }
+                          <div>
+                            <Text size="xs" tt="uppercase" fw={ 700 }>
+                              AUROC
+                            </Text>
+                          </div>
+                        </Group>
+                      </Paper>
 
 
-            </Flex>
+                      <Paper withBorder radius="md" p="xs">
+                        <Group>
+                          <RingProgress
+                            size={ 80 }
+                            roundCaps
+                            thickness={ 5 }
+                            sections={ [
+                              {
+                                value: datasetUsed?.name === "military" ? 96.2 : 94.2,
+                                color: "green",
+                              },
+                            ] }
+                            transitionDuration={ 1000 }
+                            label={
+                              <Text ta="center" fw={ 700 } size="sm">
+                                { datasetUsed?.name === "military" ? "96.2" : "94.2" }%
+                              </Text>
+                            }
+                          />
+                          <div>
+                            <Text size="xs" tt="uppercase" fw={ 700 }>
+                              AUPR
+                            </Text>
+                          </div>
+                        </Group>
+                      </Paper>
+                      { datasetUsed?.name === "military" ? (
+                        <Paper withBorder radius="md" p="xs">
+                          <Group>
+                            <RingProgress
+                              size={ 80 }
+                              roundCaps
+                              thickness={ 5 }
+                              sections={ [ { value: 0.9909 * 100, color: "green" } ] }
+                              transitionDuration={ 1000 }
+                              label={ <Text ta="center" fw={ 700 } size="sm">{ 99.1 }%</Text> }
+                            />
+                            <div>
+                              <Text size="xs" fw={ 700 }>
+                                Accuracy
+                              </Text>
+                            </div>
+                          </Group>
+                        </Paper>
 
-            { showUncertanties ? (
-              <Box>
-                <Center>
-                  <Text size="sm" mb={ 4 }>
-                    Uncertainty
-                  </Text>
-                </Center>
+                      ) : null }
+
+                    </Flex>
+                  </Paper>
+                </>
+              ) : null }
+            </Group>
+
+            <Group>
+              { showUncertanties ? (
                 <Box>
-                  <Box
-                    h={ 20 }
-                    mb={ 1 }
-                    style={ {
-                      background: 'linear-gradient(to right, blue, yellow)',
-                      borderRadius: 4,
-                      width: "200px"
-                    } }
-                  />
-                  <Flex justify="space-between" style={ { width: "200px" } }>
-                    <Text size="xs" style={ { color: "gray.600" } }>Low</Text>
-                    <Text size="xs" style={ { color: "gray.600" } }>High</Text>
-                  </Flex>
-                </Box>
-              </Box> ) : null }
+                  <Center>
+                    <Text size="sm" mb={ 4 }>
+                      Uncertainty
+                    </Text>
+                  </Center>
+                  <Box>
+                    <Box
+                      h={ 20 }
+                      mb={ 1 }
+                      style={ {
+                        background: 'linear-gradient(to right, blue, yellow)',
+                        borderRadius: 4,
+                        width: "200px"
+                      } }
+                    />
+                    <Flex justify="space-between" style={ { width: "200px" } }>
+                      <Text size="xs" style={ { color: "gray.600" } }>Low</Text>
+                      <Text size="xs" style={ { color: "gray.600" } }>High</Text>
+                    </Flex>
+                  </Box>
+                </Box> ) : null }
+            </Group>
 
           </Flex>
 
