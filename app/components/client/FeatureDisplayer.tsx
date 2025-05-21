@@ -172,7 +172,7 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
                 { ...( labelData ? { label: labelData[ index ] } : {} ) }
                 { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }
                 { ...( outliers ? { outlier: outliers[ index ] } : {} ) }
-                { ...( scores ? { score: scores[indexes[ index ]] } : {} ) }
+                { ...( scores ? { score: scores[ index ] } : {} ) }
               />
             ) }
           </div>
