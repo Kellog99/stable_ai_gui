@@ -356,7 +356,7 @@ function Home ()
                     h={ 20 }
                     mb={ 1 }
                     style={ {
-                      background: 'linear-gradient(to right, blue, red)',
+                      background: 'linear-gradient(to right, blue, yellow)',
                       borderRadius: 4,
                       width: "200px"
                     } }
