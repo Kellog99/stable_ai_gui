@@ -1,0 +1,5 @@
+export const image_type = "IMAGE_FEATURE"
+export const text_type = "TEXT_FEATURE"
+export const label_type = "LABEL_FEATURE"
+export const embedding_type = "EMBEDDING_FEATURE"
+export const numberic_type = "NUMERIC_FEATURE"

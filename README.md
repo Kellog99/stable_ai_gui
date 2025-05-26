@@ -1,2 +1,5 @@
-# data-quality_gui
-The GUI for the data-quality project
+# Mantine Next Template
+
+Get started with the template by clicking `Use this template` button on the top of the page.
+
+[Documentation](https://mantine.dev/guides/next/)
