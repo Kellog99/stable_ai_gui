@@ -1,6 +1,6 @@
 "use client";
 
-import { Accordion, Box, Text, Space, Button, Divider, Paper, Flex, Blockquote } from "@mantine/core";
+import { Accordion, Box, Text, Button, Divider, Flex, Blockquote } from "@mantine/core";
 import classes from './page.module.css'
 import { useRouter, useSearchParams } from 'next/navigation';
 import useStore from '../../../store/dsStore';
@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import Config from "@/components/client/metrics/Config";
 import { IconInfoCircle } from '@tabler/icons-react';
 import MetricsAddedDisplayer from "@/components/client/metrics/displayer/MetricsAddedDisplayer";
-import RouterButton from "@/components/client/buttons/RouterButton";
 
 export default function Metrics ()
 {

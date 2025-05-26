@@ -70,7 +70,7 @@ interface AppState {
             report: [],
             colorMap: {},
             filteredLabels: [],
-            size: { width: 630, height: 500 },
+            size: { width: 690, height: 500 },
             uqColors: null,
             
 

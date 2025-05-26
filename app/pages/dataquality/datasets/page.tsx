@@ -1,16 +1,14 @@
 "use client";
-import RouterButton from "@/components/client/buttons/RouterButton";
-import { Box, CloseButton, Flex, Text, Textarea } from "@mantine/core";
+
+import { Box, CloseButton, Flex, Text } from "@mantine/core";
 import { BarChart } from '@mantine/charts';
 import '@mantine/charts/styles.css';
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react"
 import classes from './page.module.css'
 import useStore from '@/store/dsStore';
 import SchemaShower from "@/components/client/SchemaShower";
 import Dataset, { FeatureSchema } from "@/interfaces/DatasetInterface";
-import ImageDisplayer from "@/components/server/ImageDisplayer";
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { embedding_type, image_type, label_type, text_type } from "@/properties/types";
@@ -46,15 +44,12 @@ export default function Datasets ()
   const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
   const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null )
   const [ labelDict, setLabelDict ] = useState<{ [ key: number ]: string } | null>( null )
-  const [areEmbeddings, setAreEmbeddings] = useState<boolean>(false)
+  const [ areEmbeddings, setAreEmbeddings ] = useState<boolean>( false )
 
   const barSize = 60;            // Width of each bar
   const barSpacing = 30;         // Space between each bar
   const numberOfBars = labelToSamples.length;
   const chartWidth = numberOfBars * ( barSize + barSpacing );
-
-  const containerWidth = 800; // for example
-  const availableWidth = containerWidth - 30;
 
 
   const datasets = useStore( ( state ) => ( state.datasets ) )
@@ -86,8 +81,6 @@ export default function Datasets ()
   console.log( "datasetUsed:", datasetUsed )
 
 
-
-
   useEffect( () =>
   {
     if ( datasetUsed ) {
@@ -112,11 +105,11 @@ export default function Datasets ()
         const featuresDescriptions = datasetUsed.features.map( ( { description } ) => ( {
           description
         } ) );
-        const filtered = featuresDescriptions
-          .map( ( { description } ) => description )
-          .filter( ( desc ) => desc !== null && desc !== undefined );
 
-        // Append feature descriptions to allDescriptions
+        const filtered: string[] = featuresDescriptions
+          .map( ( { description } ) => description )
+          .filter( ( desc ): desc is string => typeof desc === 'string' );
+
         allDescriptions.push( ...filtered );
         setDescriptions( allDescriptions );
 
@@ -133,20 +126,20 @@ export default function Datasets ()
         try {
           if ( datasetName && featureToDisplay ) {
             const featureLoaded = await featureLoader( datasetName, featureToDisplay );
-            
+
             if ( featureLoaded.type === image_type || featureLoaded.type === text_type ) {
               setFeature( featureLoaded );
               setFeatureType( featureLoaded.type )
-              if (labelFeature && !IsFeatureBond(datasetUsed as Dataset, featureLoaded?.name as string, labelFeature.type, labelFeature.name)) {
-                setLabelFeature(null)
+              if ( labelFeature && !IsFeatureBond( datasetUsed as Dataset, featureLoaded?.name as string, labelFeature.type, labelFeature.name ) ) {
+                setLabelFeature( null )
               }
             } else if ( featureLoaded.type === label_type ) {
-               if (IsFeatureBond(datasetUsed as Dataset, feature?.name as string, featureLoaded.type, featureLoaded.name)) {
+              if ( IsFeatureBond( datasetUsed as Dataset, feature?.name as string, featureLoaded.type, featureLoaded.name ) ) {
                 setLabelFeature( featureLoaded )
                 if ( featureLoaded && featureLoaded.label_dict ) {
-                setLabelDict( featureLoaded.label_dict )
+                  setLabelDict( featureLoaded.label_dict )
+                }
               }
-               }
             }
           }
         } catch ( error ) {
@@ -192,47 +185,16 @@ export default function Datasets ()
     }
   }, [ datasetUsed ] );
 
-  useEffect(() => {
-    if (datasetUsed) {
-    const embs = IsFeaturePresent(datasetUsed,embedding_type)
-    setAreEmbeddings(embs)
+  useEffect( () =>
+  {
+    if ( datasetUsed ) {
+      const embs = IsFeaturePresent( datasetUsed, embedding_type )
+      setAreEmbeddings( embs )
     }
-  }, [datasetUsed])
+  }, [ datasetUsed ] )
 
+  
 
-  // *********************************************************************************************************************
-
-  /*  
-      const features = [
-        { type: "IMAGE_FEATURE", name: "image", depth: 0 },
-        { type: "EMBEDDINGS_FEATURE", name: "image_embeddings", depth: 1 },
-        { type: "TEXT_FEATURE", name: "text", depth: 2 },
-        { type: "BBOX_FEATURE", name: "bbox", depth: 1 },
-        { type: "LABEL_FEATURE", name: "bbox_label", depth: 2 },
-        { type: "CROP_FEATURE", name: "image_crops", depth: 2 },
-      ];
-    
-      const connections: [ string, string ][] = [
-        [ "image", "image_embeddings" ],
-        [ "image", "bbox" ],
-        [ "image_embeddings", "text" ],
-        [ "bbox", "bbox_label" ],
-        [ "bbox", "image_crops" ],
-      ];
-    
-      const labelColorMap: Record<string, string> = {
-        image: "#FFDDC1",
-        image_crops: "#FFDDC1",
-        bbox: "#C1E1DC",
-        label: "#F7D1CD",
-        image_label: "#F7D1CD",
-        bbox_label: "#F7D1CD",
-        text: "#C1F7C1",
-        image_embeddings: "#FFABAB",
-        bbox_embeddings: "#FFABAB",
-        image_crops_embeddings: "#FFABAB",
-      };
-*/
 
   const labelColorMap: Record<string, string> = {
     image: "#FFDDC1",
@@ -270,7 +232,7 @@ export default function Datasets ()
   return (
     <div className="w-full h-screen">
       <div className="max-w-4xl mx-auto px-4">
-        
+
         <Box
           className={ classes.title }
           style={ { display: "flex", flexDirection: "column", gap: "0px" } }
@@ -279,7 +241,7 @@ export default function Datasets ()
             { datasetUsed?.name } dataset
           </h1>
         </Box>
-        
+
 
         <div style={ { display: 'flex', alignItems: 'flex-start' } }>
 
@@ -315,9 +277,9 @@ export default function Datasets ()
 
           { featureToDisplay && feature && (
             <div style={ {
-              width: '50%',        // Takes up 50% of the flex container width
-              position: 'relative', // Now works as expected within the flex layout
-              overflow: 'auto',    // Keep internal scroll if needed
+              width: '50%',        
+              position: 'relative', 
+              overflow: 'auto',  
               visibility: featureToDisplay && feature ? 'visible' : 'hidden',
               pointerEvents: featureToDisplay && feature ? 'auto' : 'none'
             } }>
@@ -374,7 +336,7 @@ export default function Datasets ()
             { datasetUsed?.name || "" }
           </Text>{ " " }
           is a dataset for { datasetUsed?.task || "" }.
-          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes and {datasetUsed?.n_samples} samples.{ " " }</> : <>It has {datasetUsed?.n_samples}{ " " }</> }{ descriptions?.map( ( description, index ) => (
+          { datasetUsed?.n_classes ? <> { " " } It has { datasetUsed?.n_classes || "" } classes and { datasetUsed?.n_samples } samples.{ " " }</> : <>It has { datasetUsed?.n_samples }{ " " }</> }{ descriptions?.map( ( description, index ) => (
             <span key={ index }>{ description } </span>
           ) ) }
         </Box>
@@ -413,7 +375,7 @@ export default function Datasets ()
                       console.log( 'Clicked bar data:', bar.label );
                     }
                   } }
-                  style={ { paddingRight: barSpacing / 2, paddingBottom: "20px"} }
+                  style={ { paddingRight: barSpacing / 2, paddingBottom: "20px" } }
                 />
               </Box>
             </Flex>

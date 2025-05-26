@@ -277,7 +277,7 @@ function Home ()
   };
 
 
-  const handleShowUncertanties = ( event ) =>
+  const handleShowUncertanties = ( event: any ) =>
   {
     setShowUncertanties( event.currentTarget.checked )
     if ( event.currentTarget.checked == true ) {
@@ -299,7 +299,7 @@ function Home ()
         <Space h="md" />
 
 
-        <div style={ { width: '100%', position: 'relative', marginBottom:"10px" } }>
+        <div style={ { width: '100%', position: 'relative', marginBottom: "10px" } }>
           <Flex direction="row" justify="space-between">
             <Group>
               <Flex
@@ -365,8 +365,8 @@ function Home ()
                 <>
                   <Paper withBorder radius="md" p="xs">
                     <Center style={ { marginBottom: "10px" } }>
-                      <Text fw={ 700 } size ="sm">
-                        {datasetName == "military" ? "Misclassification Task" : "Outliers Detection"}
+                      <Text fw={ 700 } size="sm">
+                        { datasetName == "military" ? "Misclassification Task" : "Outliers Detection" }
                       </Text>
                     </Center>
                     <Flex direction="row" gap="md">
@@ -378,14 +378,14 @@ function Home ()
                             thickness={ 5 }
                             sections={ [
                               {
-                                value: datasetUsed?.name === "military" ? 94.7 : 95.5,
+                                value: 94.7,
                                 color: "green",
                               },
                             ] }
                             transitionDuration={ 1000 }
                             label={
                               <Text ta="center" fw={ 700 } size="sx">
-                                { datasetUsed?.name === "military" ? "94.7" : "95.5" }%
+                                94.7%
                               </Text>
                             }
                           />
@@ -407,14 +407,14 @@ function Home ()
                             thickness={ 5 }
                             sections={ [
                               {
-                                value: datasetUsed?.name === "military" ? 96.2 : 94.2,
+                                value: 96.2,
                                 color: "green",
                               },
                             ] }
                             transitionDuration={ 1000 }
                             label={
                               <Text ta="center" fw={ 700 } size="sm">
-                                { datasetUsed?.name === "military" ? "96.2" : "94.2" }%
+                                96.2%
                               </Text>
                             }
                           />
@@ -425,26 +425,24 @@ function Home ()
                           </div>
                         </Group>
                       </Paper>
-                      { datasetUsed?.name === "military" ? (
-                        <Paper withBorder radius="md" p="xs">
-                          <Group>
-                            <RingProgress
-                              size={ 80 }
-                              roundCaps
-                              thickness={ 5 }
-                              sections={ [ { value: 0.9909 * 100, color: "green" } ] }
-                              transitionDuration={ 1000 }
-                              label={ <Text ta="center" fw={ 700 } size="sm">{ 99.1 }%</Text> }
-                            />
-                            <div>
-                              <Text size="xs" fw={ 700 }>
-                                Accuracy
-                              </Text>
-                            </div>
-                          </Group>
-                        </Paper>
 
-                      ) : null }
+                      <Paper withBorder radius="md" p="xs">
+                        <Group>
+                          <RingProgress
+                            size={ 80 }
+                            roundCaps
+                            thickness={ 5 }
+                            sections={ [ { value: 0.9909 * 100, color: "green" } ] }
+                            transitionDuration={ 1000 }
+                            label={ <Text ta="center" fw={ 700 } size="sm">{ 99.1 }%</Text> }
+                          />
+                          <div>
+                            <Text size="xs" fw={ 700 }>
+                              Accuracy
+                            </Text>
+                          </div>
+                        </Group>
+                      </Paper>
 
                     </Flex>
                   </Paper>
@@ -518,8 +516,6 @@ function Home ()
 
             </div>
           </Flex>
-
-
 
           { indexes.length > 0 ? (
 
