@@ -58,24 +58,27 @@ export function FeatureCard ( props: FeatureCardProps )
             { label != null ? ( labelColor ? ( <Badge color={ `rgb(${labelColor.join( "," )})` }> Class ID: { label } </Badge> ) : ( <Badge color="#ec777e"> Class ID: { label } </Badge> )
             ) : null }
           </Group>
+          <Text size="sm" c="dimmed">
+            Sample: { index }
+          </Text>
 
-          { (index || index == 0 ) && uncertainty && score && labelColor ? (<>
+          { ( index || index == 0 ) && uncertainty && score && labelColor ? ( <>
             <Group justify="space-between" mt="md" mb="xs">
-                <Badge color={ `rgb(${labelColor.join( "," )})` }>Score: { score.toFixed( 3 ) } </Badge>
+              <Badge color={ `rgb(${labelColor.join( "," )})` }> Score: { score.toFixed( 3 ) } </Badge>
             </Group>
             <Text size="sm" c="dimmed">
               Sample: { index }
             </Text>
           </>
-          
+
           ) : null }</> ) : ( outlier && score ? (
-              <>
-                <Group justify="space-between" mt="md" mb="xs">
-                  <Text fw={ 500 }>Score: { score.toFixed( 3 ) }</Text>
-                  <Badge color={ outlier == "Outlier" ? "#fa5252" : "#228be6" }>{ outlier }</Badge>
-                </Group>
-              </>
-            ) : null ) }
+            <>
+              <Group justify="space-between" mt="md" mb="xs">
+                <Text fw={ 500 }>Score: { score.toFixed( 3 ) }</Text>
+                <Badge color={ outlier == "Outlier" ? "#fa5252" : "#228be6" }>{ outlier }</Badge>
+              </Group>
+            </>
+          ) : null ) }
     </Card>
   )
 }
@@ -85,7 +88,7 @@ export function FeatureCard ( props: FeatureCardProps )
 export default function FeatureDisplayer ( props: FeatureDisplayerProps )
 {
   const { indexes, featureData, featureType, labelData, label_dict, outliers, scores, uncertainty, columns, dimensions } = props
-  
+
   const itemSize = 310;
   const totalItems = featureData.length;
   const setHoverIndex = useStore( ( state ) => state.setHoverIndex )
@@ -106,7 +109,6 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
 
       let computedColumns = Math.ceil( totalItems / computedRows );
 
-      // If columns are too wide to fit, fallback
       if ( computedColumns * itemSize > dimensions.width ) {
         computedColumns = Math.max( 1, maxPossibleColumns );
         computedRows = Math.ceil( totalItems / computedColumns );
@@ -158,10 +160,10 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
                   { ...( labelData ? { label: labelData[ index ] } : {} ) }
                   { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }
                   { ...( labelData && colorMap ? { labelColor: colorMap[ labelData[ index ] ] } : {} ) }
-                  {... (uncertainty ? {uncertainty: true}:{uncertainty: false})}
-                  {... (uncertainty ? {labelColor: uqColors[indexes[ index ]]}: null)}
+                  { ... ( uncertainty ? { uncertainty: true } : { uncertainty: false } ) }
+                  { ... ( uncertainty && uqColors ? { labelColor: uqColors[ indexes[ index ] ] } : null ) }
                   { ...( outliers ? { outlier: outliers[ index ] } : {} ) }
-                  { ...( scores ? { score: scores[indexes[ index ]] } : {} ) }
+                  { ...( scores ? { score: scores[ indexes[ index ] ] } : {} ) }
                 />
               </div>
             ) : (
