@@ -1,6 +1,5 @@
 import React, { ReactNode, useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
-import { Minus, X } from 'lucide-react';
 import { Button, Flex } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleUp, faMinus, faX } from '@fortawesome/free-solid-svg-icons';

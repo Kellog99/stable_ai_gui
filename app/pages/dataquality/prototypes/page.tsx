@@ -1,10 +1,8 @@
 "use client";
 
-import RouterButton from "@/components/client/buttons/RouterButton";
-import { Box, Button, Flex, Loader, Select, Space, Text } from "@mantine/core";
+import { Flex, Loader, Select, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import classes from './page.module.css'
 import useStore from '../../../store/dsStore';
 import { image_type, label_type, text_type } from "@/properties/types";
 import { getPrototypes } from "@/functionalities/BackendUtils";

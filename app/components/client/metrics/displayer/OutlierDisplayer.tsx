@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import
 {
@@ -15,7 +15,7 @@ import
     InteractionItem,
 } from 'chart.js';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
-import { Flex, RingProgress, Text, Image, Box, Card, Group, Badge, Button, CloseButton } from "@mantine/core";
+import { Flex, RingProgress, Text, Box, Button, CloseButton } from "@mantine/core";
 
 import { OutliersDTO } from "@/interfaces/metricsInterface";
 import { FeatureDTO } from "@/interfaces/DatasetInterface";

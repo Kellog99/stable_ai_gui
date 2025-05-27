@@ -1,6 +1,5 @@
 'use client';
-import React , {cache, Suspense, useState, useEffect} from "react";
-import { useRouter } from "next/navigation";
+import React , { Suspense } from "react";
 import Link from 'next/link'
 
 interface ClickableImageProps {

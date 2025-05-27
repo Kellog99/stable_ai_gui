@@ -4,7 +4,7 @@ import { Badge, Card, CardSection, Group, Text } from "@mantine/core";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import ImageDisplayer from "../server/ImageDisplayer";
 import TextDisplayer from "../server/TextDisplayer";
-import classes from '../../pages/dataquality/embeddings/page.module.css'
+import classes from '@/pages/dataquality/embeddings/page.module.css';
 import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
 import { useMemo } from "react";
@@ -16,7 +16,7 @@ interface FeatureCardProps
   featureType: string,
   label?: number,
   labelString?: string,
-  labelColor?: [],
+  labelColor?: number[],
   uncertainty?: boolean,
   outlier?: string,
   score?: number
@@ -95,6 +95,9 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
   const colorMap = useStore( ( state ) => state.colorMap )
   const uqColors = useStore( ( state ) => state.uqColors )
 
+
+  console.log("colorMap:", colorMap)
+  console.log("labelData", labelData)
 
   const { columnCount, rowCount } = useMemo( () =>
   {

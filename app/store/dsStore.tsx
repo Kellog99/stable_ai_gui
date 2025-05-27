@@ -20,7 +20,7 @@ interface AppState {
     isLoadingEmbs : boolean;
 
     report: Object[] | [];
-    colorMap: Object | {};
+    colorMap: Partial<Record<number, number[]>>;
     uqColors: [number, number, number][] | null;
 
     filteredLabels: string[] | [];
@@ -42,7 +42,7 @@ interface AppState {
     setAddToReport: (addToReport: boolean) => void;
     setIsLoadingEmbs: (isLoadingEmbs: boolean) => void;
     setReport: (report: Object[] | []) => void;
-    setColorMap: (colorMap: Object | {}) => void;
+    setColorMap: (colorMap: Partial<Record<number, number[]>>) => void;
     setUqColors: (uqColors: [number, number, number][] | null) => void;
 
     setFilteredLabels: (filteredLabels: string[]| []) => void;
@@ -89,7 +89,7 @@ interface AppState {
             setAddToReport:(addToReport: boolean) => set({addToReport}),
             setIsLoadingEmbs:(isLoadingEmbs: boolean) => set({isLoadingEmbs}),
             setReport:(report: Object[] | []) => set({report}),
-            setColorMap: (colorMap: Object | {}) => set({colorMap}),
+            setColorMap: (colorMap: Partial<Record<number, number[]>>) => set({colorMap}),
             setUqColors: (uqColors: [number, number, number][] | null) => set({uqColors}),
 
             setFilteredLabels: (filteredLabels: string[] | []) => set({filteredLabels}),

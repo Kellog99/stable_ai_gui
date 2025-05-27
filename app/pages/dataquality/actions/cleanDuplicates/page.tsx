@@ -1,6 +1,6 @@
 "use client";
 
-import { image_type, label_type, text_type } from '@/properties/types';
+import { image_type, text_type } from '@/properties/types';
 import { cleaner_get } from '@/properties/urls';
 import useStore from '@/store/dsStore';
 import { Alert, Box, Center, Flex, Progress, Select, Text } from '@mantine/core';

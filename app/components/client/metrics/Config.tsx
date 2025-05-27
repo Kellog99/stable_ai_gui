@@ -7,22 +7,15 @@ import { image_type, label_type, text_type } from "@/properties/types";
 import { useDisclosure } from "@mantine/hooks";
 import DuplicatesConfigs from "./DuplicatesConfig";
 import OutliersConfig from "./OutliersConfig";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import
-{
-    faCheck
-} from '@fortawesome/free-solid-svg-icons';
-import { Configs, ReportMetric } from "@/interfaces/DatasetInterface";
+
+import { ReportMetric } from "@/interfaces/DatasetInterface";
 import { IconInfoCircle } from '@tabler/icons-react';
 import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
 import { useSearchParams } from "next/navigation";
-import internal from "stream";
 import { outliers_modes } from "./utils";
 import metricsFetcher from "../../server/metricsFetcher";
 import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
-import { config } from "process";
-import { truncate } from "lodash";
 import CompletenessConfig from "./CompletenessConfig";
 import CompletenessDisplayer from "./displayer/CompletenessDisplayer";
 

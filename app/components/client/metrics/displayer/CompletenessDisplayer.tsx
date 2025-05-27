@@ -1,8 +1,8 @@
-import { getScoreColor, IsFeatureBond } from '@/functionalities/Utils';
+import { IsFeatureBond } from '@/functionalities/Utils';
 import { CompletenessDTO } from '@/interfaces/metricsInterface';
 import { BarChart } from '@mantine/charts';
 import '@mantine/charts/styles.css';
-import { Flex, RingProgress, Text } from '@mantine/core';
+import { Flex, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import FeatureDisplayer from '../../FeatureDisplayer';
 import { image_type, label_type, text_type } from '@/properties/types';

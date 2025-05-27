@@ -3,19 +3,13 @@
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group, Checkbox, Center, Paper, RingProgress } from '@mantine/core';
-import { FixedSizeGrid, GridChildComponentProps } from "react-window";
+import { Flex, Text, Box, Space, Select, MultiSelect, MultiSelectProps, Group, Checkbox, Center, Paper, RingProgress } from '@mantine/core';
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
-import LassoDrawer from '@/components/client/Lasso';
-import RouterButton from '@/components/client/buttons/RouterButton';
-import classes from './page.module.css'
-import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
-import { embedding_type, image_type, label_type, numberic_type, text_type } from '@/properties/types';
+import FeatureDisplayer from '@/components/client/FeatureDisplayer';
+import { image_type, label_type, numberic_type, text_type } from '@/properties/types';
 import { useDisclosure } from '@mantine/hooks';
-import { Rnd } from "react-rnd";
 import MovableWindow from '@/components/client/MovableWindow';
-import { Shovel } from 'lucide-react';
 import { IsFeatureBond } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/DatasetInterface';
 

@@ -1,13 +1,7 @@
 "use client";
 
-import { log } from 'console';
-import { type } from 'os';
-import { parse } from 'path';
-import { useState, useRef, useEffect, Suspense } from 'react';
-import ScatterPlotVisualization from '@/components/client/ScatterPlotVisualization';
-import { Progress, Space, Flex, Select, Text, Box, Center, Divider, Alert } from '@mantine/core';
-import { color, stagger } from 'framer-motion';
-import { size } from 'lodash';
+import { useState, useRef, useEffect } from 'react';
+import { Progress, Flex, Select, Text, Box, Center, Alert } from '@mantine/core';
 import useStore from '../../../../store/dsStore';
 import { image_type, label_type, text_type } from '@/properties/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -15,9 +9,6 @@ import
 {
   faCheck, faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
-import style from 'styled-jsx/style';
-import { send } from 'process';
-import { stringify } from 'querystring';
 import { embedder_get } from '@/properties/urls';
 import Link from "next/link";
 

@@ -11,10 +11,8 @@ import
     Text,
     Box,
     Space, Group,
-    Menu,
     Divider,
     Tooltip,
-    Indicator
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

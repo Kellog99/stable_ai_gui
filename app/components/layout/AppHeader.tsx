@@ -2,10 +2,9 @@
 import "@mantine/core/styles.css";
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useState } from "react";
+import React  from "react";
 import {
- Image, Text, Group, Burger, Button,
- Tooltip
+ Image, Text, Group, Burger, Button
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -48,11 +47,6 @@ function AppHeader() {
             {datasetUsed ? (
                 <Text><span><FontAwesomeIcon icon={ faDatabase }/></span> Dataset: {datasetUsed}</Text>
             ) : (<Text><span><FontAwesomeIcon icon={ faDatabase }/></span> No Dataset chosen</Text>)}
-            
-            {/*<Tooltip label={`${datasetUsed ? `Dataset: ${datasetUsed}` : "Choose a dataset to start"}`}>
-                <FontAwesomeIcon icon={ faDatabase }/>
-            </Tooltip>
-            */}
             </Group>
         </>
     )

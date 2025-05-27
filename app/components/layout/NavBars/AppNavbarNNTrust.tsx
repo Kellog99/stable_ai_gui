@@ -6,14 +6,12 @@ import Link from 'next/link'
 import {
     Stack,
     Button,
-    Text,
-    Box,
-    Space, Group
+    Box
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-    faHouse, faImage, faChartLine, faBolt
+    faHouse
 } from '@fortawesome/free-solid-svg-icons';
 
 function AppNavbarNNTrust() {

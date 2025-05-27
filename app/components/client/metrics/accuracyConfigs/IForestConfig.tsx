@@ -1,7 +1,7 @@
 import { useForm } from "@mantine/form";
 import useStore from '../../../../store/dsStore';
 import { useState } from "react";
-import { Box, Button, Flex, NumberInput, Slider, Switch, Text } from "@mantine/core";
+import { Box, Button, Flex, Slider, Text } from "@mantine/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {

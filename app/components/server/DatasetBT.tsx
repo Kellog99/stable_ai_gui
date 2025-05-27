@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, Card, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
+import { Card, Text, Badge, Group, Grid, CardSection, GridCol} from '@mantine/core';
 import classes from './DatasetBT.module.css';
 import Dataset from "../../interfaces/DatasetInterface"
 import ImageDisplayer from "./ImageDisplayer";

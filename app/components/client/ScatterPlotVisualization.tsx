@@ -2,15 +2,12 @@
 
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
-import { ScatterplotLayer, PointCloudLayer } from '@deck.gl/layers';
-import { log, OrbitView, project } from '@deck.gl/core';
+import { ScatterplotLayer} from '@deck.gl/layers';
 import getData, { RetrieveSamples } from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group, Slider, Alert } from '@mantine/core';
+import {Flex, Loader, Text, Textarea, CloseButton, Box, Slider, Alert } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
-import style from 'styled-jsx/style';
-import { type } from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
