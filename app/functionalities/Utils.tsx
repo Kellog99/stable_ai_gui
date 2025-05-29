@@ -25,21 +25,26 @@ export function IsFeatureBond(
     const matches: string[] = [];
 
     for (const [from, to] of dataset.edges) {
-        
+        console.log("TOOOO",from,to)
         if (from === nameFeature1) {
         const targetType = getFeatureType(to);
-
+        console.log("TARGET_TYPE",targetType)
         if (targetType === typeFeature2) {
             if (nameFeature2 === undefined) {
+             console.log("TOINT",to)
              matches.push(to);
-             return matches;
+             //return matches;
             } else if (to === nameFeature2) {
             return true; 
             }
         }
         }
     }
+    if (matches && matches.length > 0){
+      return matches
+    } else {
     return false;
+    }
     }
 
 export function IsFeaturePresent(
