@@ -2,11 +2,11 @@
 
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
-import { ScatterplotLayer} from '@deck.gl/layers';
+import { IconLayer, ScatterplotLayer } from '@deck.gl/layers';
 import getData, { RetrieveSamples } from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import {Flex, Loader, Text, Textarea, CloseButton, Box, Slider, Alert } from '@mantine/core';
+import { Flex, Loader, Text, Textarea, CloseButton, Box, Slider, Alert } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
@@ -53,7 +53,7 @@ interface propsTypes
   datasetName: string,
   featureName: string,
   labelFeatureName?: string,
-  show_uq : boolean
+  show_uq: boolean
 }
 
 export default function ScatterPlotVisualization ( props: propsTypes )
@@ -65,6 +65,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   //const [lassoMode, setLassoMode] = useState<boolean>(false);
 
   const [ data, setData ] = useState<Point[] | null>( null );
+  const [queryData, setQueryData] = useState<Point[] | null>( null );
 
   const setColorMap = useStore( ( state ) => state.setColorMap )
 
@@ -84,14 +85,14 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     zoom: -5,
   } );
   //const [ selectedPoints, setSelectedPoints ] = useState<number[]>( [] );
-  const selectedPoints = useStore((state) => state.selectedPoints)
-  const setSelectedPoints = useStore((state) => state.setSelectedPoints)
+  const selectedPoints = useStore( ( state ) => state.selectedPoints )
+  const setSelectedPoints = useStore( ( state ) => state.setSelectedPoints )
 
   const [ dragStart, setDragStart ] = useState<{ x: number; y: number } | null>( null );
   const [ dragCurrent, setDragCurrent ] = useState<{ x: number; y: number } | null>( [] );
   const [ originalColors, setOriginalColors ] = useState<Map<number, [ number, number, number ]>>( new Map() );
-  const setUqColors = useStore((state) => state.setUqColors)
-  const uqColors = useStore((state) => state.uqColors)
+  const setUqColors = useStore( ( state ) => state.setUqColors )
+  const uqColors = useStore( ( state ) => state.uqColors )
 
   const [ contextMenu, setContextMenu ] = useState( { visible: false, x: 0, y: 0 } );
 
@@ -108,6 +109,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
   const [ queryTop_k, setQueryTop_k ] = useState<number>( 10 )
 
+  const [ queries, setQueries ] = useState<string[]>( [] )
+  
+
 
 
   function getAllKeysByValues ( object, valuesList )
@@ -121,17 +125,18 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   useEffect( () =>
   {
     setSelectedIndexes( [] );
-    setSelectedPoints([])
+    setSelectedPoints( [] )
     setIsLoading( true );
     try {
-      getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ), props.show_uq )
+      getData( props.datasetName, props.featureName, props.show_uq, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ), queries )
         .then( ( fetched ) =>
         {
           setData( fetched.points ); // Only set the points in setData
           setColorMap( fetched.color_map ); // Set colorMap separately
           setOriginalColors( new Map( fetched.points.map( ( item, index ) => [ index, item.color ] ) ) );
-          const colors = fetched.points.map(item => item.color)
-          setUqColors(colors)
+          const colors = fetched.points.map( item => item.color )
+          setUqColors( colors )
+          setQueryData(fetched.query_points)
         } )
         .finally( () =>
         {
@@ -141,7 +146,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     catch ( error ) {
       console.log( "Failed to get data from backend" )
     }
-  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels , props.show_uq] );
+  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels, props.show_uq, queries] );
 
 
   useEffect( () =>
@@ -248,13 +253,14 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   {
     if ( queryRetrieve !== "" ) {
       setSelectedIndexes( [] );
-      setSelectedPoints([])
+      setSelectedPoints( [] )
 
       let loadingTimeout = setTimeout( () =>
       {
         setIsLoadingRetr( true );
       }, 500 ); // delay threshold in milliseconds
 
+      setQueries( prevQueries => [ ...prevQueries, queryRetrieve ] );
       RetrieveSamples( props.datasetName, props.featureName, queryRetrieve, queryTop_k )
         .then( ( fetched ) =>
         {
@@ -358,6 +364,34 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     },
   } );
 
+  const iconMapping = {
+    star: {
+      x: 0,
+      y: 0,
+      width: 24,
+      height: 24,
+      anchorY: 12,
+      mask: false
+    }
+  };
+
+
+  //const queryData: Point[] = [
+  //  { position: [ -100.4 + ( Math.random() - 0.5 ) * 0.2, 37.74 + ( Math.random() - 0.5 ) * 0.2 ], color: [ 255, 0, 0 ] },
+   // { position: [ 122.2 + ( Math.random() - 0.5 ) * 0.2, 37.42 + ( Math.random() - 0.5 ) * 0.2 ], color: [ 255, 0, 0 ] }
+  //];
+
+  const queryLayer = new IconLayer<Point>( {
+    id: 'icon-layer',
+    data: queryData,
+    iconAtlas: '/crosshairs-target-star.svg',
+    iconMapping,
+    getIcon: ( d: Point ) => "star",
+    getPosition: ( d: Point ) => d.position,
+    getSize: 25,
+    getColor: ( d: Point ) => d.color,
+    pickable: true
+  } );
   // Remember to include this layer in the 'layers' array passed to your <DeckGL> component.
   // Ensure the component re-renders when 'hoverIndex' changes.
 
@@ -441,7 +475,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     setSelectedPoints( selected );
     setSelectedIndexes( selected );
 
-    
+
     setDragStart( null );
     setDragCurrent( [] );
     isDraggingRef.current = false;
@@ -495,14 +529,15 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   };
 
   const menuItems = [
-  {
-    label: 'Clear indexes',
-    action: () => {
-      setSelectedIndexes([]);
-      setSelectedPoints([]);
+    {
+      label: 'Clear indexes',
+      action: () =>
+      {
+        setSelectedIndexes( [] );
+        setSelectedPoints( [] );
+      }
     }
-  }
-];
+  ];
 
 
   useEffect( () =>
@@ -611,17 +646,21 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
     typingTimeoutRef.current = setTimeout( () =>
     {
+
       setQueryRetrieve( inputValue );
       setQueryTop_k( inputTopK )
+
     }, 500 ); // adjust delay as needed
   }, [ inputValue, inputTopK ] );
 
+
+  console.log( "queries saved:", queries )
 
   useEffect( () =>
   {
     if ( queryRetrieve === "" ) {
       setSelectedIndexes( [] )
-      setSelectedPoints([])
+      setSelectedPoints( [] )
     }
   }, [ queryRetrieve ] )
 
@@ -629,13 +668,14 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   {
     setInputValue( "" );
     setSelectedIndexes( [] )
-    setSelectedPoints([])
+    setSelectedPoints( [] )
     setQueryRetrieve( "" )
   }
 
 
-console.log("INDEXES:", selectedIndexes)
-console.log("POINTS:", selectedPoints)
+  console.log( "INDEXES:", selectedIndexes )
+  console.log( "POINTS:", selectedPoints )
+  const [ hoverInfo, setHoverInfo ] = useState( null );
 
   return (
     <>
@@ -669,7 +709,7 @@ console.log("POINTS:", selectedPoints)
           icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
           style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
         >
-            Something occured while trying to get the data. Check if the embeddings are correctly loaded to the dataset. Otherwise you can compute them {" "}
+            Something occured while trying to get the data. Check if the embeddings are correctly loaded to the dataset. Otherwise you can compute them { " " }
             <Link
               href={ {
                 pathname: "/pages/dataquality/actions/embeddings",
@@ -702,7 +742,22 @@ console.log("POINTS:", selectedPoints)
                       views={ new OrthographicView( { fovy: 50 } ) }
                       viewState={ viewState }
                       onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
-                      layers={ [ layer ] }
+                      onHover={ info => setHoverInfo( info ) }
+                      getTooltip={ () =>
+                        hoverInfo && hoverInfo.object && hoverInfo.layer.id === 'icon-layer'
+                          ? {
+                            html: `<div class="custom-tooltip">Index: ${hoverInfo.index}</div>`,
+                            style: {
+                              borderRadius: '10px',
+                              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                              color: '#fff',
+                              padding: '8px',
+                              pointerEvents: 'none',
+                            }
+                          }
+                          : null
+                      }
+                      layers={ [ layer, queryLayer ] }
                       controller={
                         lassoMode ?
                           {
@@ -717,73 +772,74 @@ console.log("POINTS:", selectedPoints)
                             dragPan: true,
                             doubleClickZoom: false,
                           } }
+
                       onDragStart={ handleDragStart }
                       onDrag={ handleDrag }
                       onDragEnd={ handleDragEnd }
-                      style={ { zIndex: 100 } } />
+                      style={ { zIndex: "100" } } />
                   </div>
                 </LassoDrawer>
               </Suspense>
             </div>
 
-          {datasetUsed?.name !== "military" ? (
-            <Flex
-              direction="column"
-              align="center"
-              justify="center">
-              <Box style={ { width: "600px", marginTop: "12px" } }>
-                <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
-                <Textarea
-                  id="search-input"
-                  ref={ inputRef }
+            { datasetUsed?.name !== "military" ? (
+              <Flex
+                direction="column"
+                align="center"
+                justify="center">
+                <Box style={ { width: "600px", marginTop: "12px" } }>
+                  <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
+                  <Textarea
+                    id="search-input"
+                    ref={ inputRef }
 
-                  placeholder="Write something..."
-                  radius="md"
+                    placeholder="Write something..."
+                    radius="md"
 
-                  value={ inputValue }
-                  onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
-                  style={ {
-                    width: "100%",
-                    pointerEvents: 'auto',
-                    touchAction: 'auto',
-                    paddingRight: "6px",
-                    marginTop: "6px",
-                    zIndex: 1000
+                    value={ inputValue }
+                    onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
+                    style={ {
+                      width: "100%",
+                      pointerEvents: 'auto',
+                      touchAction: 'auto',
+                      paddingRight: "6px",
+                      marginTop: "6px",
+                      zIndex: 1000
 
-                  } }
-                  onClick={ ( e ) =>
-                  {
-                    isEventOnTextarea( e, inputRef )
-                    e.stopPropagation();
-                    e.target.focus();
-                  } }
-                  onFocus={ ( e ) => e.stopPropagation() }
-                  rightSection={
-                    <CloseButton onClick={ handleClearSearch } />
-                  }
-                />
-                { queryRetrieve !== "" ?
+                    } }
+                    onClick={ ( e ) =>
+                    {
+                      isEventOnTextarea( e, inputRef )
+                      e.stopPropagation();
+                      e.target.focus();
+                    } }
+                    onFocus={ ( e ) => e.stopPropagation() }
+                    rightSection={
+                      <CloseButton onClick={ handleClearSearch } />
+                    }
+                  />
+                  { queryRetrieve !== "" ?
 
-                  ( <>
-                    <Text size="sm" style={ { marginBottom: 0 } }>Number of best guesses</Text>
-                    <Slider
-                      defaultValue={ 10 }
-                      min={ 0 }
-                      max={ data.length }
-                      step={ 1 }
-                      marks={ [
-                        { value: 0, label: '0' },
-                        { value: data.length, label: `${data.length}` },
-                      ] }
-                      value={ inputTopK }
-                      onChange={ ( value ) => setInputTopK( value ) }
-                    /> </> ) : null }
+                    ( <>
+                      <Text size="sm" style={ { marginBottom: 0 } }>Number of best guesses</Text>
+                      <Slider
+                        defaultValue={ 10 }
+                        min={ 0 }
+                        max={ data.length }
+                        step={ 1 }
+                        marks={ [
+                          { value: 0, label: '0' },
+                          { value: data.length, label: `${data.length}` },
+                        ] }
+                        value={ inputTopK }
+                        onChange={ ( value ) => setInputTopK( value ) }
+                      /> </> ) : null }
 
-              </Box>
-              { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }
-            </Flex>
-          ) : null }
-            
+                </Box>
+                { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }
+              </Flex>
+            ) : null }
+
 
           </>
         ) }

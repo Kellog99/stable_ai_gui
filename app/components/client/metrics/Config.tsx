@@ -7,7 +7,6 @@ import { image_type, label_type, text_type } from "@/properties/types";
 import { useDisclosure } from "@mantine/hooks";
 import DuplicatesConfigs from "./DuplicatesConfig";
 import OutliersConfig from "./OutliersConfig";
-
 import { ReportMetric } from "@/interfaces/DatasetInterface";
 import { IconInfoCircle } from '@tabler/icons-react';
 import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
@@ -18,6 +17,8 @@ import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
 import CompletenessConfig from "./CompletenessConfig";
 import CompletenessDisplayer from "./displayer/CompletenessDisplayer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -467,7 +468,6 @@ export default function Config ( props: ConfigsProps )
                 direction="row"
                 justify="start"
                 gap="md">
-                {/*
                 <Button
                     onClick={ handleSaveToReport }
                     disabled={ !computed }
@@ -477,7 +477,6 @@ export default function Config ( props: ConfigsProps )
                         <span>Saved</span></> )
                         : "Save to report" }
                 </Button>
-                */}
 
                 <Button onClick={ handleClickCompute }>
                     Compute now

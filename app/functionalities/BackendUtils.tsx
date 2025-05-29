@@ -21,9 +21,8 @@ export async function getIndexes ( url: string, indexes: number[] )
 
 }
 
-
 //async function getData(datasetName: string, featureName: string, labelFeatureName: string) {
-async function getData ( datasetName: string, featureName: string, labelFeatureName?: string, label?:string[], show_uq:boolean )
+export default async function getData ( datasetName: string, featureName: string, show_uq:boolean, labelFeatureName?: string, label?:string[], queries?: string[] )
 {
   if ( labelFeatureName  ) {
     
@@ -33,6 +32,13 @@ async function getData ( datasetName: string, featureName: string, labelFeatureN
       label.forEach( lb =>
         {
             url.searchParams.append( 'label', lb );
+        } );
+    }
+
+    if (queries) {
+      queries.forEach( qr =>
+        {
+            url.searchParams.append( 'queries', qr );
         } );
     }
     
@@ -45,8 +51,16 @@ async function getData ( datasetName: string, featureName: string, labelFeatureN
     return points
     
   } else {
-    const response = await fetch( 
-      `${data_get}?datasetName=${encodeURIComponent( datasetName )}&featureName=${encodeURIComponent( featureName )}&show_uq=${encodeURIComponent(show_uq)}` );
+    const url = new URL(`${data_get}?datasetName=${encodeURIComponent( datasetName )}&featureName=${encodeURIComponent( featureName )}&show_uq=${encodeURIComponent(show_uq)}`)
+    
+    if (queries) {
+      queries.forEach( qr =>
+        {
+            url.searchParams.append( 'queries', qr );
+        } );
+    }
+
+    const response = await fetch( url );
     
       if ( !response.ok ) throw new Error( 'Failed to send files to backend' );
 
@@ -55,8 +69,6 @@ async function getData ( datasetName: string, featureName: string, labelFeatureN
 
   }
 };
-
-export default getData;
 
 
 export async function getPrototypes (datasetName: string, featureName: string, labelFeatureName: string ){
@@ -113,8 +125,6 @@ export async function getCompleteness(datasetName: string, featureName: string, 
   const completeness = await response.json();
     return completeness
 }
-
-
 
 
 export async function RetrieveSamples(datasetName: string, featureName: string, query: string, queryTop_K: number){
