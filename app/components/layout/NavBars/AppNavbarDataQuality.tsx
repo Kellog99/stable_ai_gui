@@ -621,6 +621,13 @@ function AppNavbarDataQuality ()
                         </Stack>
                     ) }
                 </Box>
+                {/*
+                <Box>
+                    <Button variant="transparent">
+                        Help
+                    </Button>
+                </Box>
+                */}
             </Stack>
         </Box>
     )

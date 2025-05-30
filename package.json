@@ -21,6 +21,7 @@
     "@mantine/hooks": "^7.17.1",
     "@tabler/icons-react": "^3.31.0",
     "@types/react": "^18.0.0",
+    "@vectopus/atlas-icons-react": "^0.0.10",
     "@xyflow/react": "^12.5.2",
     "chart.js": "^4.4.9",
     "deck.gl": "^9.1.0",
