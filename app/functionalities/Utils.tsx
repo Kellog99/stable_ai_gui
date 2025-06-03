@@ -57,5 +57,4 @@ export function IsFeaturePresent(
   } else {
     return false
   };
-  
 }

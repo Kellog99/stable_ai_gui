@@ -19,7 +19,7 @@ function Search() {
 
     return(
       <>
-        <Box style={{width:"85%"}}>
+        <Box style={{width:"90%"}}>
             <TextInput
               className={classes.search}
               radius="md"

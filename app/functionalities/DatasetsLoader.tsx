@@ -2,6 +2,8 @@
 import fs from 'fs';
 import path from 'path';
 import { datasets_get } from '../properties/urls';
+import { revalidatePath } from "next/cache";
+import fsPromises from "node:fs/promises";
 
 
 async function getDatasetFolders (): Promise<string[]>
@@ -32,7 +34,7 @@ export default async function DatasetsLoader ()
 
     const url = new URL( datasets_get );
 
-    
+
     datasetNames.forEach( datasetName =>
     {
         url.searchParams.append( 'dataset', datasetName );
@@ -49,4 +51,19 @@ export default async function DatasetsLoader ()
 
     return datasets;
 
+}
+
+export async function uploadFile ( formData: FormData )
+{
+    const file = formData.get( "file" ) as File;
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = new Uint8Array( arrayBuffer );
+
+    try {
+        await fsPromises.writeFile( `./public/${file.name}`, buffer );
+        console.log( `File ${file.name} was saved successfully.` );
+    } catch ( error ) {
+        console.error( 'Error writing file:', error );
+    }
+    revalidatePath( "/" );
 }

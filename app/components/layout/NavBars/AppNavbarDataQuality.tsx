@@ -18,7 +18,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
-    faHouse, faImage, faChartLine, faBolt, faDatabase
+    faHouse, faImage, faChartLine, faBolt, faDatabase, faCircleQuestion
 } from '@fortawesome/free-solid-svg-icons';
 import
 {
@@ -155,16 +155,16 @@ function AppNavbarDataQuality ()
 
                     <RouterButton name={ datasetUsed?.name } route={ "/pages/dataquality/datasets" }>
                         <div style={ { position: 'relative', display: 'inline-block' } }>
-                            {/*<Indicator disabled={ !showNotification } inline color="red" offset={ 6 } size={ 11 }>*/}
-                                <Button
-                                    leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
-                                    radius="xl"
-                                    variant={ isActive( "/pages/dataquality/datasets" ) ? "filled" : "subtle" }
-                                    disabled={ isDatasetUndefined }
-                                >
-                                    Dataset Description
-                                </Button>
-                            {/*</Indicator>*/}
+                            {/*<Indicator disabled={ !showNotification } inline color="red" offset={ 6 } size={ 11 }>*/ }
+                            <Button
+                                leftSection={ <FontAwesomeIcon icon={ faHouse } /> }
+                                radius="xl"
+                                variant={ isActive( "/pages/dataquality/datasets" ) ? "filled" : "subtle" }
+                                disabled={ isDatasetUndefined }
+                            >
+                                Dataset Description
+                            </Button>
+                            {/*</Indicator>*/ }
                             { isDatasetUndefined ? (
                                 <Tooltip
                                     label="Choose a dataset"
@@ -621,13 +621,21 @@ function AppNavbarDataQuality ()
                         </Stack>
                     ) }
                 </Box>
-                {/*
+
                 <Box>
-                    <Button variant="transparent">
-                        Help
-                    </Button>
+                    <RouterButton name={ datasetName } route={ "/pages/dataquality/help" }>
+                        <Button
+                            leftSection={ <FontAwesomeIcon icon={ faCircleQuestion } /> }
+                            radius="xl"
+                            variant={ isActive( "/pages/dataquality/help" ) ? "filled" : "subtle" }
+                        >
+                            <Text size="sm" fw={ 600 } c="dimmed">
+                                Help
+                            </Text>
+                        </Button>
+                    </RouterButton>
                 </Box>
-                */}
+
             </Stack>
         </Box>
     )
