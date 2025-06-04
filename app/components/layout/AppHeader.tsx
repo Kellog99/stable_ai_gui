@@ -37,11 +37,10 @@ function AppHeader() {
                 <Link href="/">
                     <Button radius={50} variant={isNNTrust ? "subtle" : "filled"}>Data Quality</Button>
                 </Link>
-                {/*
+                
                 <Link href="/pages/nntrust">
                     <Button radius={50} variant={isNNTrust ? "filled" : "subtle"}>NN Trust</Button>
                 </Link>
-                */}
             </Group>
             <Group>
             {datasetUsed ? (

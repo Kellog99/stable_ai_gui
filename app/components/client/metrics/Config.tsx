@@ -388,6 +388,7 @@ export default function Config ( props: ConfigsProps )
                             Choose a label to continue
                         </Text>
                     ) }
+                
                 </Box>
 
                 <Box style={ { position: "relative" } }>

@@ -4,7 +4,7 @@ import { Box, Button, CloseButton, Divider, FileButton, Flex, Group, Modal, Text
 import { useEffect, useState } from "react";
 import { Folder, InfoCircle, UploadArrowTray } from "@vectopus/atlas-icons-react";
 import { uploadFile } from "@/functionalities/DatasetsLoader";
-import { useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
@@ -21,23 +21,25 @@ interface UploadDatasetModalProps
 export default function UploadModal ( { opened, close }: UploadDatasetModalProps )
 {
 
+    const [ fileUpload, setFileUpload ] = useState<File | null>( null )
     const [ fileSelected, setFileSelected ] = useState( false );
     const [ fileName, setFileName ] = useState<string>( "" )
     const [ filePath, setFilePath ] = useState<string>( "" )
     const [ uploadConfigs, setUploadConfigs ] = useState<Object>( {} )
     const [ clicked, setClicked ] = useState( false )
 
-
+    const [name, extension] = fileName.split( '.' );
+    
 
     const handleFileUpload = ( file: any ) =>
     {
-        const formData = new FormData();
-        formData.append( "file", file );
         setFileName( file.name )
-        setFilePath( `/public/${file.name}` )
-        uploadFile( formData );
+        setFilePath( `/public/` )
         setFileSelected( true );
+        setFileUpload( file )
+        form.setFieldValue( 'file', file );
     }
+
 
 
     const handleCancel = () =>
@@ -49,33 +51,62 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
     const form = useForm( {
         mode: 'uncontrolled',
         initialValues: {
-            name: fileSelected ? fileName.replace( /\.[^/.]+$/, '' ) : '',
+            name: fileSelected ? name : "",
             task: "",
-            description: ""
+            description: "",
+            file: null,
+        },
+        validate: {
+            name: isNotEmpty( 'Please choose a name' ),
+            task: isNotEmpty( 'Please choose a task' ),
+            description: isNotEmpty( 'Please supply a brief description' ),
+            file: ( value ) => ( value ? null : 'Please upload a file' ),
         },
     } );
 
-    const handleSubmit = (formValues: any) => {
-    setClicked(true);
-    
 
-    const updatedFormValues = {
-        ...formValues,
-        path: filePath
+    const handleSubmit = ( formValues: any ) =>
+    {
+        
+        if ( fileUpload instanceof File ) {
+            const formData = new FormData();
+
+
+            if ( formValues.name === name ) {
+                formData.append( "file", fileUpload as File );
+                uploadFile( formData );
+            
+            } else {
+
+                const newFileName = formValues.name + "." + extension;
+                formData.append( "file", fileUpload as File, newFileName );
+                uploadFile( formData );
+            }
+
+            console.log( "formdata", formData )
+
+            setClicked( true );
+
+            console.log("path", filePath)
+            const updatedFormValues = {
+                ...formValues,
+                path: filePath
+            };
+
+            setUploadConfigs( updatedFormValues );
+
+            setTimeout( () =>
+            {
+                setClicked( false );
+            }, 3000 );
+        }
     };
-
-    setUploadConfigs(updatedFormValues);
-
-    setTimeout(() => {
-        setClicked(false);
-    }, 3000);
-};
 
 
     useEffect( () =>
     {
         if ( fileSelected ) {
-            form.setFieldValue( 'name', fileName.replace( /\.[^/.]+$/, '' ), { forceUpdate: false } );
+            form.setFieldValue( 'name', name, { forceUpdate: false } );
         } else {
             form.setFieldValue( 'name', '', { forceUpdate: false } );
         }
@@ -83,7 +114,14 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
 
 
     console.log( "upload Configs", uploadConfigs )
-    console.log( "fileSelected", fileSelected )
+
+    const handleClose = () =>
+    {
+        close()
+        setFileSelected( false )
+        form.reset()
+    }
+
 
     {/*
     useEffect( () =>
@@ -116,7 +154,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
         <>
             <Modal.Root
                 opened={ opened }
-                onClose={ close }
+                onClose={ handleClose }
 
                 radius="md"
                 centered
@@ -141,7 +179,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                                     withArrow
                                     transitionProps={ { duration: 200 } }
                                     label="Here you can upload your own dataset so you can explore and analyze it.
-                                For more information about how you should prepare your dataset, check the Help section.">
+                                    For more information about how you should prepare your dataset, check the Help section.">
                                     <InfoCircle size={ 15 } />
                                 </Tooltip>
                             </span>
@@ -151,66 +189,101 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                     </Modal.Header>
 
                     <Modal.Body>
+                        <form onSubmit={ form.onSubmit( handleSubmit ) }>
 
-                        <Flex direction="column" gap="md">
-                            <Box style={ { border: '2px dashed black', padding: '10px', marginTop: "20px" } }>
-                                <Flex direction="column" justify="center" align="center" gap="md">
+                            <Flex direction="column" gap="md">
 
-                                    { fileSelected ? (
-                                        <>
-                                            <Folder size={ 18 } />
-                                            <Flex direction="row" gap="xs" align="center">
-                                                <Text size="sm" c="dimmed">{ fileName }</Text>
-                                                <CloseButton size="xs" onClick={ handleCancel } />
-                                            </Flex>
+                                <Box
+                                    style={ ( theme ) => ( {
+                                        border: '2px dashed',
+                                        borderColor: form.errors.file ? theme.colors.red[ 6 ] : 'black',
+                                        padding: '10px',
+                                        marginTop: '20px',
+                                        '&:hover': {
+                                            borderColor: form.errors.file ? theme.colors.red[ 6 ] : 'black',
+                                            boxShadow: form.errors.file ? `0 0 0 1px ${theme.colors.red[ 6 ]}` : undefined,
+                                            transition: 'border-color 150ms ease, box-shadow 150ms ease',
+                                        },
+                                        position: 'relative',
+                                    } ) }
+                                >
 
-                                        </> ) : (
-                                        <>
-                                            <FileButton onChange={ handleFileUpload } accept="image/png,image/jpeg">
-                                                { ( props ) =>
-                                                    <Button { ...props } radius="xl" variant="light">
-                                                        <UploadArrowTray size={ 18 } />
-                                                    </Button> }
-                                            </FileButton>
-                                            <Text size="sm" c="dimmed">Drag and drop a .zip file here, or click to select</Text>
-                                        </> ) }
+                                    <Flex direction="column" justify="center" align="center" gap="md">
 
-                                </Flex>
-                            </Box>
+                                        { fileSelected ? (
+                                            <>
+                                                <Folder size={ 18 } />
+                                                <Flex direction="row" gap="xs" align="center">
+                                                    <Text size="sm" c="dimmed">{ fileName }</Text>
+                                                    <CloseButton size="xs" onClick={ handleCancel } />
+                                                </Flex>
 
-                            <form onSubmit={ form.onSubmit( handleSubmit ) }>
+                                            </> ) : (
+                                            <>
+                                                <FileButton onChange={ handleFileUpload } accept="image/png,image/jpeg">
+                                                    { ( props ) =>
+                                                        <Button { ...props } radius="xl" variant="light">
+                                                            <UploadArrowTray size={ 18 } />
+                                                        </Button> }
+                                                </FileButton>
+
+                                                <Text
+                                                    size="sm"
+
+                                                    style={ ( theme ) => ( {
+                                                        color: form.errors.file ? theme.colors.red[ 6 ] : theme.colors.gray[ 6 ],
+                                                    } ) }
+                                                >Drag and drop a .zip file here, or click to select</Text>
+                                            </> ) }
+                                    </Flex>
+                                    { form.errors.file && (
+                                        <Text
+                                            size="xs"
+                                            style={ ( theme ) => ( {
+                                                position: 'absolute',
+                                                top: '100%',
+                                                left: '70%',
+                                                marginTop: 4,
+                                                color: theme.colors.red[ 6 ],
+                                            } ) }
+                                        >{ form.errors.file }</Text>
+                                    ) }
+                                </Box>
+
+
                                 <TextInput
                                     label="Name"
                                     placeholder="Specify the name of the Dataset"
-                                    required={ true }
+                                    withAsterisk
                                     { ...form.getInputProps( 'name' ) }
                                 />
                                 <TextInput
                                     label="Task"
                                     placeholder="Specify the task of the Dataset"
-                                    required={ true }
+                                    withAsterisk
                                     { ...form.getInputProps( 'task' ) }
                                 />
                                 <TextInput
                                     label="Description"
                                     placeholder="Write a description of the Dataset"
-                                    required={ true }
+                                    withAsterisk
                                     { ...form.getInputProps( 'description' ) }
                                 />
 
-                                <Button type="submit" mt="md" onClick={ close }>
+                                <Button type="submit" mt="md" >
                                     { clicked ? ( <>
                                         <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
                                         <span>Dataset Uploaded</span></> )
                                         : "Upload" }
                                 </Button>
-                            </form>
 
-                        </Flex>
+
+                            </Flex>
+                        </form>
                     </Modal.Body>
 
                 </Modal.Content>
-            </Modal.Root>
+            </Modal.Root >
         </>
     )
 }
