@@ -1,7 +1,8 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { completeness_post, data_get, duplicates_post, outliers_post, prototypes_get, retrieve_get } from '../properties/urls';
-
+import { completeness_post, data_get, duplicates_post, outliers_post, prototypes_get, retrieve_get, upload_post } from '../properties/urls';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 export async function postIndexes ( url: string, indexes: number[] )
 {
@@ -137,4 +138,59 @@ export async function RetrieveSamples(datasetName: string, featureName: string, 
   const samples = await response.json();
     return samples
 }
+
+
+const BASE_DIRECTORY = ""; // Adjust as needed
+
+export async function copyFiles(sourceFolder: string, newFolderName?: string) {
+  const absoluteSourcePath = path.resolve(BASE_DIRECTORY, sourceFolder);
+  const absoluteDestinationPath = "/home/roberta/Desktop/Projects/data-quality_gui/public/datasets";
+
+  console.log("absolute path", absoluteSourcePath);
+
+  // Security check: ensure within base directory
+  if (!absoluteSourcePath.startsWith(BASE_DIRECTORY)) {
+    throw new Error('Invalid folder path provided. Operations are restricted to a defined base directory.');
+  }
+
+  if (sourceFolder.includes('..')) {
+    throw new Error('Folder path cannot contain ".." for security reasons.');
+  }
+
+  try {
+    // Use the new folder name if provided, otherwise use the original folder name
+    const folderName = newFolderName ?? path.basename(absoluteSourcePath);
+    const destinationPathWithFolder = path.join(absoluteDestinationPath, folderName);
+
+    // Ensure destination folder exists
+    await fs.mkdir(destinationPathWithFolder, { recursive: true });
+
+    // Copy folder and contents recursively
+    await fs.cp(absoluteSourcePath, destinationPathWithFolder, { recursive: true });
+
+    console.log(`Successfully copied ${folderName} to ${destinationPathWithFolder}`);
+    return { success: true, message: `Successfully copied folder to ${destinationPathWithFolder}` };
+  } catch (error) {
+    console.error('Error copying folder:', error);
+    return {
+      success: false,
+      message: `Failed to copy folder: ${error instanceof Error ? error.message : String(error)}`
+    };
+  }
+}
+
+
+export async function upload(configs: Object){
+  
+  const response = await fetch(`${upload_post}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, // binary content type
+    body: JSON.stringify( configs ),
+  } );
+
+  if ( !response.ok ) throw new Error( 'Failed to upload dataset' );
+  
+}
+
+
 

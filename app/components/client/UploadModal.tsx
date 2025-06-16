@@ -1,15 +1,16 @@
 "use client"
 
-import { Box, Button, CloseButton, Divider, FileButton, Flex, Group, Modal, Text, TextInput, Tooltip } from "@mantine/core";
+import { Box, Button, CloseButton, Divider, FileButton, Flex, Group, Modal, Select, Text, TextInput, Tooltip } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Folder, InfoCircle, UploadArrowTray } from "@vectopus/atlas-icons-react";
-import { uploadFile } from "@/functionalities/DatasetsLoader";
+import DatasetsLoader, { uploadFile } from "@/functionalities/DatasetsLoader";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
     faCheck
 } from '@fortawesome/free-solid-svg-icons';
+import { copyFiles, upload } from "@/functionalities/BackendUtils";
 
 
 interface UploadDatasetModalProps
@@ -21,19 +22,19 @@ interface UploadDatasetModalProps
 export default function UploadModal ( { opened, close }: UploadDatasetModalProps )
 {
 
-    const [ fileUpload, setFileUpload ] = useState<File | null>( null )
+    //const [ fileUpload, setFileUpload ] = useState<File | null>( null )
     const [ fileSelected, setFileSelected ] = useState( false );
     const [ fileName, setFileName ] = useState<string>( "" )
-    const [ filePath, setFilePath ] = useState<string>( "" )
+    //const [ filePath, setFilePath ] = useState<string>( "" )
     const [ uploadConfigs, setUploadConfigs ] = useState<Object>( {} )
     const [ clicked, setClicked ] = useState( false )
 
-    const [name, extension] = fileName.split( '.' );
-    
 
+    {/*
     const handleFileUpload = ( file: any ) =>
     {
         setFileName( file.name )
+        console.log("path", file)
         setFilePath( `/public/` )
         setFileSelected( true );
         setFileUpload( file )
@@ -47,66 +48,83 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
         setFileSelected( false )
         setFileName( "" )
     }
+        */}
 
     const form = useForm( {
         mode: 'uncontrolled',
         initialValues: {
-            name: fileSelected ? name : "",
+            filepath: "",
+            name: fileSelected ? fileName : "",
             task: "",
             description: "",
-            file: null,
+            type: "",
+            modality: ""
+
         },
         validate: {
+            filepath: isNotEmpty( 'Please choose a file path' ),
             name: isNotEmpty( 'Please choose a name' ),
             task: isNotEmpty( 'Please choose a task' ),
             description: isNotEmpty( 'Please supply a brief description' ),
-            file: ( value ) => ( value ? null : 'Please upload a file' ),
+            type: isNotEmpty( 'Please indicate the type of the ingestion you want to perform' ),
+            modality: isNotEmpty( 'Please indicate the type of the main feature' ),
+
         },
     } );
 
 
     const handleSubmit = ( formValues: any ) =>
     {
-        
-        if ( fileUpload instanceof File ) {
-            const formData = new FormData();
 
+        console.log( "filePath:", formValues )
+        const formData = new FormData();
 
-            if ( formValues.name === name ) {
-                formData.append( "file", fileUpload as File );
-                uploadFile( formData );
-            
-            } else {
+        const path = require( 'path' );
+        if ( formValues.name === path.basename( formValues.filepath ) ) {
 
-                const newFileName = formValues.name + "." + extension;
-                formData.append( "file", fileUpload as File, newFileName );
-                uploadFile( formData );
-            }
+            copyFiles( formValues.filepath )
 
-            console.log( "formdata", formData )
+        } else {
 
-            setClicked( true );
+            const newFolderName = formValues.name;
+            console.log( "filePath:", formValues.filepath )
 
-            console.log("path", filePath)
-            const updatedFormValues = {
-                ...formValues,
-                path: filePath
-            };
+            //const parentDir = path.dirname( formValues.filepath );
 
-            setUploadConfigs( updatedFormValues );
+            //const newPath = path.join( parentDir, newFolderName );
 
-            setTimeout( () =>
-            {
-                setClicked( false );
-            }, 3000 );
+            copyFiles( formValues.filepath, newFolderName )
+
+            //formData.append( "file", fileUpload as File, newFileName );
+            //uploadFile( formData );
         }
+
+        console.log( "formdata", formData )
+
+        setClicked( true );
+
+        const { filepath, ...rest } = formValues;
+        const updatedFormValues = { ...rest };
+
+        setUploadConfigs( updatedFormValues );
+
+        upload( updatedFormValues ).then( () =>
+        {
+            window.location.reload();
+        } );
+
+        setTimeout( () =>
+        {
+            setClicked( false );
+        }, 3000 );
+
     };
 
 
     useEffect( () =>
     {
         if ( fileSelected ) {
-            form.setFieldValue( 'name', name, { forceUpdate: false } );
+            form.setFieldValue( 'name', fileName, { forceUpdate: false } );
         } else {
             form.setFieldValue( 'name', '', { forceUpdate: false } );
         }
@@ -115,6 +133,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
 
     console.log( "upload Configs", uploadConfigs )
 
+
     const handleClose = () =>
     {
         close()
@@ -122,33 +141,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
         form.reset()
     }
 
-
-    {/*
-    useEffect( () =>
-    {
-        if ( !file ) return;
-
-        const uploadFile = async () =>
-        {
-            const formData = new FormData();
-            formData.append( "file", file );
-
-            try {
-                const res = await fetch( "/api/upload", {
-                    method: "POST",
-                    body: formData,
-                } );
-                if ( !res.ok ) throw new Error( "Upload failed" );
-                alert( "File uploaded successfully" );
-
-            } catch ( err ) {
-                alert( "Error uploading file" );
-            }
-        };
-
-        uploadFile();
-    }, [ file ] );
-*/}
+    console.log( "filename:", fileName )
 
     return (
         <>
@@ -191,8 +184,9 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                     <Modal.Body>
                         <form onSubmit={ form.onSubmit( handleSubmit ) }>
 
-                            <Flex direction="column" gap="md">
+                            <Flex direction="column" gap="md" style={ { marginTop: "20px" } }>
 
+                                {/*
                                 <Box
                                     style={ ( theme ) => ( {
                                         border: '2px dashed',
@@ -220,7 +214,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
 
                                             </> ) : (
                                             <>
-                                                <FileButton onChange={ handleFileUpload } accept="image/png,image/jpeg">
+                                                <FileButton onChange={ handleFileUpload } accept=".zip">
                                                     { ( props ) =>
                                                         <Button { ...props } radius="xl" variant="light">
                                                             <UploadArrowTray size={ 18 } />
@@ -249,7 +243,22 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                                         >{ form.errors.file }</Text>
                                     ) }
                                 </Box>
+                                */}
 
+                                <TextInput
+                                    label="Path"
+                                    placeholder="Specify the path of the Dataset"
+                                    withAsterisk
+                                    { ...form.getInputProps( 'filepath' ) }
+                                    onChange={ ( event ) =>
+                                    {
+                                        form.setFieldValue( 'filepath', event.currentTarget.value );
+                                        setFileSelected( true )
+
+                                        const path = require( 'path' );
+                                        setFileName( path.basename( event.currentTarget.value ) );
+                                    } }
+                                />
 
                                 <TextInput
                                     label="Name"
@@ -269,6 +278,26 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                                     withAsterisk
                                     { ...form.getInputProps( 'description' ) }
                                 />
+
+                                <Select
+                                    label="Type"
+                                    placeholder="Choose a type for ingestion"
+                                    //data={ [ "Classification", "Single Feature", "Object Detection" ] }
+                                    data={ [ "single", "class", "odetect" ] }
+                                    size="sm"
+                                    withAsterisk
+                                    { ...form.getInputProps( 'type' ) }
+                                />
+
+                                <Select
+                                    label="Modality"
+                                    placeholder="Choose a modality for ingestion"
+                                    data={ [ "image", "text" ] }
+                                    size="sm"
+                                    withAsterisk
+                                    { ...form.getInputProps( 'modality' ) }
+                                />
+
 
                                 <Button type="submit" mt="md" >
                                     { clicked ? ( <>
