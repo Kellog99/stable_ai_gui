@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { completeness_post, data_get, duplicates_post, outliers_post, prototypes_get, retrieve_get, upload_post } from '../properties/urls';
+import { completeness_post, data_get, duplicates_post, outliers_post, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -144,8 +144,7 @@ const BASE_DIRECTORY = ""; // Adjust as needed
 
 export async function copyFiles(sourceFolder: string, newFolderName?: string) {
   const absoluteSourcePath = path.resolve(BASE_DIRECTORY, sourceFolder);
-  const absoluteDestinationPath = "/home/roberta/Desktop/Projects/data-quality_gui/public/datasets";
-
+  const absoluteDestinationPath = root_folder;
   console.log("absolute path", absoluteSourcePath);
 
   // Security check: ensure within base directory

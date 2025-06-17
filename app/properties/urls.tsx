@@ -19,3 +19,6 @@ export const upload_post = "http://localhost:8000/upload"
 //export const duplicates_post = "http://10.125.34.229:5003/metrics/getDuplicates"
 //export const outliers_post = "http://10.125.34.229:5003/metrics/getOutliers"
 //export const retrieve_get = "http://10.125.34.229:5003/embeddings/retrieve"
+
+
+export const root_folder = "/home/cristiano-carta/Desktop/projects/data-quality_gui/public/datasets"
