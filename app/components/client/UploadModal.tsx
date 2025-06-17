@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, CloseButton, Divider, FileButton, Flex, Group, Modal, Select, Text, TextInput, Tooltip } from "@mantine/core";
+import { Box, Button, CloseButton, Divider, FileButton, Flex, Group, LoadingOverlay, Modal, Select, Text, TextInput, Tooltip } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Folder, InfoCircle, UploadArrowTray } from "@vectopus/atlas-icons-react";
 import DatasetsLoader, { uploadFile } from "@/functionalities/DatasetsLoader";
@@ -22,12 +22,10 @@ interface UploadDatasetModalProps
 export default function UploadModal ( { opened, close }: UploadDatasetModalProps )
 {
 
-    //const [ fileUpload, setFileUpload ] = useState<File | null>( null )
     const [ fileSelected, setFileSelected ] = useState( false );
     const [ fileName, setFileName ] = useState<string>( "" )
-    //const [ filePath, setFilePath ] = useState<string>( "" )
-    const [ uploadConfigs, setUploadConfigs ] = useState<Object>( {} )
     const [ clicked, setClicked ] = useState( false )
+    const [ reloading, setReloading ] = useState( false )
 
 
     {/*
@@ -75,10 +73,6 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
 
     const handleSubmit = ( formValues: any ) =>
     {
-
-        console.log( "filePath:", formValues )
-        const formData = new FormData();
-
         const path = require( 'path' );
         if ( formValues.name === path.basename( formValues.filepath ) ) {
 
@@ -87,31 +81,34 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
         } else {
 
             const newFolderName = formValues.name;
-            console.log( "filePath:", formValues.filepath )
-
-            //const parentDir = path.dirname( formValues.filepath );
-
-            //const newPath = path.join( parentDir, newFolderName );
 
             copyFiles( formValues.filepath, newFolderName )
 
-            //formData.append( "file", fileUpload as File, newFileName );
-            //uploadFile( formData );
         }
-
-        console.log( "formdata", formData )
 
         setClicked( true );
 
         const { filepath, ...rest } = formValues;
         const updatedFormValues = { ...rest };
 
-        setUploadConfigs( updatedFormValues );
 
+        if ( updatedFormValues.type === "Classification" ) {
+            updatedFormValues.type = "class";
+        } else if ( updatedFormValues.type === "Single Feature" ) {
+            updatedFormValues.type = "single"
+        } else if ( updatedFormValues.type === "Object Detection" ) {
+            updatedFormValues.type == "odetect"
+        }
+
+
+
+        setReloading( true )
         upload( updatedFormValues ).then( () =>
         {
+            setReloading( false )
             window.location.reload();
-        } );
+
+        } )
 
         setTimeout( () =>
         {
@@ -131,8 +128,6 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
     }, [ fileSelected, fileName ] );
 
 
-    console.log( "upload Configs", uploadConfigs )
-
 
     const handleClose = () =>
     {
@@ -140,8 +135,6 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
         setFileSelected( false )
         form.reset()
     }
-
-    console.log( "filename:", fileName )
 
     return (
         <>
@@ -182,11 +175,13 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                     </Modal.Header>
 
                     <Modal.Body>
-                        <form onSubmit={ form.onSubmit( handleSubmit ) }>
+                        <div style={ { position: "relative" } }>
+                            <LoadingOverlay visible={ reloading } zIndex={ 1000 } overlayProps={ { radius: "sm", blur: 2 } } />
+                            <form onSubmit={ form.onSubmit( handleSubmit ) }>
 
-                            <Flex direction="column" gap="md" style={ { marginTop: "20px" } }>
+                                <Flex direction="column" gap="md" style={ { marginTop: "20px" } }>
 
-                                {/*
+                                    {/*
                                 <Box
                                     style={ ( theme ) => ( {
                                         border: '2px dashed',
@@ -245,70 +240,71 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                                 </Box>
                                 */}
 
-                                <TextInput
-                                    label="Path"
-                                    placeholder="Specify the path of the Dataset"
-                                    withAsterisk
-                                    { ...form.getInputProps( 'filepath' ) }
-                                    onChange={ ( event ) =>
-                                    {
-                                        form.setFieldValue( 'filepath', event.currentTarget.value );
-                                        setFileSelected( true )
+                                    <TextInput
+                                        label="Path"
+                                        placeholder="Specify the path of the Dataset"
+                                        withAsterisk
+                                        { ...form.getInputProps( 'filepath' ) }
+                                        onChange={ ( event ) =>
+                                        {
+                                            form.setFieldValue( 'filepath', event.currentTarget.value );
+                                            setFileSelected( true )
 
-                                        const path = require( 'path' );
-                                        setFileName( path.basename( event.currentTarget.value ) );
-                                    } }
-                                />
+                                            const path = require( 'path' );
+                                            setFileName( path.basename( event.currentTarget.value ) );
+                                        } }
+                                    />
 
-                                <TextInput
-                                    label="Name"
-                                    placeholder="Specify the name of the Dataset"
-                                    withAsterisk
-                                    { ...form.getInputProps( 'name' ) }
-                                />
-                                <TextInput
-                                    label="Task"
-                                    placeholder="Specify the task of the Dataset"
-                                    withAsterisk
-                                    { ...form.getInputProps( 'task' ) }
-                                />
-                                <TextInput
-                                    label="Description"
-                                    placeholder="Write a description of the Dataset"
-                                    withAsterisk
-                                    { ...form.getInputProps( 'description' ) }
-                                />
+                                    <TextInput
+                                        label="Name"
+                                        placeholder="Specify the name of the Dataset"
+                                        withAsterisk
+                                        { ...form.getInputProps( 'name' ) }
+                                    />
+                                    <TextInput
+                                        label="Task"
+                                        placeholder="Specify the task of the Dataset"
+                                        withAsterisk
+                                        { ...form.getInputProps( 'task' ) }
+                                    />
+                                    <TextInput
+                                        label="Description"
+                                        placeholder="Write a description of the Dataset"
+                                        withAsterisk
+                                        { ...form.getInputProps( 'description' ) }
+                                    />
 
-                                <Select
-                                    label="Type"
-                                    placeholder="Choose a type for ingestion"
-                                    //data={ [ "Classification", "Single Feature", "Object Detection" ] }
-                                    data={ [ "single", "class", "odetect" ] }
-                                    size="sm"
-                                    withAsterisk
-                                    { ...form.getInputProps( 'type' ) }
-                                />
+                                    <Select
+                                        label="Type"
+                                        placeholder="Choose a type for ingestion"
+                                        data={ [ "Classification", "Single Feature", "Object Detection" ] }
+                                        //data={ [ "single", "class", "odetect" ] }
+                                        size="sm"
+                                        withAsterisk
+                                        { ...form.getInputProps( 'type' ) }
+                                    />
 
-                                <Select
-                                    label="Modality"
-                                    placeholder="Choose a modality for ingestion"
-                                    data={ [ "image", "text" ] }
-                                    size="sm"
-                                    withAsterisk
-                                    { ...form.getInputProps( 'modality' ) }
-                                />
-
-
-                                <Button type="submit" mt="md" >
-                                    { clicked ? ( <>
-                                        <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
-                                        <span>Dataset Uploaded</span></> )
-                                        : "Upload" }
-                                </Button>
+                                    <Select
+                                        label="Modality"
+                                        placeholder="Choose a modality for ingestion"
+                                        data={ [ "image", "text" ] }
+                                        size="sm"
+                                        withAsterisk
+                                        { ...form.getInputProps( 'modality' ) }
+                                    />
 
 
-                            </Flex>
-                        </form>
+                                    <Button type="submit" mt="md" >
+                                        { clicked ? ( <>
+                                            <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
+                                            <span>Dataset Uploaded</span></> )
+                                            : "Upload" }
+                                    </Button>
+
+
+                                </Flex>
+                            </form>
+                        </div>
                     </Modal.Body>
 
                 </Modal.Content>

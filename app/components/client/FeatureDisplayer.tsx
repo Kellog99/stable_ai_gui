@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge, Card, CardSection, Group, Text } from "@mantine/core";
+import { Badge, Card, CardSection, Group, Modal, Text, Image } from "@mantine/core";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import ImageDisplayer from "../server/ImageDisplayer";
 import TextDisplayer from "../server/TextDisplayer";
 import classes from '@/pages/dataquality/embeddings/page.module.css';
 import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 interface FeatureCardProps
 {
@@ -40,46 +40,102 @@ interface FeatureDisplayerProps
 export function FeatureCard ( props: FeatureCardProps )
 {
   const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty } = props
+  const [ showSection, setShowSection ] = useState( false )
 
   return (
-    <Card className={ classes.card } shadow="sm" padding="lg" radius="md" withBorder>
-      <CardSection className={ classes.cardsection }>
-        { featureType === image_type ? (
-          <ImageDisplayer className={ classes.ImageDisplayer } data={ data } alt="" />
-        ) : featureType === text_type ? (
-          <TextDisplayer className={ classes.TextDisplayer } data={ data } />
-        ) : null }
-      </CardSection>
-
-      { index || index == 0 || label || label == 0 || labelString ? (
-        <>
-          <Group justify="space-between" mt="md" mb="xs">
-            { labelString != null ? <Text fw={ 700 } size="lg">{ labelString }</Text> : null }
-            { label != null ? ( labelColor ? ( <Badge color={ `rgb(${labelColor.join( "," )})` }> Class ID: { label } </Badge> ) : ( <Badge color="#ec777e"> Class ID: { label } </Badge> )
+    <>
+      <Card className={ classes.card } shadow="sm" padding="lg" radius="md" withBorder>
+        <div onClick={ () => setShowSection( true ) } style={ { cursor: "pointer" } }>
+          <CardSection className={ classes.cardsection }>
+            { featureType === image_type ? (
+              <ImageDisplayer className={ classes.ImageDisplayer } data={ data } alt="" />
+            ) : featureType === text_type ? (
+              <TextDisplayer className={ classes.TextDisplayer } data={ data } />
             ) : null }
-          </Group>
-          <Text size="sm" c="dimmed">
-            Sample: { index }
-          </Text>
+          </CardSection>
+        </div>
 
-          { ( index || index == 0 ) && uncertainty && score && labelColor ? ( <>
+        { index || index == 0 || label || label == 0 || labelString ? (
+          <>
             <Group justify="space-between" mt="md" mb="xs">
-              <Badge color={ `rgb(${labelColor.join( "," )})` }> Score: { score.toFixed( 3 ) } </Badge>
+              { labelString != null ? <Text fw={ 700 } size="lg">{ labelString }</Text> : null }
+              { label != null ? ( labelColor ? ( <Badge color={ `rgb(${labelColor.join( "," )})` }> Class ID: { label } </Badge> ) : ( <Badge color="#ec777e"> Class ID: { label } </Badge> )
+              ) : null }
             </Group>
             <Text size="sm" c="dimmed">
               Sample: { index }
             </Text>
-          </>
 
-          ) : null }</> ) : ( outlier && score ? (
-            <>
+            { ( index || index == 0 ) && uncertainty && score && labelColor ? ( <>
               <Group justify="space-between" mt="md" mb="xs">
-                <Text fw={ 500 }>Score: { score.toFixed( 3 ) }</Text>
-                <Badge color={ outlier == "Outlier" ? "#fa5252" : "#228be6" }>{ outlier }</Badge>
+                <Badge color={ `rgb(${labelColor.join( "," )})` }> Score: { score.toFixed( 3 ) } </Badge>
               </Group>
+              <Text size="sm" c="dimmed">
+                Sample: { index }
+              </Text>
             </>
-          ) : null ) }
-    </Card>
+
+            ) : null }</> ) : ( outlier && score ? (
+              <>
+                <Group justify="space-between" mt="md" mb="xs">
+                  <Text fw={ 500 }>Score: { score.toFixed( 3 ) }</Text>
+                  <Badge color={ outlier == "Outlier" ? "#fa5252" : "#228be6" }>{ outlier }</Badge>
+                </Group>
+              </>
+            ) : null ) }
+      </Card>
+
+      <Modal
+        opened={ showSection }
+        onClose={ () => setShowSection( false ) }
+        centered
+        withCloseButton
+        overlayProps={ {
+          blur: 10,
+          backgroundOpacity: 0.4,
+        } }
+        size="auto"
+        padding="lg"
+        styles={ {
+          body: {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            height: "100%",
+          },
+        } }
+      >
+
+        { props.featureType === image_type ? (
+          <div
+            style={ {
+              width: "40vw",
+              height: "40vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "relative",
+            } }
+          >
+            <Image
+              src={ props.data }
+              alt=""
+              h={400}
+              w="auto"
+              fit="fill"
+
+            />
+          </div>
+
+        ) : props.featureType === text_type ? (
+          <div style={ { fontSize: "1.5rem", maxWidth: "80vw" } }>{ props.data }</div>
+        ) : null }
+
+      </Modal>
+
+    </>
   )
 }
 
@@ -96,8 +152,8 @@ export default function FeatureDisplayer ( props: FeatureDisplayerProps )
   const uqColors = useStore( ( state ) => state.uqColors )
 
 
-  console.log("colorMap:", colorMap)
-  console.log("labelData", labelData)
+  console.log( "colorMap:", colorMap )
+  console.log( "labelData", labelData )
 
   const { columnCount, rowCount } = useMemo( () =>
   {
