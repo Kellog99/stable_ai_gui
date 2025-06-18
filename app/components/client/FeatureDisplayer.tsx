@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Card, CardSection, Group, Modal, Text, Image } from "@mantine/core";
+import { Badge, Card, CardSection, Group, Modal, Text, Image, CloseButton } from "@mantine/core";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import ImageDisplayer from "../server/ImageDisplayer";
 import TextDisplayer from "../server/TextDisplayer";
@@ -9,8 +9,7 @@ import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
 import { useMemo, useState } from "react";
 
-interface FeatureCardProps
-{
+interface FeatureCardProps {
   index?: number,
   data: string,
   featureType: string,
@@ -22,13 +21,12 @@ interface FeatureCardProps
   score?: number
 }
 
-interface FeatureDisplayerProps
-{
+interface FeatureDisplayerProps {
   indexes?: number[],
   featureData: string[],
   featureType: string,
   labelData?: number[],
-  label_dict?: { [ key: number ]: string },
+  label_dict?: { [key: number]: string },
   outliers?: string[],
   scores?: number[],
   uncertainty?: boolean,
@@ -37,102 +35,122 @@ interface FeatureDisplayerProps
 }
 
 
-export function FeatureCard ( props: FeatureCardProps )
-{
+export function FeatureCard(props: FeatureCardProps) {
   const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty } = props
-  const [ showSection, setShowSection ] = useState( false )
+  const [showSection, setShowSection] = useState(false)
 
   return (
     <>
-      <Card className={ classes.card } shadow="sm" padding="lg" radius="md" withBorder>
-        <div onClick={ () => setShowSection( true ) } style={ { cursor: "pointer" } }>
-          <CardSection className={ classes.cardsection }>
-            { featureType === image_type ? (
-              <ImageDisplayer className={ classes.ImageDisplayer } data={ data } alt="" />
+      <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
+        <div onClick={() => setShowSection(true)} style={{ cursor: "pointer" }}>
+          <CardSection className={classes.cardsection}>
+            {featureType === image_type ? (
+              <ImageDisplayer className={classes.ImageDisplayer} data={data} alt="" />
             ) : featureType === text_type ? (
-              <TextDisplayer className={ classes.TextDisplayer } data={ data } />
-            ) : null }
+              <TextDisplayer className={classes.TextDisplayer} data={data} />
+            ) : null}
           </CardSection>
         </div>
 
-        { index || index == 0 || label || label == 0 || labelString ? (
+        {index || index == 0 || label || label == 0 || labelString ? (
           <>
             <Group justify="space-between" mt="md" mb="xs">
-              { labelString != null ? <Text fw={ 700 } size="lg">{ labelString }</Text> : null }
-              { label != null ? ( labelColor ? ( <Badge color={ `rgb(${labelColor.join( "," )})` }> Class ID: { label } </Badge> ) : ( <Badge color="#ec777e"> Class ID: { label } </Badge> )
-              ) : null }
+              {labelString != null ? <Text fw={700} size="lg">{labelString}</Text> : null}
+              {label != null ? (labelColor ? (<Badge color={`rgb(${labelColor.join(",")})`}> Class ID: {label} </Badge>) : (<Badge color="#ec777e"> Class ID: {label} </Badge>)
+              ) : null}
             </Group>
             <Text size="sm" c="dimmed">
-              Sample: { index }
+              Sample: {index}
             </Text>
 
-            { ( index || index == 0 ) && uncertainty && score && labelColor ? ( <>
+            {(index || index == 0) && uncertainty && score && labelColor ? (<>
               <Group justify="space-between" mt="md" mb="xs">
-                <Badge color={ `rgb(${labelColor.join( "," )})` }> Score: { score.toFixed( 3 ) } </Badge>
+                <Badge color={`rgb(${labelColor.join(",")})`}> Score: {score.toFixed(3)} </Badge>
               </Group>
               <Text size="sm" c="dimmed">
-                Sample: { index }
+                Sample: {index}
               </Text>
             </>
 
-            ) : null }</> ) : ( outlier && score ? (
+            ) : null}</>) : (outlier && score ? (
               <>
                 <Group justify="space-between" mt="md" mb="xs">
-                  <Text fw={ 500 }>Score: { score.toFixed( 3 ) }</Text>
-                  <Badge color={ outlier == "Outlier" ? "#fa5252" : "#228be6" }>{ outlier }</Badge>
+                  <Text fw={500}>Score: {score.toFixed(3)}</Text>
+                  <Badge color={outlier == "Outlier" ? "#fa5252" : "#228be6"}>{outlier}</Badge>
                 </Group>
               </>
-            ) : null ) }
+            ) : null)}
       </Card>
 
       <Modal
-        opened={ showSection }
-        onClose={ () => setShowSection( false ) }
+        opened={showSection}
+        onClose={() => setShowSection(false)}
         centered
-        withCloseButton
-        overlayProps={ {
+        withCloseButton={props.featureType === text_type ? true : false}
+        radius={8}
+        zIndex={1000}
+        overlayProps={{
           blur: 10,
           backgroundOpacity: 0.4,
-        } }
+        }}
         size="auto"
-        padding="lg"
-        styles={ {
+        padding={props.featureType === text_type ? "sm" : 0}
+        styles={{
           body: {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            width: "100%",
-            height: "100%",
+            maxWidth: "50vw", // Added: Limit image width
+            maxHeight: "50vh", // Added: Limit image height
           },
-        } }
+          content: {
+            overflow: "visible",
+            position: "relative",
+            padding: props.featureType === image_type ? 0 : undefined,
+            maxWidth: "50vw", // Added: Limit image width
+            maxHeight: "50vh", // Added: Limit image height
+          },
+          header: {
+            display: props.featureType === image_type ? "none" : undefined, // 'undefined' lets Mantine use its default display
+          },
+        }}
       >
-
-        { props.featureType === image_type ? (
+        {props.featureType === image_type ? (
           <div
-            style={ {
-              width: "40vw",
-              height: "40vh",
+            style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               position: "relative",
-            } }
+              maxWidth: "50vw", // Added: Limit image width
+              maxHeight: "50vh", // Added: Limit image height
+            }}
           >
-            <Image
-              src={ props.data }
-              alt=""
-              h={400}
-              w="auto"
-              fit="fill"
-
+            <Image src={props.data} alt="" fit="contain" radius={8} style={{ maxWidth: "50vw", maxHeight: "50vh" }} />
+            <CloseButton
+              onClick={() => setShowSection(false)}
+              style={{
+                position: "absolute",
+                top: 6,
+                right: 6,
+                zIndex: 1,
+              }}
+              size="md"
             />
           </div>
-
         ) : props.featureType === text_type ? (
-          <div style={ { fontSize: "1.5rem", maxWidth: "80vw" } }>{ props.data }</div>
-        ) : null }
-
+          <>
+            <Text fw={500} size="lg"
+              style={{
+                maxWidth: "60vw",
+                overflow: "auto",
+                margin: "2px",
+              }}>
+              {props.data}
+            </Text>
+          </>
+        ) : null}
       </Modal>
 
     </>
@@ -141,104 +159,101 @@ export function FeatureCard ( props: FeatureCardProps )
 
 
 
-export default function FeatureDisplayer ( props: FeatureDisplayerProps )
-{
+export default function FeatureDisplayer(props: FeatureDisplayerProps) {
   const { indexes, featureData, featureType, labelData, label_dict, outliers, scores, uncertainty, columns, dimensions } = props
 
   const itemSize = 310;
   const totalItems = featureData.length;
-  const setHoverIndex = useStore( ( state ) => state.setHoverIndex )
-  const colorMap = useStore( ( state ) => state.colorMap )
-  const uqColors = useStore( ( state ) => state.uqColors )
+  const setHoverIndex = useStore((state) => state.setHoverIndex)
+  const colorMap = useStore((state) => state.colorMap)
+  const uqColors = useStore((state) => state.uqColors)
 
 
-  console.log( "colorMap:", colorMap )
-  console.log( "labelData", labelData )
+  console.log("colorMap:", colorMap)
+  console.log("labelData", labelData)
 
-  const { columnCount, rowCount } = useMemo( () =>
-  {
-    if ( !columns && dimensions ) {
-      const maxPossibleColumns = Math.floor( dimensions.width / itemSize );
-      const maxPossibleRows = Math.floor( dimensions.height / itemSize );
+  const { columnCount, rowCount } = useMemo(() => {
+    if (!columns && dimensions) {
+      const maxPossibleColumns = Math.floor(dimensions.width / itemSize);
+      const maxPossibleRows = Math.floor(dimensions.height / itemSize);
 
-      const targetRows = Math.ceil( Math.sqrt( totalItems ) ); // key change: target row count
+      const targetRows = Math.ceil(Math.sqrt(totalItems)); // key change: target row count
 
-      let computedRows = Math.min( maxPossibleRows, targetRows );
-      computedRows = Math.max( 1, computedRows );
+      let computedRows = Math.min(maxPossibleRows, targetRows);
+      computedRows = Math.max(1, computedRows);
 
-      let computedColumns = Math.ceil( totalItems / computedRows );
+      let computedColumns = Math.ceil(totalItems / computedRows);
 
-      if ( computedColumns * itemSize > dimensions.width ) {
-        computedColumns = Math.max( 1, maxPossibleColumns );
-        computedRows = Math.ceil( totalItems / computedColumns );
+      if (computedColumns * itemSize > dimensions.width) {
+        computedColumns = Math.max(1, maxPossibleColumns);
+        computedRows = Math.ceil(totalItems / computedColumns);
       }
 
       return { columnCount: computedColumns, rowCount: computedRows };
-    } else if ( columns && !dimensions ) {
+    } else if (columns && !dimensions) {
       return {
         columnCount: columns,
-        rowCount: Math.ceil( totalItems / columns )
+        rowCount: Math.ceil(totalItems / columns)
       };
     }
 
     return { columnCount: 1, rowCount: totalItems };
-  }, [ columns, dimensions, itemSize, totalItems ] );
+  }, [columns, dimensions, itemSize, totalItems]);
 
 
   return (
     <FixedSizeGrid
-      columnCount={ columnCount }
-      columnWidth={ itemSize }
-      height={ dimensions ? dimensions.height : 600 }
-      rowCount={ rowCount }
-      rowHeight={ itemSize + itemSize * 0.08 }
-      width={ dimensions ? dimensions.width - dimensions.width * 0.08 : columnCount * itemSize }
+      columnCount={columnCount}
+      columnWidth={itemSize}
+      height={dimensions ? dimensions.height : 600}
+      rowCount={rowCount}
+      rowHeight={itemSize + itemSize * 0.08}
+      width={dimensions ? dimensions.width - dimensions.width * 0.08 : columnCount * itemSize}
 
     >
-      { ( { columnIndex, rowIndex, style }: GridChildComponentProps ) =>
-      {
+      {({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
         const index = rowIndex * columnCount + columnIndex;
-        if ( index >= featureData.length ) return null;
+        if (index >= featureData.length) return null;
         return (
-          <div style={ {
+          <div style={{
             ...style,
             background: "transparent",
             padding: '8px',
 
-          } }>
+          }}>
 
-            { indexes ? (
+            {indexes ? (
               <div
-                onMouseEnter={ () => setHoverIndex( indexes[ index ] ) }
-                onMouseLeave={ () => setHoverIndex( null ) }
+                onMouseEnter={() => setHoverIndex(indexes[index])}
+                onMouseLeave={() => setHoverIndex(null)}
               >
                 <FeatureCard
-                  data={ featureData[ index ] }
-                  featureType={ featureType }
-                  { ...( indexes ? { index: indexes[ index ] } : {} ) }
-                  { ...( labelData ? { label: labelData[ index ] } : {} ) }
-                  { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }
-                  { ...( labelData && colorMap ? { labelColor: colorMap[ labelData[ index ] ] } : {} ) }
-                  { ... ( uncertainty ? { uncertainty: true } : { uncertainty: false } ) }
-                  { ... ( uncertainty && uqColors ? { labelColor: uqColors[ indexes[ index ] ] } : null ) }
-                  { ...( outliers ? { outlier: outliers[ index ] } : {} ) }
-                  { ...( scores ? { score: scores[ indexes[ index ] ] } : {} ) }
+                  data={featureData[index]}
+                  featureType={featureType}
+                  {...(indexes ? { index: indexes[index] } : {})}
+                  {...(labelData ? { label: labelData[index] } : {})}
+                  {...(labelData && label_dict ? { labelString: label_dict[labelData[index]] } : {})}
+                  {...(labelData && colorMap ? { labelColor: colorMap[labelData[index]] } : {})}
+                  {... (uncertainty ? { uncertainty: true } : { uncertainty: false })}
+                  {... (uncertainty && uqColors ? { labelColor: uqColors[indexes[index]] } : null)}
+                  {...(outliers ? { outlier: outliers[index] } : {})}
+                  {...(scores ? { score: scores[indexes[index]] } : {})}
                 />
               </div>
             ) : (
               <FeatureCard
-                data={ featureData[ index ] }
-                featureType={ featureType }
-                { ...( indexes ? { index: indexes[ index ] } : {} ) }
-                { ...( labelData ? { label: labelData[ index ] } : {} ) }
-                { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }
-                { ...( outliers ? { outlier: outliers[ index ] } : {} ) }
-                { ...( scores ? { score: scores[ index ] } : {} ) }
+                data={featureData[index]}
+                featureType={featureType}
+                {...(indexes ? { index: indexes[index] } : {})}
+                {...(labelData ? { label: labelData[index] } : {})}
+                {...(labelData && label_dict ? { labelString: label_dict[labelData[index]] } : {})}
+                {...(outliers ? { outlier: outliers[index] } : {})}
+                {...(scores ? { score: scores[index] } : {})}
               />
-            ) }
+            )}
           </div>
         );
-      } }
+      }}
     </FixedSizeGrid>
   )
 }
