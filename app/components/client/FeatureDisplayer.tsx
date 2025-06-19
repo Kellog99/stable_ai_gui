@@ -86,7 +86,7 @@ export function FeatureCard(props: FeatureCardProps) {
         opened={showSection}
         onClose={() => setShowSection(false)}
         centered
-        withCloseButton={props.featureType === text_type ? true : false}
+        withCloseButton={featureType === text_type ? true : false}
         radius={8}
         zIndex={1000}
         overlayProps={{
@@ -94,40 +94,40 @@ export function FeatureCard(props: FeatureCardProps) {
           backgroundOpacity: 0.4,
         }}
         size="auto"
-        padding={props.featureType === text_type ? "sm" : 0}
+        padding={featureType === text_type ? "sm" : 0}
         styles={{
           body: {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            maxWidth: "50vw", // Added: Limit image width
-            maxHeight: "50vh", // Added: Limit image height
+            maxWidth: "50vw", 
+            maxHeight: "50vh"
           },
           content: {
             overflow: "visible",
             position: "relative",
-            padding: props.featureType === image_type ? 0 : undefined,
-            maxWidth: "50vw", // Added: Limit image width
-            maxHeight: "50vh", // Added: Limit image height
+            padding: featureType === image_type ? 0 : undefined,
+            maxWidth: "50vw", 
+            maxHeight: "50vh", 
           },
           header: {
-            display: props.featureType === image_type ? "none" : undefined, // 'undefined' lets Mantine use its default display
+            display: featureType === image_type ? "none" : undefined, // 'undefined' lets Mantine use its default display
           },
         }}
       >
-        {props.featureType === image_type ? (
+        {featureType === image_type ? (
           <div
             style={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
               position: "relative",
-              maxWidth: "50vw", // Added: Limit image width
-              maxHeight: "50vh", // Added: Limit image height
+              maxWidth: "50vw", 
+              maxHeight: "50vh", 
             }}
           >
-            <Image src={props.data} alt="" fit="contain" radius={8} style={{ maxWidth: "50vw", maxHeight: "50vh" }} />
+            <img src={data} alt="preview" style={{ maxWidth: "50vw", maxHeight: "50vh", borderRadius:"5px"}} />
             <CloseButton
               onClick={() => setShowSection(false)}
               style={{
@@ -147,7 +147,7 @@ export function FeatureCard(props: FeatureCardProps) {
                 overflow: "auto",
                 margin: "2px",
               }}>
-              {props.data}
+              {data}
             </Text>
           </>
         ) : null}

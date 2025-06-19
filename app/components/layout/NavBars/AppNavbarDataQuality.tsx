@@ -588,7 +588,7 @@ function AppNavbarDataQuality ()
                                                 Clean Duplicates
                                             </Text>
                                         </Button>
-                                        { isDatasetUndefined ? (
+                                        { isDatasetUndefined || !areEmbeddings? (
                                             <Tooltip
                                                 label="Choose a dataset or provide the embeddings"
                                                 radius="md"

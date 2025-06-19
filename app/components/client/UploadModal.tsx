@@ -1,6 +1,6 @@
 "use client"
 
-import { Box, Button, CloseButton, Divider, FileButton, Flex, Group, LoadingOverlay, Modal, Select, Text, TextInput, Tooltip } from "@mantine/core";
+import { Alert, Box, Button, CloseButton, Divider, FileButton, Flex, Group, LoadingOverlay, Modal, Overlay, Select, Text, TextInput, Tooltip } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Folder, InfoCircle, UploadArrowTray } from "@vectopus/atlas-icons-react";
 import DatasetsLoader, { uploadFile } from "@/functionalities/DatasetsLoader";
@@ -8,7 +8,7 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
-    faCheck
+    faCheck, faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
 import { copyFiles, upload } from "@/functionalities/BackendUtils";
 
@@ -26,6 +26,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
     const [ fileName, setFileName ] = useState<string>( "" )
     const [ clicked, setClicked ] = useState( false )
     const [ reloading, setReloading ] = useState( false )
+    const [ showError, setShowError ] = useState( false )
 
 
     {/*
@@ -108,12 +109,16 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
             setReloading( false )
             window.location.reload();
 
-        } )
-
-        setTimeout( () =>
+        } ).catch( ( error ) =>
         {
-            setClicked( false );
-        }, 3000 );
+            setReloading( false );
+            setShowError( true )
+
+            setTimeout( () =>
+            {
+                setClicked( false );
+            }, 3000 );
+        } );
 
     };
 
@@ -133,6 +138,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
     {
         close()
         setFileSelected( false )
+        setShowError( false )
         form.reset()
     }
 
@@ -177,6 +183,16 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                     <Modal.Body>
                         <div style={ { position: "relative" } }>
                             <LoadingOverlay visible={ reloading } zIndex={ 1000 } overlayProps={ { radius: "sm", blur: 2 } } />
+                            { showError ? (
+                                <Overlay blur={ 2 } center={ true } backgroundOpacity={ 0 }>
+                                    <Alert variant="filled" color="red" title="Ops!" radius="md"
+                                        withCloseButton
+                                        onClose={ () => setShowError( false ) }
+                                        style={ { zIndex: "10", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)" } }
+                                        icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }>
+                                        The dataset has already been loaded! Try upload another dataset.
+                                    </Alert> </Overlay> ) : null }
+
                             <form onSubmit={ form.onSubmit( handleSubmit ) }>
 
                                 <Flex direction="column" gap="md" style={ { marginTop: "20px" } }>

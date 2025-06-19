@@ -21,4 +21,5 @@ export const upload_post = "http://localhost:8000/upload"
 //export const retrieve_get = "http://10.125.34.229:5003/embeddings/retrieve"
 
 
-export const root_folder = "/home/cristiano-carta/Desktop/projects/data-quality_gui/public/datasets"
+//export const root_folder = "/home/cristiano-carta/Desktop/projects/data-quality_gui/public/datasets"
+export const root_folder = "/home/roberta/Desktop/Projects/data-quality_gui/public/datasets"
