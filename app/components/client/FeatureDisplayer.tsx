@@ -35,6 +35,7 @@ interface FeatureDisplayerProps {
 }
 
 
+
 export function FeatureCard(props: FeatureCardProps) {
   const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty } = props
   const [showSection, setShowSection] = useState(false)
