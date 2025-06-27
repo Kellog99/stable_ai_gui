@@ -34,7 +34,7 @@ interface FeatureDisplayerProps {
   dimensions?: { width: number, height: number }
 }
 
-
+//ciao :)
 
 export function FeatureCard(props: FeatureCardProps) {
   const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty } = props
