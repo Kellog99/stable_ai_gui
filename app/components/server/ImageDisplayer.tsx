@@ -18,7 +18,7 @@ function ImageDisplayer({ data, alt, className }: {data: string | Uint8Array | U
     return(
         <div className={className}>
             <Image
-                src={source}
+                src={"/"+source}
                 alt={alt}
                 style={{
                   paddingTop: "4px",
