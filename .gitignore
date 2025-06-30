@@ -136,3 +136,4 @@ dist
 
 # But do not ignore this specific SVG file
 !/public/crosshairs-target-star.svg
+!/public/logo_leonardo.png
