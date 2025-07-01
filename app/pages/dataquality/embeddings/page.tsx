@@ -228,7 +228,7 @@ function Home ()
 
 
   const legendData = labelDict && colorMap
-    ? Object.keys( labelDict ).map( ( key ) => ( {
+    ? Object.keys( colorMap ).map( ( key ) => ( {
       value: labelDict[ key ],
       label: labelDict[ key ],
       color: `rgb(${colorMap[ key ].join( ',' )})`,
