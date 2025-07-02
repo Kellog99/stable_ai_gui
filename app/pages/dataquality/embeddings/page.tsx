@@ -7,7 +7,7 @@ import { Flex, Text, Box, Space, Select, MultiSelect, MultiSelectProps, Group, C
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
 import FeatureDisplayer from '@/components/client/FeatureDisplayer';
-import { image_type, label_type, numberic_type, text_type } from '@/properties/types';
+import { embedding_type, image_type, label_type, numberic_type, text_type } from '@/properties/types';
 import { useDisclosure } from '@mantine/hooks';
 import MovableWindow from '@/components/client/MovableWindow';
 import { IsFeatureBond } from '@/functionalities/Utils';
@@ -37,6 +37,7 @@ function Home ()
   const [ labelFeatureType, setLabelFeatureType ] = useState<any>( "" )
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
+  const [embFeatures, setEmbFeatures] = useState<string[] | null>( null )
   const [ numericFeature, setNumericFeature ] = useState<FeatureDTO | null>( null )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
   const colorMap = useStore( ( state ) => state.colorMap )
@@ -52,9 +53,7 @@ function Home ()
 
   const indexes = useStore( ( state ) => state.selectedIndexes );
 
-
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
-
 
   const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
   const dimensions = useStore( ( state ) => state.size )
@@ -120,6 +119,17 @@ function Home ()
     }
   }, [ showUncertanties ] )
 
+  useEffect(() => {
+
+    const embsNames = IsFeatureBond(datasetUsed as Dataset, featureName, embedding_type)
+    if ( embsNames && Array.isArray(embsNames) ) {
+      setEmbFeatures( embsNames as string[] )
+    } else {
+      setEmbFeatures( null )
+    }
+
+  }, [ datasetUsed])
+
 
 
   useEffect( () =>
@@ -167,7 +177,7 @@ function Home ()
       loadFeature();
 
     }
-  }, [ labelFeatureName ] ); // Still keep indexes and featureName in the dependency array
+  }, [ labelFeatureName ] );
 
   useEffect( () =>
   {
@@ -217,6 +227,7 @@ function Home ()
 
   console.log( "indexes:", indexes )
 
+
   useEffect( () =>
   {
 
@@ -228,11 +239,14 @@ function Home ()
 
 
   const legendData = labelDict && colorMap
-    ? Object.keys( colorMap ).map( ( key ) => ( {
-      value: labelDict[ key ],
-      label: labelDict[ key ],
-      color: `rgb(${colorMap[ key ].join( ',' )})`,
-    } ) )
+    ? Object.keys( colorMap ).map( ( key ) => {
+      const numKey = Number(key);
+      return {
+        value: labelDict[ numKey ],
+        label: labelDict[ numKey ],
+        color: `rgb(${colorMap[ key ].join( ',' )})`,
+      };
+    } )
     : [];
 
   const renderMultiSelectOption: MultiSelectProps[ 'renderOption' ] = ( { option } ) =>
@@ -312,7 +326,8 @@ function Home ()
                   required={ true }
                 />
 
-                { featureName ? ( <Select
+                { featureName ? ( 
+                  <Select
                   id="labelFeature"
                   radius="md"
                   label="Label Feature"
@@ -325,6 +340,23 @@ function Home ()
                   disabled={ disableLabelFeature }
                 />
                 ) : null }
+
+                
+                {embFeatures && embFeatures.length > 0 ? (
+                  <Select
+                  id="embFeature"
+                  radius="md"
+                  label="Embedding Feature"
+                  placeholder="Choose embedding to visualize"
+                  data={ embFeatures }
+                  value={ labelFeatureName }
+                  onChange={ ( value ) => setLabelFeatureName( value as string ) }
+                  onClear={ () => setLabelFeatureName( "" ) }
+                  clearable={ true }
+                  disabled={ disableLabelFeature }
+                />
+                )
+                : null}
 
                 { labelFeatureName && labelDict ? (
                   <>

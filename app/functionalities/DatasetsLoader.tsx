@@ -25,32 +25,45 @@ async function getDatasetFolders (): Promise<string[]>
 }
 
 
+//export default async function DatasetsLoader ()
+//{
+//
+//    const datasetNames = await getDatasetFolders();
+//
+//    console.log( "FOLDER NAMES", datasetNames );
+//
+//    const url = new URL( datasets_get );
+//
+//
+//    datasetNames.forEach( datasetName =>
+//    {
+//        url.searchParams.append( 'dataset', datasetName );
+//    } );
+//
+//
+//    const response = await fetch( url );
+//
+//    if ( !response.ok ) throw new Error( 'Failed to send files to backend' );
+//
+//    const datasets = await response.json();
+//
+//    console.log( 'Server response:', datasets ); // Handle the JSON response
+//
+//    return datasets;
+//
+//}
+
+
 export default async function DatasetsLoader ()
 {
-
-    const datasetNames = await getDatasetFolders();
-
-    console.log( "FOLDER NAMES", datasetNames );
-
-    const url = new URL( datasets_get );
-
-
-    datasetNames.forEach( datasetName =>
-    {
-        url.searchParams.append( 'dataset', datasetName );
-    } );
-
-
-    const response = await fetch( url );
-
+    const response = await fetch( datasets_get );
     if ( !response.ok ) throw new Error( 'Failed to send files to backend' );
 
     const datasets = await response.json();
 
-    console.log( 'Server response:', datasets ); // Handle the JSON response
+    console.log( 'Server response:', datasets ); 
 
     return datasets;
-
 }
 
 export async function uploadFile ( formData: FormData )
