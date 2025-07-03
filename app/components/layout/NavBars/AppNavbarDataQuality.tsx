@@ -617,6 +617,46 @@ function AppNavbarDataQuality ()
                                             </Tooltip> ) : null }
                                     </div>
                                 </RouterButton>
+                                <RouterButton name={ datasetName } route={ "/pages/dataquality/actions/cropping" }>
+                                    <div style={ { position: 'relative', display: 'inline-block' } }>
+                                        <Button
+                                            radius="xl"
+                                            variant={ isActive( "/pages/dataquality/actions/cropping" ) ? "filled" : "subtle" }
+                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                        >
+                                            <Text size="sm" fw={ 600 } c="dimmed">
+                                                Cropping
+                                            </Text>
+                                        </Button>
+                                        { isDatasetUndefined ? (
+                                            <Tooltip
+                                                label="Choose a dataset"
+                                                radius="md"
+                                                withArrow
+                                                position="top"
+                                                multiline
+                                                styles={ {
+                                                    tooltip: {
+                                                        width: "200px",
+                                                        textAlign: 'center',
+                                                        lineHeight: 1.3,
+                                                    }
+                                                } }
+                                            >
+                                                <div
+                                                    style={ {
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        right: 0,
+                                                        bottom: 0,
+                                                        cursor: "not-allowed"
+                                                    } }
+                                                    aria-hidden="true"
+                                                />
+                                            </Tooltip> ) : null }
+                                    </div>
+                                </RouterButton>
                             </Box>
                         </Stack>
                     ) }
