@@ -10,7 +10,7 @@ export const retrieve_get = "http://localhost:8000/embeddings/retrieve"
 export const embedder_get = "http://localhost:8000/actions/embedder"
 export const cleaner_get = "http://localhost:8000/actions/cleaner"
 export const upload_post = "http://localhost:8000/upload"
-
+export const cropper_get = "http://localhost:8000/actions/cropper"
 //export const dataset_post = 'http://10.125.34.229:5003/process'
 //export const feature_post = 'http://10.125.34.229:5003/getFeature'
 //export const data_get = "http://10.125.34.229:5003/embeddings/getUmap"
@@ -19,7 +19,5 @@ export const upload_post = "http://localhost:8000/upload"
 //export const duplicates_post = "http://10.125.34.229:5003/metrics/getDuplicates"
 //export const outliers_post = "http://10.125.34.229:5003/metrics/getOutliers"
 //export const retrieve_get = "http://10.125.34.229:5003/embeddings/retrieve"
-
-
 //export const root_folder = "/home/cristiano-carta/Desktop/projects/data-quality_gui/public/datasets"
 export const root_folder = "/home/roberta/Desktop/Projects/data-quality_gui/public/datasets"

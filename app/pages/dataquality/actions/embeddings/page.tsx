@@ -41,7 +41,7 @@ function Home ()
     // Option 1: Pass datasets as a single comma-separated list
     url.searchParams.append( 'featureName', featureName );
     url.searchParams.append( 'datasetName', datasetUsed?.name as string );
-    url.searchParams.append( 'modelName', model )
+    url.searchParams.append( 'modelUsed', model )
     const response = await fetch( url );
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();

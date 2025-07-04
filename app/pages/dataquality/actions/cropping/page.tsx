@@ -9,7 +9,7 @@ import
 {
   faCheck, faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
-import { embedder_get } from '@/properties/urls';
+import { cropper_get } from '@/properties/urls';
 import Link from "next/link";
 
 function Home ()
@@ -19,7 +19,7 @@ function Home ()
   const [ featureName, setFeatureName ] = useState<any>("")
   const [ bboxFeatureName, setBboxFeatureName ] = useState<any>("")
   const [ features, setFeatures ] = useState<string[]>( [] )
-  const [ bboxFeatures, setBboxFeatures] = useState<[]>([])
+  const [ bboxFeatures, setBboxFeatures] = useState<string[]>([])
   const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
 
@@ -28,20 +28,22 @@ function Home ()
   const [ status, setStatus ] = useState( 'Idle' );
   const [ result, setResult ] = useState<string | null>( null );
   const [ error, setError ] = useState<string | null>( null );
+  const [ progressColor, setProgressColor] = useState<string | null>("red");
 
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const setData = useStore( ( state ) => ( state.setData ) );
 
 
-  async function ssl_crop ()
+  async function ssl_crop (bboxFeatureName : string)
   {
-    const baseUrl = embedder_get
+    const baseUrl = cropper_get
 
     const url = new URL( baseUrl );
 
     // Option 1: Pass datasets as a single comma-separated list
     url.searchParams.append( 'featureName', featureName );
     url.searchParams.append( 'datasetName', datasetUsed?.name as string );
+    url.searchParams.append( 'bboxName', bboxFeatureName);
     
     const response = await fetch( url );
     const reader = response.body?.getReader();
@@ -69,7 +71,11 @@ function Home ()
               try {
                 const jsonData = JSON.parse( line.substring( 6 ) );
                 console.log( 'Received progress update:', jsonData );
-
+                if (jsonData.type === "conversion"){
+                  setProgressColor("blue")
+                } else {
+                  setProgressColor("red")
+                }
                 // Handle the progress update
                 if ( jsonData.status === "complete" ) {
                   console.log( "Process completed:", jsonData.result );
