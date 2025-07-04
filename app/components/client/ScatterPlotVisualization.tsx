@@ -52,6 +52,7 @@ interface propsTypes
 {
   datasetName: string,
   featureName: string,
+  modelUsed?: string,
   labelFeatureName?: string,
   show_uq: boolean
 }
@@ -112,8 +113,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ queries, setQueries ] = useState<string[]>( [] )
   
 
-
-
   function getAllKeysByValues ( object, valuesList )
   {
     return valuesList.flatMap( value =>
@@ -128,7 +127,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     setSelectedPoints( [] )
     setIsLoading( true );
     try {
-      getData( props.datasetName, props.featureName, props.show_uq, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ), queries )
+      getData( props.datasetName, props.featureName, props.show_uq, props.labelFeatureName,  getAllKeysByValues( labelDict, filteredLabels as string[] ), props.modelUsed, queries )
         .then( ( fetched ) =>
         {
           setData( fetched.points ); // Only set the points in setData
@@ -146,7 +145,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     catch ( error ) {
       console.log( "Failed to get data from backend" )
     }
-  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels, props.show_uq, queries] );
+  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels, props.show_uq, queries, props.modelUsed ] );
 
 
   useEffect( () =>

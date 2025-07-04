@@ -1,17 +1,17 @@
 "use client";
 
-import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { Flex, Text, Box, Space, Select, MultiSelect, MultiSelectProps, Group, Checkbox, Center, Paper, RingProgress } from '@mantine/core';
-import featureLoader from '../../../functionalities/FeatureLoader';
-import useStore from '../../../store/dsStore';
 import FeatureDisplayer from '@/components/client/FeatureDisplayer';
-import { embedding_type, image_type, label_type, numberic_type, text_type } from '@/properties/types';
-import { useDisclosure } from '@mantine/hooks';
 import MovableWindow from '@/components/client/MovableWindow';
 import { IsFeatureBond } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/DatasetInterface';
+import { embedding_type, image_type, label_type, numberic_type, text_type } from '@/properties/types';
+import { Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Space, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
+import featureLoader from '../../../functionalities/FeatureLoader';
+import useStore from '../../../store/dsStore';
 
 interface Feature
 {
@@ -37,7 +37,8 @@ function Home ()
   const [ labelFeatureType, setLabelFeatureType ] = useState<any>( "" )
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
-  const [embFeatures, setEmbFeatures] = useState<string[] | null>( null )
+  const [ embFeatures, setEmbFeatures ] = useState<string[] | null>( null )
+  const [ modelUsed, setModelUsed ] = useState<string | "">( "" )
   const [ numericFeature, setNumericFeature ] = useState<FeatureDTO | null>( null )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
   const colorMap = useStore( ( state ) => state.colorMap )
@@ -119,16 +120,24 @@ function Home ()
     }
   }, [ showUncertanties ] )
 
-  useEffect(() => {
+  useEffect( () =>
+  {
 
-    const embsNames = IsFeatureBond(datasetUsed as Dataset, featureName, embedding_type)
-    if ( embsNames && Array.isArray(embsNames) ) {
-      setEmbFeatures( embsNames as string[] )
-    } else {
-      setEmbFeatures( null )
+    if ( datasetUsed ) {
+      const embsNames = IsFeatureBond( datasetUsed as Dataset, featureName, embedding_type )
+
+      if ( Array.isArray( datasetUsed?.features ) && Array.isArray( embsNames ) ) {
+        const extractedModels = datasetUsed.features
+          .filter( ( { name } ) => embsNames.includes( name ) )
+          .map( ( { model_name } ) => model_name );
+
+        setEmbFeatures( extractedModels as string[] )
+      } else {
+        setEmbFeatures( null )
+      }
+
     }
-
-  }, [ datasetUsed])
+  }, [ datasetUsed, featureName ] )
 
 
 
@@ -239,8 +248,9 @@ function Home ()
 
 
   const legendData = labelDict && colorMap
-    ? Object.keys( colorMap ).map( ( key ) => {
-      const numKey = Number(key);
+    ? Object.keys( colorMap ).map( ( key ) =>
+    {
+      const numKey = Number( key );
       return {
         value: labelDict[ numKey ],
         label: labelDict[ numKey ],
@@ -296,6 +306,67 @@ function Home ()
     }
   }
 
+  const renderedComponent = () => (
+    <>
+      <Flex direction="column" align="center">
+        <div style={ { position: 'relative' } }>
+          <Suspense>
+            <Box style={ { pointerEvents: 'none' } }>
+              <div style={ { pointerEvents: 'auto' } }>
+                <Flex
+                  justify="left"
+                  align="center"
+                  direction="column"
+                  wrap="wrap"
+                  style={ { width: '100%' } }
+                >
+                  { !isLoadingEmbs ? (
+                    <p>
+                      { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
+                    </p>
+                  ) : null }
+                </Flex>
+
+                <ScatterPlotVisualization
+                  datasetName={ datasetName as string }
+                  featureName={ featureName }
+                  modelUsed={ modelUsed }
+                  labelFeatureName={ labelFeatureName }
+                  show_uq={ showUncertanties }
+                />
+              </div>
+            </Box>
+          </Suspense>
+        </div>
+      </Flex>
+
+      { indexes.length > 0 ? (
+        <MovableWindow>
+          <Flex
+            mih={ 150 }
+            justify="center"
+            align="center"
+            direction="column"
+            style={ { marginLeft: '30px', borderRadius: '12px' } }
+          >
+            <div ref={ containerRef } className="h-[600px] overflow-auto">
+              <FeatureDisplayer
+                indexes={ indexes }
+                featureData={ featureData }
+                featureType={ featureType }
+                labelData={ labelData }
+                label_dict={ labelDict as { [ key: number ]: string } }
+                dimensions={ dimensions }
+                { ...( showUncertanties ? { scores: uqScores } : {} ) }
+                uncertainty={ showUncertanties }
+              />
+            </div>
+          </Flex>
+        </MovableWindow>
+      ) : null }
+    </>
+  );
+
   return (
     <div className="w-full h-screen">
 
@@ -326,37 +397,39 @@ function Home ()
                   required={ true }
                 />
 
-                { featureName ? ( 
+                { embFeatures && embFeatures.length > 1 ? (
                   <Select
-                  id="labelFeature"
-                  radius="md"
-                  label="Label Feature"
-                  placeholder="Choose label"
-                  data={ labelFeatures }
-                  value={ labelFeatureName }
-                  onChange={ ( value ) => setLabelFeatureName( value as string ) }
-                  onClear={ () => setLabelFeatureName( "" ) }
-                  clearable={ true }
-                  disabled={ disableLabelFeature }
-                />
+                    id="embFeature"
+                    radius="md"
+                    label="Embedding Feature"
+                    placeholder="Choose embedding to visualize"
+                    data={ embFeatures }
+                    value={ modelUsed }
+                    onChange={ ( value ) => setModelUsed( value as string ) }
+                    onClear={ () => setModelUsed( "" ) }
+                    clearable={ true }
+                    required={ true }
+                  />
+                )
+                  : null }
+
+
+                { featureName ? (
+                  <Select
+                    id="labelFeature"
+                    radius="md"
+                    label="Label Feature"
+                    placeholder="Choose label"
+                    data={ labelFeatures }
+                    value={ labelFeatureName }
+                    onChange={ ( value ) => setLabelFeatureName( value as string ) }
+                    onClear={ () => setLabelFeatureName( "" ) }
+                    clearable={ true }
+                    disabled={ disableLabelFeature }
+                  />
                 ) : null }
 
-                
-                {embFeatures && embFeatures.length > 0 ? (
-                  <Select
-                  id="embFeature"
-                  radius="md"
-                  label="Embedding Feature"
-                  placeholder="Choose embedding to visualize"
-                  data={ embFeatures }
-                  value={ labelFeatureName }
-                  onChange={ ( value ) => setLabelFeatureName( value as string ) }
-                  onClear={ () => setLabelFeatureName( "" ) }
-                  clearable={ true }
-                  disabled={ disableLabelFeature }
-                />
-                )
-                : null}
+
 
                 { labelFeatureName && labelDict ? (
                   <>
@@ -508,68 +581,14 @@ function Home ()
         </div>
       </div>
 
-      { featureName ? (
-        <>
-          <Flex
-            direction="column"
-            align="center">
-
-            <div style={ { position: 'relative' } }>
-
-
-              <Suspense>
-                <Box style={ { pointerEvents: 'none' } }>
-                  <div style={ { pointerEvents: 'auto' } }>
-                    <Flex
-                      justify="left"
-                      align="center"
-                      direction="column"
-                      wrap="wrap"
-                      style={ { width: '100%' } }
-                    >
-                      { !isLoadingEmbs ? ( <p>
-                        { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
-                      </p> ) : null }
-
-                    </Flex>
-
-                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } show_uq={ showUncertanties } />
-
-                  </div>
-                </Box>
-              </Suspense>
-
-
-            </div>
-          </Flex>
-
-          { indexes.length > 0 ? (
-
-            <MovableWindow >
-              <Flex
-                mih={ 150 }
-                justify="center"
-                align="center"
-                direction="column"
-                style={ { marginLeft: '30px', borderRadius: '12px' } }
-              >
-                { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
-                  <FeatureDisplayer
-                    indexes={ indexes }
-                    featureData={ featureData }
-                    featureType={ featureType }
-                    labelData={ labelData }
-                    label_dict={ labelDict as { [ key: number ]: string } }
-                    dimensions={ dimensions }
-                    { ...( showUncertanties ? { scores: uqScores } : {} ) }
-                    uncertainty={ showUncertanties ? true : false } />
-                </div> ) : null }
-              </Flex>
-            </MovableWindow> ) : null }
-        </>
-      ) : (
-        <Text size="sm" style={ { marginTop: "20px", marginLeft: "100px" } }>Select Feature</Text>
-      ) }
+      {
+        featureName && embFeatures && embFeatures.length > 1 && modelUsed
+          ? renderedComponent()
+          : featureName
+            ? renderedComponent()
+            : (
+              <Text size="sm" style={ { marginTop: "20px", marginLeft: "100px" } }>Select Feature</Text>
+            ) }
 
     </div>
   );

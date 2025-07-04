@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef } from "react";
-import
-  {
-    ReactFlow,
-    Edge,
-    Node,
-    Position,
-    ReactFlowProvider,
-    useReactFlow,
-    useNodesInitialized,
-    NodeChange
-  } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
-import tinycolor from "tinycolor2";
 import { FeatureSchema } from "@/interfaces/DatasetInterface";
+import
+{
+  Edge,
+  Node,
+  NodeChange,
+  Position,
+  ReactFlow,
+  ReactFlowProvider,
+  useNodesInitialized,
+  useReactFlow
+} from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
+import React, { useCallback, useEffect, useRef } from "react";
+import tinycolor from "tinycolor2";
 import useStore from "../../store/dsStore";
 
 
@@ -38,8 +38,8 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
   const horizontalSpacing = 160; // Fixed horizontal spacing between nodes
   const verticalSpacing = 120;
 
-  console.log("features:", features)
-  console.log("EDGES:", connections)
+  console.log( "features:", features )
+  console.log( "EDGES:", connections )
   const depthGroups: Record<number, string[]> = {};
   features.forEach( ( feature ) =>
   {
@@ -55,7 +55,12 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
     const x = feature.depth * horizontalSpacing;
     const y = ( depthIndex - ( depthGroups[ feature.depth ].length - 1 ) / 2 ) * verticalSpacing;
 
-    const nameParts = feature.name.includes( "_" ) ? feature.name.split( "_" ) : [ feature.name ];
+    let featureName = feature.name;
+    const umapMatch = featureName.match( /(umap)_\d+$/ );
+    if ( umapMatch ) {
+      featureName = featureName.replace( /(_\d+)$/, "" );
+    }
+    const nameParts = featureName.includes( "_" ) ? featureName.split( "_" ) : [ featureName ];
     const formattedParts = nameParts.map( part => part.includes( "embeddings" ) ? part.replace( "embeddings", "embs" ) : part );
 
     const backgroundColor = labelColorMap[ feature.name ] || "#FFABAB";
@@ -68,7 +73,7 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
       position: { x, y },
       data: {
         label: (
-          <div style={ { display: "flex", flexDirection: "column", textAlign: "center" } }>
+          <div style={ { display: "flex", flexDirection: "column", textAlign: "center", fontSize: "small" } }>
             { formattedParts.map( ( part, index ) => (
               <span key={ index }>{ part }</span>
             ) ) }
@@ -123,77 +128,82 @@ const SchemaGraph: React.FC<{
   nodes: Node[],
   edges: Edge[],
   dimensions: { width: number, height: number }
-}> = ({ nodes, edges, dimensions }) => {
+}> = ( { nodes, edges, dimensions } ) =>
+{
   const reactFlowInstance = useReactFlow();
   const nodesInitialized = useNodesInitialized();
-  const fitViewCalled = useRef(false);
+  const fitViewCalled = useRef( false );
 
-  const setFeatureToDisplay = useStore((state) => state.setFeatureToDisplay);
-  
+  const setFeatureToDisplay = useStore( ( state ) => state.setFeatureToDisplay );
 
-  const onNodesChange = useCallback((changes: NodeChange[]) => {
-    if (!fitViewCalled.current && changes.length > 0) {
+
+  const onNodesChange = useCallback( ( changes: NodeChange[] ) =>
+  {
+    if ( !fitViewCalled.current && changes.length > 0 ) {
       fitViewCalled.current = true;
-      reactFlowInstance.fitView({
+      reactFlowInstance.fitView( {
         padding: 0.2,
         includeHiddenNodes: true,
         duration: 0
-      });
+      } );
     }
-  }, [reactFlowInstance]);
+  }, [ reactFlowInstance ] );
 
-  useEffect(() => {
-    if (nodesInitialized && !fitViewCalled.current) {
+  useEffect( () =>
+  {
+    if ( nodesInitialized && !fitViewCalled.current ) {
       fitViewCalled.current = true;
-      reactFlowInstance.fitView({
+      reactFlowInstance.fitView( {
         padding: 0.2,
         includeHiddenNodes: true,
         duration: 0
-      });
+      } );
     }
-  }, [nodesInitialized, reactFlowInstance]);
+  }, [ nodesInitialized, reactFlowInstance ] );
 
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    setFeatureToDisplay(node.id); // Logs the name of the clicked node (id in this case)
-  }, []);
+  const handleNodeClick = useCallback( ( event: React.MouseEvent, node: Node ) =>
+  {
+    setFeatureToDisplay( node.id ); // Logs the name of the clicked node (id in this case)
+  }, [] );
 
   return (
-    <div style={{
+    <div style={ {
       width: `${dimensions.width}px`,
       height: `${dimensions.height}px`,
       background: "#ffffff",
       margin: "0 auto"
-    }}>
+    } }>
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
+        nodes={ nodes }
+        edges={ edges }
+        onNodesChange={ onNodesChange }
         fitView
-        fitViewOptions={{
+        fitViewOptions={ {
           padding: 0.2,
           includeHiddenNodes: true,
           duration: 0
-        }}
-        minZoom={1}
-        maxZoom={1}
-        nodesDraggable={false}
-        zoomOnScroll={false}
-        panOnDrag={false}
-        elementsSelectable={false}
-        preventScrolling={true}
-        style={{ pointerEvents: "none" }}
-        onNodeClick={handleNodeClick}
+        } }
+        minZoom={ 1 }
+        maxZoom={ 1 }
+        nodesDraggable={ false }
+        zoomOnScroll={ false }
+        panOnDrag={ false }
+        elementsSelectable={ false }
+        preventScrolling={ true }
+        style={ { pointerEvents: "none" } }
+        onNodeClick={ handleNodeClick }
       />
     </div>
   );
 };
 
-const HorizontalTreeSchema: React.FC<SchemaVisualizationProps> = ({ features, connections, labelColorMap }) => {
-  const { nodes, edges, dimensions } = buildTreeLayout({ features, connections, labelColorMap });
+const HorizontalTreeSchema: React.FC<SchemaVisualizationProps> = ( { features, connections, labelColorMap } ) =>
+{
+  const { nodes, edges, dimensions } = buildTreeLayout( { features, connections, labelColorMap } );
 
   return (
     <ReactFlowProvider>
-      <SchemaGraph nodes={nodes} edges={edges} dimensions={dimensions} />
+      <SchemaGraph nodes={ nodes } edges={ edges } dimensions={ dimensions } />
     </ReactFlowProvider>
   );
 };

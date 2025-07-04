@@ -7,6 +7,7 @@ export interface FeatureDTO
   is_logic: boolean;
   description?: string;
   label_dict?: { [ key: number ]: string };
+  model_name?: string; 
 }
 
 

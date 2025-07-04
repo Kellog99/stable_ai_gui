@@ -23,7 +23,7 @@ export async function getIndexes ( url: string, indexes: number[] )
 }
 
 //async function getData(datasetName: string, featureName: string, labelFeatureName: string) {
-export default async function getData ( datasetName: string, featureName: string, show_uq:boolean, labelFeatureName?: string, label?:string[], queries?: string[] )
+export default async function getData ( datasetName: string, featureName: string, show_uq:boolean, labelFeatureName?: string, label?:string[], modelUsed?: string, queries?: string[] )
 {
   if ( labelFeatureName  ) {
     
@@ -41,6 +41,10 @@ export default async function getData ( datasetName: string, featureName: string
         {
             url.searchParams.append( 'queries', qr );
         } );
+    }
+
+    if (modelUsed) {
+      url.searchParams.append( 'modelUsed', modelUsed );
     }
     
     const response = await fetch(url);
