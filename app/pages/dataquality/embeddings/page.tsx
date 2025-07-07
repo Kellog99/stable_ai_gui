@@ -584,7 +584,7 @@ function Home ()
       {
         featureName && embFeatures && embFeatures.length > 1 && modelUsed
           ? renderedComponent()
-          : featureName
+          : featureName && embFeatures && embFeatures.length == 1
             ? renderedComponent()
             : (
               <Text size="sm" style={ { marginTop: "20px", marginLeft: "100px" } }>Select Feature</Text>

@@ -25,9 +25,17 @@ export async function getIndexes ( url: string, indexes: number[] )
 //async function getData(datasetName: string, featureName: string, labelFeatureName: string) {
 export default async function getData ( datasetName: string, featureName: string, show_uq:boolean, labelFeatureName?: string, label?:string[], modelUsed?: string, queries?: string[] )
 {
+
+  const url = new URL (`${data_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}`)
+
+  if (modelUsed) {
+      
+      url.searchParams.append( 'modelUsed', modelUsed );
+    }
+
   if ( labelFeatureName  ) {
     
-    const url = new URL (`${data_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&labelFeatureName=${encodeURIComponent(labelFeatureName)}`)
+    url.searchParams.append( 'labelFeatureName', labelFeatureName )
     
     if (label) {
       label.forEach( lb =>
@@ -42,10 +50,6 @@ export default async function getData ( datasetName: string, featureName: string
             url.searchParams.append( 'queries', qr );
         } );
     }
-
-    if (modelUsed) {
-      url.searchParams.append( 'modelUsed', modelUsed );
-    }
     
     const response = await fetch(url);
     
@@ -56,7 +60,7 @@ export default async function getData ( datasetName: string, featureName: string
     return points
     
   } else {
-    const url = new URL(`${data_get}?datasetName=${encodeURIComponent( datasetName )}&featureName=${encodeURIComponent( featureName )}&show_uq=${encodeURIComponent(show_uq)}`)
+    url.searchParams.append( 'show_uq', `${show_uq}` )
     
     if (queries) {
       queries.forEach( qr =>
@@ -64,7 +68,8 @@ export default async function getData ( datasetName: string, featureName: string
             url.searchParams.append( 'queries', qr );
         } );
     }
-
+    
+    console.log("url finale:", url)
     const response = await fetch( url );
     
       if ( !response.ok ) throw new Error( 'Failed to send files to backend' );

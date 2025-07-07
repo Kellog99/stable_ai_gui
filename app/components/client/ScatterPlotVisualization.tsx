@@ -60,6 +60,7 @@ interface propsTypes
 export default function ScatterPlotVisualization ( props: propsTypes )
 {
 
+  
   const deckRef = useRef<any>( null );
   const isDraggingRef = useRef<boolean>( false );
 
