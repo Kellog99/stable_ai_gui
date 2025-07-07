@@ -622,7 +622,7 @@ function AppNavbarDataQuality ()
                                         <Button
                                             radius="xl"
                                             variant={ isActive( "/pages/dataquality/actions/cropping" ) ? "filled" : "subtle" }
-                                            disabled={ isDatasetUndefined || !areEmbeddings }
+                                            disabled={ isDatasetUndefined }
                                         >
                                             <Text size="sm" fw={ 600 } c="dimmed">
                                                 Cropping

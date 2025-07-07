@@ -11,6 +11,7 @@ export const embedder_get = "http://localhost:8000/actions/embedder"
 export const cleaner_get = "http://localhost:8000/actions/cleaner"
 export const upload_post = "http://localhost:8000/upload"
 export const cropper_get = "http://localhost:8000/actions/cropper"
+export const save_get = "http://localhost:8000/save"
 //export const dataset_post = 'http://10.125.34.229:5003/process'
 //export const feature_post = 'http://10.125.34.229:5003/getFeature'
 //export const data_get = "http://10.125.34.229:5003/embeddings/getUmap"
