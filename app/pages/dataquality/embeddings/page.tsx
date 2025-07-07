@@ -2,7 +2,7 @@
 
 import FeatureDisplayer from '@/components/client/FeatureDisplayer';
 import MovableWindow from '@/components/client/MovableWindow';
-import { IsFeatureBond } from '@/functionalities/Utils';
+import { IsFeatureBond, IsFeatureSameLength } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/DatasetInterface';
 import { embedding_type, image_type, label_type, numberic_type, text_type } from '@/properties/types';
 import { Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Space, Text } from '@mantine/core';
@@ -76,16 +76,22 @@ function Home ()
       //  .filter( ( { type } ) => type === label_type )
       //  .map( ( { name } ) => name );
 
-      if ( featureName !== "" ) {
-        const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
-        setLabelFeatures( labelFeatures as string[] )
+      if ( featureName !== "" && feature) {
+        //const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
+        const load_labels = async () =>
+          {
+            const lb_feature = await IsFeatureSameLength( datasetUsed as Dataset, feature.datas.length);
+            console.log("LX",lb_feature)
+            setLabelFeatures( lb_feature as string[] )
+          };
+        load_labels()
       }
 
       setFeatures( extractedFeatures );
       //setLabelFeatures( extractedlabelFeatures )
       //console.log( labelFeatures )
     }
-  }, [ datasetUsed, featureName ] )
+  }, [ datasetUsed, featureName, feature] )
 
   console.log( "PAGE", datasetUsed )
   console.log( "PAGE", features )
@@ -153,6 +159,8 @@ function Home ()
             console.log( feature );
             setFeature( feature );
             setFeatureType( feature.type )
+
+
           }
         } catch ( error ) {
           console.error( 'Error loading feature:', error );

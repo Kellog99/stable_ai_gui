@@ -9,6 +9,7 @@ import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
 import { useMemo, useState } from "react";
 import path from 'path';
+import datasets_folder from "@/properties/static";
 
 interface FeatureCardProps {
   index?: number,
@@ -129,7 +130,7 @@ export function FeatureCard(props: FeatureCardProps) {
               maxHeight: "50vh", 
             }}
           >
-            <img src={path.sep+data} alt="preview" style={{ maxWidth: "50vw", maxHeight: "50vh", borderRadius:"5px"}} />
+            <img src={path.sep+datasets_folder+path.sep+data} alt="preview" style={{ maxWidth: "50vw", maxHeight: "50vh", borderRadius:"5px"}} />
             <CloseButton
               onClick={() => setShowSection(false)}
               style={{

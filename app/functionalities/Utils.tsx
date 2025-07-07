@@ -1,4 +1,9 @@
 import Dataset from "@/interfaces/DatasetInterface";
+import {image_type,bbox_type, label_type} from "@/properties/types";
+import featureLoader from "./FeatureLoader";
+import {filter,map} from "lodash";
+import {features} from "process";
+import {isArray} from "util";
 
 export function getScoreColor(score: number) {
   if (score >= 0.8) {
@@ -16,14 +21,13 @@ export function IsFeatureBond(
     typeFeature2: string,
     nameFeature2?: string
     ): boolean | string | string[] {
-
     const getFeatureType = (name: string): string | undefined => {
         const feature = dataset.features.find((f) => f.name === name);
         return feature?.type;
     };
-
+    
     const matches: string[] = [];
-
+    
     for (const [from, to] of dataset.edges) {
         if (from === nameFeature1) {
         const targetType = getFeatureType(to);
@@ -41,8 +45,31 @@ export function IsFeatureBond(
     } else {
     return false;
     }
-    }
+  }
 
+export async function IsFeatureSameLength(
+  dataset: Dataset,
+  featureLength: number
+): Promise<string[]> {
+  console.log("RX",dataset)
+  if (Array.isArray(dataset?.features)) {
+    const extractedFeatures = dataset.features
+      .filter(({ type }) => type === label_type)
+      .map(({ name }) => name);
+    
+    // Run featureLoader for each label
+    const featureResults = await Promise.all(
+      extractedFeatures.map((label) => featureLoader(dataset.name, label))
+    );
+    // Filter based on datas.length and return corresponding names
+    const labelFeature = extractedFeatures.filter((_, i) => featureResults[i].datas.length === featureLength);
+
+    
+    return labelFeature;
+  }
+
+  return [];
+}
 export function IsFeaturePresent(
   dataset: Dataset, 
   featureType: string

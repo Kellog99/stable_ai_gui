@@ -155,7 +155,7 @@ function Home ()
                 radius="md"
                 label="Model name"
                 placeholder="Choose model to use"
-                data={ [ "hf-hub:apple/DFN5B-CLIP-ViT-H-14" ] }
+                data={ [ "hf-hub:apple/DFN5B-CLIP-ViT-H-14", "hf-hub:apple/DFN5B-CLIP-ViT-H-14-378" ] }
                 value={ modelName }
                 onChange={ ( value ) => connectAndAssingModel( value as string ) }
                 allowDeselect={ false }
