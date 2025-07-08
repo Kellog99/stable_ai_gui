@@ -1,19 +1,19 @@
 "use client";
 
-import { Box, CloseButton, Flex, Text } from "@mantine/core";
+import FeatureDisplayer from "@/components/client/FeatureDisplayer";
+import SchemaShower from "@/components/client/SchemaShower";
+import featureLoader from "@/functionalities/FeatureLoader";
+import { IsFeatureBond, IsFeaturePresent } from "@/functionalities/Utils";
+import Dataset, { FeatureSchema } from "@/interfaces/genericInterface";
+import { embedding_type, image_type, label_type, text_type } from "@/properties/types";
+import useStore from '@/store/dsStore';
 import { BarChart } from '@mantine/charts';
 import '@mantine/charts/styles.css';
+import { Box, CloseButton, Flex, Text } from "@mantine/core";
+import { motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react"
-import classes from './page.module.css'
-import useStore from '@/store/dsStore';
-import SchemaShower from "@/components/client/SchemaShower";
-import Dataset, { FeatureSchema } from "@/interfaces/DatasetInterface";
-import FeatureDisplayer from "@/components/client/FeatureDisplayer";
-import featureLoader from "@/functionalities/FeatureLoader";
-import { embedding_type, image_type, label_type, text_type } from "@/properties/types";
-import { motion } from 'framer-motion'
-import { IsFeatureBond, IsFeaturePresent } from "@/functionalities/Utils";
+import { useEffect, useRef, useState } from "react";
+import classes from './page.module.css';
 
 
 
@@ -193,7 +193,7 @@ export default function Datasets ()
     }
   }, [ datasetUsed ] )
 
-  
+
 
 
   const labelColorMap: Record<string, string> = {
@@ -277,9 +277,9 @@ export default function Datasets ()
 
           { featureToDisplay && feature && (
             <div style={ {
-              width: '50%',        
-              position: 'relative', 
-              overflow: 'auto',  
+              width: '50%',
+              position: 'relative',
+              overflow: 'auto',
               visibility: featureToDisplay && feature ? 'visible' : 'hidden',
               pointerEvents: featureToDisplay && feature ? 'auto' : 'none'
             } }>

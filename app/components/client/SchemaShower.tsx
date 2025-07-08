@@ -1,6 +1,6 @@
 "use client";
 
-import { FeatureSchema } from "@/interfaces/DatasetInterface";
+import { FeatureSchema } from "@/interfaces/genericInterface";
 import
 {
   Edge,
@@ -129,73 +129,73 @@ const SchemaGraph: React.FC<{
   edges: Edge[],
   dimensions: { width: number, height: number }
 }> = ( { nodes, edges, dimensions } ) =>
-{
-  const reactFlowInstance = useReactFlow();
-  const nodesInitialized = useNodesInitialized();
-  const fitViewCalled = useRef( false );
-
-  const setFeatureToDisplay = useStore( ( state ) => state.setFeatureToDisplay );
-
-
-  const onNodesChange = useCallback( ( changes: NodeChange[] ) =>
   {
-    if ( !fitViewCalled.current && changes.length > 0 ) {
-      fitViewCalled.current = true;
-      reactFlowInstance.fitView( {
-        padding: 0.2,
-        includeHiddenNodes: true,
-        duration: 0
-      } );
-    }
-  }, [ reactFlowInstance ] );
+    const reactFlowInstance = useReactFlow();
+    const nodesInitialized = useNodesInitialized();
+    const fitViewCalled = useRef( false );
 
-  useEffect( () =>
-  {
-    if ( nodesInitialized && !fitViewCalled.current ) {
-      fitViewCalled.current = true;
-      reactFlowInstance.fitView( {
-        padding: 0.2,
-        includeHiddenNodes: true,
-        duration: 0
-      } );
-    }
-  }, [ nodesInitialized, reactFlowInstance ] );
+    const setFeatureToDisplay = useStore( ( state ) => state.setFeatureToDisplay );
 
-  const handleNodeClick = useCallback( ( event: React.MouseEvent, node: Node ) =>
-  {
-    setFeatureToDisplay( node.id ); // Logs the name of the clicked node (id in this case)
-  }, [] );
 
-  return (
-    <div style={ {
-      width: `${dimensions.width}px`,
-      height: `${dimensions.height}px`,
-      background: "#ffffff",
-      margin: "0 auto"
-    } }>
-      <ReactFlow
-        nodes={ nodes }
-        edges={ edges }
-        onNodesChange={ onNodesChange }
-        fitView
-        fitViewOptions={ {
+    const onNodesChange = useCallback( ( changes: NodeChange[] ) =>
+    {
+      if ( !fitViewCalled.current && changes.length > 0 ) {
+        fitViewCalled.current = true;
+        reactFlowInstance.fitView( {
           padding: 0.2,
           includeHiddenNodes: true,
           duration: 0
-        } }
-        minZoom={ 1 }
-        maxZoom={ 1 }
-        nodesDraggable={ false }
-        zoomOnScroll={ false }
-        panOnDrag={ false }
-        elementsSelectable={ false }
-        preventScrolling={ true }
-        style={ { pointerEvents: "none" } }
-        onNodeClick={ handleNodeClick }
-      />
-    </div>
-  );
-};
+        } );
+      }
+    }, [ reactFlowInstance ] );
+
+    useEffect( () =>
+    {
+      if ( nodesInitialized && !fitViewCalled.current ) {
+        fitViewCalled.current = true;
+        reactFlowInstance.fitView( {
+          padding: 0.2,
+          includeHiddenNodes: true,
+          duration: 0
+        } );
+      }
+    }, [ nodesInitialized, reactFlowInstance ] );
+
+    const handleNodeClick = useCallback( ( event: React.MouseEvent, node: Node ) =>
+    {
+      setFeatureToDisplay( node.id ); // Logs the name of the clicked node (id in this case)
+    }, [] );
+
+    return (
+      <div style={ {
+        width: `${dimensions.width}px`,
+        height: `${dimensions.height}px`,
+        background: "#ffffff",
+        margin: "0 auto"
+      } }>
+        <ReactFlow
+          nodes={ nodes }
+          edges={ edges }
+          onNodesChange={ onNodesChange }
+          fitView
+          fitViewOptions={ {
+            padding: 0.2,
+            includeHiddenNodes: true,
+            duration: 0
+          } }
+          minZoom={ 1 }
+          maxZoom={ 1 }
+          nodesDraggable={ false }
+          zoomOnScroll={ false }
+          panOnDrag={ false }
+          elementsSelectable={ false }
+          preventScrolling={ true }
+          style={ { pointerEvents: "none" } }
+          onNodeClick={ handleNodeClick }
+        />
+      </div>
+    );
+  };
 
 const HorizontalTreeSchema: React.FC<SchemaVisualizationProps> = ( { features, connections, labelColorMap } ) =>
 {

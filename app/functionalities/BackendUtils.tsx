@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { completeness_post, data_get, duplicates_post, outliers_post, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
+import { completeness_post, data_get, duplicates_post, model_info_get, outliers_post, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -69,7 +69,6 @@ export default async function getData ( datasetName: string, featureName: string
         } );
     }
     
-    console.log("url finale:", url)
     const response = await fetch( url );
     
       if ( !response.ok ) throw new Error( 'Failed to send files to backend' );
@@ -137,9 +136,9 @@ export async function getCompleteness(datasetName: string, featureName: string, 
 }
 
 
-export async function RetrieveSamples(datasetName: string, featureName: string, query: string, queryTop_K: number){
+export async function RetrieveSamples(datasetName: string, featureName: string, query: string, queryTop_K: number, modelUsed: string){
   const response = await fetch(
-    `${retrieve_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&query=${encodeURIComponent(query)}&top_k=${encodeURIComponent(queryTop_K)}`
+    `${retrieve_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&query=${encodeURIComponent(query)}&top_k=${encodeURIComponent(queryTop_K)}&modelUsed=${encodeURIComponent(modelUsed)}`
   );
 
   if ( !response.ok ) throw new Error( 'Failed to retrieve samples from the backend' );
@@ -154,7 +153,7 @@ const BASE_DIRECTORY = ""; // Adjust as needed
 export async function copyFiles(sourceFolder: string, newFolderName?: string) {
   const absoluteSourcePath = path.resolve(BASE_DIRECTORY, sourceFolder);
   const absoluteDestinationPath = root_folder;
-  console.log("absolute path", absoluteSourcePath);
+
 
   // Security check: ensure within base directory
   if (!absoluteSourcePath.startsWith(BASE_DIRECTORY)) {
@@ -201,4 +200,16 @@ export async function upload(configs: Object){
 }
 
 
+
+
+export async function getModelInfo(model: string) {
+
+
+  const response = await fetch(`${model_info_get}?modelUsed=${encodeURIComponent(model)}`);
+
+  if ( !response.ok ) throw new Error( 'Failed to get model info from the backend' );
+
+  const modelInfo = await response.json();
+    return modelInfo
+}
 

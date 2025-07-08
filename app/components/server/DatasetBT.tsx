@@ -1,15 +1,15 @@
+import
+{
+  faCircleExclamation
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Alert, Badge, Card, CardSection, Grid, GridCol, Group, Text } from '@mantine/core';
-import Dataset from "../../interfaces/DatasetInterface";
+import Dataset from "../../interfaces/genericInterface";
 import { image_type, text_type } from "../../properties/types";
 import RouterButton from "../client/buttons/RouterButton";
 import classes from './DatasetBT.module.css';
 import ImageDisplayer from "./ImageDisplayer";
 import TextDisplayer from "./TextDisplayer";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import
-{
- faCircleExclamation
-} from '@fortawesome/free-solid-svg-icons';
 
 interface DatasetBTProps
 {
@@ -63,18 +63,18 @@ export default function DatasetBT ( { query, datasets }: DatasetBTProps )
           ) )
           ) : (
             <Alert
-            variant="light"
-            color="orange"
-            radius="md"
-            title="Attention!"
-            icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
-            style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
-          >
-              No datasets found. 
+              variant="light"
+              color="orange"
+              radius="md"
+              title="Attention!"
+              icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
+              style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
+            >
+              No datasets found.
               <br />
               Try uploading a new dataset or check the datasets folder.
-              
-          </Alert>
+
+            </Alert>
           ) }
         </Grid>
       </div>

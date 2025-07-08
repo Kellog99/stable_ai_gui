@@ -55,3 +55,15 @@ export interface ReportMetric {
   internalConfigs: any,
   results: Object
 }
+
+
+export interface ModelInfo {
+  name: string;
+  model_type: string;
+  architecture: string;
+  supports_text: boolean;
+  supports_images: boolean;
+  supports_audio: boolean;
+  embedding_dim: number;
+  max_length: number;
+}

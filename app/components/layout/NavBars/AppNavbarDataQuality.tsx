@@ -1,37 +1,41 @@
 "use client"
 
-import "@mantine/core/styles.css";
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import React, { useEffect, useRef, useState } from "react";
-import Link from 'next/link'
+import RouterButton from "@/components/client/buttons/RouterButton";
+import { IsFeaturePresent } from "@/functionalities/Utils";
+import Dataset, { FeatureDTO } from "@/interfaces/genericInterface";
+import { embedding_type } from "@/properties/types";
+import useStore from "@/store/dsStore";
 import
 {
-    Stack,
-    Button,
-    Text,
+    faBolt,
+    faChartLine,
+    faCircleQuestion,
+    faDatabase,
+    faHouse, faImage
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import
+{
     Box,
-    Space, Group,
+    Button,
     Divider,
+    Group,
+    Space,
+    Stack,
+    Text,
     Tooltip,
 } from "@mantine/core";
+import "@mantine/core/styles.css";
 import { useDisclosure } from "@mantine/hooks";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import
-{
-    faHouse, faImage, faChartLine, faBolt, faDatabase, faCircleQuestion
-} from '@fortawesome/free-solid-svg-icons';
 import
 {
     IconChevronDown,
-    IconChevronUp,
     IconChevronRight
 } from '@tabler/icons-react';
+import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useRef, useState } from "react";
 import classes from './AppNavbarDataQuality.module.css';
-import RouterButton from "@/components/client/buttons/RouterButton";
-import useStore from "@/store/dsStore";
-import { IsFeaturePresent } from "@/functionalities/Utils";
-import Dataset, { FeatureDTO } from "@/interfaces/DatasetInterface";
-import { embedding_type } from "@/properties/types";
 
 
 function AppNavbarDataQuality ()
@@ -588,7 +592,7 @@ function AppNavbarDataQuality ()
                                                 Clean Duplicates
                                             </Text>
                                         </Button>
-                                        { isDatasetUndefined || !areEmbeddings? (
+                                        { isDatasetUndefined || !areEmbeddings ? (
                                             <Tooltip
                                                 label="Choose a dataset or provide the embeddings"
                                                 radius="md"

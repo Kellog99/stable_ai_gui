@@ -1,24 +1,24 @@
 "use client";
 
+import { ReportMetric } from "@/interfaces/genericInterface";
+import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
+import { image_type, label_type, text_type } from "@/properties/types";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Alert, Box, Button, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { IconInfoCircle } from '@tabler/icons-react';
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import useStore from '../../../store/dsStore';
-import { image_type, label_type, text_type } from "@/properties/types";
-import { useDisclosure } from "@mantine/hooks";
-import DuplicatesConfigs from "./DuplicatesConfig";
-import OutliersConfig from "./OutliersConfig";
-import { ReportMetric } from "@/interfaces/DatasetInterface";
-import { IconInfoCircle } from '@tabler/icons-react';
-import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
-import { useSearchParams } from "next/navigation";
-import { outliers_modes } from "./utils";
 import metricsFetcher from "../../server/metricsFetcher";
-import OutlierDisplayer from "./displayer/OutlierDisplayer";
-import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
 import CompletenessConfig from "./CompletenessConfig";
 import CompletenessDisplayer from "./displayer/CompletenessDisplayer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
+import OutlierDisplayer from "./displayer/OutlierDisplayer";
+import DuplicatesConfigs from "./DuplicatesConfig";
+import OutliersConfig from "./OutliersConfig";
+import { outliers_modes } from "./utils";
 
 
 
@@ -38,7 +38,7 @@ export default function Config ( props: ConfigsProps )
     const [ computed, setComputed ] = useState<boolean>( false )
     const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
     const [ outliers, setOutliers ] = useState<OutliersDTO | null>( null )
-    const [completeness, setCompleteness] = useState<CompletenessDTO | null> (null)
+    const [ completeness, setCompleteness ] = useState<CompletenessDTO | null>( null )
 
 
     const [ featureName, setFeatureName ] = useState<any>( "" )
@@ -74,15 +74,15 @@ export default function Config ( props: ConfigsProps )
     };
 
 
-    console.log("INTERNAL CONFIGS:", internalConfigs)
+    console.log( "INTERNAL CONFIGS:", internalConfigs )
 
 
-    useEffect(() => 
+    useEffect( () => 
     {
-        setComputeNow(false)
-        setComputed(false)
+        setComputeNow( false )
+        setComputed( false )
 
-    }, [inputReq])
+    }, [ inputReq ] )
 
 
     useEffect( () =>
@@ -115,7 +115,7 @@ export default function Config ( props: ConfigsProps )
 
     const [ showFeatureError, setShowFeatureError ] = useState( false );
     const [ showLabelError, setShowLabelError ] = useState( false );
-    const [ showRequirementsError, setShowRequirementsError] = useState (false);
+    const [ showRequirementsError, setShowRequirementsError ] = useState( false );
     const [ showOutliersConfig, setShowOutliersConfig ] = useState( false );
     const [ clicked, setClicked ] = useState( false );
     const [ isDuplicate, setIsDuplicate ] = useState( false );
@@ -197,7 +197,7 @@ export default function Config ( props: ConfigsProps )
 
     const handleClickCompute = async () =>
     {
-        
+
         const newReportMetric: ReportMetric = {
             internalConfigs: internalConfigs,
             results: {}
@@ -215,8 +215,8 @@ export default function Config ( props: ConfigsProps )
             hasValidationErrors = true;
         }
 
-        if (props.metricName === "completeness" && !inputReq) {
-            setShowRequirementsError(true);
+        if ( props.metricName === "completeness" && !inputReq ) {
+            setShowRequirementsError( true );
             hasValidationErrors = true;
         }
 
@@ -248,11 +248,11 @@ export default function Config ( props: ConfigsProps )
                     labelFeatureName,
                     outliers_mode
                 );
-                
+
                 if ( props.metricName === "duplicates" ) setDuplicates( data );
                 if ( props.metricName === "outliers" ) setOutliers( data );
-                if (props.metricName === "completeness") setCompleteness( data );
-                
+                if ( props.metricName === "completeness" ) setCompleteness( data );
+
                 newReportMetric.results = data;
                 newReportMetric.internalConfigs = internalConfigs;
 
@@ -273,7 +273,7 @@ export default function Config ( props: ConfigsProps )
         }
     };
 
-   
+
     const handleSaveToReport = () =>
     {
         if ( reportMetric ) {
@@ -306,7 +306,7 @@ export default function Config ( props: ConfigsProps )
     const metricDisplayerMap: Record<string, React.ComponentType> = {
         "duplicates": () => <DuplicatesDisplayer duplicates={ duplicates as DuplicatesDTO } />,
         "outliers": () => <OutlierDisplayer outliers={ outliers as OutliersDTO } />,
-        "completeness" : () => <CompletenessDisplayer completeness={completeness as CompletenessDTO} requirements={internalConfigs.requirements}/>
+        "completeness": () => <CompletenessDisplayer completeness={ completeness as CompletenessDTO } requirements={ internalConfigs.requirements } />
     };
 
     const MetricDisplayerComponent = metricDisplayerMap[ props.metricName ];
@@ -388,7 +388,7 @@ export default function Config ( props: ConfigsProps )
                             Choose a label to continue
                         </Text>
                     ) }
-                
+
                 </Box>
 
                 <Box style={ { position: "relative" } }>
@@ -435,22 +435,22 @@ export default function Config ( props: ConfigsProps )
                             value={ inputReq }
                             onChange={ handleRequirements }
                             styles={ ( theme ) => ( {
-                            input: {
-                                width: "400px",
-                                borderColor: showRequirementsError ? theme.colors.red[ 6 ] : undefined,
-                                '&:hover': {
+                                input: {
+                                    width: "400px",
                                     borderColor: showRequirementsError ? theme.colors.red[ 6 ] : undefined,
+                                    '&:hover': {
+                                        borderColor: showRequirementsError ? theme.colors.red[ 6 ] : undefined,
+                                    },
                                 },
-                            },
-                        } ) } />
+                            } ) } />
                         { showRequirementsError && (
-                        <Text
-                            size="xs"
-                            style={ { position: "absolute", top: "100%", marginTop: 4, color: "red" } }
-                        >
-                            Write at least one requirement to continue
-                        </Text>
-                    ) }
+                            <Text
+                                size="xs"
+                                style={ { position: "absolute", top: "100%", marginTop: 4, color: "red" } }
+                            >
+                                Write at least one requirement to continue
+                            </Text>
+                        ) }
                     </Box>
                 ) :
                     ( <>

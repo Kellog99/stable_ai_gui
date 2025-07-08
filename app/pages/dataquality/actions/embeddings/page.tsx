@@ -1,16 +1,19 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { Progress, Flex, Select, Text, Box, Center, Alert } from '@mantine/core';
-import useStore from '../../../../store/dsStore';
+import { getModelInfo } from '@/functionalities/BackendUtils';
+import { ModelInfo } from '@/interfaces/genericInterface';
 import { image_type, label_type, text_type } from '@/properties/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { embedder_get } from '@/properties/urls';
 import
 {
   faCheck, faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
-import { embedder_get } from '@/properties/urls';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Alert, Box, Button, Center, Flex, Loader, Progress, Select, Table, Text } from '@mantine/core';
 import Link from "next/link";
+import { useEffect, useRef, useState } from 'react';
+import useStore from '../../../../store/dsStore';
+
 
 function Home ()
 {
@@ -27,12 +30,16 @@ function Home ()
   const [ status, setStatus ] = useState( 'Idle' );
   const [ result, setResult ] = useState<string | null>( null );
   const [ error, setError ] = useState<string | null>( null );
+  const [ computing, setComputing ] = useState<boolean>( false );
+  const [ loadingInfo, setLoadingInfo ] = useState<boolean>( false );
+  const [ modelInfo, setModelInfo ] = useState<ModelInfo | null>( null );
+  const [ showModelInfo, setShowModelInfo ] = useState<boolean>( false );
 
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const setData = useStore( ( state ) => ( state.setData ) );
 
 
-  async function prova ( model: string )
+  async function computeEmbeddings ( model: string )
   {
     const baseUrl = embedder_get
 
@@ -111,13 +118,33 @@ function Home ()
     }
   }, [ datasetUsed ] )
 
-  const connectAndAssingModel = ( model: string ) =>
+
+
+  const connectAndAssingModel = async ( model: string ) =>
   {
+
     setModelName( model )
-    if ( model ) {
-      prova( model )
+    setLoadingInfo( true );
+    const modelInfoReceived = await getModelInfo( model );
+    setModelInfo( modelInfoReceived );
+    setShowModelInfo( true );
+    setLoadingInfo( false );
+
+  }
+
+  console.log( "modelInfo", modelInfo )
+
+
+  const handleCompute = () =>
+  {
+    setComputing( true )
+    if ( modelName ) {
+      computeEmbeddings( modelName )
     }
   }
+
+
+
 
 
   return (
@@ -132,7 +159,7 @@ function Home ()
 
         <div style={ { width: '100%', position: 'relative' } }>
 
-          <Flex direction="row" justify="space-between" align="flex-start">
+          <Flex direction="column" justify="space-between" align="flex-start">
             <Flex
               direction="row"
               gap="xs">
@@ -155,23 +182,113 @@ function Home ()
                 radius="md"
                 label="Model name"
                 placeholder="Choose model to use"
-                data={ [ "hf-hub:apple/DFN5B-CLIP-ViT-H-14", "hf-hub:apple/DFN5B-CLIP-ViT-H-14-378" ] }
+                data={ [
+                  "sentence-transformers/all-MiniLM-L6-v2",
+                  "openai/clip-vit-base-patch32",
+                  "google/vit-base-patch16-224",
+                  "bert-base-uncased",
+                ] }
                 value={ modelName }
                 onChange={ ( value ) => connectAndAssingModel( value as string ) }
                 allowDeselect={ false }
                 clearable={ !isConnected }
                 required={ true }
+                onClear={() => {
+                  setShowModelInfo(false);
+                  setModelInfo(null);
+                  setComputing(false);
+                }}
               />
 
             </Flex>
+
+            { showModelInfo && modelInfo? (
+
+              <Table variant="vertical" layout="fixed" withTableBorder
+                style={ {
+                  marginTop: "20px",
+
+                  width: "30%",
+
+                } }>
+                <Table.Tbody>
+                  <Table.Tr>
+                    <Table.Td colSpan={ 2 } style={ { textAlign: "center", fontWeight: "bold", fontSize: "14px", paddingBottom: "10px" } }>
+                      Model Info
+                    </Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th w={ 160 }>Name</Table.Th>
+                    <Table.Td>{modelInfo.name}</Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th>Model Type</Table.Th>
+                    <Table.Td>{modelInfo.model_type}</Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th>Architecture</Table.Th>
+                    <Table.Td>{modelInfo.architecture}</Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th>Support Text</Table.Th>
+                    <Table.Td>{modelInfo.supports_text}</Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th>Support Images</Table.Th>
+                    <Table.Td>{modelInfo.supports_images}</Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th>Support Audio</Table.Th>
+                    <Table.Td>{modelInfo.supports_audio}</Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th>Embedding Dimension</Table.Th>
+                    <Table.Td>{modelInfo.embedding_dim}</Table.Td>
+                  </Table.Tr>
+
+                  <Table.Tr>
+                    <Table.Th>Max Length</Table.Th>
+                    <Table.Td>{modelInfo.max_length}</Table.Td>
+                  </Table.Tr>
+
+                </Table.Tbody>
+              </Table>
+            ) : loadingInfo ? (
+              <>
+                <Flex
+                  mih={ 150 }
+                  justify="center"
+                  align="center"
+                  direction="column"
+                  wrap="wrap"
+                >
+                  <Loader size={ 30 } />
+                </Flex>
+              </>
+            ) : null }
+
+            <Button style={ { marginTop: "20px" } }
+              onClick={ handleCompute }
+              disabled={ !featureName || !modelName }>
+              Compute Embeddings
+            </Button>
+
           </Flex>
 
 
         </div>
 
 
-        { !featureName || !modelName ? (
+        { !computing ? ( <>
           <Text size="sm" style={ { marginTop: "20px" } }>Select a feature and the model to compute embeddings </Text>
+        </>
         ) : featureName !== "" && result === null && modelName !== "" ? (
 
           <div className="my-animation-container w-full md:w-3/4 lg:w-1/2 mx-auto p-4 bg-gray-200 rounded-lg">
@@ -209,7 +326,13 @@ function Home ()
               </Text>
             </Box>
           </div>
-        ) : result == "Complete!" ? (
+        ) : 
+        
+        
+        
+        
+        
+        result == "Complete!" ? (
 
           <Alert
             variant="light"

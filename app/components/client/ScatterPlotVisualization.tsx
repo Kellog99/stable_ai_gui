@@ -261,7 +261,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       }, 500 ); // delay threshold in milliseconds
 
       setQueries( prevQueries => [ ...prevQueries, queryRetrieve ] );
-      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve, queryTop_k )
+      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve, queryTop_k, props.modelUsed as string)
         .then( ( fetched ) =>
         {
           setSelectedIndexes( fetched.indexes );
