@@ -9,6 +9,13 @@ import { Flex, Loader, Select, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useStore from '../../../store/dsStore';
+import { image_type, label_type, text_type } from "@/properties/types";
+import { getPrototypes } from "@/functionalities/BackendUtils";
+import FeatureDisplayer from "@/components/client/FeatureDisplayer";
+import { IsFeatureBond, IsFeatureSameLength } from "@/functionalities/Utils";
+import Dataset from "@/interfaces/DatasetInterface";
+import Dataset from "@/interfaces/DatasetInterface";
+import featureLoader from "@/functionalities/FeatureLoader";
 
 interface PrototypesData
 {
@@ -60,8 +67,16 @@ export default function Prototypes ()
             //    .map( ( { name } ) => name );
 
             if ( featureName !== "" ) {
-                const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
-                setLabelFeatures( labelFeatures as string[] )
+                const load_labels = async () =>
+                {   const feature = await featureLoader(datasetUsed.name, featureName)
+                    const lb_feature = await IsFeatureSameLength( datasetUsed as Dataset, feature.datas.length);
+                    setLabelFeatures( lb_feature as string[] )
+                };
+                load_labels()
+
+
+                //const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
+                //setLabelFeatures( labelFeatures as string[] )
                 const labelFeature = datasetUsed.features.find( feature => feature.type === label_type );
                 if ( labelFeature?.label_dict ) {
                     setLabelDict( labelFeature.label_dict )

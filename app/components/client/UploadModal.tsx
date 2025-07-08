@@ -11,6 +11,10 @@ import
     faCheck, faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
 import { copyFiles, upload } from "@/functionalities/BackendUtils";
+import BatchFileUpload from "./Uploader";
+import SequentialFileUpload from "./Uploader";
+import FolderUploader from "./Uploader";
+import ZipUploader from "./Uploader";
 
 
 interface UploadDatasetModalProps
@@ -181,146 +185,7 @@ export default function UploadModal ( { opened, close }: UploadDatasetModalProps
                     </Modal.Header>
 
                     <Modal.Body>
-                        <div style={ { position: "relative" } }>
-                            <LoadingOverlay visible={ reloading } zIndex={ 1000 } overlayProps={ { radius: "sm", blur: 2 } } />
-                            { showError ? (
-                                <Overlay blur={ 2 } center={ true } backgroundOpacity={ 0 }>
-                                    <Alert variant="filled" color="red" title="Ops!" radius="md"
-                                        withCloseButton
-                                        onClose={ () => setShowError( false ) }
-                                        style={ { zIndex: "10", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)" } }
-                                        icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }>
-                                        The dataset has already been loaded! Try upload another dataset.
-                                    </Alert> </Overlay> ) : null }
-
-                            <form onSubmit={ form.onSubmit( handleSubmit ) }>
-
-                                <Flex direction="column" gap="md" style={ { marginTop: "20px" } }>
-
-                                    {/*
-                                <Box
-                                    style={ ( theme ) => ( {
-                                        border: '2px dashed',
-                                        borderColor: form.errors.file ? theme.colors.red[ 6 ] : 'black',
-                                        padding: '10px',
-                                        marginTop: '20px',
-                                        '&:hover': {
-                                            borderColor: form.errors.file ? theme.colors.red[ 6 ] : 'black',
-                                            boxShadow: form.errors.file ? `0 0 0 1px ${theme.colors.red[ 6 ]}` : undefined,
-                                            transition: 'border-color 150ms ease, box-shadow 150ms ease',
-                                        },
-                                        position: 'relative',
-                                    } ) }
-                                >
-
-                                    <Flex direction="column" justify="center" align="center" gap="md">
-
-                                        { fileSelected ? (
-                                            <>
-                                                <Folder size={ 18 } />
-                                                <Flex direction="row" gap="xs" align="center">
-                                                    <Text size="sm" c="dimmed">{ fileName }</Text>
-                                                    <CloseButton size="xs" onClick={ handleCancel } />
-                                                </Flex>
-
-                                            </> ) : (
-                                            <>
-                                                <FileButton onChange={ handleFileUpload } accept=".zip">
-                                                    { ( props ) =>
-                                                        <Button { ...props } radius="xl" variant="light">
-                                                            <UploadArrowTray size={ 18 } />
-                                                        </Button> }
-                                                </FileButton>
-
-                                                <Text
-                                                    size="sm"
-
-                                                    style={ ( theme ) => ( {
-                                                        color: form.errors.file ? theme.colors.red[ 6 ] : theme.colors.gray[ 6 ],
-                                                    } ) }
-                                                >Drag and drop a .zip file here, or click to select</Text>
-                                            </> ) }
-                                    </Flex>
-                                    { form.errors.file && (
-                                        <Text
-                                            size="xs"
-                                            style={ ( theme ) => ( {
-                                                position: 'absolute',
-                                                top: '100%',
-                                                left: '70%',
-                                                marginTop: 4,
-                                                color: theme.colors.red[ 6 ],
-                                            } ) }
-                                        >{ form.errors.file }</Text>
-                                    ) }
-                                </Box>
-                                */}
-
-                                    <TextInput
-                                        label="Path"
-                                        placeholder="Specify the path of the Dataset"
-                                        withAsterisk
-                                        { ...form.getInputProps( 'filepath' ) }
-                                        onChange={ ( event ) =>
-                                        {
-                                            form.setFieldValue( 'filepath', event.currentTarget.value );
-                                            setFileSelected( true )
-
-                                            const path = require( 'path' );
-                                            setFileName( path.basename( event.currentTarget.value ) );
-                                        } }
-                                    />
-
-                                    <TextInput
-                                        label="Name"
-                                        placeholder="Specify the name of the Dataset"
-                                        withAsterisk
-                                        { ...form.getInputProps( 'name' ) }
-                                    />
-                                    <TextInput
-                                        label="Task"
-                                        placeholder="Specify the task of the Dataset"
-                                        withAsterisk
-                                        { ...form.getInputProps( 'task' ) }
-                                    />
-                                    <TextInput
-                                        label="Description"
-                                        placeholder="Write a description of the Dataset"
-                                        withAsterisk
-                                        { ...form.getInputProps( 'description' ) }
-                                    />
-
-                                    <Select
-                                        label="Type"
-                                        placeholder="Choose a type for ingestion"
-                                        data={ [ "Classification", "Single Feature", "Object Detection" ] }
-                                        //data={ [ "single", "class", "odetect" ] }
-                                        size="sm"
-                                        withAsterisk
-                                        { ...form.getInputProps( 'type' ) }
-                                    />
-
-                                    <Select
-                                        label="Modality"
-                                        placeholder="Choose a modality for ingestion"
-                                        data={ [ "image", "text" ] }
-                                        size="sm"
-                                        withAsterisk
-                                        { ...form.getInputProps( 'modality' ) }
-                                    />
-
-
-                                    <Button type="submit" mt="md" >
-                                        { clicked ? ( <>
-                                            <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
-                                            <span>Dataset Uploaded</span></> )
-                                            : "Upload" }
-                                    </Button>
-
-
-                                </Flex>
-                            </form>
-                        </div>
+                        <ZipUploader/>
                     </Modal.Body>
 
                 </Modal.Content>

@@ -13,7 +13,7 @@ import { Alert, Box, Button, Center, Flex, Loader, Progress, Select, Table, Text
 import Link from "next/link";
 import { useEffect, useRef, useState } from 'react';
 import useStore from '../../../../store/dsStore';
-
+import {Vision} from '@vectopus/atlas-icons-react';
 
 function Home ()
 {
@@ -183,11 +183,12 @@ function Home ()
                 label="Model name"
                 placeholder="Choose model to use"
                 data={ [
-                  "sentence-transformers/all-MiniLM-L6-v2",
-                  "openai/clip-vit-base-patch32",
-                  "google/vit-base-patch16-224",
-                  "bert-base-uncased",
-                ] }
+                      "sentence-transformers/all-MiniLM-L6-v2", 
+                      "openai/clip-vit-base-patch32",             
+                      "google/vit-base-patch16-224",              
+                      "bert-base-uncased", 
+                      "apple/DFN5B-CLIP-ViT-H-14-378"                      
+                  ]}
                 value={ modelName }
                 onChange={ ( value ) => connectAndAssingModel( value as string ) }
                 allowDeselect={ false }

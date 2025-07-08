@@ -79,11 +79,11 @@ function Home ()
       if ( featureName !== "" && feature ) {
         //const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
         const load_labels = async () =>
-        {
-          const lb_feature = await IsFeatureSameLength( datasetUsed as Dataset, feature.datas.length );
-          console.log( "LX", lb_feature )
-          setLabelFeatures( lb_feature as string[] )
-        };
+          {
+            const lb_feature = await IsFeatureSameLength( datasetUsed as Dataset, feature.datas.length);
+            console.log("LX",feature.datas.length)
+            setLabelFeatures( lb_feature as string[] )
+          };
         load_labels()
       }
 
