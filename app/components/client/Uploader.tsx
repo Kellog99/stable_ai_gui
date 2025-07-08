@@ -25,7 +25,7 @@ const ZipUploader = () => {
         formData.append('folder_zip', file); // 'folder_zip' must match the FastAPI parameter name
 
         try {
-            const response = await fetch('http://localhost:8000/upload_folder/', {
+            const response = await fetch(upload_post, {
                 method: 'POST',
                 body: formData,
             });
@@ -63,4 +63,5 @@ export default ZipUploader;import {ok} from 'assert';
 import {files} from 'jszip';
 import {endsWith,method} from 'lodash';
 import {type} from 'os';
-import {json} from 'stream/consumers';
+import {json} from 'stream/consumers';import {upload_post} from '@/properties/urls';
+
