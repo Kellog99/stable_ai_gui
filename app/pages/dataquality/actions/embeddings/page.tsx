@@ -2,7 +2,7 @@
 
 import { getModelInfo } from '@/functionalities/BackendUtils';
 import { ModelInfo } from '@/interfaces/genericInterface';
-import { image_type, label_type, text_type } from '@/properties/types';
+import { image_type, text_type } from '@/properties/types';
 import { embedder_get } from '@/properties/urls';
 import
 {
@@ -29,6 +29,7 @@ function Home ()
   const [ progress, setProgress ] = useState( 0 );
   const [ status, setStatus ] = useState( 'Idle' );
   const [ result, setResult ] = useState<string | null>( null );
+  const [ projecting, setProjecting ] = useState<boolean>( false );
   const [ error, setError ] = useState<string | null>( null );
   const [ computing, setComputing ] = useState<boolean>( false );
   const [ loadingInfo, setLoadingInfo ] = useState<boolean>( false );
@@ -87,6 +88,8 @@ function Home ()
                   // Update progress if available
                   console.log( `Progress: ${jsonData.progress}%` );
                   setProgress( jsonData.progress )
+                } else if ( jsonData.status == "projecting" ) {
+                  setProjecting( true );
                 }
               } catch ( e ) {
                 // Handle potential JSON parsing errors
@@ -110,30 +113,40 @@ function Home ()
         .filter( ( { type } ) => type === image_type || type === text_type )
         .map( ( { name } ) => name );
 
-      const extractedlabelFeatures = datasetUsed.features
-        .filter( ( { type } ) => type === label_type )
-        .map( ( { name } ) => name );
-
       setFeatures( extractedFeatures );
     }
   }, [ datasetUsed ] )
 
+  function checkModelFeatureCompatibility ( modelInfo: ModelInfo, featureName: string )
+  {
+    if ( Array.isArray( datasetUsed?.features ) && modelInfo) {
+      const feature = datasetUsed.features.find( f => f.name === featureName );
+      const type = feature?.type;
 
+      if ( type === image_type && modelInfo.supports_images == true ) {
+        return true;
+      } else if ( type === text_type && modelInfo.supports_text == true ) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
 
   const connectAndAssingModel = async ( model: string ) =>
   {
 
     setModelName( model )
-    setLoadingInfo( true );
-    const modelInfoReceived = await getModelInfo( model );
-    setModelInfo( modelInfoReceived );
-    setShowModelInfo( true );
-    setLoadingInfo( false );
+    if ( model ) {
+      setLoadingInfo( true );
+      const modelInfoReceived = await getModelInfo( model );
+      setModelInfo( modelInfoReceived );
+      setShowModelInfo( true );
+      setLoadingInfo( false );
+      console.log("comp:", checkModelFeatureCompatibility( modelInfoReceived, featureName ))
 
+    }
   }
-
-  console.log( "modelInfo", modelInfo )
-
 
   const handleCompute = () =>
   {
@@ -143,9 +156,7 @@ function Home ()
     }
   }
 
-
-
-
+  
 
   return (
     <div className="w-full h-screen">
@@ -194,90 +205,107 @@ function Home ()
                 allowDeselect={ false }
                 clearable={ !isConnected }
                 required={ true }
-                onClear={() => {
-                  setShowModelInfo(false);
-                  setModelInfo(null);
-                  setComputing(false);
-                }}
+                onClear={ () =>
+                {
+                  setShowModelInfo( false );
+                  setModelInfo( null );
+                  setComputing( false );
+                } }
               />
 
             </Flex>
 
-            { showModelInfo && modelInfo? (
-
-              <Table variant="vertical" layout="fixed" withTableBorder
-                style={ {
-                  marginTop: "20px",
-
-                  width: "30%",
-
-                } }>
-                <Table.Tbody>
-                  <Table.Tr>
-                    <Table.Td colSpan={ 2 } style={ { textAlign: "center", fontWeight: "bold", fontSize: "14px", paddingBottom: "10px" } }>
-                      Model Info
-                    </Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th w={ 160 }>Name</Table.Th>
-                    <Table.Td>{modelInfo.name}</Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th>Model Type</Table.Th>
-                    <Table.Td>{modelInfo.model_type}</Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th>Architecture</Table.Th>
-                    <Table.Td>{modelInfo.architecture}</Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th>Support Text</Table.Th>
-                    <Table.Td>{modelInfo.supports_text}</Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th>Support Images</Table.Th>
-                    <Table.Td>{modelInfo.supports_images}</Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th>Support Audio</Table.Th>
-                    <Table.Td>{modelInfo.supports_audio}</Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th>Embedding Dimension</Table.Th>
-                    <Table.Td>{modelInfo.embedding_dim}</Table.Td>
-                  </Table.Tr>
-
-                  <Table.Tr>
-                    <Table.Th>Max Length</Table.Th>
-                    <Table.Td>{modelInfo.max_length}</Table.Td>
-                  </Table.Tr>
-
-                </Table.Tbody>
-              </Table>
-            ) : loadingInfo ? (
+            { showModelInfo && modelInfo ? (
               <>
-                <Flex
-                  mih={ 150 }
-                  justify="center"
-                  align="center"
-                  direction="column"
-                  wrap="wrap"
-                >
-                  <Loader size={ 30 } />
+              <Flex direction="row" gap="md" align="center" wrap="nowrap">
+                <Table variant="vertical" layout="fixed" withTableBorder
+                  style={ {
+                    marginTop: "20px",
+
+                    width: "30%",
+
+                  } }>
+
+                  <Table.Tbody>
+                    <Table.Tr>
+                      <Table.Td colSpan={ 2 } style={ { textAlign: "center", fontWeight: "bold", fontSize: "14px", paddingBottom: "10px" } }>
+                        Model Info
+                      </Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th w={ 160 }>Name</Table.Th>
+                      <Table.Td>{ modelInfo.name }</Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th>Model Type</Table.Th>
+                      <Table.Td>{ modelInfo.model_type }</Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th>Architecture</Table.Th>
+                      <Table.Td>{ modelInfo.architecture }</Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th>Support Text</Table.Th>
+                      <Table.Td>{ modelInfo.supports_text.toString() }</Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th>Support Images</Table.Th>
+                      <Table.Td>{ modelInfo.supports_images.toString() }</Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th>Support Audio</Table.Th>
+                      <Table.Td>{ modelInfo.supports_audio.toString() }</Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th>Embedding Dimension</Table.Th>
+                      <Table.Td>{ modelInfo.embedding_dim }</Table.Td>
+                    </Table.Tr>
+
+                    <Table.Tr>
+                      <Table.Th>Max Length</Table.Th>
+                      <Table.Td>{ modelInfo.max_length }</Table.Td>
+                    </Table.Tr>
+
+                  </Table.Tbody>
+                </Table>
+
+                { !checkModelFeatureCompatibility( modelInfo, featureName ) && (
+                  <Alert
+                    variant="light"
+                    color="orange"
+                    radius="md"
+                    title="Warning"
+                    icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
+                    style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
+                  >
+                    Check the compatibility between the selected model and the feature type.
+                  </Alert>
+                ) }
                 </Flex>
-              </>
-            ) : null }
+              </> ) : loadingInfo ? (
+                <>
+                  <Flex
+                    mih={ 150 }
+                    justify="center"
+                    align="center"
+                    direction="column"
+                    wrap="wrap"
+                  >
+                    <Loader size={ 30 } />
+                  </Flex>
+                </>
+              ) : null }
 
             <Button style={ { marginTop: "20px" } }
               onClick={ handleCompute }
-              disabled={ !featureName || !modelName }>
+              disabled={ !featureName || !modelName || !checkModelFeatureCompatibility( modelInfo as ModelInfo, featureName ) || computing }>
               Compute Embeddings
             </Button>
 
@@ -294,7 +322,10 @@ function Home ()
 
           <div className="my-animation-container w-full md:w-3/4 lg:w-1/2 mx-auto p-4 bg-gray-200 rounded-lg">
             <Center>
-              <Text size="sm" style={ { marginTop: "60px" } }>Computing embeddings...</Text>
+              { projecting ?
+                <Text size="sm" style={ { marginTop: "60px" } }>Projecting embeddings...</Text>
+                : <Text size="sm" style={ { marginTop: "60px" } }>Computing embeddings...</Text> }
+
             </Center>
 
 
@@ -326,50 +357,47 @@ function Home ()
                 { progress }%
               </Text>
             </Box>
+
+
           </div>
-        ) : 
-        
-        
-        
-        
-        
-        result == "Complete!" ? (
+        ) :
+          result == "Complete!" ? (
 
-          <Alert
-            variant="light"
-            color="green"
-            radius="md"
-            title={ result }
-            icon={ <FontAwesomeIcon icon={ faCheck } /> }
-            style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }>
+            <Alert
+              variant="light"
+              color="green"
+              radius="md"
+              title={ result }
+              icon={ <FontAwesomeIcon icon={ faCheck } /> }
+              style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }>
 
-            The { featureName } feature has been correctly embedded and added to schema.
-          </Alert>
+              The { featureName } feature has been correctly embedded and added to schema.
+            </Alert>
 
 
-        ) : result == "Feature image is already embedded!" ? (
-          <Alert
-            variant="light"
-            color="orange"
-            radius="md"
-            title="Attention!"
-            icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
-            style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
-          >
-            The { featureName } feature is already embedded. Check the dataset schema{ " " }
-            <Link
-              href={ {
-                pathname: "/pages/dataquality/datasets",
-                query: { datasetName: datasetName }
-              } }
-              style={ { color: 'blue' } }
+          ) : result == "Feature image is already embedded!" ? (
+            <Alert
+              variant="light"
+              color="orange"
+              radius="md"
+              title="Attention!"
+              icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
+              style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
             >
-              here
-            </Link>.
-          </Alert>
+              The { featureName } feature is already embedded. Check the dataset schema{ " " }
+              <Link
+                href={ {
+                  pathname: "/pages/dataquality/datasets",
+                  query: { datasetName: datasetName }
+                } }
+                style={ { color: 'blue' } }
+              >
+                here
+              </Link>.
+            </Alert>
 
 
-        ) : null }
+          ) : null }
       </div>
     </div>
   );
