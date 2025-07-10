@@ -1,164 +1,184 @@
-import React, { useRef, useState } from 'react';
-import {
-  Container,
-  Paper,
-  Title,
-  Text,
-  Button,
-  Group,
-  Stack,
+import DatasetsLoader from '@/functionalities/DatasetsLoader';
+import { upload_post } from '@/properties/urls';
+import useStore from '@/store/dsStore';
+import
+{
   Alert,
-  Progress,
+  Button,
   Center,
-  rem,
-  FileInput,
-  ThemeIcon,
-  Notification,
-  Select,
+  Container,
   Divider,
+  FileInput,
+  Group,
+  Paper,
+  Progress,
+  Select,
+  Stack,
+  Switch,
+  Text,
+  ThemeIcon,
+  Title
 } from '@mantine/core';
-import {
-  IconUpload,
-  IconFile,
+import
+{
   IconCheck,
-  IconX,
-  IconFileZip,
   IconCloudUpload,
   IconFileText,
+  IconFileZip,
   IconSettings,
+  IconUpload,
+  IconX
 } from '@tabler/icons-react';
-import { upload_post } from '@/properties/urls';
+import { useState } from 'react';
 
-const ZipUploadComponent = () => {
-  const [file, setFile] = useState(null);
-  const [jsonFile, setJsonFile] = useState(null);
-  const [mode, setMode] = useState('');
-  const [description, setDescription] = useState('');
-  const [labelDict, setLabelDict] = useState({});
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState(null); // 'success', 'error', null
+const ZipUploadComponent = () =>
+{
+  const [ file, setFile ] = useState<File | null>( null );
+  const [ jsonFile, setJsonFile ] = useState<File | null>( null );
+  const [ mode, setMode ] = useState<string>( '' ); // or a union type if limited values: useState<'edit' | 'view' | ''>('')
+  const [type, setType ] = useState<string>( '' ); // or a union type if limited values: useState<'image' | 'text' | ''>('')
+  const [ description, setDescription ] = useState<string>( '' );
+  const [ labelDict, setLabelDict ] = useState<Record<string, string>>( {} );
+  const [ message, setMessage ] = useState<string>( '' );
+  const [ loading, setLoading ] = useState<boolean>( false );
+  const setDatasets = useStore( ( state ) => state.setDatasets )
+  const [ uploadStatus, setUploadStatus ] = useState<string | null>( null ); // 'success', 'error', null
+  const [ arrowAv, setArrowAv ] = useState<boolean>( true ); // Default to true, can be changed by user
 
-  const handleJsonFileChange = async (selectedFile) => {
-    if (!selectedFile) {
-      setJsonFile(null);
-      setDescription('');
-      setLabelDict({});
+  const handleJsonFileChange = async ( selectedFile: File ) =>
+  {
+    if ( !selectedFile ) {
+      setJsonFile( null );
+      setDescription( '' );
+      setLabelDict( {} );
+      return;
+    } else if ( selectedFile.type !== 'application/json' && !selectedFile.name.endsWith( '.json' ) ) {
+      setMessage( 'Please select a .json file.' );
+      setUploadStatus( 'error' );
       return;
     }
 
-    if (selectedFile.type !== 'application/json' && !selectedFile.name.endsWith('.json')) {
-      setMessage('Please select a .json file.');
-      setUploadStatus('error');
-      return;
-    }
+    setJsonFile( selectedFile );
 
-    setJsonFile(selectedFile);
-    
-    // Read and parse JSON file
     try {
       const text = await selectedFile.text();
-      const jsonData = JSON.parse(text);
-      
-      if (jsonData.description) {
-        setDescription(jsonData.description);
+      const jsonData = JSON.parse( text );
+
+      if ( jsonData.description ) {
+        setDescription( jsonData.description );
       }
-      
-      if (jsonData.label_dict) {
-        setLabelDict(jsonData.label_dict);
+
+      if ( jsonData.label_dict ) {
+        setLabelDict( jsonData.label_dict );
       }
-      
-      setMessage(`JSON file loaded: ${selectedFile.name}`);
-      setUploadStatus(null);
-    } catch (error) {
-      setMessage(`Error reading JSON file: ${error.message}`);
-      setUploadStatus('error');
+
+      setMessage( `JSON file loaded: ${selectedFile.name}` );
+      setUploadStatus( null );
+    } catch ( error ) {
+      setMessage( `Error reading JSON file: ${error}` );
+      setUploadStatus( 'error' );
     }
   };
-  const handleFileChange = async (selectedFile) => {
-    if (!selectedFile) {
-      setMessage('No file selected.');
-      setUploadStatus(null);
+
+  const handleFileChange = async ( selectedFile: File ) =>
+  {
+    console.log( "Selected file:", selectedFile );
+    if ( !selectedFile ) {
+      setMessage( 'No file selected.' );
+      setUploadStatus( null );
       return;
     }
 
-    if (selectedFile.type !== 'application/zip' && !selectedFile.name.endsWith('.zip')) {
-      setMessage('Please select a .zip file.');
-      setUploadStatus('error');
+    if ( selectedFile.type !== 'application/zip' && !selectedFile.name.endsWith( '.zip' ) ) {
+      setMessage( 'Please select a .zip file.' );
+      setUploadStatus( 'error' );
       return;
     }
 
-    setFile(selectedFile);
-    setMessage(`Selected file: ${selectedFile.name}. Ready to upload.`);
-    setUploadStatus(null);
+    setFile( selectedFile );
+    setMessage( `Selected file: ${selectedFile.name}. Ready to upload.` );
+    setUploadStatus( null );
   };
 
-  const handleUpload = async () => {
-    if (!file) {
-      setMessage('Please select a zip file first.');
-      setUploadStatus('error');
+
+
+
+  const handleUpload = async () =>
+  {
+    if ( !file ) {
+      setMessage( 'Please select a zip file first.' );
+      setUploadStatus( 'error' );
       return;
     }
 
-    setMessage(`Uploading ${file.name}...`);
-    setLoading(true);
-    setUploadStatus(null);
+    setMessage( `Uploading ${file.name}...` );
+    setLoading( true );
+    setUploadStatus( null );
 
     const formData = new FormData();
-    formData.append('folder_zip', file);
+    formData.append( 'folder_zip', file );
 
     // Build query parameters
     const queryParams = new URLSearchParams();
-    
-    if (description) {
-      queryParams.append('description', description);
-    }
-    
-    if (Object.keys(labelDict).length > 0) {
-      queryParams.append('label_dict', JSON.stringify(labelDict));
-    }
-    
-    if (mode) {
-      queryParams.append('mode', mode);
+
+    if ( description ) {
+      queryParams.append( 'description', description );
     }
 
-    const uploadUrl = queryParams.toString() ? 
-      `${upload_post}?${queryParams.toString()}` : 
+    if ( Object.keys( labelDict ).length > 0 ) {
+      queryParams.append( 'label_dict', JSON.stringify( labelDict ) );
+    }
+
+    if ( mode ) {
+      queryParams.append( 'mode', mode );
+    }
+    if ( type ) {
+      queryParams.append( 'type', type );
+    }
+
+    const uploadUrl = queryParams.toString() ?
+      `${upload_post}?${queryParams.toString()}` :
       upload_post;
 
     try {
-      const response = await fetch(uploadUrl, {
+      const response = await fetch( uploadUrl, {
         method: 'POST',
         body: formData,
-      });
+      } );
 
-      if (response.ok) {
+      if ( response.ok ) {
         const data = await response.json();
-        setMessage(`Upload successful: ${data.message}`);
-        setUploadStatus('success');
+        setMessage( `Upload successful: ${data.message}` );
+        setUploadStatus( 'success' );
       } else {
-        setMessage(`Upload failed: ${response.statusText}`);
-        setUploadStatus('error');
+        setMessage( `Upload failed: ${response.statusText}` );
+        setUploadStatus( 'error' );
       }
-    } catch (error) {
-      console.error('Error uploading:', error);
-      setMessage(`An error occurred: ${error.message}`);
-      setUploadStatus('error');
+    } catch ( error ) {
+      console.error( 'Error uploading:', error );
+      setMessage( `An error occurred: ${error}` );
+      setUploadStatus( 'error' );
     } finally {
-      setLoading(false);
+      DatasetsLoader().then( fetchedData =>
+      {
+        setDatasets( fetchedData );
+      } )
+      setLoading( false );
     }
   };
 
-  const getStatusColor = () => {
-    if (uploadStatus === 'success') return 'red';
-    if (uploadStatus === 'error') return 'red';
+  const getStatusColor = () =>
+  {
+    if ( uploadStatus === 'success' ) return 'red';
+    if ( uploadStatus === 'error' ) return 'red';
     return 'red';
   };
 
-  const getStatusIcon = () => {
-    if (uploadStatus === 'success') return <IconCheck size={20} />;
-    if (uploadStatus === 'error') return <IconX size={20} />;
-    return <IconUpload size={20} />;
+  const getStatusIcon = () =>
+  {
+    if ( uploadStatus === 'success' ) return <IconCheck size={ 20 } />;
+    if ( uploadStatus === 'error' ) return <IconX size={ 20 } />;
+    return <IconUpload size={ 20 } />;
   };
 
   return (
@@ -166,13 +186,13 @@ const ZipUploadComponent = () => {
       <Paper shadow="md" p="xl" radius="md" withBorder>
         <Stack gap="lg">
           <Center>
-            <ThemeIcon size={60} radius="xl" variant="light" color="red">
-              <IconFileZip size={30} />
+            <ThemeIcon size={ 60 } radius="xl" variant="light" color="red">
+              <IconFileZip size={ 30 } />
             </ThemeIcon>
           </Center>
 
           <Center>
-            <Title order={2} ta="center" c="dark">
+            <Title order={ 2 } ta="center" c="dark">
               Upload Zip File
             </Title>
           </Center>
@@ -185,13 +205,56 @@ const ZipUploadComponent = () => {
             label="Choose zip file"
             placeholder="Click to select file"
             accept=".zip,application/zip"
-            value={file}
-            onChange={handleFileChange}
-            leftSection={<IconFileZip size={14} />}
+            value={ file }
+            onChange={ ( file ) => handleFileChange( file as File ) }
+            leftSection={ <IconFileZip size={ 14 } /> }
             clearable
             size="md"
             required
           />
+
+          <Switch
+            defaultChecked
+            color="gray"
+            label="Arrow available"
+            onChange={ ( e ) => setArrowAv( e.currentTarget.checked ) }
+          />
+
+          { !arrowAv && (
+            <>
+            <Select
+              label="Processing Mode"
+              placeholder="Select processing mode"
+              value={ mode }
+              onChange={ ( mode ) => setMode( mode as string ) }
+              data={ [
+                { value: 'single_feature', label: 'Single Feature' },
+                { value: 'classification', label: 'Classification' },
+                { value: 'object_detection', label: 'Object Detection' },
+              ] }
+              leftSection={ <IconSettings size={ 14 } /> }
+              clearable
+              size="md"
+              required
+            /> 
+
+            <Select
+              label="Type of the main feature"
+              placeholder="Select type"
+              value={ type }
+              onChange={ ( type ) => setType( type as string ) }
+              data={ [
+                { value: 'image', label: 'Image' },
+                { value: 'text', label: 'Text' },
+              ] }
+              leftSection={ <IconSettings size={ 14 } /> }
+              clearable
+              size="md"
+              required
+            /> 
+
+            </>
+            )}
 
           <Divider label="Optional Configuration" labelPosition="center" />
 
@@ -199,76 +262,63 @@ const ZipUploadComponent = () => {
             label="Configuration JSON file (optional)"
             placeholder="Click to select JSON file"
             accept=".json,application/json"
-            value={jsonFile}
-            onChange={handleJsonFileChange}
-            leftSection={<IconFileText size={14} />}
+            value={ jsonFile }
+            onChange={ ( jsonFile ) => handleJsonFileChange( jsonFile as File ) }
+            leftSection={ <IconFileText size={ 14 } /> }
             clearable
             size="md"
             description="Upload a JSON file containing description and label_dict"
           />
 
-          <Select
-            label="Processing Mode (optional)"
-            placeholder="Select processing mode"
-            value={mode}
-            onChange={setMode}
-            data={[
-              { value: 'single_feature', label: 'Single Feature' },
-              { value: 'classification', label: 'Classification' },
-              { value: 'object_detection', label: 'Object Detection' },
-            ]}
-            leftSection={<IconSettings size={14} />}
-            clearable
-            size="md"
-          />
 
-          {file && (
+
+          { file && (
             <Alert
-              icon={<IconFileZip size={16} />}
+              icon={ <IconFileZip size={ 16 } /> }
               title="File Selected"
               color="blue"
               variant="light"
             >
-              <Text size="sm" fw={500}>
-                {file.name}
+              <Text size="sm" fw={ 500 }>
+                { file.name }
               </Text>
               <Text size="xs" c="dimmed">
-                Size: {(file.size / 1024 / 1024).toFixed(2)} MB
+                Size: { ( file.size / 1024 / 1024 ).toFixed( 2 ) } MB
               </Text>
             </Alert>
-          )}
+          ) }
 
-          {loading && (
+          { loading && (
             <Stack gap="xs">
-              <Progress value={100} animated color="red" />
+              <Progress value={ 100 } animated color="red" />
               <Text size="sm" c="dimmed" ta="center">
                 Uploading file...
               </Text>
             </Stack>
-          )}
+          ) }
 
-          {message && !loading && (
+          { message && !loading && (
             <Alert
-              icon={getStatusIcon()}
-              title={uploadStatus === 'success' ? 'Success' : uploadStatus === 'error' ? 'Error' : 'Info'}
-              color={getStatusColor()}
+              icon={ getStatusIcon() }
+              title={ uploadStatus === 'success' ? 'Success' : uploadStatus === 'error' ? 'Error' : 'Info' }
+              color={ getStatusColor() }
               variant="light"
             >
-              {message}
+              { message }
             </Alert>
-          )}
+          ) }
 
           <Group justify="center" mt="md">
             <Button
-              leftSection={<IconCloudUpload size={16} />}
-              onClick={handleUpload}
-              loading={loading}
-              disabled={!file || loading}
+              leftSection={ <IconCloudUpload size={ 16 } /> }
+              onClick={ handleUpload }
+              loading={ loading }
+              disabled={ !file || loading }
               size="md"
               variant="filled"
               color="red"
             >
-              {loading ? 'Uploading...' : 'Upload File'}
+              { loading ? 'Uploading...' : 'Upload File' }
             </Button>
           </Group>
         </Stack>
