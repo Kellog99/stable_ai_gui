@@ -103,6 +103,7 @@ const useStore = create<AppState>()(
         datasets: state.datasets,
         datasetUsed: state.datasetUsed,
         selectedFeature: state.selectedFeature,
+        report: state.report
         //featureToDisplay: state.featureToDisplay
         // queryDataset is NOT included, so it won't be persisted
       } ),

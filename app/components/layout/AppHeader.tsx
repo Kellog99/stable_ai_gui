@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDatabase, faFloppyDisk} from "@fortawesome/free-solid-svg-icons";
+import { faDatabase, faFloppyDisk, faFilePdf, faPrint} from "@fortawesome/free-solid-svg-icons";
 import useStore from "@/store/dsStore";
 import {Target} from "lucide-react";
 import {save_get} from "@/properties/urls";
@@ -17,7 +17,10 @@ function AppHeader() {
   const pathName = usePathname();
   const isActive = (path: string) => pathName === path;
   const datasetUsed = useStore((state) => state.datasetUsed)?.name;
+  const report = useStore((state) => state.report)
   const [opened, setOpened] = useState(false);
+  //const [reportOpen, setReportOpen] = useState(false)
+  const [ reportOpen, { open, close } ] = useDisclosure( false );
   const [saveMessage, setSaveMessage] = useState("Dataset saved");
 
   // Fixed: Function should not be called immediately in onClick
@@ -46,7 +49,7 @@ function AppHeader() {
   };
 
   const isNNTrust = pathName.includes('/nntrust');
-
+  console.log("REPORT_OPEN",reportOpen)
   return (
     <>
       <Group>
@@ -76,6 +79,18 @@ function AppHeader() {
       <Group>
         {datasetUsed ? (
           <>
+          
+              
+            <Button 
+              radius="lg" 
+              onClick={open}
+              disabled={report.length===0}
+              >
+                <span><FontAwesomeIcon icon={faPrint}/></span>
+              </Button> 
+            <PDFPreviewModal opened={reportOpen} close={close}/>
+             
+           
             <Popover opened={opened} onChange={setOpened}>
               <Popover.Target>
                 <Button 
@@ -104,4 +119,5 @@ function AppHeader() {
 export default React.memo(AppHeader);import {icon} from "@fortawesome/fontawesome-svg-core";
 import {ok} from "assert";
 import {includes} from "lodash";
-import {memo} from "react";
+import {memo} from "react";import PDFPreviewModal from "../client/ReportModal";
+

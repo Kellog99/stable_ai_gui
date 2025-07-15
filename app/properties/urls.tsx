@@ -13,6 +13,7 @@ export const upload_post = "http://localhost:8000/upload_folder"
 export const cropper_get = "http://localhost:8000/actions/cropper"
 export const save_get = "http://localhost:8000/save"
 export const model_info_get = "http://localhost:8000/inference_server/model_info"
+export const report_post = "http://localhost:8000/report"
 //export const dataset_post = 'http://10.125.34.229:5003/process'
 //export const feature_post = 'http://10.125.34.229:5003/getFeature'
 //export const data_get = "http://10.125.34.229:5003/embeddings/getUmap"

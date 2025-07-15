@@ -231,7 +231,8 @@ export default function Config ( props: ConfigsProps )
             ) &&
             metricReport.results.featureName === featureName &&
             ( !props?.labelFeatureReq || metricReport.results.labelFeatureName === labelFeatureName ) &&
-            JSON.stringify( metricReport.internalConfigs ) === JSON.stringify( newReportMetric.internalConfigs )
+            JSON.stringify( metricReport.internalConfigs ) === JSON.stringify( newReportMetric.internalConfigs ) &&
+            (metricReport.results.name==="accuracy" && metricReport.results.mode === outliers_mode)
         );
 
 
