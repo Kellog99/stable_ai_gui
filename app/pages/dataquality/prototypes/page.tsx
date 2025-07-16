@@ -2,19 +2,13 @@
 
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import { getPrototypes } from "@/functionalities/BackendUtils";
-import { IsFeatureBond } from "@/functionalities/Utils";
+import { IsFeatureBond, IsFeatureSameLength } from "@/functionalities/Utils";
 import Dataset from "@/interfaces/genericInterface";
 import { image_type, label_type, text_type } from "@/properties/types";
 import { Flex, Loader, Select, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useStore from '../../../store/dsStore';
-import { image_type, label_type, text_type } from "@/properties/types";
-import { getPrototypes } from "@/functionalities/BackendUtils";
-import FeatureDisplayer from "@/components/client/FeatureDisplayer";
-import { IsFeatureBond, IsFeatureSameLength } from "@/functionalities/Utils";
-import Dataset from "@/interfaces/DatasetInterface";
-import Dataset from "@/interfaces/DatasetInterface";
 import featureLoader from "@/functionalities/FeatureLoader";
 
 interface PrototypesData
