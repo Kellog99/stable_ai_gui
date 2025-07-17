@@ -36,7 +36,7 @@ const ZipUploadComponent = () =>
   const [ file, setFile ] = useState<File | null>( null );
   const [ jsonFile, setJsonFile ] = useState<File | null>( null );
   const [ mode, setMode ] = useState<string>( '' ); // or a union type if limited values: useState<'edit' | 'view' | ''>('')
-  const [type, setType ] = useState<string>( '' ); // or a union type if limited values: useState<'image' | 'text' | ''>('')
+  const [ type, setType ] = useState<string>( '' ); // or a union type if limited values: useState<'image' | 'text' | ''>('')
   const [ description, setDescription ] = useState<string>( '' );
   const [ labelDict, setLabelDict ] = useState<Record<string, string>>( {} );
   const [ message, setMessage ] = useState<string>( '' );
@@ -222,39 +222,41 @@ const ZipUploadComponent = () =>
 
           { !arrowAv && (
             <>
-            <Select
-              label="Processing Mode"
-              placeholder="Select processing mode"
-              value={ mode }
-              onChange={ ( mode ) => setMode( mode as string ) }
-              data={ [
-                { value: 'single_feature', label: 'Single Feature' },
-                { value: 'classification', label: 'Classification' },
-                { value: 'object_detection', label: 'Object Detection' },
-              ] }
-              leftSection={ <IconSettings size={ 14 } /> }
-              clearable
-              size="md"
-              required
-            /> 
+              <Select
+                label="Processing Mode"
+                placeholder="Select processing mode"
+                value={ mode }
+                onChange={ ( mode ) => setMode( mode as string ) }
+                data={ [
+                  { value: 'single_feature', label: 'Single Feature' },
+                  { value: 'classification', label: 'Classification' },
+                  { value: 'object detection', label: 'Object Detection' },
+                ] }
+                leftSection={ <IconSettings size={ 14 } /> }
+                clearable
+                size="md"
+                required
+              />
 
-            <Select
-              label="Type of the main feature"
-              placeholder="Select type"
-              value={ type }
-              onChange={ ( type ) => setType( type as string ) }
-              data={ [
-                { value: 'image', label: 'Image' },
-                { value: 'text', label: 'Text' },
-              ] }
-              leftSection={ <IconSettings size={ 14 } /> }
-              clearable
-              size="md"
-              required
-            /> 
+              { mode != "object detection" && mode != ""?
+
+                <Select
+                  label="Type of the main feature"
+                  placeholder="Select type"
+                  value={ type }
+                  onChange={ ( type ) => setType( type as string ) }
+                  data={ [
+                    { value: 'image', label: 'Image' },
+                    { value: 'text', label: 'Text' },
+                  ] }
+                  leftSection={ <IconSettings size={ 14 } /> }
+                  clearable
+                  size="md"
+                  required
+                /> : null }
 
             </>
-            )}
+          ) }
 
           <Divider label="Optional Configuration" labelPosition="center" />
 

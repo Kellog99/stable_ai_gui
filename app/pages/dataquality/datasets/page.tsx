@@ -56,6 +56,7 @@ export default function Datasets ()
   const setDatasets: ( datasets: null ) => void = useStore( ( state ) => state.setDatasets );
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const setData = useStore( ( state ) => ( state.setData ) );
+  const setReport = useStore((state) => state.setReport)
 
   const featureToDisplay = useStore( ( state ) => state.featureToDisplay );
   const setFeatureToDisplay = useStore( ( state ) => state.setFeatureToDisplay )
@@ -73,6 +74,7 @@ export default function Datasets ()
       if ( filteredDataset ) {
         setData( filteredDataset );
         setDatasets( null )
+        setReport([])
       }
     }
 
