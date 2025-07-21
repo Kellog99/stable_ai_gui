@@ -137,6 +137,7 @@ export default function CompletenessDisplayer ( props: { completeness: Completen
 
           <Text fw={ 600 } style={ { margin: "20px" } } >Samples that best adhere to the requirement selected</Text>
           <FeatureDisplayer
+            indexes={indexesRetrieved as number[]}
             featureData={ samplesRetrieved as string[] }
             featureType={ featureType as string }
             labelData={ labelsRetrived as number[] }

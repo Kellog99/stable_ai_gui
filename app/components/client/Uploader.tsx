@@ -169,7 +169,7 @@ const ZipUploadComponent = () =>
 
   const getStatusColor = () =>
   {
-    if ( uploadStatus === 'success' ) return 'red';
+    if ( uploadStatus === 'success' ) return 'green';
     if ( uploadStatus === 'error' ) return 'red';
     return 'red';
   };
@@ -318,7 +318,7 @@ const ZipUploadComponent = () =>
               disabled={ !file || loading }
               size="md"
               variant="filled"
-              color="red"
+              
             >
               { loading ? 'Uploading...' : 'Upload File' }
             </Button>

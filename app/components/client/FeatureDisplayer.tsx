@@ -36,15 +36,13 @@ interface FeatureDisplayerProps {
   dimensions?: { width: number, height: number }
 }
 
-//ciaooooooooo :)
-
 export function FeatureCard(props: FeatureCardProps) {
   const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty } = props
   const [showSection, setShowSection] = useState(false)
 
   return (
     <>
-      <Card className={classes.card} shadow="sm" padding="lg" radius="md" withBorder>
+      <Card className={classes.card} shadow="sm" radius="md" withBorder>
         <div onClick={() => setShowSection(true)} style={{ cursor: "pointer" }}>
           <CardSection className={classes.cardsection}>
             {featureType === image_type ? (
@@ -62,9 +60,11 @@ export function FeatureCard(props: FeatureCardProps) {
               {label != null ? (labelColor ? (<Badge color={`rgb(${labelColor.join(",")})`}> Class ID: {label} </Badge>) : (<Badge color="#ec777e"> Class ID: {label} </Badge>)
               ) : null}
             </Group>
-            <Text size="sm" c="dimmed">
+            {index || index ==0 ? 
+            (<Text size="sm" c="dimmed">
               Sample: {index}
-            </Text>
+            </Text>) : null}
+            
 
             {(index || index == 0) && uncertainty && score && labelColor ? (<>
               <Group justify="space-between" mt="md" mb="xs">
@@ -115,7 +115,7 @@ export function FeatureCard(props: FeatureCardProps) {
             maxHeight: "50vh", 
           },
           header: {
-            display: featureType === image_type ? "none" : undefined, // 'undefined' lets Mantine use its default display
+            display: featureType === image_type ? "none" : undefined, 
           },
         }}
       >
@@ -130,7 +130,7 @@ export function FeatureCard(props: FeatureCardProps) {
               maxHeight: "50vh", 
             }}
           >
-            <img src={path.sep+datasets_folder+path.sep+data} alt="preview" style={{ maxWidth: "50vw", maxHeight: "50vh", borderRadius:"5px"}} />
+            <img src={path.sep+datasets_folder+path.sep+data} alt="preview" style={{ maxWidth: "50vw", maxHeight: "50vh"}} />
             <CloseButton
               onClick={() => setShowSection(false)}
               style={{

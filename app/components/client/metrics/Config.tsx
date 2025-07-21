@@ -127,7 +127,8 @@ export default function Config ( props: ConfigsProps )
 
     const setAddToReport = useStore( ( state ) => state.setAddToReport )
 
-
+    console.log("REPORT", report)
+    
     useEffect( () =>
     {
         setComputeNow( false )

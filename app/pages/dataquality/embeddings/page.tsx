@@ -196,6 +196,8 @@ function Home ()
     }
   }, [ labelFeatureName ] );
 
+
+  console.log("LABEL DICT page:", labelDict)
   useEffect( () =>
   {
     // Only proceed if indexes is not null

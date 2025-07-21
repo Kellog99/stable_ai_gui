@@ -117,6 +117,7 @@ function Home ()
     }
   }, [ datasetUsed ] )
 
+
   function checkModelFeatureCompatibility ( modelInfo: ModelInfo, featureName: string )
   {
     if ( Array.isArray( datasetUsed?.features ) && modelInfo) {
@@ -143,7 +144,6 @@ function Home ()
       setModelInfo( modelInfoReceived );
       setShowModelInfo( true );
       setLoadingInfo( false );
-      console.log("comp:", checkModelFeatureCompatibility( modelInfoReceived, featureName ))
 
     }
   }

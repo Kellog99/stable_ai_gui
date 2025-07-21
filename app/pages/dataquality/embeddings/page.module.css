@@ -12,6 +12,7 @@
   height: 180px;
   overflow: hidden;
   position: relative;
+  padding-bottom: 10px;
 }
 
 .title {
