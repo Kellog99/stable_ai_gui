@@ -82,27 +82,40 @@ function AppHeader() {
         {datasetUsed ? (
           <>
 
-            <Tooltip label="Obtain report">
-              <Button
-                radius="lg"
-                onClick={open}
-                disabled={report.length === 0}
-              >
-                <span><LinesGraphClipboard size={18} /></span>
-              </Button>
-            </Tooltip>
-            <PDFPreviewModal opened={reportOpen} close={close} />
+            
+            <RouterButton name={datasetUsed} route={"/pages/dataquality/report"}>
+              <Tooltip label="Obtain report">
+                <Button
+                  radius="lg"
+                  onClick={open}
+                  disabled={report.length === 0}
+                >
+                  <span><LinesGraphClipboard size={18} /></span>
+                </Button>
+              </Tooltip>
+            </RouterButton>
+            
 
-
+            {/*
+            <Button
+                  radius="lg"
+                  onClick={open}
+                  disabled={report.length === 0}
+                >
+                  <span><LinesGraphClipboard size={18} /></span>
+                </Button>
+                <PDFPreviewModal opened={reportOpen} close={close} />
+            */}
+            
             <Popover opened={opened} onChange={setOpened}>
               <Popover.Target>
                 <Tooltip label="Save dataset">
-                <Button
-                  radius="lg"
-                  onClick={() => handleSave(datasetUsed)}
-                >
-                  <span><FontAwesomeIcon icon={faFloppyDisk} /></span>
-                </Button>
+                  <Button
+                    radius="lg"
+                    onClick={() => handleSave(datasetUsed)}
+                  >
+                    <span><FontAwesomeIcon icon={faFloppyDisk} /></span>
+                  </Button>
                 </Tooltip>
               </Popover.Target>
               <Popover.Dropdown>{saveMessage}</Popover.Dropdown>
@@ -125,4 +138,5 @@ export default React.memo(AppHeader); import { icon } from "@fortawesome/fontawe
 import { ok } from "assert";
 import { includes } from "lodash";
 import { memo } from "react"; import PDFPreviewModal from "../client/ReportModal";
+import RouterButton from "../client/buttons/RouterButton";
 

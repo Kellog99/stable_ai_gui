@@ -2,6 +2,8 @@ import { Button, Divider, LoadingOverlay, Modal, Text, Tooltip, Alert, Box, Scro
 import { useState } from "react";
 import { InfoCircle } from "@vectopus/atlas-icons-react";
 import useStore from "@/store/dsStore";
+import {report_post} from "@/properties/urls";
+
 interface PDFPreviewModalProps {
     opened: boolean;
     close: () => void;
@@ -22,7 +24,6 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
             
             const url = new URL(report_post);
             url.searchParams.append('datasetName', datasetName);
-            console.log("UUU",datasetName)
             const response = await fetch(url , {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }, 
@@ -33,7 +34,6 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
             }
             
             const data = await response.json();
-            console.log("UUUUU",data)
             setPdfData(data); 
         } catch (err) {
             setError(err instanceof Error ? err.message : 'An error occurred');
@@ -177,15 +177,5 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
         </Modal.Root>
     );
 }
-import transition from "@deck.gl/core/dist/transitions/transition";
-import {Overlay,CloseButton} from "@mantine/core";
-import {ok} from "assert";
-import {Title} from "chart.js";
-import {color} from "framer-motion";
-import {size} from "lodash";
-import {map, type} from "os";
-import {title} from "process";
-import {createElement} from "react";
-import {json} from "stream/consumers";
-import style from "styled-jsx/style";import {report_post} from "@/properties/urls";
+
 
