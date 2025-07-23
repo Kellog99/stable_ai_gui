@@ -30,7 +30,8 @@ export default interface Dataset
   edges: [ string, string ][];
   n_classes: number;
   samples_per_class?: { [ key: number ]: number };
-  description?: string
+  description?: string;
+  default_embedding_model?:string
 }
 
 export interface FeatureSchema

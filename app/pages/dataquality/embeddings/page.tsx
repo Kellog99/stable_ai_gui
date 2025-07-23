@@ -403,7 +403,10 @@ function Home ()
                   placeholder="Choose feature to visualize"
                   data={ features }
                   value={ featureName }
-                  onChange={ ( value ) => setFeatureName( value ) }
+                  onChange={(value) => {
+                    setFeatureName(value);
+                    setModelUsed(datasetUsed.default_embedding_model);
+                  }}
                   required={ true }
                 />
 

@@ -498,12 +498,13 @@ export default function ScatterPlotVisualization(props: propsTypes) {
     if ( Array.isArray( datasetUsed?.features ) && modelInfo) {
       const feature = datasetUsed.features.find( f => f.name === featureName );
       const type = feature?.type;
-      if ( type === image_type && modelInfo.supports_images == true ) { // Removed `&& modelInfo.supports_text == true` for image_type
+      if ( type === image_type && modelInfo.supports_images == true && modelInfo.supports_text == true) { // Removed `&& modelInfo.supports_text == true` for image_type
         return true;
       } else if ( type === text_type && modelInfo.supports_text == true ) {
         return true;
       }
     }
+    
     return false; // Default return if conditions are not met
   }
 
