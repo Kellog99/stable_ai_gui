@@ -13,7 +13,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
     const [pdfData, setPdfData] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const datasetName = useStore( ( state ) => state.datasetUsed.name)
+    const datasetName = useStore( ( state ) => state.datasetUsed?.name)
     const report = useStore((state) => state.report)
     
     const fetchPDFData = async () => {
@@ -23,7 +23,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
         try {
             
             const url = new URL(report_post);
-            url.searchParams.append('datasetName', datasetName);
+            url.searchParams.append('datasetName', datasetName as string);
             const response = await fetch(url , {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }, 

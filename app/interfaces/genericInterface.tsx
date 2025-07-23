@@ -67,3 +67,14 @@ export interface ModelInfo {
   embedding_dim: number;
   max_length: number;
 }
+
+export interface PrototypesData
+{
+    data: any,
+    label_data: number
+}
+export interface PrototypesInt
+{
+    type: string,
+    datas: PrototypesData[]
+}

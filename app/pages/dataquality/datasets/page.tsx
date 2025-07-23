@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import classes from './page.module.css';
+import { labelColorMap } from "@/properties/static";
 
 
 
@@ -41,7 +42,9 @@ export default function Datasets ()
   const [ feature, setFeature ] = useState<Feature | null>( null )
   const [ featureType, setFeatureType ] = useState<any>( "" )
   const [ indexes, setIndexes ] = useState<number[]>( [] );
-  const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
+  //const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
+  const labelToSamples = useStore((state) => state.labelToSamples)
+  const setLabelToSamples = useStore((state) => state.setLabelToSamples)
   const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null )
   const [ labelDict, setLabelDict ] = useState<{ [ key: number ]: string } | null>( null )
   const [ areEmbeddings, setAreEmbeddings ] = useState<boolean>( false )
@@ -57,6 +60,11 @@ export default function Datasets ()
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
   const setData = useStore( ( state ) => ( state.setData ) );
   const setReport = useStore((state) => state.setReport)
+
+  const setPrototypesData = useStore((state) => state.setPrototypesData)
+  const setLabelProtoData = useStore((state) => state.setLabelProtoData)
+  
+ 
 
   const featureToDisplay = useStore( ( state ) => state.featureToDisplay );
   const setFeatureToDisplay = useStore( ( state ) => state.setFeatureToDisplay )
@@ -75,6 +83,10 @@ export default function Datasets ()
         setData( filteredDataset );
         setDatasets( null )
         setReport([])
+        setPrototypesData(null)
+        setLabelProtoData(null)
+        setLabelToSamples([])
+
       }
     }
 
@@ -196,21 +208,6 @@ export default function Datasets ()
   }, [ datasetUsed ] )
 
 
-
-
-  const labelColorMap: Record<string, string> = {
-    image: "#FFDDC1",
-    image_crops: "#FFDDC1",
-    bbox: "#C1E1DC",
-    label: "#F7D1CD",
-    image_label: "#F7D1CD",
-    bbox_label: "#F7D1CD",
-    text: "#C1F7C1",
-    image_embeddings: "#FFABAB",
-    bbox_embeddings: "#FFABAB",
-    image_crops_embeddings: "#FFABAB",
-  };
-
   useEffect( () =>
   {
     if ( feature && Array.isArray( feature.datas ) ) {
@@ -268,6 +265,7 @@ export default function Datasets ()
                     features={ features }
                     connections={ connections }
                     labelColorMap={ labelColorMap }
+                    clickable={true}
                   />
                 </div>
               </motion.div>

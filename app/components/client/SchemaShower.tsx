@@ -23,6 +23,7 @@ interface SchemaVisualizationProps
   features: FeatureSchema[];
   connections: [ string, string ][];
   labelColorMap: Record<string, string>;
+  clickable?: boolean;
 }
 
 
@@ -32,7 +33,7 @@ const darkenHexColor = ( color: string ): string =>
 };
 
 
-const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisualizationProps ) =>
+const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: SchemaVisualizationProps ) =>
 {
   const nodeSize = 80;
   const horizontalSpacing = 160; // Fixed horizontal spacing between nodes
@@ -94,8 +95,8 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
         color: "black",
         border: `2px solid ${darkerColor}`,
         pointerEvents: "auto",
-        //cursor: feature.name === "image" ? "pointer" : "default",
-        cursor: "pointer"
+        cursor: clickable ? "pointer" :  "default",
+        //cursor: "pointer"
       },
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
@@ -197,9 +198,9 @@ const SchemaGraph: React.FC<{
     );
   };
 
-const HorizontalTreeSchema: React.FC<SchemaVisualizationProps> = ( { features, connections, labelColorMap } ) =>
+const HorizontalTreeSchema: React.FC<SchemaVisualizationProps> = ( { features, connections, labelColorMap, clickable } ) =>
 {
-  const { nodes, edges, dimensions } = buildTreeLayout( { features, connections, labelColorMap } );
+  const { nodes, edges, dimensions } = buildTreeLayout( { features, connections, labelColorMap, clickable } );
 
   return (
     <ReactFlowProvider>

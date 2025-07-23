@@ -27,6 +27,12 @@ interface AppState
   filteredLabels: string[] | [];
   size: { width: number, height: number }
 
+  prototypesData: string[] | null;
+  labelProtoData: number[] | null;
+  labelToSamples: { label: string; samples: number }[]
+
+  
+
 
   setSelectedIndexes: ( selectedIndexes: number[] ) => void;
   setSelectedPoints: ( selectedPoints: number[] ) => void;
@@ -48,6 +54,9 @@ interface AppState
 
   setFilteredLabels: ( filteredLabels: string[] | [] ) => void;
   setSize: ( size: { width: number, height: number } ) => void;
+  setPrototypesData: (prototypesData: string[] | null) => void;
+  setLabelProtoData: (labelProtoData: number[] | null) => void;
+  setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => void;
 
 }
 
@@ -74,6 +83,10 @@ const useStore = create<AppState>()(
       size: { width: 690, height: 500 },
       uqColors: null,
 
+      prototypesData: null,
+      labelProtoData: null,
+      labelToSamples: [],
+
 
       setData: ( datasetUsed ) => set( { datasetUsed } ),
       setDatasets: ( datasets: Dataset[] | null ) => set( { datasets } ),
@@ -95,7 +108,12 @@ const useStore = create<AppState>()(
 
       setFilteredLabels: ( filteredLabels: string[] | [] ) => set( { filteredLabels } ),
       setSize: ( size: { width: number, height: number } ) => set( { size } ),
+
+      setPrototypesData: (prototypesData: string[] | null) => set( { prototypesData } ),
+      setLabelProtoData: (labelProtoData: number[] | null) => set( { labelProtoData } ),
+      setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set( { labelToSamples } ),
     } ),
+
     {
       name: "app-storage",
       storage: createJSONStorage( () => sessionStorage ),
@@ -103,7 +121,10 @@ const useStore = create<AppState>()(
         datasets: state.datasets,
         datasetUsed: state.datasetUsed,
         selectedFeature: state.selectedFeature,
-        report: state.report
+        report: state.report,
+        prototypesData: state.prototypesData,
+        labelProtoData:state.labelProtoData,
+        labelToSamples: state.labelToSamples,
         //featureToDisplay: state.featureToDisplay
         // queryDataset is NOT included, so it won't be persisted
       } ),

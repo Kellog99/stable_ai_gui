@@ -3,7 +3,7 @@
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import { getPrototypes } from "@/functionalities/BackendUtils";
 import { IsFeatureBond, IsFeatureSameLength } from "@/functionalities/Utils";
-import Dataset from "@/interfaces/genericInterface";
+import Dataset, {PrototypesInt} from "@/interfaces/genericInterface";
 import { image_type, label_type, text_type } from "@/properties/types";
 import { Flex, Loader, Select, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
@@ -11,16 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import useStore from '../../../store/dsStore';
 import featureLoader from "@/functionalities/FeatureLoader";
 
-interface PrototypesData
-{
-    data: any,
-    label_data: number
-}
-interface Prototypes
-{
-    type: string,
-    datas: PrototypesData[]
-}
+
 
 export default function Prototypes ()
 {
@@ -32,11 +23,21 @@ export default function Prototypes ()
     const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
     const [ featureName, setFeatureName ] = useState<any>( "" )
     const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
-    const [ prototypes, setPrototypes ] = useState<Prototypes | null>( null )
+    
+    const [ prototypes, setPrototypes ] = useState<PrototypesInt | null>( null )
     const [ labelDict, setLabelDict ] = useState<{ [ key: number ]: string } | null>( null )
-    const [ featureData, setFeatureData ] = useState<string[] | null>( null )
+    
+    const featureData = useStore((state) => state.prototypesData)
+    const setFeatureData = useStore((state) => state.setPrototypesData)
+
+    //const [ featureData, setFeatureData ] = useState<string[] | null>( null )
+
     const [ featureType, setFeatureType ] = useState<any>( "" )
-    const [ labelData, setLabelData ] = useState<number[] | null>( null )
+    
+    //const [ labelData, setLabelData ] = useState<number[] | null>( null )
+    const labelData = useStore((state) => state.labelProtoData)
+    const setLabelData = useStore((state) => state.setLabelProtoData)
+    
     const [ isLoading, setIsLoading ] = useState<boolean>( false )
 
     const datasetUsed = useStore( ( state ) => state.datasetUsed )
@@ -88,7 +89,7 @@ export default function Prototypes ()
 
     useEffect( () =>
     {
-        if ( featureName && labelFeatureName ) {
+        if ( featureName ) {
             setIsLoading( true );
             getPrototypes( datasetName as string, featureName, labelFeatureName )
                 .then( fetchedData =>
@@ -102,8 +103,6 @@ export default function Prototypes ()
                 } );
         }
     }, [ featureName, labelFeatureName ] );
-
-
 
     useEffect( () =>
     {
