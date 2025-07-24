@@ -31,6 +31,8 @@ export default interface Dataset
   n_classes: number;
   samples_per_class?: { [ key: number ]: number };
   description?: string;
+  bboxes_areas?: number[];
+  bboxes_per_sample?: number[];
   default_embedding_model?:string
 }
 
