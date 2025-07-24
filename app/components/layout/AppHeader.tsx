@@ -107,19 +107,7 @@ function AppHeader() {
                 <PDFPreviewModal opened={reportOpen} close={close} />
             */}
             
-            <Popover opened={opened} onChange={setOpened}>
-              <Popover.Target>
-                <Tooltip label="Save dataset">
-                  <Button
-                    radius="lg"
-                    onClick={() => handleSave(datasetUsed)}
-                  >
-                    <span><FontAwesomeIcon icon={faFloppyDisk} /></span>
-                  </Button>
-                </Tooltip>
-              </Popover.Target>
-              <Popover.Dropdown>{saveMessage}</Popover.Dropdown>
-            </Popover>
+            
             <Text>
               <span><FontAwesomeIcon icon={faDatabase} /></span> Dataset: {datasetUsed}
             </Text>

@@ -65,7 +65,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
   const isLoading = useStore((state) => state.isLoadingEmbs)
   const setIsLoading = useStore((state) => state.setIsLoadingEmbs)
   const [isLoadingRetr, setIsLoadingRetr] = useState<boolean>(false)
-
+  const [noEmbAvailable, setNoEmbAvailable] = useState<boolean>(false)
   const [viewState, setViewState] = useState<OrbitViewState>({
     target: [0, 0, 0],
     rotationX: 0,
@@ -113,12 +113,18 @@ export default function ScatterPlotVisualization(props: propsTypes) {
     try {
       getData(props.datasetName, props.featureName, props.show_uq, props.labelFeatureName, getAllKeysByValues(labelDict, filteredLabels as string[]), props.modelUsed, queries)
         .then((fetched) => {
+          if (fetched.points.length !=0){
           setData(fetched.points);
           setColorMap(fetched.color_map);
           setOriginalColors(new Map(fetched.points.map((item, index) => [index, item.color])));
           const colors = fetched.points.map(item => item.color)
           setUqColors(colors)
-          setQueryData(fetched.query_points)
+          setQueryData(fetched.query_points) 
+          setNoEmbAvailable(false)
+        } else {
+          setData(null)
+          setNoEmbAvailable(true)
+        }
         })
         .finally(() => {
           setIsLoading(false);
@@ -509,7 +515,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
   }
 
   console.log("compatibility:", checkMultiModalCompatibility(modelInfo,props.featureName))
-
+  console.log("UUUUUUUUUUUUUUU",noEmbAvailable)
   // New: Handlers for textarea focus/blur
   const handleTextareaFocus = useCallback(() => {
     setIsTextareaFocused(true);
@@ -551,7 +557,10 @@ export default function ScatterPlotVisualization(props: propsTypes) {
           <p>Loading...</p>
           <Loader />
         </Flex>
-      ) : (<>
+      ) : noEmbAvailable===true ? (
+        <Text> No Embs Available </Text>
+      )
+      : (<>
         {!data ? (
         <Flex
           mih={150}

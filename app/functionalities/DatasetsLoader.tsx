@@ -1,7 +1,7 @@
 "use server";
 import fs from 'fs';
 import path from 'path';
-import { datasets_get } from '../properties/urls';
+import { dataset_get, datasets_get, save_get } from '../properties/urls';
 import { revalidatePath } from "next/cache";
 import fsPromises from "node:fs/promises";
 
@@ -65,6 +65,45 @@ export default async function DatasetsLoader ()
 
     return datasets;
 }
+
+export async function DatasetGetter (datasetName: string)
+{   
+    const baseUrl = dataset_get;
+    const url = new URL(baseUrl);
+    url.searchParams.append('dataset', datasetName);
+    const response = await fetch( url);
+    if ( !response.ok ) throw new Error( 'Failed to send files to backend' );
+
+    const dataset = await response.json();
+
+    console.log( 'Server response:', dataset ); 
+
+    return dataset;
+}
+
+export async function AutomaticSave(datasetName: string) {
+    const baseUrl = save_get;
+    const url = new URL(baseUrl);
+    url.searchParams.append('datasetName', datasetName);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        console.log("Error while saving Dataset");
+      } else {
+        console.log("Dataset saved");
+      }
+    } catch (error) {
+        console.log("Error while saving Dataset");
+    }
+  };
+
+export async function GetDatasetAndSave(datasetName: string) {
+    const dataset = await DatasetGetter(datasetName)
+    await AutomaticSave(datasetName)
+    return dataset
+  };
+
+
 
 export async function uploadFile ( formData: FormData )
 {

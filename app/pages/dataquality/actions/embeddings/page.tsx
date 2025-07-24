@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from 'react';
 import useStore from '../../../../store/dsStore';
 import {Vision} from '@vectopus/atlas-icons-react';
+import {GetDatasetAndSave} from '../../../../functionalities/DatasetsLoader';
 
 function Home ()
 {
@@ -81,7 +82,8 @@ function Home ()
                 if ( jsonData.status === "complete" ) {
                   console.log( "Process completed:", jsonData.result );
                   if ( jsonData.dataset ) {
-                    setData( jsonData.dataset )
+                    const dataset = await GetDatasetAndSave(jsonData.dataset)
+                    setData(dataset)
                   }
                   setResult( jsonData.result )
                 } else if ( jsonData.progress !== undefined ) {
@@ -375,7 +377,7 @@ function Home ()
             </Alert>
 
 
-          ) : result == "Feature image is already embedded!" ? (
+          ) : result == "Feature is already embedded!" ? (
             <Alert
               variant="light"
               color="orange"

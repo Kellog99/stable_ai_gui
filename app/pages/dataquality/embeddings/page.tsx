@@ -5,13 +5,15 @@ import MovableWindow from '@/components/client/MovableWindow';
 import { IsFeatureBond, IsFeatureSameLength } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/genericInterface';
 import { embedding_type, image_type, numberic_type, text_type } from '@/properties/types';
-import { Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Space, Text } from '@mantine/core';
+import { Alert, Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Space, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
+import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 interface Feature
 {
@@ -139,7 +141,7 @@ function Home ()
 
         setEmbFeatures( extractedModels as string[] )
       } else {
-        setEmbFeatures( null )
+        setEmbFeatures([])
       }
 
     }
@@ -599,6 +601,18 @@ function Home ()
           ? renderedComponent()
           : featureName && embFeatures && embFeatures.length == 1
             ? renderedComponent()
+            : featureName && embFeatures && embFeatures.length == 0 ? (
+              <Alert
+              variant="light"
+              color="orange"
+              radius="md"
+              title="Attention!"
+              icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
+              style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px", marginLeft:"50px" } }
+                >
+                  The { featureName } feature is not embedded. You can embed it in the Action menù.
+                </Alert>
+            )
             : (
               <Text size="sm" style={ { marginTop: "20px", marginLeft: "100px" } }>Select Feature</Text>
             ) }

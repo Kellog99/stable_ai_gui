@@ -1,7 +1,6 @@
 "use client";
-
 import { useState, useRef, useEffect } from 'react';
-import { Progress, Flex, Select, Text, Box, Center, Alert } from '@mantine/core';
+import { Progress, Flex, Select, Text, Box, Center, Alert, Button } from '@mantine/core';
 import useStore from '../../../../store/dsStore';
 import { bbox_type, image_type, label_type, text_type } from '@/properties/types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -11,6 +10,8 @@ import
 } from '@fortawesome/free-solid-svg-icons';
 import { cropper_get } from '@/properties/urls';
 import Link from "next/link";
+import {ModelInfo} from '@/interfaces/genericInterface';
+import {GetDatasetAndSave} from '../../../../functionalities/DatasetsLoader';
 
 function Home ()
 {
@@ -24,6 +25,7 @@ function Home ()
 
 
   const [ isConnected, setIsConnected ] = useState( false );
+  const [isCropping, setIsCropping] = useState(false);
   const [ progress, setProgress ] = useState( 0 );
   const [ status, setStatus ] = useState( 'Idle' );
   const [ result, setResult ] = useState<string | null>( null );
@@ -78,9 +80,11 @@ function Home ()
                 }
                 // Handle the progress update
                 if ( jsonData.status === "complete" ) {
+                  setIsCropping(false)
                   console.log( "Process completed:", jsonData.result );
                   if ( jsonData.dataset ) {
-                    setData( jsonData.dataset )
+                    const dataset = await GetDatasetAndSave(jsonData.dataset)
+                    setData(dataset)
                   }
                   setResult( jsonData.result )
                 } else if ( jsonData.progress !== undefined ) {
@@ -140,7 +144,8 @@ function Home ()
 
 
         <div style={ { width: '100%', position: 'relative' } }>
-
+        
+        <Flex direction="column" justify="space-between" align="flex-start">
           <Flex direction="row" justify="space-between" align="flex-start">
             <Flex
               direction="row"
@@ -166,13 +171,22 @@ function Home ()
                 placeholder="Choose bounding boxes to use"
                 data={ bboxFeatures }
                 value={ bboxFeatureName }
-                onChange={ ( value ) => startCropping( value as string ) }
+                onChange={ ( value ) => setBboxFeatureName( value ) }
                 allowDeselect={ false }
                 clearable={ !isConnected }
                 required={ true }
               />
 
             </Flex>
+          </Flex>
+            <Button style={ { marginTop: "20px" } }
+                onClick={() => {
+                  ssl_crop(bboxFeatureName);
+                  setIsCropping(true);
+                }}
+                disabled={ !featureName || !bboxFeatureName || result == "Complete!" || isCropping || result == "Feature image is already cropped!"}>
+                Crop Image
+            </Button>
           </Flex>
 
 
@@ -181,7 +195,7 @@ function Home ()
 
         { !featureName || !bboxFeatureName ? (
           <Text size="sm" style={ { marginTop: "20px" } }>Select a feature to crop and the bounding boxes to use. </Text>
-        ) : featureName !== "" && result === null && bboxFeatureName !== "" ? (
+        ) : featureName !== "" && result === null && bboxFeatureName !== "" && isCropping===true ? (
 
           <div className="my-animation-container w-full md:w-3/4 lg:w-1/2 mx-auto p-4 bg-gray-200 rounded-lg">
             <Center>
