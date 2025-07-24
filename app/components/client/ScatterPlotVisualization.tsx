@@ -114,6 +114,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
       getData(props.datasetName, props.featureName, props.show_uq, props.labelFeatureName, getAllKeysByValues(labelDict, filteredLabels as string[]), props.modelUsed, queries)
         .then((fetched) => {
           if (fetched.points.length !=0){
+          console.log("AAAAAAAAAAAAAAAA",fetched)  
           setData(fetched.points);
           setColorMap(fetched.color_map);
           setOriginalColors(new Map(fetched.points.map((item, index) => [index, item.color])));
@@ -133,7 +134,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
     catch (error) {
       console.log("Failed to get data from backend")
     }
-  }, [props.datasetName, props.featureName, props.labelFeatureName, filteredLabels, props.show_uq, props.modelUsed, setColorMap, setUqColors, setIsLoading, setSelectedIndexes, setSelectedPoints, labelDict]); // Added all dependencies
+  }, [props.datasetName, props.featureName, props.labelFeatureName, filteredLabels, props.show_uq, props.modelUsed, setColorMap, setUqColors, setIsLoading, setSelectedIndexes, setSelectedPoints]); // Added all dependencies
 
   useEffect(() => {
     if (props.labelFeatureName) {
