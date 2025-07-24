@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import AppNavbarNNTrust from "./NavBars/AppNavbarNNTrust";
-import AppNavbarDataQuality from "./NavBars/AppNavbarDataQuality";
+import AppNavbarDataQuality from "./NavBars/DataQuality/AppNavbarDataQuality";
 import { useDisclosure } from "@mantine/hooks";
 import { Burger } from "@mantine/core";
 

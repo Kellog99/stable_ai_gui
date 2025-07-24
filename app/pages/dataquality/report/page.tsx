@@ -8,7 +8,7 @@ import PDFPreviewModal from "@/components/client/ReportModal";
 import { InfoCircle, LinesGraphClipboard } from "@vectopus/atlas-icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faX, faCircleExclamation, faTrashCan  } from '@fortawesome/free-solid-svg-icons';
+import { faX, faCircleExclamation, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import SchemaShower from "@/components/client/SchemaShower";
 import { labelColorMap } from "@/properties/static";
 import { FeatureSchema } from "@/interfaces/genericInterface";
@@ -17,12 +17,14 @@ import { getPrototypes } from "@/functionalities/BackendUtils";
 import { BarChart } from "@mantine/charts";
 import '@mantine/charts/styles.css';
 import MetricsAddedDisplayer from "@/components/client/metrics/displayer/MetricsAddedDisplayer";
+import { MetricResume } from "@/components/client/metrics/displayer/MetricResume";
 
 
 
 export default function Report() {
 
     const report = useStore((state) => state.report)
+
     const [features, setFeatures] = useState<FeatureSchema[]>([])
     const [connections, setConnections] = useState<[string, string][]>([])
     const datasetUsed = useStore((state) => state.datasetUsed)
@@ -36,8 +38,8 @@ export default function Report() {
 
     const [reportOpen, { open, close }] = useDisclosure(false);
 
-    const [showOverview, setShowOverview] = useState<boolean>(true)
-    const [showMetrics, setShowMetrics] = useState<boolean>(true)
+    const showOverview = useStore((state) => state.showOverview)
+    const setShowOverview = useStore((state) => state.setShowOverview)
 
     const barSize = 60;
     const barSpacing = 30;
@@ -79,6 +81,7 @@ export default function Report() {
     }, [datasetUsed]);
 
     console.log("report", report)
+
     return (
         <>
             <Flex direction="row" justify="space-between" pb="md">
@@ -103,10 +106,12 @@ export default function Report() {
                     </Button>
 
                     <PDFPreviewModal opened={reportOpen} close={close} />
+                    {/*
                     <Button
                         radius="lg">
                         Download PDF
                     </Button>
+                    */}
                 </Flex>
             </Flex>
             <Flex direction="column" gap="md" justify="center" align="flex-start">
@@ -117,7 +122,6 @@ export default function Report() {
                                 <Title order={3}>Overview Dataset</Title>
                                 <Tooltip
                                     multiline
-                                    w={220}
                                     withArrow
                                     transitionProps={{ duration: 200 }}
                                     label="Eliminate section from report">
@@ -183,27 +187,29 @@ export default function Report() {
                             {labelToSamples.length > 0 ? (
                                 <>
                                     <Title order={4} mt="md" mb="md">Graph Section</Title>
-                                    <Box
-                                        style={{
-                                            marginLeft: "30px",
-                                            marginRight: "30px",
-                                            overflowX: 'auto',
-                                            overflowY: 'hidden',
-                                            maxWidth: '100%',
-                                        }}
-                                    >
-                                        <BarChart
-                                            h={400}
-                                            w={chartWidth}
-                                            data={labelToSamples}
-                                            dataKey="label"
-                                            series={[{ name: 'samples', color: '#a9adb9' }]}
-                                            barProps={{
-                                                barSize: barSize
+                                    <div style={{ width: '1000px', margin: '20px auto' }}>
+
+                                        <Box
+                                            style={{
+                                                marginLeft: "30px",
+                                                marginRight: "30px",
+                                                overflowX: 'auto',
+                                                overflowY: 'hidden',
+                                                maxWidth: '100%',
                                             }}
-                                            style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
-                                        />
-                                    </Box></>) : null}
+                                        >
+                                            <BarChart
+                                                h={400}
+                                                w={chartWidth}
+                                                data={labelToSamples}
+                                                dataKey="label"
+                                                series={[{ name: 'samples', color: '#a9adb9' }]}
+                                                barProps={{
+                                                    barSize: barSize
+                                                }}
+                                                style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
+                                            />
+                                        </Box></div></>) : null}
                         </Box>
                     </>) : (
                     <>
@@ -214,40 +220,15 @@ export default function Report() {
                         </Button>
                     </>
                 )}
-                {showMetrics ? (
-                    <Box style={{ border: '1px solid #e0e0e0', borderRadius: 4, padding: "15px" }} mt="md">
-                        <span style={{ display: 'flex', alignItems: 'center', gap: "8px" }}>
-                            <Title order={3}>Metrics</Title>
-                            <Tooltip
-                                multiline
-                                w={220}
-                                withArrow
-                                transitionProps={{ duration: 200 }}
-                                label="Eliminate section from report">
-                                <Button
-                                    variant="transparent"
-                                    radius="xl"
-                                    size="xs"
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onClick={() => { setShowMetrics(false) }}
-                                    style={{
-                                        transition: "background-color 0.2s ease",
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#FCA5A5"} // Lighter red
-                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                                >
-                                    <FontAwesomeIcon icon={faTrashCan} />
-                                </Button>
-                            </Tooltip>
-                        </span>
-                        
-                    </Box>
-                ) : (
-                    <Button
-                        variant="light"
-                        onClick={() => setShowMetrics(true)}>
-                        Restore Metrics Sections
-                    </Button>)}
+                <Box style={{ border: '1px solid #e0e0e0', borderRadius: 4, padding: "15px" }} mt="md">
+                    <span style={{ display: 'flex', alignItems: 'center', gap: "8px", marginBottom: "8px" }} >
+                        <Title order={3}>Metrics</Title>
+                    </span>
+                    {report.map((metric, index) => (
+                        <MetricResume key={index} metric={metric as any} index={index} />
+                    ))}
+                </Box>
+
             </Flex>
 
         </>

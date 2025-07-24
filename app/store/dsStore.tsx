@@ -31,6 +31,8 @@ interface AppState
   labelProtoData: number[] | null;
   labelToSamples: { label: string; samples: number }[]
 
+  showOverview: boolean;
+
   
 
 
@@ -57,6 +59,8 @@ interface AppState
   setPrototypesData: (prototypesData: string[] | null) => void;
   setLabelProtoData: (labelProtoData: number[] | null) => void;
   setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => void;
+
+  setShowOverview: (showOverview: boolean) => void;
 
 }
 
@@ -86,6 +90,7 @@ const useStore = create<AppState>()(
       prototypesData: null,
       labelProtoData: null,
       labelToSamples: [],
+      showOverview: true,
 
 
       setData: ( datasetUsed ) => set( { datasetUsed } ),
@@ -112,6 +117,8 @@ const useStore = create<AppState>()(
       setPrototypesData: (prototypesData: string[] | null) => set( { prototypesData } ),
       setLabelProtoData: (labelProtoData: number[] | null) => set( { labelProtoData } ),
       setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set( { labelToSamples } ),
+
+      setShowOverview: ( showOverview: boolean ) => set( { showOverview } ),
     } ),
 
     {

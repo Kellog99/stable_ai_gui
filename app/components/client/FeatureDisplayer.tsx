@@ -165,15 +165,11 @@ export function FeatureCard(props: FeatureCardProps) {
 export default function FeatureDisplayer(props: FeatureDisplayerProps) {
   const { indexes, featureData, featureType, labelData, label_dict, outliers, scores, uncertainty, columns, dimensions } = props
 
-  const itemSize = 310;
+  const itemSize = 280;
   const totalItems = featureData.length;
   const setHoverIndex = useStore((state) => state.setHoverIndex)
   const colorMap = useStore((state) => state.colorMap)
   const uqColors = useStore((state) => state.uqColors)
-
-
-  console.log("colorMap:", colorMap)
-  console.log("labelData", labelData)
 
   const { columnCount, rowCount } = useMemo(() => {
     if (!columns && dimensions) {
@@ -210,7 +206,7 @@ export default function FeatureDisplayer(props: FeatureDisplayerProps) {
       columnWidth={itemSize}
       height={dimensions ? dimensions.height : 600}
       rowCount={rowCount}
-      rowHeight={itemSize + itemSize * 0.08}
+      rowHeight={itemSize}
       width={dimensions ? dimensions.width - dimensions.width * 0.08 : columnCount * itemSize}
 
     >

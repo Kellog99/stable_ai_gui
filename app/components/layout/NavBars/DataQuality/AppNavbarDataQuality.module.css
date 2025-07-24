@@ -1,6 +1,7 @@
 .navbar {
     background-color: #f0f0f0 !important; /* Override Mantine's default */
     color: black !important; /* Ensure the text is visible */
+    
 
   }
   

@@ -1,8 +1,9 @@
 import { Button, Divider, LoadingOverlay, Modal, Text, Tooltip, Alert, Box, ScrollArea } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InfoCircle } from "@vectopus/atlas-icons-react";
 import useStore from "@/store/dsStore";
 import {report_post} from "@/properties/urls";
+import { fetchExternalImage } from "next/dist/server/image-optimizer";
 
 interface PDFPreviewModalProps {
     opened: boolean;
@@ -15,6 +16,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
     const [error, setError] = useState<string | null>(null);
     const datasetName = useStore( ( state ) => state.datasetUsed?.name)
     const report = useStore((state) => state.report)
+    const showOverview = useStore((state) => state.showOverview)
     
     const fetchPDFData = async () => {
         setLoading(true);
@@ -24,6 +26,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
             
             const url = new URL(report_post);
             url.searchParams.append('datasetName', datasetName as string);
+            url.searchParams.append('showOverview',  `${showOverview}`);
             const response = await fetch(url , {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }, 
@@ -41,6 +44,11 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        console.log('Component mounted');
+        fetchPDFData()
+    }, [opened])
 
     const downloadPDF = () => {
         if (!pdfData) return;
@@ -111,7 +119,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
                 <Modal.Body>
                     <Box style={{ position: 'relative', minHeight: 400 }}>
                         <LoadingOverlay visible={loading} />
-                        
+                        {/*
                         {!pdfData && !error && (
                             <Box style={{ 
                                 display: 'flex', 
@@ -127,6 +135,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
                                 </Button>
                             </Box>
                         )}
+                            */}
 
                         {error && (
                             <Alert color="red" title="Error" mb="md">

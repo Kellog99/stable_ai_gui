@@ -70,7 +70,7 @@ export default async function RootLayout ( { children }: { children: any } )
             </AppShellHeader>
 
             <AppShellNavbar
-              p="md"
+
               bg="#f0f0f0"
             >
               
