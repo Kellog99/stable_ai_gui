@@ -16,6 +16,7 @@ interface AppState
   featureToDisplay: string | null;
   metricsConfig: Configs[] | [];
   internalConfigs: Object;
+  labelDict: { [key: number]: string } | null;
 
   addToReport: boolean;
   isLoadingEmbs: boolean;
@@ -47,6 +48,7 @@ interface AppState
   setFeatureToDisplay: ( featureToDisplay: string | null ) => void;
   setMetricsConfigs: ( metricsConfig: Configs[] | [] ) => void;
   setInternalConfigs: ( internalConfigs: Object ) => void;
+  setLabelDict: (labelDict: { [key: number]: string } | null) => void;
 
   setAddToReport: ( addToReport: boolean ) => void;
   setIsLoadingEmbs: ( isLoadingEmbs: boolean ) => void;
@@ -78,6 +80,7 @@ const useStore = create<AppState>()(
       featureToDisplay: null,
       metricsConfig: [],
       internalConfigs: {},
+      labelDict: null,
 
       addToReport: false,
       isLoadingEmbs: true,
@@ -104,6 +107,7 @@ const useStore = create<AppState>()(
       setFeatureToDisplay: ( featureToDisplay: string | null ) => set( { featureToDisplay } ),
       setMetricsConfigs: ( metricsConfig: Configs[] | [] ) => set( { metricsConfig } ),
       setInternalConfigs: ( internalConfigs: Object ) => set( { internalConfigs } ),
+      setLabelDict: (labelDict: { [key: number]: string } | null) => set({labelDict}),
 
       setAddToReport: ( addToReport: boolean ) => set( { addToReport } ),
       setIsLoadingEmbs: ( isLoadingEmbs: boolean ) => set( { isLoadingEmbs } ),
@@ -119,6 +123,7 @@ const useStore = create<AppState>()(
       setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set( { labelToSamples } ),
 
       setShowOverview: ( showOverview: boolean ) => set( { showOverview } ),
+
     } ),
 
     {

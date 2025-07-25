@@ -664,7 +664,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
                     radius="md"
                     value={inputValue}
                     onChange={(event) => setInputValue(event.currentTarget.value)}
-                    disabled={!checkMultiModalCompatibility(modelInfo, props.featureName)}
+                    
                     onFocus={handleTextareaFocus} // New: Set focus state
                     onBlur={handleTextareaBlur}   // New: Clear focus state
                     onKeyDown={handleKeyDown}

@@ -45,6 +45,7 @@ export default function Datasets ()
   //const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
   const labelToSamples = useStore((state) => state.labelToSamples)
   const setLabelToSamples = useStore((state) => state.setLabelToSamples)
+  
   const [ labelFeature, setLabelFeature ] = useState<Feature | null>( null )
   const [ labelDict, setLabelDict ] = useState<{ [ key: number ]: string } | null>( null )
   const [bboxesHistogramData, setBboxesHistogramData] = useState<{ label: string; samples: number }[]>([]);
@@ -135,6 +136,7 @@ export default function Datasets ()
         setData( filteredDataset );
         setDatasets( null )
         setReport([])
+
         setPrototypesData(null)
         setLabelProtoData(null)
         setLabelToSamples([])
@@ -142,7 +144,7 @@ export default function Datasets ()
       }
     }
 
-  }, [ searchParams, datasets, setData, setDatasets ] );
+  }, [ searchParams, datasets, setData, setDatasets, datasetName ] );
 
   console.log( "datasetUsed:", datasetUsed )
 
@@ -248,6 +250,8 @@ export default function Datasets ()
             : [];
           setLabelToSamples( fallbackMapping );
         }
+      } else {
+        setLabelToSamples([])
       }
 
       if ( bboxFeature ) {

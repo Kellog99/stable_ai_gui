@@ -51,11 +51,6 @@ export function MetricResume({ metric, index }: MetricProps) {
         setReport([...report]);
     }
 
-
-
-    console.log("INDEX", index)
-    console.log("REPORT LENGTH", report.length)
-
     return (
         <>
             <Flex direction="row" align="center" justify="flex-start" >
@@ -78,7 +73,7 @@ export function MetricResume({ metric, index }: MetricProps) {
                                 <CheckCircle size={20} style={{ color: '#228be6' }} />
 
                                 {results.name == "accuracy" ?
-                                    (<Text fw={700} size="lg" c="dark.7">Accuracy: {results.mode}</Text>) : (
+                                    (<Text fw={700} size="lg" c="dark.7">{results.mode}</Text>) : (
                                         <Text fw={700} size="lg" c="dark.7">{results.name}</Text>
                                     )}
 
@@ -163,7 +158,7 @@ export function MetricResume({ metric, index }: MetricProps) {
                         </Group>)}
                     </Stack>
                 </Paper>
-                {/*
+            
                 {index > 0 && report.length > 1 &&
                     (<Tooltip
                         multiline
@@ -204,7 +199,6 @@ export function MetricResume({ metric, index }: MetricProps) {
                         <MoveDown size={14} />
                     </Button>
                 </Tooltip>)}
-                */}
 
                 <Tooltip
                     multiline

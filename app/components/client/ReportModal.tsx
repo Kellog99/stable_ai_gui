@@ -46,7 +46,6 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
     };
 
     useEffect(() => {
-        console.log('Component mounted');
         fetchPDFData()
     }, [opened])
 

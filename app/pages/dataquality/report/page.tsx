@@ -1,11 +1,12 @@
 "use client"
 
-import { Button, Divider, LoadingOverlay, Modal, Text, Tooltip, Alert, Box, ScrollArea, Title, Flex } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { Button, Divider, LoadingOverlay, Modal, Text, Tooltip, Alert, Box, ScrollArea, Title, Flex, Paper, Stack, Group } from "@mantine/core";
+import { useEffect, useRef, useState } from "react";
 import useStore from "@/store/dsStore";
 import { report_post } from "@/properties/urls";
 import PDFPreviewModal from "@/components/client/ReportModal";
 import { InfoCircle, LinesGraphClipboard } from "@vectopus/atlas-icons-react";
+import { CheckCircle, MoveDown, MoveUp } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX, faCircleExclamation, faTrashCan } from '@fortawesome/free-solid-svg-icons';
@@ -24,11 +25,14 @@ import { MetricResume } from "@/components/client/metrics/displayer/MetricResume
 export default function Report() {
 
     const report = useStore((state) => state.report)
+    const setReport = useStore((state) => state.setReport)
 
     const [features, setFeatures] = useState<FeatureSchema[]>([])
     const [connections, setConnections] = useState<[string, string][]>([])
     const datasetUsed = useStore((state) => state.datasetUsed)
     const [descriptions, setDescriptions] = useState<string[]>([])
+
+    const [outIndexes, setOutIndexes] = useState<number[]>([])
 
     const prototypesData = useStore((state) => state.prototypesData)
     const labelProtoData = useStore((state) => state.labelProtoData)
@@ -38,8 +42,12 @@ export default function Report() {
 
     const [reportOpen, { open, close }] = useDisclosure(false);
 
+    const labelDict = useStore((state) => state.labelDict)
+
     const showOverview = useStore((state) => state.showOverview)
     const setShowOverview = useStore((state) => state.setShowOverview)
+
+    const [showAccuracyCard, setShowAccuracyCard] = useState<boolean>(true)
 
     const barSize = 60;
     const barSpacing = 30;
@@ -80,7 +88,105 @@ export default function Report() {
         }
     }, [datasetUsed]);
 
-    console.log("report", report)
+
+    const originalAccuracyItems = useRef<Object[]>([]);
+
+    useEffect(() => {
+        // Save items that were originally at positions where name === "accuracy"
+        const accuracyItems = report.filter(item => item.results.name === "accuracy");
+        originalAccuracyItems.current = accuracyItems;
+
+        // Reorder the list
+        const reordered = [
+            ...accuracyItems,
+            ...report.filter(item => item.results.name !== "accuracy"),
+        ];
+        setReport(reordered);
+    }, []);
+
+    useEffect(() => {
+        const currentIndexes = report.map((item, index) => {
+            return originalAccuracyItems.current.includes(item) ? index : -1;
+        }).filter(index => index !== -1);
+
+        setOutIndexes(currentIndexes);
+    }, [report]);
+
+    console.log("OUT INDEXES", outIndexes)
+
+
+    useEffect(() => {
+
+    }, [])
+
+
+    console.log("report FINALE", report)
+
+    const handleMoveOutUp = (indexes: number[]) => {
+        if (indexes.length === 0) return;
+
+        // Sort indexes to process in block order
+        const sortedIndexes = [...indexes].sort((a, b) => a - b);
+
+        // Prevent moving above index 0
+        const insertBefore = Math.max(sortedIndexes[0] - 1, 0);
+
+        // Extract the block
+        const block = sortedIndexes.map(i => report[i]);
+
+        // Remove the items from report
+        const remaining = report.filter((_, idx) => !sortedIndexes.includes(idx));
+
+        // Insert block before `insertBefore` in the remaining list
+        const newReport = [
+            ...remaining.slice(0, insertBefore),
+            ...block,
+            ...remaining.slice(insertBefore),
+        ];
+
+        setReport(newReport);
+    };
+
+    const handleMoveOutDown = (indexes: number[]) => {
+        if (indexes.length === 0) return;
+
+        // Sort indexes to preserve block order
+        const sortedIndexes = [...indexes].sort((a, b) => a - b);
+
+        // Prevent moving if block ends at the last index
+        const lastIndex = report.length - 1;
+        if (sortedIndexes[sortedIndexes.length - 1] === lastIndex) return;
+
+        // Extract block
+        const block = sortedIndexes.map(i => report[i]);
+
+        // Remove block from report
+        const remaining = report.filter((_, idx) => !sortedIndexes.includes(idx));
+
+        // Insert block after the first element *after* the block
+        const insertPos = sortedIndexes[sortedIndexes.length - 1] + 1;
+
+        const newReport = [
+            ...remaining.slice(0, insertPos),
+            ...block,
+            ...remaining.slice(insertPos),
+        ];
+
+        setReport(newReport);
+    };
+
+
+
+    const handleCancelOut = (indexes: number[]) => {
+        const newReport = report.filter((_, index) => !indexes.includes(index));
+        setReport(newReport);
+        setShowAccuracyCard(false)
+    };
+
+    console.log("OUT INDEXES", outIndexes[outIndexes.length - 1])
+    console.log("REPORT LENGTH", report.length)
+
+
 
     return (
         <>
@@ -168,7 +274,7 @@ export default function Report() {
                                     style={{ width: '100%' }}
                                 >
                                     <div className="overflow-auto">
-                                        <FeatureDisplayer featureData={prototypesData as string[]} featureType={protoType as string} labelData={labelProtoData as number[]} columns={4} />
+                                        <FeatureDisplayer featureData={prototypesData as string[]} featureType={protoType as string} labelData={labelProtoData as number[]} label_dict={labelDict as { [key: number]: string }} columns={4} />
                                     </div>
                                 </Flex>) : (
                                     <Alert
@@ -224,9 +330,114 @@ export default function Report() {
                     <span style={{ display: 'flex', alignItems: 'center', gap: "8px", marginBottom: "8px" }} >
                         <Title order={3}>Metrics</Title>
                     </span>
-                    {report.map((metric, index) => (
-                        <MetricResume key={index} metric={metric as any} index={index} />
-                    ))}
+                    <>
+                        {showAccuracyCard && (
+                            <Flex direction="row" align="center" justify="flex-start" >
+                                <Paper
+                                    shadow="sm"
+                                    p="lg"
+                                    radius="md"
+                                    withBorder
+                                    style={{
+                                        background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+                                        border: '1px solid #e9ecef',
+                                        transition: 'all 0.2s ease',
+                                        marginBottom: "8px"
+                                    }}
+                                    className="hover:shadow-lg hover:scale-[1.01] cursor-pointer"
+                                >
+                                    <Stack gap="md">
+                                        <Group justify="space-between" align="flex-start">
+                                            <Group gap="sm" align="center" mb="sm">
+                                                <CheckCircle size={20} style={{ color: '#228be6' }} />
+                                                <Text fw={700} size="lg" c="dark.7">Accuracy</Text>
+                                            </Group>
+                                        </Group>
+                                    </Stack>
+
+                                    {report
+                                        .filter(metric => metric.results.name === "accuracy")
+                                        .map((metric, index) => (
+                                            <MetricResume key={`accuracy-${index}`} metric={metric as any} index={index} />
+                                        ))
+                                    }
+                                </Paper>
+
+                                {outIndexes[0] > 0 &&
+                                    (<Tooltip
+                                        multiline
+                                        withArrow
+                                        transitionProps={{ duration: 200 }}
+                                        label="Move the metric up">
+                                        <Button
+                                            variant="transparent"
+                                            radius="xl"
+                                            size="xs"
+                                            onClick={() => handleMoveOutUp(outIndexes as number[])}
+                                            style={{
+                                                transition: "background-color 0.2s ease",
+                                            }}
+                                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#a5d8ff")} // lighter blue
+                                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                                        >
+                                            <MoveUp size={14} />
+                                        </Button>
+                                    </Tooltip>)}
+
+                                {outIndexes[outIndexes.length - 1] < report.length && (<Tooltip
+                                    multiline
+                                    withArrow
+                                    transitionProps={{ duration: 200 }}
+                                    label="Move the metric down">
+                                    <Button
+                                        variant="transparent"
+                                        radius="xl"
+                                        size="xs"
+                                        onClick={() => handleMoveOutDown(outIndexes as number[])}
+                                        style={{
+                                            transition: "background-color 0.2s ease",
+                                        }}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#a5d8ff"} // Lighter red
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                    >
+                                        <MoveDown size={14} />
+                                    </Button>
+                                </Tooltip>)}
+
+
+                                <Tooltip
+                                    multiline
+                                    withArrow
+                                    transitionProps={{ duration: 200 }}
+                                    label="Eliminate metric from report">
+                                    <Button
+                                        variant="transparent"
+                                        radius="xl"
+                                        size="xs"
+                                        onClick={() => handleCancelOut(outIndexes as number[])}
+                                        style={{
+                                            transition: "background-color 0.2s ease",
+                                        }}
+                                        disabled={report.length == outIndexes.length}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#FCA5A5"} // Lighter red
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                    >
+                                        <FontAwesomeIcon icon={faTrashCan} />
+                                    </Button>
+                                </Tooltip>
+
+                            </Flex>)}
+
+
+                        {report
+                            .map((metric, index) => ({ metric, index })) // attach original index
+                            .filter(({ metric }) => metric.results.name !== "accuracy") // filter by condition
+                            .map(({ metric, index }) => (
+                                <MetricResume key={`other-${index}`} metric={metric as any} index={index} />
+                            ))}
+                    </>
+
+
                 </Box>
 
             </Flex>
