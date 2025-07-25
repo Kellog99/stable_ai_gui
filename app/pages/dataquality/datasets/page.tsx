@@ -255,7 +255,7 @@ export default function Datasets ()
       }
 
       if ( bboxFeature ) {
-
+    
         const bboxesPerArea = datasetUsed.bboxes_areas;
         const bboxesPerSample = datasetUsed.bboxes_per_sample;
 
@@ -449,11 +449,24 @@ export default function Datasets ()
         </div>
       </>
     ) : null}
-
-    <div style={{ display: 'flex', gap: '20px', margin: '20px auto', maxWidth: '2040px', overflowX: 'auto' }}>
+    
+        <div style={{ 
+      display: 'flex', 
+      gap: '20px', 
+      margin: '20px auto', 
+      maxWidth: '2040px', 
+      overflowX: 'auto',
+      // Aggiungi padding per evitare che il contenuto venga tagliato
+      paddingBottom: '10px'
+    }}>
       {datasetUsed?.bboxes_per_sample && bboxesHistogramData.length > 0 ? (
-        <div style={{ flex: '1', minWidth: '500px' }}>
-          <h2>Bounding boxes per sample</h2>
+        <div style={{ 
+          flex: '1', 
+          minWidth: '500px',
+          // Assicurati che il container non ecceda la larghezza disponibile
+          maxWidth: 'calc(50% - 10px)'
+        }}>
+          <h2>Number of Bounding Boxes per Image</h2>
           <div style={{ width: '100%' }}>
             <Flex
               justify="center"
@@ -467,23 +480,53 @@ export default function Datasets ()
                   marginRight: "30px",
                   overflowX: 'auto',
                   overflowY: 'hidden',
+                  width: '100%', // Usa tutta la larghezza disponibile
                   maxWidth: '100%',
                 }}
               >
-                <BarChart
-                  h={400}
-                  w={dynamicChartWidth}
-                  data={bboxesHistogramData}
-                  dataKey="label"
-                  series={[{ name: 'samples', color: '#a9adb9' }]}
-                  barProps={{
-                    barSize: barSize,
-                    onClick: (bar) => {
-                      console.log('Clicked bin:', bar.label);
+               <Flex direction="column" align="center">
+              <BarChart
+                h={400}
+                w={Math.min(dynamicChartWidth, 500)}
+                data={bboxesHistogramData}
+                dataKey="label"
+                series={[{ name: 'samples', color: '#a9adb9' }]}
+                barProps={{
+                  barSize: barSize,
+                  onClick: (bar) => {
+                    console.log('Clicked bin:', bar.label);
+                  }
+                }}
+                withTooltip
+                tooltipProps={{
+                  content: ({ label, payload }) => {
+                    if (payload && payload.length > 0) {
+                      return (
+                        <div style={{
+                          backgroundColor: 'white',
+                          padding: '8px 12px',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}>
+                          <p style={{ margin: 0, fontWeight: 'bold' }}>
+                            {label} bounding boxes
+                          </p>
+                          <p style={{ margin: 0, color: '#666' }}>
+                            Samples: {payload[0].value}
+                          </p>
+                        </div>
+                      );
                     }
-                  }}
-                  style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
-                />
+                    return null;
+                  }
+                }}
+                style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
+              />
+              <Text size="sm" mt="xs" color="dimmed">
+                Bounding Boxes per Image
+              </Text>
+            </Flex>
               </Box>
             </Flex>
           </div>
@@ -491,8 +534,13 @@ export default function Datasets ()
       ) : null}
 
       {datasetUsed?.bboxes_areas && bboxesAreaHistogramData.length > 0 ? (
-        <div style={{ flex: '1', minWidth: '500px' }}>
-          <h2>Bounding boxes per area</h2>
+        <div style={{ 
+          flex: '1', 
+          minWidth: '500px',
+          // Assicurati che il container non ecceda la larghezza disponibile
+          maxWidth: 'calc(50% - 10px)'
+        }}>
+          <h2>Number of Bounding Boxes per Area</h2>
           <div style={{ width: '100%' }}>
             <Flex
               justify="center"
@@ -506,39 +554,73 @@ export default function Datasets ()
                   marginRight: "30px",
                   overflowX: 'auto',
                   overflowY: 'hidden',
+                  width: '100%', // Usa tutta la larghezza disponibile
                   maxWidth: '100%',
                 }}
               >
-                <BarChart
-                  h={400}
-                  w={dynamicChartWidth}
-                  data={bboxesAreaHistogramData}
-                  dataKey="label"
-                  series={[{ name: 'samples', color: '#a9adb9' }]}
-                  xAxisProps={{
-                    ticks: ticks,
-                    tickFormatter: (label: string) => {
-                      if (label.includes('-')) {
-                        const [min, max] = label.split('-').map(Number);
-                        return Math.round((min + max) / 2).toString();
-                      }
-                      return label;
+               <Flex direction="column" align="center">
+              <BarChart
+                h={400}
+                w={Math.min(dynamicChartWidth, 500)}
+                data={bboxesAreaHistogramData}
+                dataKey="label"
+                series={[{ name: 'samples', color: '#a9adb9' }]}
+                xAxisProps={{
+                  ticks: ticks,
+                  tickFormatter: (label: string) => {
+                    if (label.includes('-')) {
+                      const [min, max] = label.split('-').map(Number);
+                      const midpoint = Math.round((min + max) / 2);
+                      // Trova il multiplo di 200 più vicino
+                      const nearestMultiple = Math.round(midpoint / 200) * 200;
+                      return nearestMultiple.toString();
                     }
-                  }}
-                  barProps={{
-                    barSize: barSize,
-                    onClick: (bar) => {
-                      console.log('Clicked bin:', bar.label);
+                    return label;
+                  }
+                }}
+                barProps={{
+                  barSize: barSize,
+                  onClick: (bar) => {
+                    console.log('Clicked bin:', bar.label);
+                  }
+                }}
+                withTooltip
+                tooltipProps={{
+                  content: ({ label, payload }) => {
+                    if (payload && payload.length > 0) {
+                      return (
+                        <div style={{
+                          backgroundColor: 'white',
+                          padding: '8px 12px',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                        }}>
+                          <p style={{ margin: 0, fontWeight: 'bold' }}>
+                            {label} px²
+                          </p>
+                          <p style={{ margin: 0, color: '#666' }}>
+                            Samples: {payload[0].value}
+                          </p>
+                        </div>
+                      );
                     }
-                  }}
-                  style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
-                />
+                    return null;
+                  }
+                }}
+                style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
+              />
+              <Text size="sm" mt="xs" color="dimmed">
+                Bounding Box Area (px²)
+              </Text>
+            </Flex>
               </Box>
             </Flex>
           </div>
         </div>
       ) : null}
     </div>
-  </div>
+        
+      </div>
 );
 }
