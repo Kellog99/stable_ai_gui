@@ -11,6 +11,7 @@ import
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import Link from "next/link";
+import {GetDatasetAndSave} from '../../../../functionalities/DatasetsLoader';
 
 export default function CleanDuplicates ()
 {
@@ -65,8 +66,9 @@ async function prova (name : string)
                 if ( jsonData.status === "complete" ) {
                   console.log( "Process completed:", jsonData.result );
                   if ( jsonData.dataset ) {
-                    setData( jsonData.dataset )
-                  }
+                      const dataset = await GetDatasetAndSave(jsonData.dataset)
+                      setData(dataset)
+                    }
                   setResult( jsonData.result )
                 } else if ( jsonData.progress !== undefined ) {
                   // Update progress if available
