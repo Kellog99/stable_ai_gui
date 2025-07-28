@@ -41,6 +41,7 @@ export interface FeatureSchema
   type: string;
   name: string;
   depth: number;
+  model_name?: string;
 }
 
 

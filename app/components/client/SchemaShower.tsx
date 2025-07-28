@@ -57,6 +57,10 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
     const y = ( depthIndex - ( depthGroups[ feature.depth ].length - 1 ) / 2 ) * verticalSpacing;
 
     let featureName = feature.name;
+    const modelName = feature.model_name;
+    console.log(JSON.stringify(features, null, 2));
+
+
     const umapMatch = featureName.match( /(umap)_\d+$/ );
     if ( umapMatch ) {
       featureName = featureName.replace( /(_\d+)$/, "" );
@@ -73,14 +77,23 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
       id: feature.name,
       position: { x, y },
       data: {
-        label: (
-          <div style={ { display: "flex", flexDirection: "column", textAlign: "center", fontSize: "small" } }>
-            { formattedParts.map( ( part, index ) => (
-              <span key={ index }>{ part }</span>
-            ) ) }
-          </div>
-        )
-      },
+      label: (
+        <div
+          {...(modelName ? { title: `Model: ${modelName}` } : {})}
+          style={ {
+            display: "flex",
+            flexDirection: "column",
+            textAlign: "center",
+            fontSize: "small",
+            pointerEvents: "auto"
+          } }
+        >
+          { formattedParts.map( ( part, index ) => (
+            <span key={ index }>{ part }</span>
+          ) ) }
+        </div>
+      )
+    },
       style: {
         background: backgroundColor,
         width: `${nodeSize}px`,

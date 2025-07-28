@@ -74,14 +74,13 @@ export default function Datasets ()
   function buildHistogram(
   values: number[],
   binCount?: number
-  ): { label: string; samples: number }[] {
+): { label: string; samples: number }[] {
   if (!Array.isArray(values) || values.length === 0) return [];
 
   const n = values.length;
   const bins = binCount || Math.ceil(Math.sqrt(n));
   const min = Math.min(...values);
   const max = Math.max(...values);
-
   const range = max - min;
   const binWidth = range === 0 ? 1 : Math.ceil((range + 1) / bins);
 
@@ -89,7 +88,8 @@ export default function Datasets ()
     const start = min + i * binWidth;
     const end = start + binWidth - 1;
     return {
-      range: `${start}-${end}`,
+      start,
+      end,
       count: 0
     };
   });
@@ -99,17 +99,17 @@ export default function Datasets ()
       Math.floor((value - min) / binWidth),
       bins - 1
     );
-
     if (index >= 0 && index < histogramBins.length) {
       histogramBins[index].count += 1;
     }
   });
 
   return histogramBins.map(bin => ({
-    label: bin.range,
+    label: bin.start === bin.end ? `${bin.start}` : `${bin.start}-${bin.end}`,
     samples: bin.count
   }));
- }
+}
+
 
   const dataLength = bboxesAreaHistogramData?.length ?? 0;
   const numberOfTicks = 10;
@@ -162,10 +162,11 @@ export default function Datasets ()
 
 
       if ( Array.isArray( datasetUsed?.features ) ) {
-        const extractedFeatures = datasetUsed.features.map( ( { type, name, depth } ) => ( {
+        const extractedFeatures = datasetUsed.features.map( ( { type, name, depth, model_name } ) => ( {
           type,
           name,
           depth,
+          model_name
         } ) );
 
         setFeatures( extractedFeatures );
@@ -466,7 +467,9 @@ export default function Datasets ()
           // Assicurati che il container non ecceda la larghezza disponibile
           maxWidth: 'calc(50% - 10px)'
         }}>
-          <h2>Number of Bounding Boxes per Image</h2>
+          <h2 style={{ textAlign: 'center' }}>
+            Number of Bounding Boxes per Image
+          </h2>
           <div style={{ width: '100%' }}>
             <Flex
               justify="center"
@@ -532,7 +535,7 @@ export default function Datasets ()
           </div>
         </div>
       ) : null}
-
+      
       {datasetUsed?.bboxes_areas && bboxesAreaHistogramData.length > 0 ? (
         <div style={{ 
           flex: '1', 
@@ -540,7 +543,9 @@ export default function Datasets ()
           // Assicurati che il container non ecceda la larghezza disponibile
           maxWidth: 'calc(50% - 10px)'
         }}>
-          <h2>Number of Bounding Boxes per Area</h2>
+           <h2 style={{ textAlign: 'center' }}>
+            Number of Bounding Boxes per Area
+          </h2>
           <div style={{ width: '100%' }}>
             <Flex
               justify="center"
