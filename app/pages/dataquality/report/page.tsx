@@ -183,7 +183,7 @@ export default function Report() {
         setShowAccuracyCard(false)
     };
 
-    console.log("OUT INDEXES", outIndexes[outIndexes.length - 1])
+
     console.log("REPORT LENGTH", report.length)
 
 
@@ -331,110 +331,137 @@ export default function Report() {
                         <Title order={3}>Metrics</Title>
                     </span>
                     <>
-                        {showAccuracyCard && (
-                            <Flex direction="row" align="center" justify="flex-start" >
-                                <Paper
-                                    shadow="sm"
-                                    p="lg"
-                                    radius="md"
-                                    withBorder
-                                    style={{
-                                        background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                                        border: '1px solid #e9ecef',
-                                        transition: 'all 0.2s ease',
-                                        marginBottom: "8px"
-                                    }}
-                                    className="hover:shadow-lg hover:scale-[1.01] cursor-pointer"
-                                >
-                                    <Stack gap="md">
-                                        <Group justify="space-between" align="flex-start">
-                                            <Group gap="sm" align="center" mb="sm">
-                                                <CheckCircle size={20} style={{ color: '#228be6' }} />
-                                                <Text fw={700} size="lg" c="dark.7">Accuracy</Text>
-                                            </Group>
-                                        </Group>
-                                    </Stack>
+                        {report.map((metric, index) => {
+                            // Check if this is an accuracy metric
+                            if (metric.results.name === "accuracy") {
+                                // Only render the accuracy block for the FIRST accuracy metric found
+                                const firstAccuracyIndex = report.findIndex(m => m.results.name === "accuracy");
+                                if (index !== firstAccuracyIndex) {
+                                    return null;
+                                }
 
-                                    {report
-                                        .filter(metric => metric.results.name === "accuracy")
-                                        .map((metric, index) => (
-                                            <MetricResume key={`accuracy-${index}`} metric={metric as any} index={index} />
-                                        ))
-                                    }
-                                </Paper>
+                                if (!showAccuracyCard) return null;
 
-                                {outIndexes[0] > 0 &&
-                                    (<Tooltip
-                                        multiline
-                                        withArrow
-                                        transitionProps={{ duration: 200 }}
-                                        label="Move the metric up">
-                                        <Button
-                                            variant="transparent"
-                                            radius="xl"
-                                            size="xs"
-                                            onClick={() => handleMoveOutUp(outIndexes as number[])}
+                                const accuracyMetrics = report.filter(m => m.results.name === "accuracy");
+                                const accuracyIndexes = report
+                                    .map((m, i) => ({ metric: m, index: i }))
+                                    .filter(({ metric }) => metric.results.name === "accuracy")
+                                    .map(({ index }) => index);
+                                console.log("ACCURACY INDEXES", accuracyIndexes)
+                                return (
+                                    <Flex key={`accuracy-block-${index}`} direction="row" align="center" justify="flex-start">
+                                        <Paper
+                                            shadow="sm"
+                                            p="lg"
+                                            radius="md"
+                                            withBorder
                                             style={{
-                                                transition: "background-color 0.2s ease",
+                                                background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+                                                border: '1px solid #e9ecef',
+                                                transition: 'all 0.2s ease',
+                                                marginBottom: "8px"
                                             }}
-                                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#a5d8ff")} // lighter blue
-                                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                                            className="hover:shadow-lg hover:scale-[1.01] cursor-pointer"
                                         >
-                                            <MoveUp size={14} />
-                                        </Button>
-                                    </Tooltip>)}
+                                            <Stack gap="md">
+                                                <Group justify="space-between" align="flex-start">
+                                                    <Group gap="sm" align="center" mb="sm">
+                                                        <CheckCircle size={20} style={{ color: '#228be6' }} />
+                                                        <Text fw={700} size="lg" c="dark.7">Accuracy</Text>
+                                                    </Group>
+                                                </Group>
+                                            </Stack>
 
-                                {outIndexes[outIndexes.length - 1] < report.length && (<Tooltip
-                                    multiline
-                                    withArrow
-                                    transitionProps={{ duration: 200 }}
-                                    label="Move the metric down">
-                                    <Button
-                                        variant="transparent"
-                                        radius="xl"
-                                        size="xs"
-                                        onClick={() => handleMoveOutDown(outIndexes as number[])}
-                                        style={{
-                                            transition: "background-color 0.2s ease",
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#a5d8ff"} // Lighter red
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                                    >
-                                        <MoveDown size={14} />
-                                    </Button>
-                                </Tooltip>)}
+                                            {/* Render all accuracy metrics */}
+                                            {accuracyMetrics.map((accuracyMetric, accuracyIndex) => (
+                                                <MetricResume
+                                                    key={`accuracy-metric-${accuracyIndex}`}
+                                                    metric={accuracyMetric as any}
+                                                    index={report.findIndex(m => m === accuracyMetric)}
+                                                    outIndexes={outIndexes}
+                                                />
+                                            ))}
+                                        </Paper>
 
+                                        {/* Move up button - use the first accuracy metric's index */}
+                                        {firstAccuracyIndex > 0 && (
+                                            <Tooltip
+                                                multiline
+                                                withArrow
+                                                transitionProps={{ duration: 200 }}
+                                                label="Move the metric up">
+                                                <Button
+                                                    variant="transparent"
+                                                    radius="xl"
+                                                    size="xs"
+                                                    onClick={() => handleMoveOutUp(accuracyIndexes)}
+                                                    style={{
+                                                        transition: "background-color 0.2s ease",
+                                                    }}
+                                                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#a5d8ff")}
+                                                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                                                >
+                                                    <MoveUp size={14} />
+                                                </Button>
+                                            </Tooltip>
+                                        )}
 
-                                <Tooltip
-                                    multiline
-                                    withArrow
-                                    transitionProps={{ duration: 200 }}
-                                    label="Eliminate metric from report">
-                                    <Button
-                                        variant="transparent"
-                                        radius="xl"
-                                        size="xs"
-                                        onClick={() => handleCancelOut(outIndexes as number[])}
-                                        style={{
-                                            transition: "background-color 0.2s ease",
-                                        }}
-                                        disabled={report.length == outIndexes.length}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#FCA5A5"} // Lighter red
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                                    >
-                                        <FontAwesomeIcon icon={faTrashCan} />
-                                    </Button>
-                                </Tooltip>
+                                        {/* Move down button */}
+                                        {accuracyIndexes[accuracyIndexes.length - 1] < report.length - 1 && (
+                                            <Tooltip
+                                                multiline
+                                                withArrow
+                                                transitionProps={{ duration: 200 }}
+                                                label="Move the metric down">
+                                                <Button
+                                                    variant="transparent"
+                                                    radius="xl"
+                                                    size="xs"
+                                                    onClick={() => handleMoveOutDown(accuracyIndexes)}
+                                                    style={{
+                                                        transition: "background-color 0.2s ease",
+                                                    }}
+                                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#a5d8ff"}
+                                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                                >
+                                                    <MoveDown size={14} />
+                                                </Button>
+                                            </Tooltip>
+                                        )}
 
-                            </Flex>)}
-
-
-                        {report
-                            .map((metric, index) => ({ metric, index })) // attach original index
-                            .filter(({ metric }) => metric.results.name !== "accuracy") // filter by condition
-                            .map(({ metric, index }) => (
-                                <MetricResume key={`other-${index}`} metric={metric as any} index={index} />
-                            ))}
+                                        {/* Delete button */}
+                                        <Tooltip
+                                            multiline
+                                            withArrow
+                                            transitionProps={{ duration: 200 }}
+                                            label="Eliminate metric from report">
+                                            <Button
+                                                variant="transparent"
+                                                radius="xl"
+                                                size="xs"
+                                                onClick={() => handleCancelOut(accuracyIndexes)}
+                                                style={{
+                                                    transition: "background-color 0.2s ease",
+                                                }}
+                                                disabled={report.length === accuracyIndexes.length}
+                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                            >
+                                                <FontAwesomeIcon icon={faTrashCan} />
+                                            </Button>
+                                        </Tooltip>
+                                    </Flex>
+                                );
+                            } else {
+                                // Render non-accuracy metrics normally
+                                return (
+                                    <MetricResume
+                                        key={`other-${index}`}
+                                        metric={metric as any}
+                                        index={index}
+                                        outIndexes={outIndexes} />
+                                );
+                            }
+                        })}
                     </>
 
 

@@ -13,9 +13,10 @@ interface Metric {
 interface MetricProps {
     metric: Metric;
     index: number;
+    outIndexes: number[];
 }
 
-export function MetricResume({ metric, index }: MetricProps) {
+export function MetricResume({ metric, index, outIndexes }: MetricProps) {
 
     const report = useStore((state) => state.report)
     const setReport = useStore((state) => state.setReport)
@@ -40,15 +41,27 @@ export function MetricResume({ metric, index }: MetricProps) {
     }
 
     const handleMoveUp = (indexC: number) => {
-        const element = report.splice(indexC, 1)[0]; // Remove element
-        report.splice(indexC - 1, 0, element); // Insert element (don't capture return)
-        setReport([...report]);
+        if (!outIndexes.includes(indexC) && (outIndexes.includes(indexC - 1))) {
+            const element = report.splice(indexC, 1)[0]; // Remove element
+            report.splice(indexC - outIndexes.length, 0, element); // Insert element (don't capture return)
+            setReport([...report]);
+        } else {
+            const element = report.splice(indexC, 1)[0]; // Remove element
+            report.splice(indexC - 1, 0, element); // Insert element (don't capture return)
+            setReport([...report]);
+        }
     }
 
     const handleMoveDown = (indexC: number) => {
-        const element = report.splice(indexC, 1)[0]; // Remove element
-        report.splice(indexC + 1, 0, element); // Insert element (don't capture return)
-        setReport([...report]);
+        if (!outIndexes.includes(indexC) && (outIndexes.includes(indexC +1))) {
+            const element = report.splice(indexC, 1)[0]; // Remove element
+            report.splice(indexC + outIndexes.length, 0, element); // Insert element (don't capture return)
+            setReport([...report]);
+        } else {
+            const element = report.splice(indexC, 1)[0]; // Remove element
+            report.splice(indexC + 1, 0, element); // Insert element (don't capture return)
+            setReport([...report]);
+        }
     }
 
     return (
@@ -159,7 +172,7 @@ export function MetricResume({ metric, index }: MetricProps) {
                     </Stack>
                 </Paper>
             
-                {index > 0 && report.length > 1 &&
+                {index > 0 && report.length > 1 && index !== outIndexes[0] &&
                     (<Tooltip
                         multiline
                         withArrow
@@ -180,7 +193,7 @@ export function MetricResume({ metric, index }: MetricProps) {
                         </Button>
                     </Tooltip>)}
 
-                {index + 1 < report.length && report.length > 1 && (<Tooltip
+                {index + 1 < report.length && report.length > 1 && index !== outIndexes[outIndexes.length - 1] && (<Tooltip
                     multiline
                     withArrow
                     transitionProps={{ duration: 200 }}
