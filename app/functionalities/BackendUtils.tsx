@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { completeness_post, data_get, duplicates_post, model_info_get, outliers_post, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
+import { completeness_post, completenessOK_get, data_get, duplicates_post, model_info_get, outliers_post, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -99,6 +99,7 @@ export async function getDuplicates(datasetName: string, featureName: string, in
     body: JSON.stringify(internalConfig),
   });
 
+ 
   if (!response.ok) throw new Error('Failed to get duplicates from the backend');
 
   const duplicates = await response.json();
@@ -113,10 +114,12 @@ export async function getOutliers(datasetName: string, featureName: string, inte
     headers: { 'Content-Type': 'application/json' }, // binary content type
     body: JSON.stringify(internalConfig),
   });
-
+  
+  
   if (!response.ok) throw new Error('Failed to get outliers from the backend');
 
   const outliers = await response.json();
+  
   return outliers
 }
 
@@ -211,4 +214,20 @@ export async function getModelInfo(model: string) {
   const modelInfo = await response.json();
   return modelInfo
 }
+
+export async function getCompletenessOK(datasetName: string, featureName: string): Promise<boolean> {
+  const url = new URL(`${completenessOK_get}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}`);
+
+  const response = await fetch(url);
+
+  if (response.status === 200) {
+    return true;
+  } else if (response.status === 404) {
+    return false;
+  } else {
+    const errorText = await response.text(); // optional: log/debug response body
+    throw new Error(`Failed to get completeness check: ${response.status} ${errorText}`);
+  }
+}
+
 

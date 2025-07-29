@@ -1,11 +1,11 @@
 "use client";
 
-import { ReportMetric } from "@/interfaces/genericInterface";
+import Dataset, { ReportMetric } from "@/interfaces/genericInterface";
 import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
-import { image_type, label_type, text_type } from "@/properties/types";
-import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { embedding_type, image_type, label_type, text_type } from "@/properties/types";
+import { faCheck, faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Box, Button, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
+import { Alert, Box, Button, Code, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useSearchParams } from "next/navigation";
@@ -19,120 +19,134 @@ import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import DuplicatesConfigs from "./DuplicatesConfig";
 import OutliersConfig from "./OutliersConfig";
 import { outliers_modes } from "./utils";
+import { IsFeatureBond } from "@/functionalities/Utils";
+import { getCompletenessOK } from "@/functionalities/BackendUtils";
+import Link from "next/link";
 
 
 
-interface ConfigsProps
-{
+interface ConfigsProps {
     metricName: string,
     labelFeatureReq?: boolean
 }
 
-export default function Config ( props: ConfigsProps )
-{
+export default function Config(props: ConfigsProps) {
     const searchParams = useSearchParams();
-    const [ datasetName, setDatasetName ] = useState<string | null>( "" )
-    const [ features, setFeatures ] = useState<string[]>( [] )
-    const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
-    const [ isLoading, setIsLoading ] = useState<boolean>( false )
-    const [ computed, setComputed ] = useState<boolean>( false )
-    const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
-    const [ outliers, setOutliers ] = useState<OutliersDTO | null>( null )
-    const [ completeness, setCompleteness ] = useState<CompletenessDTO | null>( null )
+    const [datasetName, setDatasetName] = useState<string | null>("")
+    const [features, setFeatures] = useState<string[]>([])
+    const [labelFeatures, setLabelFeatures] = useState<string[]>([])
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [computed, setComputed] = useState<boolean>(false)
+    const [duplicates, setDuplicates] = useState<DuplicatesDTO | null>(null)
+    const [outliers, setOutliers] = useState<OutliersDTO | null>(null)
+    const [completeness, setCompleteness] = useState<CompletenessDTO | null>(null)
 
 
-    const [ featureName, setFeatureName ] = useState<any>( "" )
-    const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
-    const [ outliers_mode, setOutliersMode ] = useState<string>( "" )
+    const [featureName, setFeatureName] = useState<any>("")
+    const [labelFeatureName, setLabelFeatureName] = useState<string>("")
+    const [outliers_mode, setOutliersMode] = useState<string>("")
 
 
-    const [ opened, { open, close } ] = useDisclosure( false );
+    const [opened, { open, close }] = useDisclosure(false);
 
 
-    const datasetUsed = useStore( ( state ) => state.datasetUsed )
+    const datasetUsed = useStore((state) => state.datasetUsed)
 
-    const configs = useStore( ( state ) => state.metricsConfig )
-    const setConfigs = useStore( ( state ) => state.setMetricsConfigs )
+    const configs = useStore((state) => state.metricsConfig)
+    const setConfigs = useStore((state) => state.setMetricsConfigs)
     const internalConfigs = useStore.getState().internalConfigs;
-    const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
+    const setInternalConfigs = useStore((state) => state.setInternalConfigs)
 
 
-    const [ inputReq, setInputReq ] = useState( '' );
+    const [inputReq, setInputReq] = useState('');
 
-    const handleRequirements = ( event: React.ChangeEvent<HTMLTextAreaElement> ) =>
-    {
+    const handleRequirements = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const inputValue = event.target.value;
-        setInputReq( inputValue );
+        setInputReq(inputValue);
 
         const lines = inputValue
-            .split( '\n' )
-            .map( line => line.trim() )
-            .filter( line => line !== '' );
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line !== '');
 
-        setInternalConfigs( { requirements: lines } );
-        if ( showRequirementsError ) setShowRequirementsError( false );
+        setInternalConfigs({ requirements: lines });
+        if (showRequirementsError) setShowRequirementsError(false);
     };
 
 
-    console.log( "INTERNAL CONFIGS:", internalConfigs )
+    console.log("INTERNAL CONFIGS:", internalConfigs)
 
 
-    useEffect( () => 
-    {
-        setComputeNow( false )
-        setComputed( false )
+    useEffect(() => {
+        setComputeNow(false)
+        setComputed(false)
 
-    }, [ inputReq ] )
+    }, [inputReq])
 
 
-    useEffect( () =>
-    {
-        if ( searchParams.get( "datasetName" ) ) {
-            setDatasetName( searchParams.get( "datasetName" ) )
+    useEffect(() => {
+        if (searchParams.get("datasetName")) {
+            setDatasetName(searchParams.get("datasetName"))
         }
-    }, [ searchParams ] )
+    }, [searchParams])
 
 
-    useEffect( () =>
-    {
-        if ( Array.isArray( datasetUsed?.features ) ) {
+    useEffect(() => {
+        if (Array.isArray(datasetUsed?.features)) {
             const extractedFeatures = datasetUsed.features
-                .filter( ( { type } ) => type === image_type || type === text_type )
-                .map( ( { name } ) => name );
+                .filter(({ type }) => type === image_type || type === text_type)
+                .map(({ name }) => name);
 
-            setFeatures( extractedFeatures );
+            setFeatures(extractedFeatures);
 
-            if ( props?.labelFeatureReq === true ) {
+            if (props?.labelFeatureReq === true) {
                 const extractedlabelFeatures = datasetUsed.features
-                    .filter( ( { type } ) => type === label_type )
-                    .map( ( { name } ) => name );
+                    .filter(({ type }) => type === label_type)
+                    .map(({ name }) => name);
 
-                setLabelFeatures( extractedlabelFeatures )
+                setLabelFeatures(extractedlabelFeatures)
             }
         }
-    }, [ datasetUsed ] )
+    }, [datasetUsed])
 
 
-    const [ showFeatureError, setShowFeatureError ] = useState( false );
-    const [ showLabelError, setShowLabelError ] = useState( false );
-    const [ showRequirementsError, setShowRequirementsError ] = useState( false );
-    const [ showOutliersConfig, setShowOutliersConfig ] = useState( false );
-    const [ clicked, setClicked ] = useState( false );
-    const [ isDuplicate, setIsDuplicate ] = useState( false );
-    const [ computeNow, setComputeNow ] = useState( false );
+    const [showFeatureError, setShowFeatureError] = useState(false);
+    const [showLabelError, setShowLabelError] = useState(false);
+    const [showRequirementsError, setShowRequirementsError] = useState(false);
+    const [showOutliersConfig, setShowOutliersConfig] = useState(false);
+    const [clicked, setClicked] = useState(false);
+    const [isDuplicate, setIsDuplicate] = useState(false);
+    const [computeNow, setComputeNow] = useState(false);
+    const [isCompletenessOK, setIsCompletenessOK] = useState<boolean>(true)
 
-    const report = useStore( ( state ) => state.report )
-    const [ reportMetric, setReportMetric ] = useState<ReportMetric | null>( null )
-    const setReport = useStore( ( state ) => state.setReport )
+    const report = useStore((state) => state.report)
+    const [reportMetric, setReportMetric] = useState<ReportMetric | null>(null)
+    const setReport = useStore((state) => state.setReport)
 
-    const setAddToReport = useStore( ( state ) => state.setAddToReport )
+    const setAddToReport = useStore((state) => state.setAddToReport)
 
     console.log("REPORT", report)
+
+    useEffect(() => {
+        setComputeNow(false)
+    }, [featureName, outliers_mode, labelFeatureName, configs])
+
     
-    useEffect( () =>
-    {
-        setComputeNow( false )
-    }, [ featureName, outliers_mode, labelFeatureName, configs ] )
+    
+    useEffect(() => {
+        if (featureName && datasetName) {
+            getCompletenessOK(datasetName, featureName)
+                .then((fetched) => {
+                    if (fetched === true) {
+                        setIsCompletenessOK(true)
+                    } else if (fetched === false) {
+                        setIsCompletenessOK(false)
+                    }
+                })
+        }
+    }, [featureName])
+    
+
 
     {/*
     const handleClickToReport = ( metricName: string ) =>
@@ -196,8 +210,8 @@ export default function Config ( props: ConfigsProps )
     };
     */}
 
-    const handleClickCompute = async () =>
-    {
+
+    const handleClickCompute = async () => {
 
         const newReportMetric: ReportMetric = {
             internalConfigs: internalConfigs,
@@ -206,23 +220,23 @@ export default function Config ( props: ConfigsProps )
 
         let hasValidationErrors = false;
 
-        if ( !featureName ) {
-            setShowFeatureError( true );
+        if (!featureName) {
+            setShowFeatureError(true);
             hasValidationErrors = true;
         }
 
-        if ( props?.labelFeatureReq && !labelFeatureName ) {
-            setShowLabelError( true );
+        if (props?.labelFeatureReq && !labelFeatureName) {
+            setShowLabelError(true);
             hasValidationErrors = true;
         }
 
-        if ( props.metricName === "completeness" && !inputReq ) {
-            setShowRequirementsError( true );
+        if (props.metricName === "completeness" && !inputReq) {
+            setShowRequirementsError(true);
             hasValidationErrors = true;
         }
 
 
-        const isDuplicate = report.some( ( metricReport ) =>
+        const isDuplicate = report.some((metricReport) =>
             (
                 props.metricName === "duplicates"
                     ? metricReport.results.name === "uniqueness"
@@ -231,15 +245,15 @@ export default function Config ( props: ConfigsProps )
                         : metricReport.results.name === props.metricName
             ) &&
             metricReport.results.featureName === featureName &&
-            ( !props?.labelFeatureReq || metricReport.results.labelFeatureName === labelFeatureName ) &&
-            JSON.stringify( metricReport.internalConfigs ) === JSON.stringify( newReportMetric.internalConfigs ) &&
-            (metricReport.results.name==="accuracy" && metricReport.results.mode === outliers_mode)
+            (!props?.labelFeatureReq || metricReport.results.labelFeatureName === labelFeatureName) &&
+            JSON.stringify(metricReport.internalConfigs) === JSON.stringify(newReportMetric.internalConfigs) &&
+            (metricReport.results.name === "accuracy" && metricReport.results.mode === outliers_mode)
         );
 
 
-        if ( !hasValidationErrors && !isDuplicate ) {
-            setIsLoading( true );
-            setComputeNow( true );
+        if (!hasValidationErrors && !isDuplicate) {
+            setIsLoading(true);
+            setComputeNow(true);
 
             try {
                 const data = await metricsFetcher(
@@ -251,219 +265,246 @@ export default function Config ( props: ConfigsProps )
                     outliers_mode
                 );
 
-                if ( props.metricName === "duplicates" ) setDuplicates( data );
-                if ( props.metricName === "outliers" ) setOutliers( data );
-                if ( props.metricName === "completeness" ) setCompleteness( data );
+                if (props.metricName === "duplicates") setDuplicates(data);
+                if (props.metricName === "outliers") setOutliers(data);
+                if (props.metricName === "completeness") setCompleteness(data);
 
                 newReportMetric.results = data;
                 newReportMetric.internalConfigs = internalConfigs;
 
-            } catch ( error ) {
+            } catch (error) {
                 // Handle error appropriately
-                console.error( "Error computing metrics:", error );
+                console.error("Error computing metrics:", error);
             } finally {
-                setIsLoading( false );
-                setComputed( true );
-                setIsDuplicate( false )
-                setReportMetric( newReportMetric )
+                setIsLoading(false);
+                setComputed(true);
+                setIsDuplicate(false)
+                setReportMetric(newReportMetric)
             }
-        } else if ( isDuplicate ) {
-            setIsDuplicate( true )
-            setClicked( false )
-            setComputeNow( false )
+        } else if (isDuplicate) {
+            setIsDuplicate(true)
+            setClicked(false)
+            setComputeNow(false)
 
         }
     };
 
 
-    const handleSaveToReport = () =>
-    {
-        if ( reportMetric ) {
-            setClicked( true )
-            setTimeout( () =>
-            {
-                setClicked( false );
-                setComputed( false )
-            }, 3000 );
-            setIsDuplicate( false )
-            setReport( [ ...report, reportMetric ] );
+    const handleSaveToReport = () => {
+        if (reportMetric) {
+            setClicked(true)
+            setTimeout(() => {
+                setClicked(false);
+                setComputed(false)
+            }, 3000);
+            setIsDuplicate(false)
+            setReport([...report, reportMetric]);
         }
 
     }
 
-    console.log( "REPORT:", report )
+    console.log("REPORT:", report)
 
     const icon = <IconInfoCircle />;
-    console.log( "CONFIGS:", configs )
+    console.log("CONFIGS:", configs)
 
     const metricComponentMap: Record<string, React.ComponentType> = {
         "duplicates": () => <DuplicatesConfigs />,
-        "outliers": () => <OutliersConfig mode={ outliers_mode } />,
+        "outliers": () => <OutliersConfig mode={outliers_mode} />,
         "completeness": () => <CompletenessConfig />
     };
 
-    const MetricConfigComponent = metricComponentMap[ props.metricName ];
+    const MetricConfigComponent = metricComponentMap[props.metricName];
 
 
     const metricDisplayerMap: Record<string, React.ComponentType> = {
-        "duplicates": () => <DuplicatesDisplayer duplicates={ duplicates as DuplicatesDTO } />,
-        "outliers": () => <OutlierDisplayer outliers={ outliers as OutliersDTO } />,
-        "completeness": () => <CompletenessDisplayer completeness={ completeness as CompletenessDTO } requirements={ internalConfigs.requirements } />
+        "duplicates": () => <DuplicatesDisplayer duplicates={duplicates as DuplicatesDTO} />,
+        "outliers": () => <OutlierDisplayer outliers={outliers as OutliersDTO} />,
+        "completeness": () => <CompletenessDisplayer completeness={completeness as CompletenessDTO} requirements={internalConfigs.requirements} />
     };
 
-    const MetricDisplayerComponent = metricDisplayerMap[ props.metricName ];
+    const MetricDisplayerComponent = metricDisplayerMap[props.metricName];
 
     return (
-        <div style={ {
+        <div style={{
             marginLeft: "100px",
             marginRight: "100px"
-        } }>
+        }}>
+            {props.metricName === "completeness" && (
+                <>
+                    <Alert
+                        variant="light"
+                        color="yellow"
+                        radius="md"
+                        title="Attention"
+                        icon={<FontAwesomeIcon icon={faCircleExclamation} />}
+                        style={{ display: 'inline-block', width: '800px', marginBottom:"30px" }}
+                    >
+                        Currently, this metric is only available if the available embeddings are computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
+                        Make it sure you have those embeddings available for the selected feature.
+                    </Alert>
+
+                    {!isCompletenessOK && (
+                        <Alert
+                        variant="light"
+                        color="red"
+                        radius="md"
+                        title="Ops!"
+                        icon={<FontAwesomeIcon icon={faCircleExclamation} />}
+                        style={{ display: 'inline-block', width: '800px', marginBottom:"30px" }}
+                    >
+                        The selected feature has not embeddings computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>! You can compute them on 
+                        the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
+                        
+                    </Alert>
+                    )}
+                </>
+            )}
             <Flex
                 direction="row"
                 align="flex-end"
                 gap="md"
             >
 
-                <Box style={ { position: "relative" } }>
+                <Box style={{ position: "relative" }}>
                     <Select
                         id="feature"
                         radius="md"
                         label="Feature"
                         placeholder="Choose feature"
-                        data={ features }
-                        value={ featureName }
-                        onChange={ ( value ) =>
-                        {
-                            setFeatureName( value );
-                            if ( showFeatureError ) setShowFeatureError( false );
-                        } }
+                        data={features}
+                        value={featureName}
+                        onChange={(value) => {
+                            setFeatureName(value);
+                            if (showFeatureError) setShowFeatureError(false);
+                        }}
                         required
-                        styles={ ( theme ) => ( {
+                        styles={(theme) => ({
                             input: {
-                                borderColor: showFeatureError ? theme.colors.red[ 6 ] : undefined,
+                                borderColor: showFeatureError ? theme.colors.red[6] : undefined,
                                 '&:hover': {
-                                    borderColor: showFeatureError ? theme.colors.red[ 6 ] : undefined,
+                                    borderColor: showFeatureError ? theme.colors.red[6] : undefined,
                                 },
                             },
-                        } ) }
+                        })}
                     />
 
-                    { showFeatureError && (
+                    {showFeatureError && (
                         <Text
                             size="xs"
-                            style={ { position: "absolute", top: "100%", marginTop: 4, color: "red" } }
+                            style={{ position: "absolute", top: "100%", marginTop: 4, color: "red" }}
                         >
                             Choose a feature to continue
                         </Text>
-                    ) }
+                    )}
                 </Box>
 
-                <Box style={ { position: "relative" } }>
-                    { props?.labelFeatureReq ? ( <Select
-                        id="labelFeature"
-                        radius="md"
-                        label="Label Feature"
-                        placeholder="Choose label"
-                        data={ labelFeatures }
-                        value={ labelFeatureName }
-                        onChange={ ( value ) =>
-                        {
-                            setLabelFeatureName( value as string );
-                            if ( showLabelError ) setShowLabelError( false );
-                        } }
-                        required={ true }
-                        styles={ ( theme ) => ( {
-                            input: {
-                                borderColor: showLabelError ? theme.colors.red[ 6 ] : undefined,
-                                '&:hover': {
-                                    borderColor: showLabelError ? theme.colors.red[ 6 ] : undefined,
+                <Box style={{ position: "relative" }}>
+                    {props?.labelFeatureReq ? (
+                        <Select
+                            id="labelFeature"
+                            radius="md"
+                            label="Label Feature"
+                            placeholder="Choose label"
+                            data={labelFeatures}
+                            value={labelFeatureName}
+                            onChange={(value) => {
+                                setLabelFeatureName(value as string);
+                                if (showLabelError) setShowLabelError(false);
+                            }}
+                            required={true}
+                            styles={(theme) => ({
+                                input: {
+                                    borderColor: showLabelError ? theme.colors.red[6] : undefined,
+                                    '&:hover': {
+                                        borderColor: showLabelError ? theme.colors.red[6] : undefined,
+                                    },
                                 },
-                            },
-                        } ) }
-                    /> ) : null }
+                            })}
+                        />) : null}
 
-                    { showLabelError && (
+                    {showLabelError && (
                         <Text
                             size="xs"
-                            style={ { position: "absolute", top: "100%", marginTop: 4, color: "red" } }
+                            style={{ position: "absolute", top: "100%", marginTop: 4, color: "red" }}
                         >
                             Choose a label to continue
                         </Text>
-                    ) }
+                    )}
 
                 </Box>
 
-                <Box style={ { position: "relative" } }>
-                    { props?.metricName == "outliers" ? ( <Select
+                <Box style={{ position: "relative" }}>
+                    {props?.metricName == "outliers" ? (<Select
                         id="outliers-mode"
                         radius="md"
                         label="Mode"
                         placeholder="Choose a mode to compute outliers"
-                        data={ outliers_modes }
-                        value={ outliers_mode }
-                        onChange={ ( value ) =>
-                        {
-                            setOutliersMode( value as string );
+                        data={outliers_modes}
+                        value={outliers_mode}
+                        onChange={(value) => {
+                            setOutliersMode(value as string);
 
-                            if ( value ) {
-                                if ( !showOutliersConfig ) {
-                                    setShowOutliersConfig( true );
+                            if (value) {
+                                if (!showOutliersConfig) {
+                                    setShowOutliersConfig(true);
                                 }
                             } else {
-                                setShowOutliersConfig( false );
+                                setShowOutliersConfig(false);
                             }
-                        } }
-                        required={ true }
-                        styles={ ( theme ) => ( {
+                        }}
+                        required={true}
+                        styles={(theme) => ({
                             input: {
-                                borderColor: showLabelError ? theme.colors.red[ 6 ] : undefined,
+                                borderColor: showLabelError ? theme.colors.red[6] : undefined,
                                 '&:hover': {
-                                    borderColor: showLabelError ? theme.colors.red[ 6 ] : undefined,
+                                    borderColor: showLabelError ? theme.colors.red[6] : undefined,
                                 },
                             },
-                        } ) }
-                    /> ) : null }
+                        })}
+                    />) : null}
 
                 </Box>
-                { props.metricName == "completeness" ? (
-                    <Box style={ { position: "relative" } }>
+                {props.metricName == "completeness" ? (
+                    <Box style={{ position: "relative" }}>
                         <Textarea
                             label="Requirements"
                             radius="md"
                             size="xs"
                             placeholder="Write each requirement in a different line."
                             autosize
-                            required={ true }
-                            value={ inputReq }
-                            onChange={ handleRequirements }
-                            styles={ ( theme ) => ( {
+                            required={true}
+                            value={inputReq}
+                            disabled={!isCompletenessOK}
+                            onChange={handleRequirements}
+                            styles={(theme) => ({
                                 input: {
                                     width: "400px",
-                                    borderColor: showRequirementsError ? theme.colors.red[ 6 ] : undefined,
+                                    borderColor: showRequirementsError ? theme.colors.red[6] : undefined,
                                     '&:hover': {
-                                        borderColor: showRequirementsError ? theme.colors.red[ 6 ] : undefined,
+                                        borderColor: showRequirementsError ? theme.colors.red[6] : undefined,
                                     },
                                 },
-                            } ) } />
-                        { showRequirementsError && (
+                            })} />
+                        {showRequirementsError && (
                             <Text
                                 size="xs"
-                                style={ { position: "absolute", top: "100%", marginTop: 4, color: "red" } }
+                                style={{ position: "absolute", top: "100%", marginTop: 4, color: "red" }}
                             >
                                 Write at least one requirement to continue
                             </Text>
-                        ) }
+                        )}
                     </Box>
                 ) :
-                    ( <>
-                        <Modal opened={ opened } onClose={ close } title="Configurations">
-                            { MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div> }
+                    (<>
+                        <Modal opened={opened} onClose={close} title="Configurations">
+                            {MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div>}
                         </Modal>
 
-                        <Button variant="default" onClick={ open } size="xs" radius="md" disabled={ props.metricName == "outliers" && showOutliersConfig == false }>
+                        <Button variant="default" onClick={open} size="xs" radius="md" disabled={props.metricName == "outliers" && showOutliersConfig == false}>
                             Configs
                         </Button>
-                    </> )
+                    </>)
                 }
             </Flex>
             <Space h="xl" />
@@ -472,37 +513,39 @@ export default function Config ( props: ConfigsProps )
                 justify="start"
                 gap="md">
                 <Button
-                    onClick={ handleSaveToReport }
-                    disabled={ !computed }
+                    onClick={handleSaveToReport}
+                    disabled={!computed}
                 >
-                    { clicked && !isDuplicate ? ( <>
-                        <FontAwesomeIcon icon={ faCheck } style={ { marginRight: 8 } } />
-                        <span>Saved</span></> )
-                        : "Save to report" }
+                    {clicked && !isDuplicate ? (<>
+                        <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
+                        <span>Saved</span></>)
+                        : "Save to report"}
                 </Button>
 
-                <Button onClick={ handleClickCompute }>
+                <Button 
+                    onClick={handleClickCompute}
+                    disabled={props.metricName=="completeness" && !isCompletenessOK}>
                     Compute now
                 </Button>
             </Flex>
 
-            { isDuplicate ? (
+            {isDuplicate ? (
                 <>
                     <Space h="md" />
-                    <Alert variant="light" color="red" withCloseButton onClose={ () => { setIsDuplicate( false ); setClicked( false ) } } title="Attention" icon={ icon }>
+                    <Alert variant="light" color="red" withCloseButton onClose={() => { setIsDuplicate(false); setClicked(false) }} title="Attention" icon={icon}>
                         A metric with this same configuration has been already computed. Please change something or choose another metric.
                     </Alert>
-                </> ) : null }
+                </>) : null}
 
-            { computeNow ? (
+            {computeNow ? (
                 isLoading ? (
                     <Flex
-                        mih={ 150 }
+                        mih={150}
                         justify="center"
                         align="center"
                         direction="column"
                         wrap="wrap"
-                        style={ { width: '100%' } }
+                        style={{ width: '100%' }}
                     >
                         <p>Loading...</p>
                         <Loader />
@@ -515,7 +558,7 @@ export default function Config ( props: ConfigsProps )
                         : <div>Unsupported metric</div>
 
                 )
-            ) : null }
+            ) : null}
         </div >
     )
 }

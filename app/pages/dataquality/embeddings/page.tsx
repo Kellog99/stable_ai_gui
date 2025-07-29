@@ -429,7 +429,7 @@ function Home ()
                   : null }
 
 
-                { featureName ? (
+                { featureName && labelFeatures.length > 0? (
                   <Select
                     id="labelFeature"
                     radius="md"
