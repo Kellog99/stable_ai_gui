@@ -74,7 +74,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
   });
   const selectedPoints = useStore((state) => state.selectedPoints)
   const setSelectedPoints = useStore((state) => state.setSelectedPoints)
-
+  const [enableTextArea, setEnableTextArea] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
   const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>([]);
   const [originalColors, setOriginalColors] = useState<Map<number, [number, number, number]>>(new Map());
@@ -92,7 +92,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
   const lassoMode = useStore((state) => state.lazoMode);
   const lazoModeSetter = useStore((state) => state.setLazoMode);
   const filteredLabels = useStore((state) => state.filteredLabels)
-
+  
   const [queryRetrieve, setQueryRetrieve] = useState<string>("")
   const [queryTop_k, setQueryTop_k] = useState<number>(10)
 
@@ -122,9 +122,12 @@ export default function ScatterPlotVisualization(props: propsTypes) {
           setUqColors(colors)
           setQueryData(fetched.query_points) 
           setNoEmbAvailable(false)
+          const enable = !checkMultiModalCompatibility(modelInfo, props.featureName);
+          setEnableTextArea(enable);
         } else {
           setData(null)
           setNoEmbAvailable(true)
+          setEnableTextArea(false);
         }
         })
         .finally(() => {
@@ -506,8 +509,10 @@ export default function ScatterPlotVisualization(props: propsTypes) {
       const feature = datasetUsed.features.find( f => f.name === featureName );
       const type = feature?.type;
       if ( type === image_type && modelInfo.supports_images == true && modelInfo.supports_text == true) { // Removed `&& modelInfo.supports_text == true` for image_type
+        
         return true;
       } else if ( type === text_type && modelInfo.supports_text == true ) {
+        
         return true;
       }
     }
@@ -664,7 +669,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
                     radius="md"
                     value={inputValue}
                     onChange={(event) => setInputValue(event.currentTarget.value)}
-                    
+                    disabled={!enableTextArea}
                     onFocus={handleTextareaFocus} // New: Set focus state
                     onBlur={handleTextareaBlur}   // New: Clear focus state
                     onKeyDown={handleKeyDown}
