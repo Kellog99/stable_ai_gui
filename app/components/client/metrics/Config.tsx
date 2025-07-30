@@ -340,8 +340,8 @@ export default function Config(props: ConfigsProps) {
                         icon={<FontAwesomeIcon icon={faCircleExclamation} />}
                         style={{ display: 'inline-block', width: '800px', marginBottom:"30px" }}
                     >
-                        Currently, this metric is only available if the available embeddings are computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
-                        Make it sure you have those embeddings available for the selected feature.
+                    This metric can only be computed if the available embeddings were generated using the following model: <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
+                    Please ensure that embeddings from this model are available for the selected feature.
                     </Alert>
 
                     {!isCompletenessOK && (
