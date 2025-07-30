@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { ReactNode } from 'react';
-import classes from './AppNavbarDataQuality.module.css';
+import classes from './AppNavbar.module.css';
 
 interface CollapsibleSectionProps {
   title: string;

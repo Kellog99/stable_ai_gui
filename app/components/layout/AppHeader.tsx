@@ -95,18 +95,6 @@ function AppHeader() {
               </Tooltip>
             </RouterButton>
             
-
-            {/*
-            <Button
-                  radius="lg"
-                  onClick={open}
-                  disabled={report.length === 0}
-                >
-                  <span><LinesGraphClipboard size={18} /></span>
-                </Button>
-                <PDFPreviewModal opened={reportOpen} close={close} />
-            */}
-            
             
             <Text>
               <span><FontAwesomeIcon icon={faDatabase} /></span> Dataset: {datasetUsed}
