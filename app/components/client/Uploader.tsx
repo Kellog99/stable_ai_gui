@@ -100,9 +100,6 @@ const ZipUploadComponent = () =>
     setUploadStatus( null );
   };
 
-
-
-
   const handleUpload = async () =>
   {
     if ( !file ) {
