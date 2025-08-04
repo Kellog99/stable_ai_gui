@@ -1,19 +1,40 @@
 "use client";
 
 import UploadModal from "@/components/client/UploadModal";
+import { getDatasets, getModels } from "@/functionalities/NNTrustBackendUtils";
+import useStore from "@/store/nnTrustStore";
 import { Button, Divider, Flex, Paper, Select, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconUpload } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function NNtrustMainPage() {
 
   const [opened, { open, close }] = useDisclosure(false);
   const [model, setModel] = useState<string | null>("")
+  
+  const models = useStore((state) => state.models)
+  const setModels = useStore((state) => state.setModels)
+  
+  const datasets = useStore((state) => state.datasets)
+  const setDatasets = useStore((state) => state.setDatasets)
+ 
   const [dataset, setDataset] = useState<string | null>("")
   const [object, setObject] = useState<string | null> ("")
 
-  // quando ci sarà il servizio backend --> va chiamato quando sia model sia dataset sono stati selezionati.
+  useEffect(() => {
+    getDatasets().then( fetchedData =>
+    {
+      setDatasets( fetchedData.names );
+    } )
+
+    getModels().then(fetched=>
+      setModels(fetched.names)
+    )
+  }, [])
+
+  console.log("models list", models)
+  console.log("datasets list", datasets)
 
   return (
     <>
@@ -62,7 +83,7 @@ export default function NNtrustMainPage() {
         <Flex direction={{ base: 'column', sm: 'row' }} gap="lg" align="end" style={{ marginBottom: '32px' }}>
           <Select
             placeholder="Pick a model"
-            data={['TensorFlow', 'PyTorch', 'Scikit-learn', 'XGBoost']}
+            data={models as string[]}
             style={{ flex: 1 }}
             value={model}
             onChange={(value) => setModel(value as string)}
@@ -137,7 +158,7 @@ export default function NNtrustMainPage() {
         <Flex direction={{ base: 'column', sm: 'row' }} gap="lg" align="end" style={{ marginBottom: '32px' }}>
           <Select
             placeholder="Pick a dataset"
-            data={['MNIST', 'CIFAR-10', 'ImageNet', 'Custom Data']}
+            data={datasets as string[]}
             style={{ flex: 1 }}
             value={dataset}
             onChange={(value) => setDataset(value as string)}

@@ -1,5 +1,7 @@
-import { getModels } from '@/functionalities/NNTrustBackendUtils';
-import { model_upload } from '@/properties/urlsNNTrust';
+import DatasetsLoader from '@/functionalities/DatasetsLoader';
+import { getDatasets } from '@/functionalities/NNTrustBackendUtils';
+import { upload_post } from '@/properties/urls';
+import { dataset_upload } from '@/properties/urlsNNTrust';
 import useStore from '@/store/nnTrustStore';
 import
 {
@@ -7,11 +9,14 @@ import
   Button,
   Center,
   Container,
+  Divider,
   FileInput,
   Group,
   Paper,
   Progress,
+  Select,
   Stack,
+  Switch,
   Text,
   ThemeIcon,
   Title
@@ -20,19 +25,21 @@ import
 {
   IconCheck,
   IconCloudUpload,
+  IconFileText,
   IconFileZip,
+  IconSettings,
   IconUpload,
   IconX
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
-const ModelUploadComponent = () =>
+const ZipUploadComponent = () =>
 {
   const [ file, setFile ] = useState<File | null>( null );
   const [ message, setMessage ] = useState<string>( '' );
   const [ loading, setLoading ] = useState<boolean>( false );
+  const setDatasets = useStore( ( state ) => state.setDatasets )
   const [ uploadStatus, setUploadStatus ] = useState<string | null>( null ); // 'success', 'error', null
-  const setModels = useStore((state) => state.setModels)
 
   const handleFileChange = async ( selectedFile: File ) =>
   {
@@ -43,8 +50,8 @@ const ModelUploadComponent = () =>
       return;
     }
 
-    if ( !selectedFile.name.endsWith( '.pth' ) ) {
-      setMessage( 'Please select a .pth file.' );
+    if ( selectedFile.type !== 'application/zip' && !selectedFile.name.endsWith( '.zip' ) ) {
+      setMessage( 'Please select a .zip file.' );
       setUploadStatus( 'error' );
       return;
     }
@@ -54,10 +61,11 @@ const ModelUploadComponent = () =>
     setUploadStatus( null );
   };
 
+  
   const handleUpload = async () =>
   {
     if ( !file ) {
-      setMessage( 'Please select a .pth file first.' );
+      setMessage( 'Please select a zip file first.' );
       setUploadStatus( 'error' );
       return;
     }
@@ -70,7 +78,7 @@ const ModelUploadComponent = () =>
     formData.append( 'file', file );
 
     try {
-      const response = await fetch( model_upload, {
+      const response = await fetch( dataset_upload, {
         method: 'POST',
         body: formData,
       } );
@@ -79,7 +87,7 @@ const ModelUploadComponent = () =>
         setMessage( `Upload successful` );
         setUploadStatus( 'success' );
       } else {
-        const data = await response.json();
+        const data = await response.json()
         setMessage( `Upload failed: ${data.message}` );
         setUploadStatus( 'error' );
       }
@@ -88,15 +96,14 @@ const ModelUploadComponent = () =>
       setMessage( `An error occurred: ${error}` );
       setUploadStatus( 'error' );
     } finally {
-      getModels().then( fetchedData =>
+      getDatasets().then( fetchedData =>
       {
-        setModels( fetchedData.names );
+        setDatasets( fetchedData.names );
       } )
       setLoading( false );
     }
   };
   
-
   const getStatusColor = () =>
   {
     if ( uploadStatus === 'success' ) return 'green';
@@ -123,18 +130,18 @@ const ModelUploadComponent = () =>
 
           <Center>
             <Title order={ 2 } ta="center" c="dark">
-              Upload Model
+              Upload Zip File
             </Title>
           </Center>
 
           <Text size="sm" c="dimmed" ta="center">
-            Select a .pth file from your computer to upload
+            Select a .zip file from your computer to upload
           </Text>
 
           <FileInput
-            label="Choose .pth file"
+            label="Choose zip file"
             placeholder="Click to select file"
-            accept=".pth"
+            accept=".zip,application/zip"
             value={ file }
             onChange={ ( file ) => handleFileChange( file as File ) }
             leftSection={ <IconFileZip size={ 14 } /> }
@@ -142,6 +149,7 @@ const ModelUploadComponent = () =>
             size="md"
             required
           />
+
           { file && (
             <Alert
               icon={ <IconFileZip size={ 16 } /> }
@@ -186,6 +194,7 @@ const ModelUploadComponent = () =>
               disabled={ !file || loading }
               size="md"
               variant="filled"
+              
             >
               { loading ? 'Uploading...' : 'Upload File' }
             </Button>
@@ -196,4 +205,4 @@ const ModelUploadComponent = () =>
   );
 };
 
-export default ModelUploadComponent;
+export default ZipUploadComponent;

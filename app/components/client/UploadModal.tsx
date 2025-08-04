@@ -4,6 +4,8 @@ import { Divider, Modal, Text, Tooltip } from "@mantine/core";
 import ZipUploader from "./Uploader";
 import { InfoCircle } from "@vectopus/atlas-icons-react";
 import ModelUploader from "./ModelUploader";
+import { usePathname } from "next/navigation";
+import NNDatasetUploader from "./NNDatasetUploader";
 
 
 interface UploadDatasetModalProps {
@@ -13,7 +15,10 @@ interface UploadDatasetModalProps {
 }
 
 export default function UploadModal({ opened, close, object }: UploadDatasetModalProps) {
-
+    const pathName = usePathname();
+    
+    const isNNTrust = pathName.includes('/nntrust');
+    
     return (
         <>
             <Modal.Root
@@ -65,7 +70,7 @@ export default function UploadModal({ opened, close, object }: UploadDatasetModa
                     </Modal.Header>
 
                     <Modal.Body>
-                        {object === "dataset" ? <ZipUploader /> : <ModelUploader />}
+                        {object === "dataset" ? (isNNTrust ? <NNDatasetUploader/> : <ZipUploader />) : <ModelUploader />}
                     </Modal.Body>
 
                 </Modal.Content>

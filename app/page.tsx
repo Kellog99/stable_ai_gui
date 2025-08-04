@@ -80,7 +80,7 @@ export default function HomePage ()
           </Flex>
        
 
-        <UploadModal opened={ opened } close={ close } />
+        <UploadModal opened={ opened } close={ close } object="dataset" />
 
 
         { isLoading ? (
