@@ -7,14 +7,11 @@ import
   Button,
   Center,
   Container,
-  Divider,
   FileInput,
   Group,
   Paper,
   Progress,
-  Select,
   Stack,
-  Switch,
   Text,
   ThemeIcon,
   Title
@@ -23,62 +20,18 @@ import
 {
   IconCheck,
   IconCloudUpload,
-  IconFileText,
   IconFileZip,
-  IconSettings,
   IconUpload,
   IconX
 } from '@tabler/icons-react';
 import { useState } from 'react';
 
-const ZipUploadComponent = () =>
+const ModelUploadComponent = () =>
 {
   const [ file, setFile ] = useState<File | null>( null );
-  const [ jsonFile, setJsonFile ] = useState<File | null>( null );
-  const [ mode, setMode ] = useState<string>( '' ); // or a union type if limited values: useState<'edit' | 'view' | ''>('')
-  const [ type, setType ] = useState<string>( '' ); // or a union type if limited values: useState<'image' | 'text' | ''>('')
-  const [ description, setDescription ] = useState<string>( '' );
-  const [ labelDict, setLabelDict ] = useState<Record<string, string>>( {} );
   const [ message, setMessage ] = useState<string>( '' );
   const [ loading, setLoading ] = useState<boolean>( false );
-  const setDatasets = useStore( ( state ) => state.setDatasets )
   const [ uploadStatus, setUploadStatus ] = useState<string | null>( null ); // 'success', 'error', null
-  const [ arrowAv, setArrowAv ] = useState<boolean>( true ); // Default to true, can be changed by user
-
-  const handleJsonFileChange = async ( selectedFile: File ) =>
-  {
-    if ( !selectedFile ) {
-      setJsonFile( null );
-      setDescription( '' );
-      setLabelDict( {} );
-      return;
-    } else if ( selectedFile.type !== 'application/json' && !selectedFile.name.endsWith( '.json' ) ) {
-      setMessage( 'Please select a .json file.' );
-      setUploadStatus( 'error' );
-      return;
-    }
-
-    setJsonFile( selectedFile );
-
-    try {
-      const text = await selectedFile.text();
-      const jsonData = JSON.parse( text );
-
-      if ( jsonData.description ) {
-        setDescription( jsonData.description );
-      }
-
-      if ( jsonData.label_dict ) {
-        setLabelDict( jsonData.label_dict );
-      }
-
-      setMessage( `JSON file loaded: ${selectedFile.name}` );
-      setUploadStatus( null );
-    } catch ( error ) {
-      setMessage( `Error reading JSON file: ${error}` );
-      setUploadStatus( 'error' );
-    }
-  };
 
   const handleFileChange = async ( selectedFile: File ) =>
   {
@@ -89,8 +42,8 @@ const ZipUploadComponent = () =>
       return;
     }
 
-    if ( selectedFile.type !== 'application/zip' && !selectedFile.name.endsWith( '.zip' ) ) {
-      setMessage( 'Please select a .zip file.' );
+    if ( !selectedFile.name.endsWith( '.pth' ) ) {
+      setMessage( 'Please select a .pth file.' );
       setUploadStatus( 'error' );
       return;
     }
@@ -103,7 +56,7 @@ const ZipUploadComponent = () =>
   const handleUpload = async () =>
   {
     if ( !file ) {
-      setMessage( 'Please select a zip file first.' );
+      setMessage( 'Please select a .pth file first.' );
       setUploadStatus( 'error' );
       return;
     }
@@ -118,20 +71,6 @@ const ZipUploadComponent = () =>
     // Build query parameters
     const queryParams = new URLSearchParams();
 
-    if ( description ) {
-      queryParams.append( 'description', description );
-    }
-
-    if ( Object.keys( labelDict ).length > 0 ) {
-      queryParams.append( 'label_dict', JSON.stringify( labelDict ) );
-    }
-
-    if ( mode ) {
-      queryParams.append( 'mode', mode );
-    }
-    if ( type ) {
-      queryParams.append( 'type', type );
-    }
 
     const uploadUrl = queryParams.toString() ?
       `${upload_post}?${queryParams.toString()}` :
@@ -156,10 +95,6 @@ const ZipUploadComponent = () =>
       setMessage( `An error occurred: ${error}` );
       setUploadStatus( 'error' );
     } finally {
-      DatasetsLoader().then( fetchedData =>
-      {
-        setDatasets( fetchedData );
-      } )
       setLoading( false );
     }
   };
@@ -191,18 +126,18 @@ const ZipUploadComponent = () =>
 
           <Center>
             <Title order={ 2 } ta="center" c="dark">
-              Upload Zip File
+              Upload Model
             </Title>
           </Center>
 
           <Text size="sm" c="dimmed" ta="center">
-            Select a .zip file from your computer to upload
+            Select a .pth file from your computer to upload
           </Text>
 
           <FileInput
-            label="Choose zip file"
+            label="Choose .pth file"
             placeholder="Click to select file"
-            accept=".zip,application/zip"
+            accept=".pth"
             value={ file }
             onChange={ ( file ) => handleFileChange( file as File ) }
             leftSection={ <IconFileZip size={ 14 } /> }
@@ -210,68 +145,6 @@ const ZipUploadComponent = () =>
             size="md"
             required
           />
-
-          <Switch
-            defaultChecked
-            color="gray"
-            label="Arrow available"
-            onChange={ ( e ) => setArrowAv( e.currentTarget.checked ) }
-          />
-
-          { !arrowAv && (
-            <>
-              <Select
-                label="Processing Mode"
-                placeholder="Select processing mode"
-                value={ mode }
-                onChange={ ( mode ) => setMode( mode as string ) }
-                data={ [
-                  { value: 'single_feature', label: 'Single Feature' },
-                  { value: 'classification', label: 'Classification' },
-                  { value: 'object detection', label: 'Object Detection' },
-                ] }
-                leftSection={ <IconSettings size={ 14 } /> }
-                clearable
-                size="md"
-                required
-              />
-
-              { mode != "object detection" && mode != ""?
-
-                <Select
-                  label="Type of the main feature"
-                  placeholder="Select type"
-                  value={ type }
-                  onChange={ ( type ) => setType( type as string ) }
-                  data={ [
-                    { value: 'image', label: 'Image' },
-                    { value: 'text', label: 'Text' },
-                  ] }
-                  leftSection={ <IconSettings size={ 14 } /> }
-                  clearable
-                  size="md"
-                  required
-                /> : null }
-
-            </>
-          ) }
-
-          <Divider label="Optional Configuration" labelPosition="center" />
-
-          <FileInput
-            label="Configuration JSON file (optional)"
-            placeholder="Click to select JSON file"
-            accept=".json,application/json"
-            value={ jsonFile }
-            onChange={ ( jsonFile ) => handleJsonFileChange( jsonFile as File ) }
-            leftSection={ <IconFileText size={ 14 } /> }
-            clearable
-            size="md"
-            description="Upload a JSON file containing description and label_dict"
-          />
-
-
-
           { file && (
             <Alert
               icon={ <IconFileZip size={ 16 } /> }
@@ -316,7 +189,6 @@ const ZipUploadComponent = () =>
               disabled={ !file || loading }
               size="md"
               variant="filled"
-              
             >
               { loading ? 'Uploading...' : 'Upload File' }
             </Button>
@@ -327,4 +199,4 @@ const ZipUploadComponent = () =>
   );
 };
 
-export default ZipUploadComponent;
+export default ModelUploadComponent;

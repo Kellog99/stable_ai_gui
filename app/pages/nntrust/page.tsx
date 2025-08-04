@@ -11,6 +11,7 @@ export default function NNtrustMainPage() {
   const [opened, { open, close }] = useDisclosure(false);
   const [model, setModel] = useState<string | null>("")
   const [dataset, setDataset] = useState<string | null>("")
+  const [object, setObject] = useState<string | null> ("")
 
   // quando ci sarà il servizio backend --> va chiamato quando sia model sia dataset sono stati selezionati.
 
@@ -103,7 +104,7 @@ export default function NNtrustMainPage() {
 
           <Button
             leftSection={<IconUpload size={18} />}
-            onClick={open}
+            onClick={() => {open();setObject("model")}}
             style={{
               background: 'linear-gradient(135deg, #dc2626 0%, #000000 100%)',
               border: 'none',
@@ -120,7 +121,8 @@ export default function NNtrustMainPage() {
           >
             Upload Model
           </Button>
-          <UploadModal opened={opened} close={close} />
+          <UploadModal opened={opened} close={close} object={object as string}/>
+          
         </Flex>
 
         <div style={{ marginBottom: '16px' }}>
@@ -177,7 +179,7 @@ export default function NNtrustMainPage() {
           />
           <Button
             leftSection={<IconUpload size={18} />}
-            onClick={open}
+             onClick={() => {open();setObject("dataset")}}
             style={{
               background: 'linear-gradient(135deg, #dc2626 0%, #000000 100%)',
               border: 'none',
@@ -194,7 +196,7 @@ export default function NNtrustMainPage() {
           >
             Upload Dataset
           </Button>
-          <UploadModal opened={opened} close={close} />
+          <UploadModal opened={opened} close={close} object={object as string}/>
         </Flex>
 
 
