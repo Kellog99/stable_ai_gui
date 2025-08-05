@@ -1,6 +1,7 @@
 import {
-  faHouse,
+  faHouse, faChartLine
 } from '@fortawesome/free-solid-svg-icons';
+
 
 export interface NavigationItem {
   key: string;
@@ -25,7 +26,13 @@ export const mainNavigation: NavigationItem[] = [
     label: 'Home',
     href: '/pages/nntrust',
     icon: faHouse,
-  }
+  },
+  {
+    key: 'report',
+    label: 'Report',
+    href: '/pages/nntrust/report/',
+    icon: faChartLine,
+  },
 ];
 
 {/*

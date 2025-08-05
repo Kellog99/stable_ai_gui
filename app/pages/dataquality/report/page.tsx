@@ -1,26 +1,23 @@
 "use client"
 
-import { Button, Divider, LoadingOverlay, Modal, Text, Tooltip, Alert, Box, ScrollArea, Title, Flex, Paper, Stack, Group } from "@mantine/core";
+import { Button, Text, Tooltip, Alert, Box, ScrollArea, Title, Flex, Paper, Stack, Group } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import useStore from "@/store/dsStore";
-import { report_post } from "@/properties/urls";
 import PDFPreviewModal from "@/components/client/ReportModal";
-import { InfoCircle, LinesGraphClipboard } from "@vectopus/atlas-icons-react";
+import { InfoCircle } from "@vectopus/atlas-icons-react";
 import { CheckCircle, MoveDown, MoveUp } from "lucide-react";
 import { useDisclosure } from "@mantine/hooks";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faX, faCircleExclamation, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faCircleExclamation, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import SchemaShower from "@/components/client/SchemaShower";
 import { labelColorMap } from "@/properties/static";
 import { FeatureSchema } from "@/interfaces/genericInterface";
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
-import { getPrototypes } from "@/functionalities/BackendUtils";
+
 import { BarChart } from "@mantine/charts";
 import '@mantine/charts/styles.css';
-import MetricsAddedDisplayer from "@/components/client/metrics/displayer/MetricsAddedDisplayer";
+
 import { MetricResume } from "@/components/client/metrics/displayer/MetricResume";
-
-
 
 export default function Report() {
 

@@ -45,7 +45,7 @@ export default function NavigationButton({
 
   const searchParams = useSearchParams();
   const [datasetName, setDatasetName] = useState<string | null>("")
-  
+
   useEffect(() => {
     if (searchParams.get("datasetName")) {
       setDatasetName(searchParams.get("datasetName"))
@@ -106,6 +106,7 @@ export default function NavigationButton({
       )}
     </div>
   ) : (
+    
     <RouterButton name={datasetName} route={href}>
       {buttonContent}
     </RouterButton>
@@ -113,3 +114,4 @@ export default function NavigationButton({
 
   return content;
 }
+
