@@ -2,7 +2,7 @@
 
 import { getJobsId, getProgress } from "@/functionalities/NNTrustBackendUtils";
 import { Job } from "@/interfaces/NNInterfaces";
-import { Badge, Flex, Group, Paper, Stack, Title, Text, Button } from "@mantine/core";
+import { Badge, Flex, Group, Paper, Stack, Title, Text, Button, Tooltip } from "@mantine/core";
 import { IconTrendingUp } from "@tabler/icons-react";
 import { CheckCircle, RefreshCw } from "lucide-react";
 import { useEffect } from "react";
@@ -69,9 +69,16 @@ export default function JobStatus({ jobs, status }: JobStatusProps) {
                     {status == "active" ? "Active Jobs" : "Completed Jobs"}
                 </Title>
                 {status == "active" ? (
-                    <Button variant="transparent" onClick={handleReload}>
-                        <RefreshCw size={20} style={{ color: '#868e96', marginTop: '2px' }} />
-                    </Button>
+                    <Tooltip withArrow label="Refresh to update progress" radius="sm">
+                        <Button
+                            size="sm"
+                            variant="transparent"
+                            onClick={handleReload}
+                            style={{ padding: 0, minWidth: 'auto' }}
+                        >
+                            <RefreshCw size={20} style={{ color: '#868e96', marginTop: '2px' }} />
+                        </Button>
+                    </Tooltip>
                 ) : (
                     <CheckCircle size={20} style={{ color: '#868e96', marginTop: '2px' }} />
                 )}
@@ -119,28 +126,7 @@ export default function JobStatus({ jobs, status }: JobStatusProps) {
                                         <strong>Progress:</strong> {jobDetails?.progress}
                                     </Text>
                                 </div>
-                                {status == "active" ? (
-                                    <Button
-                                        leftSection={<IconTrendingUp size={16} />}
-                                        onClick={() => getJobProgress(jobDetails?.id as number)}
-                                        style={{
-                                            background: 'linear-gradient(135deg, #000000 0%, #dc2626 100%)',
-                                            border: 'none',
-                                            borderRadius: '6px',
-                                            fontWeight: 500,
-                                            fontSize: '14px',
-                                            padding: '8px 16px',
-                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                transform: 'translateY(-1px)',
-                                                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
-                                            }
-                                        }}
-                                    >
-                                        Get Progress
-                                    </Button>
-                                ) : (
+                                {status != "active" && (
                                     <Link href="/pages/nntrust/report">
                                         <Button
                                             leftSection={<IconTrendingUp size={16} />}
@@ -162,7 +148,9 @@ export default function JobStatus({ jobs, status }: JobStatusProps) {
                                         >
                                             Get Results
                                         </Button>
-                                    </Link>)}
+                                    </Link>
+                                    
+                                )}
 
                             </Flex>
                         </Paper>
