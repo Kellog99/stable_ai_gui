@@ -3,17 +3,17 @@
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { getScoreColor } from "@/functionalities/Utils";
-import { FeatureDTO } from "@/interfaces/DatasetInterface";
-import { DuplicatesDTO } from "@/interfaces/metricsInterface"
+import { FeatureDTO } from "@/interfaces/genericInterface";
+import { DuplicatesDTO } from "@/interfaces/metricsInterface";
 import { image_type, text_type } from "@/properties/types";
-import { Alert, Flex, RingProgress, Text } from "@mantine/core"
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Alert, Flex, RingProgress, Text } from "@mantine/core";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 
 

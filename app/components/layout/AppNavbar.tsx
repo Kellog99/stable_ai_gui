@@ -1,8 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import AppNavbarNNTrust from "./NavBars/AppNavbarNNTrust";
-import AppNavbarDataQuality from "./NavBars/AppNavbarDataQuality";
+import AppNavbarNNTrust from "./NavBars/NNTrust/AppNavBarNNTrust";
+import AppNavbarDataQuality from "./NavBars/DataQuality/AppNavbarDataQuality";
 import { useDisclosure } from "@mantine/hooks";
 import { Burger } from "@mantine/core";
 

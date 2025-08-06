@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef } from "react";
+import { FeatureSchema } from "@/interfaces/genericInterface";
 import
-  {
-    ReactFlow,
-    Edge,
-    Node,
-    Position,
-    ReactFlowProvider,
-    useReactFlow,
-    useNodesInitialized,
-    NodeChange
-  } from "@xyflow/react";
+{
+  Edge,
+  Node,
+  NodeChange,
+  Position,
+  ReactFlow,
+  ReactFlowProvider,
+  useNodesInitialized,
+  useReactFlow
+} from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import React, { useCallback, useEffect, useRef } from "react";
 import tinycolor from "tinycolor2";
-import { FeatureSchema } from "@/interfaces/DatasetInterface";
 import useStore from "../../store/dsStore";
 
 
@@ -23,6 +23,7 @@ interface SchemaVisualizationProps
   features: FeatureSchema[];
   connections: [ string, string ][];
   labelColorMap: Record<string, string>;
+  clickable?: boolean;
 }
 
 
@@ -32,14 +33,14 @@ const darkenHexColor = ( color: string ): string =>
 };
 
 
-const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisualizationProps ) =>
+const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: SchemaVisualizationProps ) =>
 {
   const nodeSize = 80;
   const horizontalSpacing = 160; // Fixed horizontal spacing between nodes
   const verticalSpacing = 120;
 
-  console.log("features:", features)
-  console.log("EDGES:", connections)
+  console.log( "features:", features )
+  console.log( "EDGES:", connections )
   const depthGroups: Record<number, string[]> = {};
   features.forEach( ( feature ) =>
   {
@@ -55,7 +56,16 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
     const x = feature.depth * horizontalSpacing;
     const y = ( depthIndex - ( depthGroups[ feature.depth ].length - 1 ) / 2 ) * verticalSpacing;
 
-    const nameParts = feature.name.includes( "_" ) ? feature.name.split( "_" ) : [ feature.name ];
+    let featureName = feature.name;
+    const modelName = feature.model_name;
+    console.log(JSON.stringify(features, null, 2));
+
+
+    const umapMatch = featureName.match( /(umap)_\d+$/ );
+    if ( umapMatch ) {
+      featureName = featureName.replace( /(_\d+)$/, "" );
+    }
+    const nameParts = featureName.includes( "_" ) ? featureName.split( "_" ) : [ featureName ];
     const formattedParts = nameParts.map( part => part.includes( "embeddings" ) ? part.replace( "embeddings", "embs" ) : part );
 
     const backgroundColor = labelColorMap[ feature.name ] || "#FFABAB";
@@ -67,14 +77,23 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
       id: feature.name,
       position: { x, y },
       data: {
-        label: (
-          <div style={ { display: "flex", flexDirection: "column", textAlign: "center" } }>
-            { formattedParts.map( ( part, index ) => (
-              <span key={ index }>{ part }</span>
-            ) ) }
-          </div>
-        )
-      },
+      label: (
+        <div
+          {...(modelName ? { title: `Model: ${modelName}` } : {})}
+          style={ {
+            display: "flex",
+            flexDirection: "column",
+            textAlign: "center",
+            fontSize: "small",
+            pointerEvents: "auto"
+          } }
+        >
+          { formattedParts.map( ( part, index ) => (
+            <span key={ index }>{ part }</span>
+          ) ) }
+        </div>
+      )
+    },
       style: {
         background: backgroundColor,
         width: `${nodeSize}px`,
@@ -89,8 +108,8 @@ const buildTreeLayout = ( { features, connections, labelColorMap }: SchemaVisual
         color: "black",
         border: `2px solid ${darkerColor}`,
         pointerEvents: "auto",
-        //cursor: feature.name === "image" ? "pointer" : "default",
-        cursor: "pointer"
+        cursor: clickable ? "pointer" :  "default",
+        //cursor: "pointer"
       },
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
@@ -123,77 +142,82 @@ const SchemaGraph: React.FC<{
   nodes: Node[],
   edges: Edge[],
   dimensions: { width: number, height: number }
-}> = ({ nodes, edges, dimensions }) => {
-  const reactFlowInstance = useReactFlow();
-  const nodesInitialized = useNodesInitialized();
-  const fitViewCalled = useRef(false);
+}> = ( { nodes, edges, dimensions } ) =>
+  {
+    const reactFlowInstance = useReactFlow();
+    const nodesInitialized = useNodesInitialized();
+    const fitViewCalled = useRef( false );
 
-  const setFeatureToDisplay = useStore((state) => state.setFeatureToDisplay);
-  
+    const setFeatureToDisplay = useStore( ( state ) => state.setFeatureToDisplay );
 
-  const onNodesChange = useCallback((changes: NodeChange[]) => {
-    if (!fitViewCalled.current && changes.length > 0) {
-      fitViewCalled.current = true;
-      reactFlowInstance.fitView({
-        padding: 0.2,
-        includeHiddenNodes: true,
-        duration: 0
-      });
-    }
-  }, [reactFlowInstance]);
 
-  useEffect(() => {
-    if (nodesInitialized && !fitViewCalled.current) {
-      fitViewCalled.current = true;
-      reactFlowInstance.fitView({
-        padding: 0.2,
-        includeHiddenNodes: true,
-        duration: 0
-      });
-    }
-  }, [nodesInitialized, reactFlowInstance]);
-
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    setFeatureToDisplay(node.id); // Logs the name of the clicked node (id in this case)
-  }, []);
-
-  return (
-    <div style={{
-      width: `${dimensions.width}px`,
-      height: `${dimensions.height}px`,
-      background: "#ffffff",
-      margin: "0 auto"
-    }}>
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        fitView
-        fitViewOptions={{
+    const onNodesChange = useCallback( ( changes: NodeChange[] ) =>
+    {
+      if ( !fitViewCalled.current && changes.length > 0 ) {
+        fitViewCalled.current = true;
+        reactFlowInstance.fitView( {
           padding: 0.2,
           includeHiddenNodes: true,
           duration: 0
-        }}
-        minZoom={1}
-        maxZoom={1}
-        nodesDraggable={false}
-        zoomOnScroll={false}
-        panOnDrag={false}
-        elementsSelectable={false}
-        preventScrolling={true}
-        style={{ pointerEvents: "none" }}
-        onNodeClick={handleNodeClick}
-      />
-    </div>
-  );
-};
+        } );
+      }
+    }, [ reactFlowInstance ] );
 
-const HorizontalTreeSchema: React.FC<SchemaVisualizationProps> = ({ features, connections, labelColorMap }) => {
-  const { nodes, edges, dimensions } = buildTreeLayout({ features, connections, labelColorMap });
+    useEffect( () =>
+    {
+      if ( nodesInitialized && !fitViewCalled.current ) {
+        fitViewCalled.current = true;
+        reactFlowInstance.fitView( {
+          padding: 0.2,
+          includeHiddenNodes: true,
+          duration: 0
+        } );
+      }
+    }, [ nodesInitialized, reactFlowInstance ] );
+
+    const handleNodeClick = useCallback( ( event: React.MouseEvent, node: Node ) =>
+    {
+      setFeatureToDisplay( node.id ); // Logs the name of the clicked node (id in this case)
+    }, [] );
+
+    return (
+      <div style={ {
+        width: `${dimensions.width}px`,
+        height: `${dimensions.height}px`,
+        background: "#ffffff",
+        margin: "0 auto"
+      } }>
+        <ReactFlow
+          nodes={ nodes }
+          edges={ edges }
+          onNodesChange={ onNodesChange }
+          fitView
+          fitViewOptions={ {
+            padding: 0.2,
+            includeHiddenNodes: true,
+            duration: 0
+          } }
+          minZoom={ 1 }
+          maxZoom={ 1 }
+          nodesDraggable={ false }
+          zoomOnScroll={ false }
+          panOnDrag={ false }
+          elementsSelectable={ false }
+          preventScrolling={ true }
+          style={ { pointerEvents: "none" } }
+          onNodeClick={ handleNodeClick }
+        />
+      </div>
+    );
+  };
+
+const HorizontalTreeSchema: React.FC<SchemaVisualizationProps> = ( { features, connections, labelColorMap, clickable } ) =>
+{
+  const { nodes, edges, dimensions } = buildTreeLayout( { features, connections, labelColorMap, clickable } );
 
   return (
     <ReactFlowProvider>
-      <SchemaGraph nodes={nodes} edges={edges} dimensions={dimensions} />
+      <SchemaGraph nodes={ nodes } edges={ edges } dimensions={ dimensions } />
     </ReactFlowProvider>
   );
 };

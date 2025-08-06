@@ -3,12 +3,9 @@
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import DeckGL from '@deck.gl/react';
 import { PointCloudLayer } from '@deck.gl/layers';
-import { OrbitView, project } from '@deck.gl/core';
+import { OrbitView} from '@deck.gl/core';
 import getData from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
-import LassoOverlay, { LassoDrawing } from './Lasso';
-import LassoDrawer from './Lasso';
-import deck from '@deck.gl/core/dist/lib/deck';
 import { Flex } from '@mantine/core';
 
 interface OrbitViewState

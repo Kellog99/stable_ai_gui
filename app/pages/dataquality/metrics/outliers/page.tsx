@@ -1,8 +1,6 @@
 "use client";
 
 import Config from "@/components/client/metrics/Config";
-import classes from './page.module.css'
-import { Box, Button, Flex } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

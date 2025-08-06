@@ -17,7 +17,7 @@ import AppNavbar from './components/layout/AppNavbar';
 
 import { theme } from "../theme";
 import AppHeader from "@/components/layout/AppHeader"
-import AppNavbarNNTrust from "./components/layout/NavBars/AppNavbarNNTrust";
+import AppNavbarNNTrust from "./components/layout/NavBars/AppNavbarNNTrustOriginal";
 import { headers } from "next/headers";
 import {extend} from "lodash";
 
@@ -70,7 +70,7 @@ export default async function RootLayout ( { children }: { children: any } )
             </AppShellHeader>
 
             <AppShellNavbar
-              p="md"
+
               bg="#f0f0f0"
             >
               

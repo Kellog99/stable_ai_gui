@@ -1,4 +1,6 @@
 import { Image} from '@mantine/core';
+import path from 'path';
+import datasets_folder from "@/properties/static";
 
 function ImageDisplayer({ data, alt, className }: {data: string | Uint8Array | URL, alt: string, className: string}) {
     
@@ -18,7 +20,7 @@ function ImageDisplayer({ data, alt, className }: {data: string | Uint8Array | U
     return(
         <div className={className}>
             <Image
-                src={source}
+                src={path.sep+datasets_folder+path.sep+source}
                 alt={alt}
                 style={{
                   paddingTop: "4px",

@@ -2,7 +2,7 @@
 
 import { useDebouncedCallback } from 'use-debounce';
 import classes from './SearchBar.module.css';
-import { TextInput } from '@mantine/core';
+import { Box, TextInput } from '@mantine/core';
 import { Suspense } from 'react'
 import useStore from '../../store/dsStore';
 
@@ -18,13 +18,17 @@ function Search() {
   }, 50);
 
     return(
+      <>
+        <Box style={{width:"90%"}}>
             <TextInput
-            className={classes.search}
-            radius="xl"
-            placeholder="Search datasets..."
-            value={queryDataset}
-            onChange={(e) => handleSearch(e.target.value)}
+              className={classes.search}
+              radius="md"
+              placeholder="Search datasets..."
+              value={queryDataset}
+              onChange={(e) => handleSearch(e.target.value)}
             />
+        </Box>
+        </>
     )
 }
 

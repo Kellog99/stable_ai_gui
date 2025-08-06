@@ -1,13 +1,12 @@
 import { useForm } from "@mantine/form";
 import useStore from '../../../../store/dsStore';
 import { useState } from "react";
-import { Box, Button, Flex, NumberInput, Select, Slider, Switch, Text } from "@mantine/core";
+import { Box, Button, Flex, NumberInput, Slider, Text } from "@mantine/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import
 {
     faCheck
 } from '@fortawesome/free-solid-svg-icons';
-import { model_type_LUNAR, negative_sampling_LUNAR } from "../utils";
 
 export default function IForestConfig ()
 {

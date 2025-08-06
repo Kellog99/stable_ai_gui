@@ -1,23 +1,19 @@
 "use client";
 
-import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
+import FeatureDisplayer from '@/components/client/FeatureDisplayer';
+import MovableWindow from '@/components/client/MovableWindow';
+import { IsFeatureBond, IsFeatureSameLength } from '@/functionalities/Utils';
+import Dataset, { FeatureDTO } from '@/interfaces/genericInterface';
+import { embedding_type, image_type, numberic_type, text_type } from '@/properties/types';
+import { Alert, Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Space, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
-import { Autocomplete, Flex, Button, Text, Box, Space, Select, Textarea, TextInput, Modal, MultiSelect, MultiSelectProps, Group, Checkbox, Center, Paper, RingProgress } from '@mantine/core';
-import { FixedSizeGrid, GridChildComponentProps } from "react-window";
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
 import featureLoader from '../../../functionalities/FeatureLoader';
 import useStore from '../../../store/dsStore';
-import LassoDrawer from '@/components/client/Lasso';
-import RouterButton from '@/components/client/buttons/RouterButton';
-import classes from './page.module.css'
-import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
-import { embedding_type, image_type, label_type, numberic_type, text_type } from '@/properties/types';
-import { useDisclosure } from '@mantine/hooks';
-import { Rnd } from "react-rnd";
-import MovableWindow from '@/components/client/MovableWindow';
-import { Shovel } from 'lucide-react';
-import { IsFeatureBond } from '@/functionalities/Utils';
-import Dataset, { FeatureDTO } from '@/interfaces/DatasetInterface';
+import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 interface Feature
 {
@@ -43,6 +39,8 @@ function Home ()
   const [ labelFeatureType, setLabelFeatureType ] = useState<any>( "" )
   const [ featureName, setFeatureName ] = useState<any>( "" )
   const [ labelFeatureName, setLabelFeatureName ] = useState<string>( "" )
+  const [ embFeatures, setEmbFeatures ] = useState<string[] | null>( null )
+  const [ modelUsed, setModelUsed ] = useState<string | "">( "" )
   const [ numericFeature, setNumericFeature ] = useState<FeatureDTO | null>( null )
   const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
   const colorMap = useStore( ( state ) => state.colorMap )
@@ -58,9 +56,7 @@ function Home ()
 
   const indexes = useStore( ( state ) => state.selectedIndexes );
 
-
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
-
 
   const isLoadingEmbs = useStore( ( state ) => state.isLoadingEmbs )
   const dimensions = useStore( ( state ) => state.size )
@@ -82,16 +78,22 @@ function Home ()
       //  .filter( ( { type } ) => type === label_type )
       //  .map( ( { name } ) => name );
 
-      if ( featureName !== "" ) {
-        const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
-        setLabelFeatures( labelFeatures as string[] )
+      if ( featureName !== "" && feature ) {
+        //const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
+        const load_labels = async () =>
+          {
+            const lb_feature = await IsFeatureSameLength( datasetUsed as Dataset, feature.datas.length);
+            console.log("LX",feature.datas.length)
+            setLabelFeatures( lb_feature as string[] )
+          };
+        load_labels()
       }
 
       setFeatures( extractedFeatures );
       //setLabelFeatures( extractedlabelFeatures )
       //console.log( labelFeatures )
     }
-  }, [ datasetUsed, featureName ] )
+  }, [ datasetUsed, featureName, feature ] )
 
   console.log( "PAGE", datasetUsed )
   console.log( "PAGE", features )
@@ -126,6 +128,25 @@ function Home ()
     }
   }, [ showUncertanties ] )
 
+  useEffect( () =>
+  {
+
+    if ( datasetUsed ) {
+      const embsNames = IsFeatureBond( datasetUsed as Dataset, featureName, embedding_type )
+
+      if ( Array.isArray( datasetUsed?.features ) && Array.isArray( embsNames ) ) {
+        const extractedModels = datasetUsed.features
+          .filter( ( { name } ) => embsNames.includes( name ) )
+          .map( ( { model_name } ) => model_name );
+
+        setEmbFeatures( extractedModels as string[] )
+      } else {
+        setEmbFeatures([])
+      }
+
+    }
+  }, [ datasetUsed, featureName ] )
+
 
 
   useEffect( () =>
@@ -140,6 +161,8 @@ function Home ()
             console.log( feature );
             setFeature( feature );
             setFeatureType( feature.type )
+
+
           }
         } catch ( error ) {
           console.error( 'Error loading feature:', error );
@@ -173,8 +196,10 @@ function Home ()
       loadFeature();
 
     }
-  }, [ labelFeatureName ] ); // Still keep indexes and featureName in the dependency array
+  }, [ labelFeatureName ] );
 
+
+  console.log("LABEL DICT page:", labelDict)
   useEffect( () =>
   {
     // Only proceed if indexes is not null
@@ -223,6 +248,7 @@ function Home ()
 
   console.log( "indexes:", indexes )
 
+
   useEffect( () =>
   {
 
@@ -234,11 +260,15 @@ function Home ()
 
 
   const legendData = labelDict && colorMap
-    ? Object.keys( labelDict ).map( ( key ) => ( {
-      value: labelDict[ key ],
-      label: labelDict[ key ],
-      color: `rgb(${colorMap[ key ].join( ',' )})`,
-    } ) )
+    ? Object.keys( colorMap ).map( ( key ) =>
+    {
+      const numKey = Number( key );
+      return {
+        value: labelDict[ numKey ],
+        label: labelDict[ numKey ],
+        color: `rgb(${colorMap[ key ].join( ',' )})`,
+      };
+    } )
     : [];
 
   const renderMultiSelectOption: MultiSelectProps[ 'renderOption' ] = ( { option } ) =>
@@ -288,6 +318,67 @@ function Home ()
     }
   }
 
+  const renderedComponent = () => (
+    <>
+      <Flex direction="column" align="center">
+        <div style={ { position: 'relative' } }>
+          <Suspense>
+            <Box style={ { pointerEvents: 'none' } }>
+              <div style={ { pointerEvents: 'auto' } }>
+                <Flex
+                  justify="left"
+                  align="center"
+                  direction="column"
+                  wrap="wrap"
+                  style={ { width: '100%' } }
+                >
+                  { !isLoadingEmbs ? (
+                    <p>
+                      { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
+                    </p>
+                  ) : null }
+                </Flex>
+
+                <ScatterPlotVisualization
+                  datasetName={ datasetName as string }
+                  featureName={ featureName }
+                  modelUsed={ modelUsed }
+                  labelFeatureName={ labelFeatureName }
+                  show_uq={ showUncertanties }
+                />
+              </div>
+            </Box>
+          </Suspense>
+        </div>
+      </Flex>
+
+      { indexes.length > 0 ? (
+        <MovableWindow>
+          <Flex
+            mih={ 150 }
+            justify="center"
+            align="center"
+            direction="column"
+            style={ { marginLeft: '30px', borderRadius: '12px' } }
+          >
+            <div ref={ containerRef } className="h-[600px] overflow-auto">
+              <FeatureDisplayer
+                indexes={ indexes }
+                featureData={ featureData }
+                featureType={ featureType }
+                labelData={ labelData }
+                label_dict={ labelDict as { [ key: number ]: string } }
+                dimensions={ dimensions }
+                { ...( showUncertanties ? { scores: uqScores } : {} ) }
+                uncertainty={ showUncertanties }
+              />
+            </div>
+          </Flex>
+        </MovableWindow>
+      ) : null }
+    </>
+  );
+
   return (
     <div className="w-full h-screen">
 
@@ -314,23 +405,46 @@ function Home ()
                   placeholder="Choose feature to visualize"
                   data={ features }
                   value={ featureName }
-                  onChange={ ( value ) => setFeatureName( value ) }
+                  onChange={(value) => {
+                    setFeatureName(value);
+                    setModelUsed(datasetUsed.default_embedding_model);
+                  }}
                   required={ true }
                 />
 
-                { featureName ? ( <Select
-                  id="labelFeature"
-                  radius="md"
-                  label="Label Feature"
-                  placeholder="Choose label"
-                  data={ labelFeatures }
-                  value={ labelFeatureName }
-                  onChange={ ( value ) => setLabelFeatureName( value as string ) }
-                  onClear={ () => setLabelFeatureName( "" ) }
-                  clearable={ true }
-                  disabled={ disableLabelFeature }
-                />
+                { embFeatures && embFeatures.length > 1 ? (
+                  <Select
+                    id="embFeature"
+                    radius="md"
+                    label="Embedding Feature"
+                    placeholder="Choose embedding to visualize"
+                    data={ embFeatures }
+                    value={ modelUsed }
+                    onChange={ ( value ) => setModelUsed( value as string ) }
+                    onClear={ () => setModelUsed( "" ) }
+                    clearable={ true }
+                    required={ true }
+                  />
+                )
+                  : null }
+
+
+                { featureName && labelFeatures.length > 0? (
+                  <Select
+                    id="labelFeature"
+                    radius="md"
+                    label="Label Feature"
+                    placeholder="Choose label"
+                    data={ labelFeatures }
+                    value={ labelFeatureName }
+                    onChange={ ( value ) => setLabelFeatureName( value as string ) }
+                    onClear={ () => setLabelFeatureName( "" ) }
+                    clearable={ true }
+                    disabled={ disableLabelFeature }
+                  />
                 ) : null }
+
+
 
                 { labelFeatureName && labelDict ? (
                   <>
@@ -482,68 +596,26 @@ function Home ()
         </div>
       </div>
 
-      { featureName ? (
-        <>
-          <Flex
-            direction="column"
-            align="center">
-
-            <div style={ { position: 'relative' } }>
-
-
-              <Suspense>
-                <Box style={ { pointerEvents: 'none' } }>
-                  <div style={ { pointerEvents: 'auto' } }>
-                    <Flex
-                      justify="left"
-                      align="center"
-                      direction="column"
-                      wrap="wrap"
-                      style={ { width: '100%' } }
-                    >
-                      { !isLoadingEmbs ? ( <p>
-                        { indexes.length } point{ indexes.length !== 1 ? 's' : '' } selected
-                      </p> ) : null }
-
-                    </Flex>
-
-                    <ScatterPlotVisualization datasetName={ datasetName as string } featureName={ featureName } labelFeatureName={ labelFeatureName } show_uq={ showUncertanties } />
-
-                  </div>
-                </Box>
-              </Suspense>
-
-
-            </div>
-          </Flex>
-
-          { indexes.length > 0 ? (
-
-            <MovableWindow >
-              <Flex
-                mih={ 150 }
-                justify="center"
-                align="center"
-                direction="column"
-                style={ { marginLeft: '30px', borderRadius: '12px' } }
-              >
-                { indexes.length > 0 ? ( <div ref={ containerRef } className="h-[600px] overflow-auto">
-                  <FeatureDisplayer
-                    indexes={ indexes }
-                    featureData={ featureData }
-                    featureType={ featureType }
-                    labelData={ labelData }
-                    label_dict={ labelDict as { [ key: number ]: string } }
-                    dimensions={ dimensions }
-                    { ...( showUncertanties ? { scores: uqScores } : {} ) }
-                    uncertainty={ showUncertanties ? true : false } />
-                </div> ) : null }
-              </Flex>
-            </MovableWindow> ) : null }
-        </>
-      ) : (
-        <Text size="sm" style={ { marginTop: "20px", marginLeft: "100px" } }>Select Feature</Text>
-      ) }
+      {
+        featureName && embFeatures && embFeatures.length > 1 && modelUsed
+          ? renderedComponent()
+          : featureName && embFeatures && embFeatures.length == 1
+            ? renderedComponent()
+            : featureName && embFeatures && embFeatures.length == 0 ? (
+              <Alert
+              variant="light"
+              color="orange"
+              radius="md"
+              title="Attention!"
+              icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
+              style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px", marginLeft:"50px" } }
+                >
+                  The { featureName } feature is not embedded. You can embed it in the Action menù.
+                </Alert>
+            )
+            : (
+              <Text size="sm" style={ { marginTop: "20px", marginLeft: "100px" } }>Select Feature</Text>
+            ) }
 
     </div>
   );

@@ -1,28 +1,28 @@
 "use client";
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { Box, Button, CloseButton, Flex, RingProgress, Text } from "@mantine/core";
 import
 {
+    ChartData,
     Chart as ChartJS,
+    ChartOptions,
+    InteractionItem,
+    Legend,
+    LineElement,
     LinearScale,
     PointElement,
-    LineElement,
     Tooltip,
-    Legend,
-    ChartOptions,
-    ChartData,
-    InteractionItem,
 } from 'chart.js';
+import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
-import { Flex, RingProgress, Text, Image, Box, Card, Group, Badge, Button, CloseButton } from "@mantine/core";
 
-import { OutliersDTO } from "@/interfaces/metricsInterface";
-import { FeatureDTO } from "@/interfaces/DatasetInterface";
-import featureLoader from "@/functionalities/FeatureLoader";
-import { image_type, text_type } from "@/properties/types";
 import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
+import featureLoader from "@/functionalities/FeatureLoader";
 import { getScoreColor } from '@/functionalities/Utils';
+import { FeatureDTO } from "@/interfaces/genericInterface";
+import { OutliersDTO } from "@/interfaces/metricsInterface";
+import { image_type, text_type } from "@/properties/types";
 
 
 ChartJS.register( LinearScale, PointElement, LineElement, Tooltip, Legend );

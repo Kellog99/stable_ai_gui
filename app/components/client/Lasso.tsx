@@ -1,8 +1,5 @@
-import path from 'path';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import useStore from "../../store/dsStore";
-import style from 'styled-jsx/style';
-import {fill} from 'three/src/extras/TextureUtils';
 
 interface LassoDrawerProps {
   children: React.ReactNode;

@@ -23,7 +23,6 @@ export default function LOFConfig ()
     const [ clicked, setClicked ] = useState( false )
     const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
 
-
     const handleSubmit = ( formValues: any ) =>
     {
         setClicked( true )

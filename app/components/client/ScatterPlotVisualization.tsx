@@ -1,28 +1,26 @@
 'use client';
 
-import React, { useState, useRef, useEffect, Suspense } from 'react';
+import React, { useState, useRef, useEffect, Suspense, useCallback } from 'react';
 import DeckGL from '@deck.gl/react';
-import { ScatterplotLayer, PointCloudLayer } from '@deck.gl/layers';
-import { log, OrbitView, project } from '@deck.gl/core';
-import getData, { RetrieveSamples } from '../../functionalities/BackendUtils';
+import { IconLayer, ScatterplotLayer } from '@deck.gl/layers';
+import getData, { getModelInfo, RetrieveSamples } from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
 import { OrthographicView } from 'deck.gl';
-import { Button, Flex, Loader, Menu, MenuDropdown, MenuItem, Text, MultiSelect, Textarea, CloseButton, Box, Paper, Badge, Stack, Divider, MultiSelectProps, Group, Slider, Alert } from '@mantine/core';
+import { Flex, Loader, Text, Textarea, CloseButton, Box, Slider, Alert } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
-import style from 'styled-jsx/style';
-import { type } from 'os';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import
-{
-  faCircleExclamation
+import {
+faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
 import Link from "next/link";
 import LassoDrawer from './Lasso';
+import { ModelInfo } from '@/interfaces/genericInterface';
+import { image_type, text_type } from '@/properties/types';
+// No need for 'style' from 'styled-jsx/style' if not used for actual styling
 
 
-interface OrbitViewState
-{
-  target: [ number, number, number ]; // This ensures 'target' has exactly 3 elements
+interface OrbitViewState {
+  target: [number, number, number]; // This ensures 'target' has exactly 3 elements
   rotationX?: number;
   rotationOrbit?: number;
   zoom: number;
@@ -32,430 +30,346 @@ interface OrbitViewState
   maxRotationX?: number;
 }
 
-interface Point
-{
-  position: [ number, number ];
-  color: [ number, number, number ];
+interface Point {
+  position: [number, number];
+  color: [number, number, number];
 }
 
-interface Info
-{
+interface Info {
   index: number;
   object: any;
+  layer: { id: string }; // Add layer info for tooltip check
 }
 
-{/*
-export async function getDataPoints(): Promise<Point[]> {
-  const points = await getData();
-  return points;
-}
-*/}
-
-interface propsTypes
-{
+interface propsTypes {
   datasetName: string,
   featureName: string,
+  modelUsed?: string,
   labelFeatureName?: string,
-  show_uq : boolean
+  show_uq: boolean
 }
 
-export default function ScatterPlotVisualization ( props: propsTypes )
-{
+export default function ScatterPlotVisualization(props: propsTypes) {
+  const deckRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null); // Ref for the textarea
+  const [isTextareaFocused, setIsTextareaFocused] = useState<boolean>(false); // New state to track textarea focus
 
-  const deckRef = useRef<any>( null );
-  const isDraggingRef = useRef<boolean>( false );
+  const isDraggingRef = useRef<boolean>(false);
 
-  //const [lassoMode, setLassoMode] = useState<boolean>(false);
+  const [data, setData] = useState<Point[] | null>(null);
+  const [queryData, setQueryData] = useState<Point[] | null>(null);
 
-  const [ data, setData ] = useState<Point[] | null>( null );
+  const setColorMap = useStore((state) => state.setColorMap)
 
-  const setColorMap = useStore( ( state ) => state.setColorMap )
-
-
-
-
-  const [ labelDict, setLabelDict ] = useState<Object | null>( null )
-  //const [ isLoading, setIsLoading ] = useState( true );
-  const isLoading = useStore( ( state ) => state.isLoadingEmbs )
-  const setIsLoading = useStore( ( state ) => state.setIsLoadingEmbs )
-  const [ isLoadingRetr, setIsLoadingRetr ] = useState<boolean>( false )
-
-  const [ viewState, setViewState ] = useState<OrbitViewState>( {
-    target: [ 0, 0, 0 ],
+  const [labelDict, setLabelDict] = useState<Object | null>(null)
+  const isLoading = useStore((state) => state.isLoadingEmbs)
+  const setIsLoading = useStore((state) => state.setIsLoadingEmbs)
+  const [isLoadingRetr, setIsLoadingRetr] = useState<boolean>(false)
+  const [noEmbAvailable, setNoEmbAvailable] = useState<boolean>(false)
+  const [viewState, setViewState] = useState<OrbitViewState>({
+    target: [0, 0, 0],
     rotationX: 0,
     rotationOrbit: 0,
     zoom: -5,
-  } );
-  //const [ selectedPoints, setSelectedPoints ] = useState<number[]>( [] );
+  });
   const selectedPoints = useStore((state) => state.selectedPoints)
   const setSelectedPoints = useStore((state) => state.setSelectedPoints)
-
-  const [ dragStart, setDragStart ] = useState<{ x: number; y: number } | null>( null );
-  const [ dragCurrent, setDragCurrent ] = useState<{ x: number; y: number } | null>( [] );
-  const [ originalColors, setOriginalColors ] = useState<Map<number, [ number, number, number ]>>( new Map() );
+  const [enableTextArea, setEnableTextArea] = useState<boolean>(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
+  const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>([]);
+  const [originalColors, setOriginalColors] = useState<Map<number, [number, number, number]>>(new Map());
   const setUqColors = useStore((state) => state.setUqColors)
-  const uqColors = useStore((state) => state.uqColors)
+  // const uqColors = useStore((state) => state.uqColors) // Not directly used in render, so can be omitted if not needed elsewhere in component
 
-  const [ contextMenu, setContextMenu ] = useState( { visible: false, x: 0, y: 0 } );
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
 
-  const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
-  const selectedIndexes = useStore( ( state ) => state.selectedIndexes )
-  const hoverIndex = useStore( ( state ) => state.hoverIndex )
-  const datasetUsed = useStore( ( state ) => state.datasetUsed )
+  const setSelectedIndexes = useStore((state) => state.setSelectedIndexes);
+  const selectedIndexes = useStore((state) => state.selectedIndexes)
+  const hoverIndex = useStore((state) => state.hoverIndex) // Get hoverIndex from store
+  const setHoverIndex = useStore((state) => state.setHoverIndex); // Setter for hoverIndex
+  const datasetUsed = useStore((state) => state.datasetUsed)
 
-  const lassoMode = useStore( ( state ) => state.lazoMode );
-  const lazoModeSetter = useStore( ( state ) => state.setLazoMode );
-  const inputRef = useRef<HTMLTextAreaElement>( null );
-  const filteredLabels = useStore( ( state ) => state.filteredLabels )
+  const lassoMode = useStore((state) => state.lazoMode);
+  const lazoModeSetter = useStore((state) => state.setLazoMode);
+  const filteredLabels = useStore((state) => state.filteredLabels)
+  
+  const [queryRetrieve, setQueryRetrieve] = useState<string>("")
+  const [queryTop_k, setQueryTop_k] = useState<number>(10)
 
-  const [ queryRetrieve, setQueryRetrieve ] = useState<string>( "" )
-  const [ queryTop_k, setQueryTop_k ] = useState<number>( 10 )
+  const [queries, setQueries] = useState<string[]>([])
 
 
-
-  function getAllKeysByValues ( object, valuesList )
-  {
-    return valuesList.flatMap( value =>
-      Object.keys( object ).filter( key => object[ key ] === value )
+  function getAllKeysByValues(object, valuesList) {
+    return valuesList.flatMap(value =>
+      Object.keys(object).filter(key => object[key] === value)
     );
   }
 
 
-  useEffect( () =>
-  {
-    setSelectedIndexes( [] );
+  useEffect(() => {
+    setSelectedIndexes([]);
     setSelectedPoints([])
-    setIsLoading( true );
+    setIsLoading(true);
     try {
-      getData( props.datasetName, props.featureName, props.labelFeatureName, getAllKeysByValues( labelDict, filteredLabels as string[] ), props.show_uq )
-        .then( ( fetched ) =>
-        {
-          setData( fetched.points ); // Only set the points in setData
-          setColorMap( fetched.color_map ); // Set colorMap separately
-          setOriginalColors( new Map( fetched.points.map( ( item, index ) => [ index, item.color ] ) ) );
+      getData(props.datasetName, props.featureName, props.show_uq, props.labelFeatureName, getAllKeysByValues(labelDict, filteredLabels as string[]), props.modelUsed, queries)
+        .then((fetched) => {
+          if (fetched.points.length !=0){
+          console.log("AAAAAAAAAAAAAAAA",fetched)  
+          setData(fetched.points);
+          setColorMap(fetched.color_map);
+          setOriginalColors(new Map(fetched.points.map((item, index) => [index, item.color])));
           const colors = fetched.points.map(item => item.color)
           setUqColors(colors)
-        } )
-        .finally( () =>
-        {
-          setIsLoading( false );
-        } )
+          setQueryData(fetched.query_points) 
+          setNoEmbAvailable(false)
+          const enable = !checkMultiModalCompatibility(modelInfo, props.featureName);
+          setEnableTextArea(enable);
+        } else {
+          setData(null)
+          setNoEmbAvailable(true)
+          setEnableTextArea(false);
+        }
+        })
+        .finally(() => {
+          setIsLoading(false);
+        })
     }
-    catch ( error ) {
-      console.log( "Failed to get data from backend" )
+    catch (error) {
+      console.log("Failed to get data from backend")
     }
-  }, [ props.datasetName, props.featureName, props.labelFeatureName, filteredLabels , props.show_uq] );
+  }, [props.datasetName, props.featureName, props.labelFeatureName, filteredLabels, props.show_uq, props.modelUsed, setColorMap, setUqColors, setIsLoading, setSelectedIndexes, setSelectedPoints]); // Added all dependencies
 
-
-  useEffect( () =>
-  {
-    if ( props.labelFeatureName ) {
-      const loadFeature = async () =>
-      {
-
+  useEffect(() => {
+    if (props.labelFeatureName) {
+      const loadFeature = async () => {
         try {
-          const featureLoaded = await featureLoader( props.datasetName, props.labelFeatureName as string );
-          console.log( "FEATURE LOADED:", featureLoaded );
-          setLabelDict( featureLoaded.label_dict )
-        } catch ( error ) {
-          console.error( 'Error loading feature:', error );
+          const featureLoaded = await featureLoader(props.datasetName, props.labelFeatureName as string);
+          setLabelDict(featureLoaded.label_dict)
+        } catch (error) {
+          console.error('Error loading feature:', error);
         }
       };
       loadFeature();
     }
-  }, [ props.labelFeatureName ] );
+  }, [props.labelFeatureName]);
+  const labelsList: string[] = labelDict ? Object.values(labelDict) : [];
 
-
-  const labelsList: string[] = labelDict ? Object.values( labelDict ) : [];
-
-  useEffect( () =>
-  {
-    // Handler for mouse down events
-    //console.log("BASE",lassoMode)
-    const handleMouseDown = ( event ) =>
-    {
-      // Middle mouse button has button value of 1
-      event.preventDefault()
-      if ( event.button === 1 ) {
-        event.preventDefault()
-        lazoModeSetter( true )
-        console.log( "I AM MOUSE DOWN" )
-        //console.log('Mouse wheel button pressed down',lassoMode);
+  useEffect(() => {
+    const handleMouseDown = (event: MouseEvent) => {
+      if (event.button === 1) { // Middle mouse button
+        event.preventDefault(); // Prevent default browser behavior (e.g., autoscroll)
+        lazoModeSetter(true);
       }
     };
 
-    // Handler for mouse up events
-    const handleMouseUp = ( event ) =>
-    {
-      event.preventDefault()
-      if ( event.button === 1 ) {
-        lazoModeSetter( false )
-        console.log( "I AM MOUSE UP" )
-        //console.log('Mouse wheel button released',!lassoMode);
+    const handleMouseUp = (event: MouseEvent) => {
+      if (event.button === 1) { // Middle mouse button
+        event.preventDefault();
+        lazoModeSetter(false);
       }
     };
 
-    // Add event listeners to the entire document
-    document.addEventListener( 'mousedown', handleMouseDown );
-    document.addEventListener( 'mouseup', handleMouseUp );
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
 
-    // Cleanup function to remove event listeners
-    return () =>
-    {
-      document.removeEventListener( 'mousedown', handleMouseDown );
-      document.removeEventListener( 'mouseup', handleMouseUp );
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [] ); // Empty dependency array means this effect runs once on mount
+  }, [lazoModeSetter]); // Dependency on lazoModeSetter
 
+  // Lasso mode logging - useful for debugging, keep if desired
+  useEffect(() => {
+    console.log("lassoMode changed:", lassoMode);
+  }, [lassoMode]);
 
-  const isEventOnTextarea = ( event, textareaRef ) =>
-  {
-    // Support both React synthetic events and DeckGL/Mjolnir.js events
-    const domEvent = event?.srcEvent || event;
+  const handlePointClick = useCallback((info: Info): void => {
+    // Only allow clicks if not in lasso mode and not focusing the textarea
+    if (info.index !== -1 && !lassoMode && !isTextareaFocused) {
+      const newSelectedPoints = selectedPoints.includes(info.index)
+        ? selectedPoints.filter((i) => i !== info.index)
+        : [...selectedPoints, info.index];
 
-    if ( !domEvent || !textareaRef?.current ) {
-      console.log( "l'evento non è sulla text area" );
-      return false;
+      setSelectedPoints(newSelectedPoints);
+      setSelectedIndexes(newSelectedPoints);
     }
+  }, [lassoMode, isTextareaFocused, selectedPoints, setSelectedPoints, setSelectedIndexes]);
 
-    const isInside = textareaRef.current.contains( domEvent.target );
-    console.log( isInside ? "l'evento è sulla text area" : "l'evento non è sulla text area" );
-    return isInside;
-  };
+  //useEffect(() => {
+  //  if (queryRetrieve !== "") {
+  //    setSelectedIndexes([]);
+  //    setSelectedPoints([])
+//
+  //    let loadingTimeout = setTimeout(() => {
+  //      setIsLoadingRetr(true);
+  //    }, 500);
+//
+  //    // Use a Set to avoid duplicate queries, then convert back to array
+  //    setQueries(prevQueries => Array.from(new Set([...prevQueries, queryRetrieve])));
+  //    RetrieveSamples(props.datasetName, props.featureName, queryRetrieve, queryTop_k, props.modelUsed as string)
+  //      .then((fetched) => {
+  //        setSelectedIndexes(fetched.indexes);
+  //      })
+  //      .finally(() => {
+  //        clearTimeout(loadingTimeout);
+  //        setIsLoadingRetr(false);
+  //      });
+  //  }
+  //}, [queryRetrieve, queryTop_k]);
 
+  useEffect(() => {
+    const highlightIndicesSet = new Set<number>(selectedIndexes);
+    if (data) {
+      const updatedData = data.map((item, index) => {
+        const originalColor = originalColors.get(index) ?? item.color;
 
-
-  useEffect( () =>
-  {
-    console.log( "lassoMode changed:", lassoMode );
-  }, [ lassoMode ] );
-
-
-
-  const handlePointClick = ( info: Info ): void =>
-  {
-    if ( info.index !== -1 && !lassoMode ) {
-      const filteredPoints = selectedPoints.includes( info.index )
-        ? selectedPoints.filter( ( i ) => i !== info.index )
-        : [ ...selectedPoints, info.index ];
-
-      setSelectedPoints( filteredPoints );
-      setSelectedIndexes( filteredPoints );
-
-    }
-  };
-
-
-
-  useEffect( () =>
-  {
-    if ( queryRetrieve !== "" ) {
-      setSelectedIndexes( [] );
-      setSelectedPoints([])
-
-      let loadingTimeout = setTimeout( () =>
-      {
-        setIsLoadingRetr( true );
-      }, 500 ); // delay threshold in milliseconds
-
-      RetrieveSamples( props.datasetName, props.featureName, queryRetrieve, queryTop_k )
-        .then( ( fetched ) =>
-        {
-          setSelectedIndexes( fetched.indexes );
-        } )
-        .finally( () =>
-        {
-          clearTimeout( loadingTimeout ); // prevent setting loading to true if fetch finished quickly
-          setIsLoadingRetr( false );
-        } );
-    }
-  }, [ queryRetrieve, queryTop_k ] );
-
-  // *******************************************************************************************************************************************
-
-  useEffect( () =>
-  {
-    const highlightIndicesSet = new Set<number>( selectedIndexes );
-    if ( data ) {
-      const updatedData = data.map( ( item, index ) =>
-      {
-        const originalColor = originalColors.get( index ) ?? item.color;
-
-        // If selectedIndexes is empty, use original colors for all points
-        if ( selectedIndexes.length === 0 ) {
+        if (selectedIndexes.length === 0) {
           return { ...item, color: originalColor };
         }
 
-        // If this point is selected, use its original color
-        if ( highlightIndicesSet.has( index ) ) {
+        if (highlightIndicesSet.has(index)) {
           return { ...item, color: originalColor };
         }
 
-        // Otherwise fade the non-selected points
-        const fadedColor: [ number, number, number ] = originalColor.map(
-          ( channel ) => Math.min( 255, Math.floor( channel + ( 255 - channel ) * 0.8 ) )
-        ) as [ number, number, number ];
+        const fadedColor: [number, number, number] = originalColor.map(
+          (channel) => Math.min(255, Math.floor(channel + (255 - channel) * 0.8))
+        ) as [number, number, number];
 
         return {
           ...item,
           color: fadedColor,
         };
-      } );
-      setData( updatedData );
+      });
+      setData(updatedData);
     }
-  }, [ selectedIndexes ] );
+  }, [selectedIndexes]);
+  const BASE_RADIUS_METERS = 3.5;
+  const HIGHLIGHT_RADIUS_METERS = BASE_RADIUS_METERS * 3;
+  const STROKE_WIDTH = 0.8;
+  const HIGHLIGHT_STROKE_WIDTH = 2.5;
+  const HIGHLIGHT_STROKE_COLOR = [0, 0, 0, 255];
+  const TRANSITION_DURATION = 300;
 
-
-  const BASE_RADIUS_METERS = 3.5; // Base size of points in meters or pixels
-  const HIGHLIGHT_RADIUS_METERS = BASE_RADIUS_METERS * 3; // Size of the hovered point
-  const STROKE_WIDTH = 0.8; // Default border width for non-hovered points
-  const HIGHLIGHT_STROKE_WIDTH = 2.5; // Thicker border for hovered point
-  const HIGHLIGHT_STROKE_COLOR = [ 0, 0, 0, 255 ];; // Yellow highlight border (RGBA)
-  const TRANSITION_DURATION = 300; // Milliseconds for the transition
-
-  const layer = new ScatterplotLayer<Point>( {
+  const layer = new ScatterplotLayer<Point>({
     id: 'scatterplot-layer-hover-effect',
     data,
     pickable: true,
-    // --- Style ---
-    stroked: true, // Enable borders
+    stroked: true,
     filled: true,
-    radiusUnits: 'pixels', // Or 'meters' if your positions are lng/lat
+    radiusUnits: 'pixels',
     radiusScale: 1,
     radiusMinPixels: 1,
     radiusMaxPixels: 100,
 
-    // --- Accessors ---
-    getPosition: ( d: Point ) => d.position,
-
-    // Keep the size increase behavior
-    getRadius: ( d: Point, { index }: { index: number } ) =>
+    getPosition: (d: Point) => d.position,
+    getRadius: (d: Point, { index }: { index: number }) =>
       index === hoverIndex ? HIGHLIGHT_RADIUS_METERS : BASE_RADIUS_METERS,
-
-    // Color accessor - keep original fill color for all points
-    getFillColor: ( d: Point ) => d.color,
-
-    // Stroke color accessor - highlight color for hovered point
-    getLineColor: ( d: Point, { index }: { index: number } ) =>
+    getFillColor: (d: Point) => d.color,
+    getLineColor: (d: Point, { index }: { index: number }) =>
       index === hoverIndex ? HIGHLIGHT_STROKE_COLOR : d.color,
-
-    // Stroke width accessor - thicker for hovered point
-    getLineWidth: ( d: Point, { index }: { index: number } ) =>
+    getLineWidth: (d: Point, { index }: { index: number }) =>
       index === hoverIndex ? HIGHLIGHT_STROKE_WIDTH : STROKE_WIDTH,
-
-    // --- Interactivity ---
-    onClick: ( info: any ) => handlePointClick( info ),
-
-    // --- Transitions ---
+    onClick: handlePointClick,
     transitions: {
       getRadius: { duration: TRANSITION_DURATION },
       getLineWidth: { duration: TRANSITION_DURATION },
       getLineColor: { duration: TRANSITION_DURATION }
     },
-
-    // --- Updates ---
     updateTriggers: {
-      getRadius: [ hoverIndex ],
-      getLineWidth: [ hoverIndex ],
-      getLineColor: [ hoverIndex ]
+      getRadius: [hoverIndex],
+      getLineWidth: [hoverIndex],
+      getLineColor: [hoverIndex]
     },
-  } );
+  });
 
-  // Remember to include this layer in the 'layers' array passed to your <DeckGL> component.
-  // Ensure the component re-renders when 'hoverIndex' changes.
+  const iconMapping = {
+    star: {
+      x: 0, y: 0, width: 24, height: 24, anchorY: 12, mask: false
+    }
+  };
 
-  {/*
-  const layer = new PointCloudLayer( {
-    id: 'point-cloud-layer',
-    data,
-    pickable: true,
-    pointSize: 3.5,
-    getPosition: ( d: Point ) => d.position,
-    getColor: ( d: Point ) => d.color,
-    onClick: ( info: any ) => handlePointClick( info ),
-  } );
-  */}
+  const queryLayer = new IconLayer<Point>({
+    id: 'icon-layer',
+    data: queryData,
+    iconAtlas: '/crosshairs-target-star.svg',
+    iconMapping,
+    getIcon: (d: Point) => "star",
+    getPosition: (d: Point) => d.position,
+    getSize: 25,
+    getColor: (d: Point) => d.color,
+    pickable: true
+  });
 
-  const isPointInPolygon = ( point: Point, polygon: Point[] ): boolean =>
-  {
+  const isPointInPolygon = (point: { x: number; y: number }, polygon: { x: number; y: number }[]): boolean => {
     let inside = false;
     const n = polygon.length;
 
-    for ( let i = 0, j = n - 1; i < n; j = i++ ) {
-      const pi = polygon[ i ];
-      const pj = polygon[ j ];
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const pi = polygon[i];
+      const pj = polygon[j];
 
       const intersect =
-        ( ( pi.y > point.y ) !== ( pj.y > point.y ) ) &&
-        ( point.x < ( pj.x - pi.x ) * ( point.y - pi.y ) / ( pj.y - pi.y ) + pi.x );
+        ((pi.y > point.y) !== (pj.y > point.y)) &&
+        (point.x < (pj.x - pi.x) * (point.y - pi.y) / (pj.y - pi.y) + pi.x);
 
-      if ( intersect ) inside = !inside;
+      if (intersect) inside = !inside;
     }
-
     return inside;
   }
 
-  const handleDragStart = ( info: any, event: any ): void =>
-  {
-    if ( !lassoMode ) return;
-    if ( !isDraggingRef.current ) {
+  const handleDragStart = (info: any): void => {
+    if (!lassoMode) return;
+    if (!isDraggingRef.current) {
       isDraggingRef.current = true;
-      setDragStart( { x: info.x, y: info.y } );
-      setDragCurrent( prev => [ ...prev, { x: info.x, y: info.y } ] );
+      setDragStart({ x: info.x, y: info.y });
+      setDragCurrent([{ x: info.x, y: info.y }]); // Initialize dragCurrent as an array
     }
   };
 
-  const handleDrag = ( info: any, event: any ): void =>
-  {
-    if ( !lassoMode || !dragStart ) return;
-    setDragCurrent( prev => [ ...prev, { x: info.x, y: info.y } ] );
+  const handleDrag = (info: any): void => {
+    if (!lassoMode || !dragStart) return;
+    setDragCurrent(prev => [...(prev || []), { x: info.x, y: info.y }]); // Ensure prev is an array
   };
 
-  const handleDragEnd = ( info: any, event: any ): void =>
-  {
-    if ( !lassoMode || !dragStart ) return;
+  const handleDragEnd = (info: any): void => {
+    if (!lassoMode || !dragStart || !dragCurrent) return; // Ensure dragCurrent is not null
 
-    const start = dragStart;
-    const end = { x: info.x, y: info.y };
-
-    // Polygon points defining the lasso area
-    const polygon = dragCurrent
+    const polygon = dragCurrent;
 
     const deckInstance = deckRef.current?.deck;
-    if ( !deckInstance ) return;
+    if (!deckInstance) return;
 
     const viewports = deckInstance.getViewports();
-    if ( !viewports || viewports.length === 0 ) return;
+    if (!viewports || viewports.length === 0) return;
 
-    const viewport = viewports[ 0 ];
+    const viewport = viewports[0];
     const selected: number[] = [];
 
-    data?.forEach( ( point, index ) =>
-    {
-      const screenPos = viewport.project( point.position );
-      const [ screenX, screenY ] = screenPos;
+    data?.forEach((point, index) => {
+      const screenPos = viewport.project(point.position);
+      const [screenX, screenY] = screenPos;
 
-      // Check if the point is inside the polygon
-      if ( isPointInPolygon( { x: screenX, y: screenY }, polygon ) ) {
-        selected.push( index );
+      if (isPointInPolygon({ x: screenX, y: screenY }, polygon as { x: number; y: number }[])) { // Cast polygon for safety
+        selected.push(index);
       }
-    } );
+    });
 
-    setSelectedPoints( selected );
-    setSelectedIndexes( selected );
+    setSelectedPoints(selected);
+    setSelectedIndexes(selected);
 
-    
-    setDragStart( null );
-    setDragCurrent( [] );
+    setDragStart(null);
+    setDragCurrent([]);
     isDraggingRef.current = false;
   };
 
+  // Lasso style is conditional on dragStart and dragCurrent, and doesn't directly impact the DeckGL interaction issue.
+  // Kept as is.
   let lassoStyle: React.CSSProperties = {};
-  if ( dragStart && dragCurrent ) {
-    const left = Math.min( dragStart.x, dragCurrent.x );
-    const top = Math.min( dragStart.y, dragCurrent.y );
-    const width = Math.abs( dragCurrent.x - dragStart.x );
-    const height = Math.abs( dragCurrent.y - dragStart.y );
+  if (dragStart && dragCurrent) {
+    const left = Math.min(dragStart.x, dragCurrent[0]?.x || 0); // Use first point for initial x
+    const top = Math.min(dragStart.y, dragCurrent[0]?.y || 0); // Use first point for initial y
+    const width = Math.abs((dragCurrent[dragCurrent.length - 1]?.x || 0) - dragStart.x); // Use last point for width
+    const height = Math.abs((dragCurrent[dragCurrent.length - 1]?.y || 0) - dragStart.y); // Use last point for height
     lassoStyle = {
       position: 'absolute',
       pointerEvents: 'none',
@@ -469,333 +383,340 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     };
   }
 
-  const handleClick = ( e ) =>
-  {
-    if ( contextMenu.visible ) {
-      setContextMenu( { ...contextMenu, visible: false } );
-    }
-    if ( isEventOnTextarea( e, inputRef ) ) {
-      // If the drag started on the textarea, return false.
-      // This tells DeckGL to abort its own drag handling for this event.
-      return;
-    }
-  };
-
-  useEffect( () =>
-  {
-    document.addEventListener( 'click', handleClick );
-    return () =>
-    {
-      document.removeEventListener( 'click', handleClick );
+  // Context menu logic
+  useEffect(() => {
+    document.addEventListener('click', handleClick);
+    return () => {
+      document.removeEventListener('click', handleClick);
     };
-  }, [ contextMenu.visible ] );
+  }, [contextMenu.visible]);
 
-
-  const handleContextMenu = ( e ) =>
-  {
+  const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    setContextMenu( { visible: true, x: e.pageX, y: e.pageY } );
+    setContextMenu({ visible: true, x: e.pageX, y: e.pageY });
   };
 
   const menuItems = [
-  {
-    label: 'Clear indexes',
-    action: () => {
-      setSelectedIndexes([]);
-      setSelectedPoints([]);
+    {
+      label: 'Clear indexes',
+      action: () => {
+        setSelectedIndexes([]);
+        setSelectedPoints([]);
+        setContextMenu({ ...contextMenu, visible: false }); // Close context menu
+      }
     }
-  }
-];
+  ];
 
+  // Modified: Textarea event handling - simplified to focus/blur
+  // This useEffect previously tried to stop propagation which might be redundant
+  // when pointer-events are managed. We need onFocus/onBlur for `isTextareaFocused`.
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
 
-  useEffect( () =>
-  {
-    console.log( "sono qui" )
-    const textarea = inputRef.current;
-    if ( !textarea ) return;
-
-    // Ensure the textarea can be a target for pointer events
-    // and set touch-action to allow default touch behaviors like text selection.
+    // These styles are fine as they ensure the textarea is interactive
     textarea.style.pointerEvents = 'auto';
     textarea.style.touchAction = 'auto';
 
-    const handlePointerDown = ( e ) =>
-    {
-      console.log( "pointerDown" )
-      // Stop the event from propagating to DeckGL or other higher-level listeners.
-      // This is crucial to prevent DeckGL from initiating map interactions.
-      e.stopPropagation();
+    // The core issue is DeckGL capturing events.
+    // We handle focus/blur directly to manage DeckGL's controller.
+  }, []);
 
-      // Attempt to explicitly capture the pointer for the textarea.
-      // This directs subsequent events for this pointer (like pointermove, pointerup)
-      // to this textarea, which is essential for drag-to-select.
-      try {
-        console.log( "pointer setted" )
-        textarea.setPointerCapture( e.pointerId );
-      } catch ( error ) {
-        // This might fail if another element has already captured the pointer,
-        // or on some older browsers/devices.
-        console.error( "Textarea: Failed to set pointer capture.", error );
-      }
-      // IMPORTANT: Do NOT call e.preventDefault(). That would prevent text selection.
-    };
+  // Updated handleClick to just handle context menu closure
+  const handleClick = (e: MouseEvent) => {
+    if (contextMenu.visible) {
+      setContextMenu({ ...contextMenu, visible: false });
+    }
+  };
 
-    const handlePointerMove = ( e ) =>
-    {
-      console.log( "pointer moving" )
-      // If pointer capture was successful, pointermove events will be targeted here.
-      // The default action for pointermove (when a button is down and pointer is captured
-      // on a text input) is to extend the text selection.
-      // We still stop propagation to prevent DeckGL from potentially using these
-      // events for map panning if it has global move listeners.
-      console.log( "pointer movingggg" )
-      e.stopPropagation();
-    };
-
-    const handlePointerUp = ( e ) =>
-    {
-      console.log( "pointer up" )
-      // Stop propagation to prevent DeckGL interactions.
-      e.stopPropagation();
-
-      // Release the pointer capture. This is critical.
-      try {
-        console.log( "pointer released" )
-        textarea.releasePointerCapture( e.pointerId );
-      } catch ( error ) {
-        console.error( "Textarea: Failed to release pointer capture.", error );
-      }
-    };
-
-    const handleClick = ( e ) =>
-    {
-      console.log( "clicked" )
-      // Clicks are usually for cursor placement.
-      // Stopping propagation prevents DeckGL from interpreting this as a map click.
-      e.stopPropagation();
-    };
-
-    // Add event listeners in the capture phase to act before DeckGL
-    textarea.addEventListener( 'pointerdown', handlePointerDown, true );
-    textarea.addEventListener( 'pointermove', handlePointerMove, true );
-    textarea.addEventListener( 'pointerup', handlePointerUp, true );
-    textarea.addEventListener( 'click', handleClick, true ); // For cursor placement
-
-    // Optional: for debugging if capture is being lost unexpectedly
-    const handleLostPointerCapture = ( e ) =>
-    {
-      console.warn( "Textarea: Lost pointer capture.", e );
-      // This might indicate that DeckGL (or another component) forcefully took pointer capture.
-    };
-    textarea.addEventListener( 'lostpointercapture', handleLostPointerCapture, true );
-
-
-    // Cleanup function
-    return () =>
-    {
-      textarea.removeEventListener( 'pointerdown', handlePointerDown, true );
-      textarea.removeEventListener( 'pointermove', handlePointerMove, true );
-      textarea.removeEventListener( 'pointerup', handlePointerUp, true );
-      textarea.removeEventListener( 'click', handleClick, true );
-      textarea.removeEventListener( 'lostpointercapture', handleLostPointerCapture, true );
-    };
-  }, [] ); // Add inputRef to dependencies if it can change: [inputRef]
-
-
-  const [ inputValue, setInputValue ] = useState( queryRetrieve );
-  const [ inputTopK, setInputTopK ] = useState( queryTop_k )
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>( null );
+  const [inputValue, setInputValue] = useState(queryRetrieve);
+  const [inputTopK, setInputTopK] = useState(queryTop_k)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Update queryRetrieve after user stops typing for 500ms
-  useEffect( () =>
-  {
-    if ( typingTimeoutRef.current ) {
-      clearTimeout( typingTimeoutRef.current );
+  useEffect(() => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
     }
-    typingTimeoutRef.current = setTimeout( () =>
-    {
-      setQueryRetrieve( inputValue );
-      setQueryTop_k( inputTopK )
-    }, 500 ); // adjust delay as needed
-  }, [ inputValue, inputTopK ] );
+    typingTimeoutRef.current = setTimeout(() => {
+      setQueryRetrieve(inputValue);
+      setQueryTop_k(inputTopK)
+    }, 1); // adjust delay as needed
+  }, [inputValue, inputTopK]);
 
+  console.log("queries saved:", queries)
 
-  useEffect( () =>
-  {
-    if ( queryRetrieve === "" ) {
-      setSelectedIndexes( [] )
+  useEffect(() => {
+    if (queryRetrieve === "") {
+      setSelectedIndexes([])
       setSelectedPoints([])
     }
-  }, [ queryRetrieve ] )
+  }, [queryRetrieve])
 
-  const handleClearSearch = () => 
-  {
-    setInputValue( "" );
-    setSelectedIndexes( [] )
+  const handleClearSearch = () => {
+    setInputValue("");
+    setSelectedIndexes([])
     setSelectedPoints([])
-    setQueryRetrieve( "" )
+    setQueryRetrieve("")
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault(); // Prevent new line if needed
+      if (queryRetrieve !== "") {
+        setSelectedIndexes([]);
+        setSelectedPoints([])
+  
+        let loadingTimeout = setTimeout(() => {
+          setIsLoadingRetr(true);
+        }, 500);
+  
+        // Use a Set to avoid duplicate queries, then convert back to array
+        setQueries(prevQueries => Array.from(new Set([...prevQueries, queryRetrieve])));
+        RetrieveSamples(props.datasetName, props.featureName, queryRetrieve, queryTop_k, props.modelUsed as string)
+          .then((fetched) => {
+            setSelectedIndexes(fetched.indexes);
+          })
+          .finally(() => {
+            clearTimeout(loadingTimeout);
+            setIsLoadingRetr(false);
+          });
+      }
+    }
+  };
 
-console.log("INDEXES:", selectedIndexes)
-console.log("POINTS:", selectedPoints)
+  console.log("INDEXES:", selectedIndexes)
+  console.log("POINTS:", selectedPoints)
+  // const [hoverInfo, setHoverInfo] = useState(null); // No longer needed, as hoverIndex is from store
+  const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null)
+
+  useEffect(() => {
+    if (props.modelUsed) {
+      try {
+        getModelInfo(props.modelUsed as string)
+          .then((fetched) => {
+            setModelInfo(fetched);
+          })
+      }
+      catch (error) {
+        console.log("Failed to load model info")
+      }
+    }
+  }, [props.modelUsed]);
+
+  function checkMultiModalCompatibility ( modelInfo: ModelInfo | null, featureName: string ) {
+    if ( Array.isArray( datasetUsed?.features ) && modelInfo) {
+      const feature = datasetUsed.features.find( f => f.name === featureName );
+      const type = feature?.type;
+      if ( type === image_type && modelInfo.supports_images == true && modelInfo.supports_text == true) { // Removed `&& modelInfo.supports_text == true` for image_type
+        
+        return true;
+      } else if ( type === text_type && modelInfo.supports_text == true ) {
+        
+        return true;
+      }
+    }
+    
+    return false; // Default return if conditions are not met
+  }
+
+  console.log("compatibility:", checkMultiModalCompatibility(modelInfo,props.featureName))
+  console.log("UUUUUUUUUUUUUUU",noEmbAvailable)
+  // New: Handlers for textarea focus/blur
+  const handleTextareaFocus = useCallback(() => {
+    setIsTextareaFocused(true);
+  }, []);
+
+  const handleTextareaBlur = useCallback(() => {
+    setIsTextareaFocused(false);
+  }, []);
+
+  // New: Dynamic controller based on lassoMode and isTextareaFocused
+  const deckGLController =
+    lassoMode || isTextareaFocused
+      ? {
+          scrollZoom: false,
+          dragRotate: false,
+          dragPan: false,
+          doubleClickZoom: false,
+          keyboard: false, // Disables keyboard navigation for DeckGL when textarea is focused
+        }
+      : {
+          scrollZoom: true,
+          dragRotate: true,
+          dragPan: true,
+          doubleClickZoom: false, // Keep double click zoom disabled if that's the desired default
+          keyboard: true,
+        };
 
   return (
     <>
-      { isLoading ? (
-        <>
-          <Flex
-            mih={ 150 }
-            justify="center"
-            align="center"
-            direction="column"
-            wrap="wrap"
-            style={ { width: '100%' } }
-          >
-            <p>Loading...</p>
-            <Loader />
-          </Flex>
-        </>
-      ) : ( <>
-        { !data ? ( <Flex
-          mih={ 150 }
+      {isLoading ? (
+        <Flex
+          mih={150}
           justify="center"
           align="center"
           direction="column"
           wrap="wrap"
-          style={ { width: '100%' } }
-        ><Alert
-          variant="light"
-          color="red"
-          radius="md"
-          title="Ops!"
-          icon={ <FontAwesomeIcon icon={ faCircleExclamation } /> }
-          style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
+          style={{ width: '100%' }}
         >
+          <p>Loading...</p>
+          <Loader />
+        </Flex>
+      ) : noEmbAvailable===true ? (
+        <Text> No Embs Available </Text>
+      )
+      : (<>
+        {!data ? (
+        <Flex
+          mih={150}
+          justify="center"
+          align="center"
+          direction="column"
+          wrap="wrap"
+          style={{ width: '100%' }}
+        >
+          <Alert
+            variant="light"
+            color="red"
+            radius="md"
+            title="Ops!"
+            icon={<FontAwesomeIcon icon={faCircleExclamation} />}
+            style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}
+          >
             Something occured while trying to get the data. Check if the embeddings are correctly loaded to the dataset. Otherwise you can compute them {" "}
             <Link
-              href={ {
+              href={{
                 pathname: "/pages/dataquality/actions/embeddings",
                 query: { datasetName: datasetUsed?.name }
-              } }
-              style={ { color: 'blue' } }
+              }}
+              style={{ color: 'blue' }}
             >
               here
             </Link>.
           </Alert>
-        </Flex> ) : (
+        </Flex>) : (
           <>
-            <div style={ { width: '1830px', height: '600px' } }>
-
+            <div style={{ width: '1830px', height: '600px', position: 'relative' }}>
               <Suspense>
                 <LassoDrawer>
                   <div id="deckgl-container"
-                    onContextMenu={ handleContextMenu }
-                    style={ {
+                    onContextMenu={handleContextMenu}
+                    style={{
                       width: '100%',
                       height: '100%',
                       border: '2px solid #9a9a9a',
                       background: 'white',
                       overflow: 'hidden',
                       zIndex: 10,
-                      pointerEvents: 'auto',
-                    } }>
+                      // The pointerEvents on the container might need to be dynamic
+                      // but for now, let's rely on the controller prop for interaction.
+                      pointerEvents: 'auto', // Keep this as auto, controller will manage disabling
+                    }}>
                     <DeckGL
-                      ref={ deckRef }
-                      views={ new OrthographicView( { fovy: 50 } ) }
-                      viewState={ viewState }
-                      onViewStateChange={ ( { viewState } ) => setViewState( viewState ) }
-                      layers={ [ layer ] }
-                      controller={
-                        lassoMode ?
-                          {
-                            scrollZoom: false,
-                            dragRotate: false,
-                            dragPan: false,
-                            doubleClickZoom: false,
+                      ref={deckRef}
+                      views={new OrthographicView({ fovy: 50 })}
+                      viewState={viewState}
+                      onViewStateChange={({ viewState }) => setViewState(viewState)}
+                      onHover={info => {
+                        // Only update hoverIndex if the textarea is NOT focused
+                        if (!isTextareaFocused) {
+                            if (info.index !== undefined && info.index !== -1) {
+                                setHoverIndex(info.index);
+                            } else {
+                                setHoverIndex(null); // Clear hover when not on an object
+                            }
+                        } else {
+                            setHoverIndex(null); // Explicitly clear hover if textarea is focused
+                        }
+                      }}
+                      getTooltip={() =>
+                        hoverIndex !== null && data && data[hoverIndex] && !isTextareaFocused // Also check isTextareaFocused for tooltip visibility
+                          ? {
+                            html: `<div class="custom-tooltip">Index: ${hoverIndex}</div>`, // Use hoverIndex from store
+                            style: {
+                              borderRadius: '10px',
+                              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                              color: '#fff',
+                              padding: '8px',
+                              pointerEvents: 'none',
+                            }
                           }
-                          : {
-                            scrollZoom: true,
-                            dragRotate: true,
-                            dragPan: true,
-                            doubleClickZoom: false,
-                          } }
-                      onDragStart={ handleDragStart }
-                      onDrag={ handleDrag }
-                      onDragEnd={ handleDragEnd }
-                      style={ { zIndex: 100 } } />
+                          : null
+                      }
+                      layers={[layer, queryLayer]}
+                      controller={deckGLController} // Dynamically set controller
+                      onDragStart={handleDragStart}
+                      onDrag={handleDrag}
+                      onDragEnd={handleDragEnd}
+                      style={{ zIndex: "100" }} />
                   </div>
                 </LassoDrawer>
               </Suspense>
             </div>
 
-          {datasetUsed?.name !== "military" ? (
-            <Flex
-              direction="column"
-              align="center"
-              justify="center">
-              <Box style={ { width: "600px", marginTop: "12px" } }>
-                <Text size="sm" style={ { textAlign: 'center', width: '100%', marginTop: "15px" } }>Semantic Search</Text>
-                <Textarea
-                  id="search-input"
-                  ref={ inputRef }
+            {datasetUsed?.name !== "military" ? (
+              <Flex
+                direction="column"
+                align="center"
+                justify="center">
+                <Box style={{ width: "600px", marginTop: "12px" }}>
+                  <Text size="sm" style={{ textAlign: 'center', width: '100%', marginTop: "1px" }}>Semantic Search</Text>
+                  <Textarea
+                    id="search-input"
+                    ref={textareaRef}
+                    placeholder="Write something..."
+                    radius="md"
+                    value={inputValue}
+                    onChange={(event) => setInputValue(event.currentTarget.value)}
+                    disabled={!enableTextArea}
+                    onFocus={handleTextareaFocus} // New: Set focus state
+                    onBlur={handleTextareaBlur}   // New: Clear focus state
+                    onKeyDown={handleKeyDown}
+                    style={{
+                      width: "100%",
+                      pointerEvents: 'auto', // Ensure textarea can capture events
+                      touchAction: 'auto',
+                      paddingRight: "6px",
+                      marginTop: "6px",
+                      zIndex: 1000 // Ensure textarea is above DeckGL canvas
+                    }}
+                    // The onClick and onFocus here were remnants of previous attempts to stop propagation.
+                    // With dynamic controller and z-index, they might be redundant or counterproductive.
+                    // Removing them for cleaner event flow.
+                    
+                  />
+                  {queryRetrieve !== "" ?
 
-                  placeholder="Write something..."
-                  radius="md"
+                    (<>
+                      <Text size="sm" style={{ marginBottom: 0 }}>Number of best guesses</Text>
+                      <Slider
+                        defaultValue={10}
+                        min={0}
+                        max={data?.length || 100} // Added null check for data.length
+                        step={1}
+                        marks={[
+                          { value: 0, label: '0' },
+                          { value: data?.length || 100, label: `${data?.length || 100}` }, // Added null check
+                        ]}
+                        value={inputTopK}
+                        onChange={(value) => setInputTopK(value)}
+                      /> </>) : null}
 
-                  value={ inputValue }
-                  onChange={ ( event ) => setInputValue( event.currentTarget.value ) }
-                  style={ {
-                    width: "100%",
-                    pointerEvents: 'auto',
-                    touchAction: 'auto',
-                    paddingRight: "6px",
-                    marginTop: "6px",
-                    zIndex: 1000
+                </Box>
+                {isLoadingRetr ? (<><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></>) : null}
+              </Flex>
+            ) : null}
 
-                  } }
-                  onClick={ ( e ) =>
-                  {
-                    isEventOnTextarea( e, inputRef )
-                    e.stopPropagation();
-                    e.target.focus();
-                  } }
-                  onFocus={ ( e ) => e.stopPropagation() }
-                  rightSection={
-                    <CloseButton onClick={ handleClearSearch } />
-                  }
-                />
-                { queryRetrieve !== "" ?
-
-                  ( <>
-                    <Text size="sm" style={ { marginBottom: 0 } }>Number of best guesses</Text>
-                    <Slider
-                      defaultValue={ 10 }
-                      min={ 0 }
-                      max={ data.length }
-                      step={ 1 }
-                      marks={ [
-                        { value: 0, label: '0' },
-                        { value: data.length, label: `${data.length}` },
-                      ] }
-                      value={ inputTopK }
-                      onChange={ ( value ) => setInputTopK( value ) }
-                    /> </> ) : null }
-
-              </Box>
-              { isLoadingRetr ? ( <><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></> ) : null }
-            </Flex>
-          ) : null }
-            
 
           </>
-        ) }
+        )}
 
 
-        { contextMenu.visible && (
-          <div style={ { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' } }>
+        {contextMenu.visible && (
+          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
             <div
-              style={ {
+              style={{
                 position: 'absolute',
                 top: contextMenu.y,
                 left: contextMenu.x,
@@ -805,27 +726,42 @@ console.log("POINTS:", selectedPoints)
                 borderRadius: '4px',
                 backgroundColor: 'white',
                 minWidth: '150px',
-              } }
+              }}
             >
-              { menuItems.map( ( item, index ) => (
+              {menuItems.map((item, index) => (
                 <div
-                  key={ index }
-                  onClick={ item.action }
-                  style={ {
+                  key={index}
+                  onClick={item.action}
+                  style={{
                     padding: '8px 12px',
                     cursor: 'pointer',
-                  } }
-                  onMouseOver={ ( e ) => e.currentTarget.style.backgroundColor = '#f5f5f5' }
-                  onMouseOut={ ( e ) => e.currentTarget.style.backgroundColor = 'transparent' }
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
-                  { item.label }
+                  {item.label}
                 </div>
-              ) ) }
+              ))}
             </div>
           </div>
-        ) }
+        )}
       </>
-      ) }
+      )}
     </>
   );
-}
+}import {project} from '@deck.gl/core';
+import controller from '@deck.gl/core/dist/controllers/controller';
+import deck from '@deck.gl/core/dist/lib/deck';
+import {layer,icon} from '@fortawesome/fontawesome-svg-core';
+import {getRadius,getSize} from '@mantine/core';
+import {transitions} from '@mantine/core/lib/components/Transition/transitions';
+import {log} from 'console';
+import {color} from 'framer-motion';
+import {get} from 'http';
+import {flatMap,keys,filter,map,includes,has,min,floor,forEach,find,size,max} from 'lodash';
+import {wrap} from 'module';
+import {type} from 'os';
+import {features,title} from 'process';
+import {CSSProperties} from 'react';
+import style from 'styled-jsx/style';
+import {isArray} from 'util';
