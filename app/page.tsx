@@ -5,6 +5,7 @@ import './pages/HomePage/HomePage.css';
 import { HomePageProps } from "./interfaces/NNInterfaces";
 import HomePageDrop from "./pages/HomePage/HomePageDrop";
 import HomePageTask from "./pages/HomePage/HomePageTask";
+import Benchmark from './pages/nntrust/RedTeam/page';
 
 
 
@@ -19,28 +20,27 @@ const HomePage: React.FC<HomePageProps> = ({
 
 
   return (
-    <div className="home-container">
-      <HomePageDrop
-        dataset={dataset}
-        model={model}
-        onFileSelect={onFileSelect}
-        onTaskSelect={onTaskSelect} />
+    // <div className="home-container">
+    //   <HomePageDrop
+    //     dataset={dataset}
+    //     model={model}
+    //     onFileSelect={onFileSelect}
+    //     onTaskSelect={onTaskSelect} />
 
+    //   <div className='task'>
+    //     <div className="section-header">
+    //       <h2 className="section-title">
+    //         Analysis Tasks
+    //       </h2>
+    //       <p className="section-subtitle">
+    //         Select an analysis task to begin
+    //       </p>
+    //     </div>
 
-      
-      <div className='task'>
-        <div className="section-header">
-          <h2 className="section-title">
-            Analysis Tasks
-          </h2>
-          <p className="section-subtitle">
-            Select an analysis task to begin
-          </p>
-        </div>
-
-        <HomePageTask />
-      </div>
-    </div>
+    //     <HomePageTask />
+    //   </div>
+    // </div>
+    <Benchmark/>
   );
 }
 

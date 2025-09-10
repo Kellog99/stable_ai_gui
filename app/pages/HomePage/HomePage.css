@@ -1,17 +1,9 @@
-.home-page {
-  width: 80%;
-  height: 100vw;
-  margin: auto;
-  padding-top: 1vw;
-}
-
 .home-container {
-  padding-top: 1.5vw;
   justify-content: center;
   align-items: center;
   margin: auto;
   width: 100%;
-  height: 100vh;
+  height: 100%;
 }
 
 .section-header {
