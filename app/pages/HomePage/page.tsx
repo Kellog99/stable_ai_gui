@@ -1,8 +1,8 @@
-import { LoadedFile, Task, TaskType, FileDropZoneProps } from "@/app/types";
 import './HomePage.css';
 import HomePageTask from "./HomePageTask";
 import HomePageDrop from "./HomePageDrop";
-import { HomePageProps } from "@/app/types";
+import { HomePageProps } from "@/interfaces/NNInterfaces";
+
 
 
 
@@ -26,7 +26,7 @@ const HomePage: React.FC<HomePageProps> = ({
         onTaskSelect={onTaskSelect} />
 
 
-      {/* Task Section */}
+      
       <div className='task'>
         <div className="section-header">
           <h2 className="section-title">

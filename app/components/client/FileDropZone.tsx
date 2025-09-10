@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useRef } from 'react';
 import { Upload, FileX, CheckCircle, Database, File } from 'lucide-react';
-import styles from './FileDropZone.module.css';
-import { ButtonProps, FileDropZoneProps } from '@/app/types/index'
+import styles from '../../styles/FileDropZone.module.css'
+
 import SelectionButton from './utils/SelectionButtons';
+import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 
 const FileDropZone: React.FC<FileDropZoneProps> = ({
   title,
@@ -75,7 +76,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
   };
   const [selection, setSelection] = useState<"selection" | "drag&drop">("selection")
 
-  const btns: ButtonProps[] = [
+  const btns = [
     {
       id: "selection",
       name: "Select Dataset",

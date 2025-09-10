@@ -1,8 +1,8 @@
 import React from 'react'
 import { Brain, Database } from 'lucide-react';
-import { FileDropZoneProps } from "@/app/types";
-import FileDropZone from "@/app/components/FileDropZone";
-import { HomePageProps } from "@/app/types";
+import { FileDropZoneProps, HomePageProps } from '@/interfaces/NNInterfaces';
+import FileDropZone from '@/components/client/FileDropZone';
+
 
 const HomePageDrop: React.FC<HomePageProps> = ({
     dataset,

@@ -1,8 +1,10 @@
 import React from 'react'
-import { LoadedFile, Task, TaskType, FileDropZoneProps } from "@/app/types";
+
 import './HomePage.css';
 import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
-import TaskButton from "@/app/components/TaskButton";
+import { Task } from '@/interfaces/NNInterfaces';
+import TaskButton from '@/components/client/TaskButton';
+
 
 // major information about the tasks
 const tasks: Task[] = [
