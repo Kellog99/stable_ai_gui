@@ -25,8 +25,6 @@ const HomePage: React.FC<HomePageProps> = ({
         onFileSelect={onFileSelect}
         onTaskSelect={onTaskSelect} />
 
-
-      
       <div className='task'>
         <div className="section-header">
           <h2 className="section-title">

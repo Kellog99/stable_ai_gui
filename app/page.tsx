@@ -6,6 +6,7 @@ import { HomePageProps } from "./interfaces/NNInterfaces";
 import HomePageDrop from "./pages/HomePage/HomePageDrop";
 import HomePageTask from "./pages/HomePage/HomePageTask";
 import Benchmark from './pages/nntrust/RedTeam/page';
+import { useState } from 'react';
 
 
 
@@ -17,7 +18,6 @@ const HomePage: React.FC<HomePageProps> = ({
   // Button state logic
   const canUseAnalysis = dataset !== null;
   const canUseOtherTasks = dataset !== null && model !== null;
-
 
   return (
     // <div className="home-container">
@@ -41,6 +41,7 @@ const HomePage: React.FC<HomePageProps> = ({
     //   </div>
     // </div>
     <Benchmark/>
+
   );
 }
 

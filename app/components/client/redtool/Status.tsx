@@ -10,7 +10,6 @@ function getStatus(id: string, item: 'status' | 'criticality') {
     else {
         return 'None'
     }
-
 }
 const Status: React.FC<StatusProp> = ({ attackList }) => {
 

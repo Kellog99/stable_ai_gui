@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AttackProps } from '@/app/types';
+import { AttackProps } from '@/interfaces/NNInterfaces';
 import AttackCard from '@/components/client/redtool/AttackCard';
 import './Benchmark.css';
 import { Play, ChevronDown, ChevronUp } from 'lucide-react';
@@ -79,14 +79,14 @@ const Benchmark: React.FC = () => {
           </div>
           <button className='attack-button'>
             <Play className='icon' />
-            <p>Execute benchmark</p>
+            <div className='btn-desc'> Execute benchmark</div>
           </button>
         </div>
 
         <Status attackList={Array.from(selectedAttacks)} />
 
         <div className='attack-title'>
-          <h3>Vulnearbility selection</h3>
+          <div className='attack-header'>Vulnearbility selection</div>
           <button className='btn-open'
             onClick={() => setOpen((prev) => !prev)}>
             {open ?
@@ -94,24 +94,24 @@ const Benchmark: React.FC = () => {
               <ChevronDown className='icon' />
             }
           </button>
+
         </div>
 
         {
           open ?
-            <div><p>
-              Selected: {selectedAttacks.size} of {attacks.length} attacks
-            </p>
-              <div className="attacks-grid">
-                {attacks.map((attack) => (
-                  <AttackCard
-                    key={attack.id}
-                    attack={attack}
-                    isSelected={selectedAttacks.has(attack.id)}
-                    onSelect={handleAttackSelect}
-                  />
-                ))}
-              </div>
-            </div> : null}
+
+            <div className="attacks-grid">
+              {attacks.map((attack) => (
+                <AttackCard
+                  key={attack.id}
+                  attack={attack}
+                  isSelected={selectedAttacks.has(attack.id)}
+                  onSelect={handleAttackSelect}
+                />
+              ))}
+            </div>
+            : null
+        }
       </div >);
   }
 

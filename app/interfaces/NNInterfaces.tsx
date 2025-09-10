@@ -65,3 +65,10 @@ export interface AttackProps {
   description: string
   parameters: ParametersProps[]
 }
+
+// Settings Modal Component
+export interface ParametersWindowProps {
+  isOpen: boolean,
+  onClose: ()=>void,
+  parameters: ParametersProps[],
+}
