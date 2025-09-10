@@ -14,31 +14,6 @@ import useStore from './store/dsStore';
 import UploadModal from './components/client/UploadModal';
 import { useDisclosure } from '@mantine/hooks';
 
-/*
-export const metadata = {
-  title: "Data Quality Framework",
-  description: "",
-};
-*/
-
-/*
-export default async function HomePage ( props: { searchParams: Promise<{ query: string }> } )
-{
-  const { searchParams } = props;
-
-  const { query } = await searchParams;
-  const datasets = await DatasetsLoader()
-
-  console.log( "Server Response:", datasets )
-
-  return (
-    <>
-      <SearchBar />
-      <DatasetBT query={ query } datasets={ datasets } />
-    </>
-  );
-}
-*/
 
 export default function HomePage ()
 {

@@ -1,0 +1,30 @@
+.button {
+  display: inline-flex;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  font-size: 1vw;
+  align-items: center;
+  align-content: center;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.2s;
+  --sidepadding: 2vw;
+  --toppadding: 0.5vw; 
+  padding: var(--toppadding);
+  padding-left: var(--sidepadding);
+  padding-right: var(--sidepadding);
+}
+
+.button.active {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.button.inactive {
+  color: #6B7280;
+  background: transparent;
+}
+
+.button.inactive:hover {
+  color: white;
+}
