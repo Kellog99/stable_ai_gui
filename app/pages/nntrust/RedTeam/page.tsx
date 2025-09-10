@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { AttackProps } from '@/app/types';
-import AttackGrid from '@/app/components/redtool/AttackCard';
+
 import './Benchmark.css';
 import { Play, ChevronDown, ChevronUp } from 'lucide-react';
-import Status from '@/app/components/redtool/Status';
+import { AttackProps } from '@/interfaces/NNInterfaces';
+import Status from '@/components/client/redtool/Status';
+
 
 const listAttacks: AttackProps[] = [
   {

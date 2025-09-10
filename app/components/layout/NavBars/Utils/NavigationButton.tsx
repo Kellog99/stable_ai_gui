@@ -3,7 +3,6 @@
 import { Button, Text, Tooltip } from "@mantine/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 import RouterButton from "@/components/client/buttons/RouterButton";
 import { useSearchParams } from "next/navigation";
@@ -28,7 +27,7 @@ const buttonStyles = {
 
 const activeStyles = {
   backgroundColor: '#dddbdb',
-  color: 'black',
+  color: 'white',
 };
 
 export default function NavigationButton({

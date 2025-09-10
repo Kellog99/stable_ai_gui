@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import Dataset, { Configs } from "../interfaces/genericInterface";
+import Dataset, { Configs, datasetMock } from "../interfaces/genericInterface";
 
 interface AppState
 {
@@ -70,7 +70,7 @@ const useStore = create<AppState>()(
   persist(
     ( set ) => ( {
       datasets: null,
-      datasetUsed: null,
+      datasetUsed: datasetMock,
       queryDataset: "",
       selectedIndexes: [],
       selectedPoints: [],
