@@ -155,7 +155,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     <div className={styles.containerDropzone}>
       <div className={styles.buttons}>
         {btns.map((btnprop) =>
-          <SelectionButton {...btnprop} />)}
+          <SelectionButton key={btnprop.id} {...btnprop} />)}
       </div>
       {renderLoadingPage()}
     </div>

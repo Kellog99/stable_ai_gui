@@ -14,6 +14,7 @@ const HomePageDrop: React.FC<HomePageProps> = ( {
     //This create the grid for the loading part
     const homePageDropZones: FileDropZoneProps[] = [
         {
+            id: "drop1",
             title: "Dataset",
             Icon: Database,
             description: "Upload your dataset in ZIP format",
@@ -23,6 +24,7 @@ const HomePageDrop: React.FC<HomePageProps> = ( {
             loadedFileName: "dataset?.name",
         },
         {
+            id: "drop2",
             title: "Model",
             Icon: Brain,
             description: "Upload your model in a `.pth` format",
@@ -34,8 +36,8 @@ const HomePageDrop: React.FC<HomePageProps> = ( {
     ]
     return (
         <div className="file-grid">
-            { homePageDropZones.map( ( dropElement: FileDropZoneProps, index: number ) => (
-                <FileDropZone key={ index } { ...dropElement } />
+            { homePageDropZones.map( ( dropElement: FileDropZoneProps) => (
+                <FileDropZone key={ dropElement.id } { ...dropElement } />
             ) ) }
         </div>
     )

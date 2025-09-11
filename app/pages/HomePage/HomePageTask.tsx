@@ -37,7 +37,7 @@ const HomePageTask = () => {
   // in order to have a better readebility it has been created another file
   return (
     <div className="task-grid">
-      {tasks.map((task) => <TaskButton {...task} />)}
+      {tasks.map((task) => <TaskButton key={task.title} {...task} />)}
     </div>
   )
 }

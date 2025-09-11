@@ -1,5 +1,4 @@
 "use client";
-
 import { Button, Text, Tooltip } from "@mantine/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
@@ -23,11 +22,23 @@ const buttonStyles = {
   width: 'calc(100% + 32px)',
   marginLeft: '-16px',
   marginRight: '-16px',
+  display: 'flex',
+  justifyContent: 'flex-start', // left-align content
+  alignItems: 'center',
+  gap: '8px', // spacing between icon and text
 };
 
 const activeStyles = {
   backgroundColor: '#dddbdb',
   color: 'white',
+};
+
+const disabledStyles = {
+  backgroundColor: '#f8f9fa',
+  color: '#adb5bd',
+  cursor: 'not-allowed',
+  opacity: 0.6,
+  pointerEvents: 'none' as const,
 };
 
 export default function NavigationButton({
@@ -41,7 +52,6 @@ export default function NavigationButton({
   rightSection,
   variant = 'subtle'
 }: NavigationButtonProps) {
-
   const searchParams = useSearchParams();
   const [datasetName, setDatasetName] = useState<string | null>("")
 
@@ -51,25 +61,35 @@ export default function NavigationButton({
     }
   }, [searchParams])
 
+  const getButtonStyles = () => {
+    let styles = { ...buttonStyles };
+    
+    if (isActive && !disabled) {
+      styles = { ...styles, ...activeStyles };
+    } else if (disabled) {
+      styles = { ...styles, ...disabledStyles };
+    }
+    
+    return styles;
+  };
 
   const buttonContent = (
-    
-      <Button
-        fullWidth
-        leftSection={leftSection ?? (icon ? <FontAwesomeIcon icon={icon} /> : undefined)}
-        rightSection={rightSection}
-        variant={isActive ? "filled" : variant}
-        disabled={disabled}
-        style={{
-          ...buttonStyles,
-          ...(isActive && activeStyles)
-        }}
+    <Button
+      fullWidth
+      leftSection={leftSection ?? (icon ? <FontAwesomeIcon icon={icon} color="#475569" /> : undefined)}
+      rightSection={rightSection}
+      variant={isActive && !disabled ? "filled" : variant}
+      disabled={disabled}
+      style={getButtonStyles()}
+    >
+      <Text 
+        size="sm" 
+        fw={600} 
+        c={disabled ? "dimmed" : isActive ? "#475569" : "dimmed"}
       >
-        <Text size="sm" fw={600} c="dimmed">
-          {label}
-        </Text>
-      </Button>
-    
+        {label}
+      </Text>
+    </Button>
   );
 
   const content = disabled ? (
@@ -105,7 +125,6 @@ export default function NavigationButton({
       )}
     </div>
   ) : (
-    
     <RouterButton name={datasetName} route={href}>
       {buttonContent}
     </RouterButton>
@@ -113,4 +132,3 @@ export default function NavigationButton({
 
   return content;
 }
-

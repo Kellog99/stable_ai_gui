@@ -25,12 +25,7 @@ export interface NavigationSection {
 }
 
 export const mainNavigation: NavigationItem[] = [
-  {
-    key: 'datasets',
-    label: 'Datasets',
-    href: '/',
-    icon: faDatabase,
-  },
+  
   {
     key: 'description',
     label: 'Dataset Description',

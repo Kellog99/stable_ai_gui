@@ -1,0 +1,19 @@
+/* Reset any default browser margins/padding */
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+/* Target Mantine AppShell specifically */
+.mantine-AppShell-root {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.mantine-AppShell-main {
+  margin: 0 !important;
+}
+
+.mantine-AppShell-navbar {
+  margin: 0 !important;
+}

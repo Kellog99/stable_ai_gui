@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Eye, Trash2, FileText } from 'lucide-react';
 
-import './ReportPage.css';
+import './report.css';
 import { LoadedFile } from "@/interfaces/NNInterfaces";
 
 

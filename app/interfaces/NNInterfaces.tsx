@@ -49,6 +49,7 @@ export interface ButtonProps {
 }
 
 export interface FileDropZoneProps {
+  id: string,
   onFileSelect: (file: File) => void;
   title: string;
   Icon: LucideIcon;

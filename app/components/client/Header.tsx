@@ -39,7 +39,7 @@ export default function Header ()
     {
       id: 'ReportPage',
       Icon: FileText,
-      href: "/pages/nntrust/ReportPage",
+      href: "/pages/report",
       name: "report"
     }
   ]

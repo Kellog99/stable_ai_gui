@@ -14,12 +14,12 @@ const TaskButton: React.FC<Task> = ( {
 {
   //const navigate = useNavigate();
 
-
+"/pages/dataquality/datasets"
   
   // #TODO: change the route 
 
   return (
-    <RouterButton name={ "Animals" } route="/pages/dataquality/datasets">
+    <RouterButton name={ "Animals" } route={title == "Data Quality Tool" ? "/pages/dataquality/datasets" : "/pages/nntrust/RedTeam"}>
       <div className={ styles.card }
         onClick={ () => {/*navigate("/redtool")*/ } }>
         <div className={ styles.card_header }>

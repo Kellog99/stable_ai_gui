@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from 'react';
 
 import './Benchmark.css';
@@ -274,6 +276,7 @@ const Benchmark: React.FC = () => {
             <div><p>
               Selected: {selectedAttacks.size} of {attacks.length} attacks
             </p>
+            {/*
               <div className="attacks-grid">
                 {attacks.map((attack) => (
                   <AttackGrid
@@ -284,6 +287,7 @@ const Benchmark: React.FC = () => {
                   />
                 ))}
               </div>
+              */}
             </div> : null}
       </div >);
   }

@@ -1,8 +1,12 @@
 .navbar {
-    background-color: inherit !important; /* Override Mantine's default */
+    background-color: transparent !important; /* Override Mantine's default */
     color: white !important; /* Ensure the text is visible */
-  }
-  
-  .navbar:hover {
-    background-color: #dddbdb !important; /* Optional: Slight hover effect */
-  }
+    width: calc(100% + 32px);
+    margin-left: -16px;
+    margin-right: -16px;
+    justify-content: flex-start;
+}
+
+.navbar:hover {
+    background-color: rgba(71, 85, 105, 0.3) !important; /* Optional: Slight hover effect */
+}

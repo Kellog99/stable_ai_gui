@@ -184,7 +184,7 @@ const SchemaGraph: React.FC<{
       <div style={ {
         width: `${dimensions.width}px`,
         height: `${dimensions.height}px`,
-        background: "#ffffff",
+        background: "transparent",
         margin: "0 auto"
       } }>
         <ReactFlow
@@ -206,6 +206,7 @@ const SchemaGraph: React.FC<{
           preventScrolling={ true }
           style={ { pointerEvents: "none" } }
           onNodeClick={ handleNodeClick }
+          proOptions={{ hideAttribution: true }}
         />
       </div>
     );

@@ -22,14 +22,14 @@ export interface NavigationSection {
 
 export const mainNavigation: NavigationItem[] = [
   {
-    key: 'home',
-    label: 'Benchmark',
+    key: 'dataquality',
+    label: 'Data Quality Report',
     href: '/pages/nntrust',
-    icon: faHouse,
+    icon: faChartLine,
   },
   {
-    key: 'report',
-    label: 'Test',
+    key: 'nntrust',
+    label: 'Titann Report',
     href: '/pages/nntrust/report/',
     icon: faChartLine,
   },

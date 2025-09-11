@@ -28,6 +28,18 @@ export default function CollapsibleSection({
         fullWidth
         className={classes.navbar}
         onClick={onToggle}
+        styles={{
+          root: {
+            display: 'flex',
+            justifyContent: 'flex-start', // left-align content
+            alignItems: 'center',
+            gap: '8px', // spacing between icon and text
+            textAlign: 'left',
+          },
+          inner: {
+            justifyContent: 'flex-start', // also ensures inner content aligns left
+          },
+        }}
         rightSection={
           isVisible ? (
             <IconChevronDown size={18} stroke={1.5} />
@@ -42,17 +54,13 @@ export default function CollapsibleSection({
             style={{ opacity: 0.6 }}
           />
         }
-        style={{
-          width: 'calc(100% + 32px)',
-          marginLeft: '-16px',
-          marginRight: '-16px',
-        }}
         mb="xs"
       >
         <Text size="sm" fw={600} c="dimmed">
           {title}
         </Text>
       </Button>
+
 
       {isVisible && (
         <Stack mt="sm">
