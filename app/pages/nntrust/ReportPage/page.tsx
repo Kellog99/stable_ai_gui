@@ -1,5 +1,5 @@
 import { LoadedFile } from "@/app/types";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Eye, Trash2, FileText } from 'lucide-react';
 import FileDropZone from "@/app/components/FileDropZone";
 import './ReportPage.css';
@@ -7,34 +7,16 @@ import './ReportPage.css';
 
 interface ReportPageProps {
   reportFiles: LoadedFile[];
-  onFileSelect: (file: File) => void;
   onFileDelete: (index: number) => void;
 }
 
-export default function ReportPage({ reportFiles, onFileSelect, onFileDelete }: ReportPageProps) {
+const ReportPage: React.FC = ({
+
+ }) => {
   const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null);
   const [jsonData, setJsonData] = useState<any>(null);
 
-  const handleShowData = async (index: number) => {
-    const file = reportFiles[index];
-    try {
-      const text = await file.file.text();
-      const data = JSON.parse(text);
-      setJsonData(data);
-      setSelectedFileIndex(index);
-    } catch (error) {
-      console.error('Error parsing JSON:', error);
-      alert('Invalid JSON file');
-    }
-  };
-
-  const handleDelete = (index: number) => {
-    onFileDelete(index);
-    if (selectedFileIndex === index) {
-      setSelectedFileIndex(null);
-      setJsonData(null);
-    }
-  };
+  const reportFiles = []
 
   return (
     <div className="report-container">
@@ -47,7 +29,7 @@ export default function ReportPage({ reportFiles, onFileSelect, onFileDelete }: 
           Upload and manage your analysis reports
         </p>
       </div>
-
+      
       {/* File Management */}
       {reportFiles.length > 0 && (
         <div className="files-section">
@@ -61,14 +43,12 @@ export default function ReportPage({ reportFiles, onFileSelect, onFileDelete }: 
                 </div>
                 <div className="file-actions">
                   <button
-                    onClick={() => handleShowData(index)}
                     className="action-button view-button"
                   >
                     <Eye className="w-4 h-4" />
                     <span>View</span>
                   </button>
                   <button
-                    onClick={() => handleDelete(index)}
                     className="action-button delete-button"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -85,3 +65,5 @@ export default function ReportPage({ reportFiles, onFileSelect, onFileDelete }: 
     </div>
   );
 }
+
+export default ReportPage
