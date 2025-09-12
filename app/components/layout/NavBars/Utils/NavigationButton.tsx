@@ -1,12 +1,13 @@
 "use client";
-import { Button, Text, Tooltip } from "@mantine/core";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { ReactNode, useEffect, useState } from 'react';
 import RouterButton from "@/components/client/buttons/RouterButton";
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Button, Text, Tooltip } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
+import { ReactNode, useEffect, useState } from 'react';
 
-interface NavigationButtonProps {
+interface NavigationButtonProps
+{
   href: string;
   icon?: IconDefinition;
   label: string;
@@ -16,6 +17,7 @@ interface NavigationButtonProps {
   leftSection?: ReactNode;
   rightSection?: ReactNode;
   variant?: 'filled' | 'subtle';
+  collapsed?: boolean;
 }
 
 const buttonStyles = {
@@ -41,7 +43,7 @@ const disabledStyles = {
   pointerEvents: 'none' as const,
 };
 
-export default function NavigationButton({
+export default function NavigationButton ( {
   href,
   icon,
   label,
@@ -50,83 +52,118 @@ export default function NavigationButton({
   tooltipLabel,
   leftSection,
   rightSection,
-  variant = 'subtle'
-}: NavigationButtonProps) {
+  variant = 'subtle',
+  collapsed = false
+}: NavigationButtonProps )
+{
   const searchParams = useSearchParams();
-  const [datasetName, setDatasetName] = useState<string | null>("")
+  const [ datasetName, setDatasetName ] = useState<string | null>( "" )
 
-  useEffect(() => {
-    if (searchParams.get("datasetName")) {
-      setDatasetName(searchParams.get("datasetName"))
+  useEffect( () =>
+  {
+    if ( searchParams.get( "datasetName" ) ) {
+      setDatasetName( searchParams.get( "datasetName" ) )
     }
-  }, [searchParams])
+  }, [ searchParams ] )
 
-  const getButtonStyles = () => {
+  const getButtonStyles = () =>
+  {
     let styles = { ...buttonStyles };
-    
-    if (isActive && !disabled) {
+
+    if ( isActive && !disabled ) {
       styles = { ...styles, ...activeStyles };
-    } else if (disabled) {
+    } else if ( disabled ) {
       styles = { ...styles, ...disabledStyles };
     }
-    
+
     return styles;
   };
 
   const buttonContent = (
     <Button
       fullWidth
-      leftSection={leftSection ?? (icon ? <FontAwesomeIcon icon={icon} color="#475569" /> : undefined)}
-      rightSection={rightSection}
-      variant={isActive && !disabled ? "filled" : variant}
-      disabled={disabled}
-      style={getButtonStyles()}
+      leftSection={ leftSection ?? ( icon ? <FontAwesomeIcon icon={ icon } color="#475569" /> : undefined ) }
+      rightSection={ rightSection }
+      variant={ isActive && !disabled ? "filled" : variant }
+      disabled={ disabled }
+      style={ {
+        ...getButtonStyles(),
+        // Add these to maintain consistent positioning
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start'
+      } }
     >
-      <Text 
-        size="sm" 
-        fw={600} 
-        c={disabled ? "dimmed" : isActive ? "#475569" : "dimmed"}
+      <Text
+        size="sm"
+        fw={ 600 }
+        c={ disabled ? "dimmed" : isActive ? "#475569" : "dimmed" }
       >
-        {label}
+        { label }
       </Text>
     </Button>
   );
 
+  if ( collapsed ) {
+    return (
+      <Tooltip label={ label } position="right" withArrow disabled={ disabled }>
+        <RouterButton name={ datasetName } route={ href }>
+        <Button
+          fullWidth
+          variant={ isActive && !disabled ? "filled" : variant }
+          disabled={ disabled }
+          style={ {
+            ...getButtonStyles(),
+            // Add these to maintain consistent positioning
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-start'
+          } }
+        >
+          { icon ? <FontAwesomeIcon icon={ icon } color="#475569" /> : undefined }
+        </Button>
+        </RouterButton>
+      </Tooltip>
+    );
+  }
+
   const content = disabled ? (
-    <div style={{ position: 'relative' }}>
-      {buttonContent}
-      {tooltipLabel && (
+    <div style={ { position: 'relative' } }>
+      { buttonContent }
+      { tooltipLabel && (
         <Tooltip
-          label={tooltipLabel}
+          label={ tooltipLabel }
           radius="md"
           withArrow
           position="top"
           multiline
-          styles={{
+          styles={ {
             tooltip: {
               width: "200px",
               textAlign: 'center',
               lineHeight: 1.3,
             }
-          }}
+          } }
         >
           <div
-            style={{
+            style={ {
               position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
               cursor: "not-allowed"
-            }}
+            } }
             aria-hidden="true"
           />
         </Tooltip>
-      )}
+      ) }
     </div>
   ) : (
-    <RouterButton name={datasetName} route={href}>
-      {buttonContent}
+    <RouterButton name={ datasetName } route={ href }>
+      { buttonContent }
     </RouterButton>
   );
 

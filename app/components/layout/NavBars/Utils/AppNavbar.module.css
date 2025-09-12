@@ -1,6 +1,6 @@
 .navbar {
-    background-color: transparent !important; /* Override Mantine's default */
-    color: white !important; /* Ensure the text is visible */
+    background-color: transparent !important; 
+    color: white !important; 
     width: calc(100% + 32px);
     margin-left: -16px;
     margin-right: -16px;
@@ -8,5 +8,5 @@
 }
 
 .navbar:hover {
-    background-color: rgba(71, 85, 105, 0.3) !important; /* Optional: Slight hover effect */
+    background-color: rgba(71, 85, 105, 0.3) !important; 
 }

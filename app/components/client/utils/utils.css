@@ -1,19 +1,17 @@
 .button {
   display: inline-flex;
-  gap: 10px;
-  width: 100%;
-  height: 100%;
-  font-size: 1vw;
+  gap: 8px;
+  width: auto; /* let button size to its content */
+  height: auto;
+  font-size: 0.8vw; /* smaller text */
   align-items: center;
   align-content: center;
-  border-radius: 20px;
+  border-radius: 12px; /* less rounded */
   font-weight: 500;
   transition: all 0.2s;
-  --sidepadding: 2vw;
-  --toppadding: 0.5vw; 
-  padding: var(--toppadding);
-  padding-left: var(--sidepadding);
-  padding-right: var(--sidepadding);
+  --sidepadding: 1vw;  /* narrower */
+  --toppadding: 0.3vw; /* shorter */
+  padding: var(--toppadding) var(--sidepadding);
 }
 
 .button.active {

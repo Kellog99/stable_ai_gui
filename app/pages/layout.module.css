@@ -1,0 +1,41 @@
+.customNavbar {
+  background-color: transparent;
+  border: none;
+  width: 250px;
+  position: fixed;
+  left: 5%;
+  top: 102px;
+  height: calc(100vh);
+  z-index: 100;
+  transition: width 0.3s ease; /* smooth collapse */
+  
+}
+
+.customNavbar.collapsed {
+  width: 50px; 
+}
+
+
+.navbarContent {
+  background-color: rgba(62, 129, 236, 0.2);
+  height: 100%;
+  padding-top: 20px; /* Reduced since we're already below header */
+}
+
+/* Hide navbar on small screens */
+@media (max-width: 768px) {
+  .customNavbar {
+    display: none;
+  }
+}
+
+.mainContainer {
+  height: 100%;
+  padding-top: 30px;
+  padding-left: 330px;
+  transition: width 0.3s ease;
+}
+
+.mainContainer.collapsed {
+  padding-left: 130px;
+}

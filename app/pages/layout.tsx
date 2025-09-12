@@ -1,20 +1,17 @@
-"use client"; // if you need client-side behavior
-
-import {
+"use client";
+import AppNavbar from "@/components/layout/AppNavbar";
+import useStore from "@/store/dsStore";
+import
+{
   AppShell,
-  AppShellMain,
-  AppShellNavbar,
   Container,
   createTheme,
-  MantineProvider,
+  MantineProvider
 } from "@mantine/core";
 import "@mantine/core/styles.css";
-import './HomePage/HomePage.css';
-import "./layout.css";
+import classes from "./layout.module.css";
 
-import AppNavbar from "@/components/layout/AppNavbar";
-
-const myTheme = createTheme({
+const myTheme = createTheme( {
   defaultRadius: 0,
   fontSmoothing: true,
   fontFamily: "Roboto, sans-serif",
@@ -26,40 +23,26 @@ const myTheme = createTheme({
       },
     },
   },
-});
+} );
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout ( { children }: { children: React.ReactNode } )
+{
+  const collapsed = useStore( ( state ) => state.collapsed );
+
   return (
-    <MantineProvider theme={myTheme}>
-      <AppShell
-        navbar={{
-          width: 250,
-          breakpoint: "sm",
-        }}
-
-        withBorder={false}
-      >
-        <AppShellNavbar
-          style={{
-            backgroundColor: "transparent",
-            border: "none",
-            padding: "16px",
-          }}
+    <MantineProvider theme={ myTheme }>
+      <AppShell withBorder={ false }>
+        <Container
+          size="100%"
+          className={`${classes.mainContainer} ${collapsed ? classes.collapsed : ""}`}
         >
-          <div
-            style={{
-              backgroundColor: "rgba(62, 129, 236, 0.2)",
-              borderRadius: "12px",
-              height: "100%",
-              paddingTop: "80px",
-            }}
-          >
-            <AppNavbar />
+          <div className={ `${classes.customNavbar} ${collapsed ? classes.collapsed : ""}` }>
+            <div className={ classes.navbarContent }>
+              <AppNavbar />
+            </div>
           </div>
-        </AppShellNavbar>
-
-        <Container size="100%" style={{ height: "100%", paddingLeft: "80px", paddingTop:"30px"}}>{children}</Container>
-        
+          { children }
+        </Container>
       </AppShell>
     </MantineProvider>
   );

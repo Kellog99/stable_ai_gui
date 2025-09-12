@@ -1,34 +1,74 @@
 "use client";
 
-import { Box, Button, Group, Stack, Text } from "@mantine/core";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box, Button, Stack, Text, Tooltip } from "@mantine/core";
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import classes from './AppNavbar.module.css';
+import { StatementSync } from 'node:sqlite';
+import useStore from '@/store/dsStore';
 
-interface CollapsibleSectionProps {
+interface CollapsibleSectionProps
+{
   title: string;
   icon: IconDefinition;
   isVisible: boolean;
   onToggle: () => void;
   children: ReactNode;
+  collapsed?: boolean;
 }
 
-export default function CollapsibleSection({
+export default function CollapsibleSection ( {
   title,
   icon,
   isVisible,
   onToggle,
-  children
-}: CollapsibleSectionProps) {
+  children,
+  collapsed = false,
+}: CollapsibleSectionProps )
+{
+  const setCollapsed = useStore((state) => state.setCollapsed);
+  if ( collapsed ) {
+    return (
+      <Tooltip label={ title } position="right" withArrow>
+        <Button
+          fullWidth
+          className={ classes.navbar }
+          styles={ {
+            root: {
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '48px',
+              minHeight: '48px',
+              padding: '0',
+            },
+            inner: {
+              justifyContent: 'center',
+            },
+          } }
+          onClick={() => { setCollapsed(false)  }}
+          mb="xs"
+        >
+          <FontAwesomeIcon
+            icon={ icon }
+            size="sm"
+            style={ { opacity: 0.6 } }
+          />
+        </Button>
+      </Tooltip>
+    )
+  }
+
+
   return (
     <Box>
       <Button
         fullWidth
-        className={classes.navbar}
-        onClick={onToggle}
-        styles={{
+        className={ classes.navbar }
+        onClick={ onToggle }
+        styles={ {
           root: {
             display: 'flex',
             justifyContent: 'flex-start', // left-align content
@@ -39,36 +79,36 @@ export default function CollapsibleSection({
           inner: {
             justifyContent: 'flex-start', // also ensures inner content aligns left
           },
-        }}
+        } }
         rightSection={
           isVisible ? (
-            <IconChevronDown size={18} stroke={1.5} />
+            <IconChevronDown size={ 18 } stroke={ 1.5 } />
           ) : (
-            <IconChevronRight size={18} stroke={1.5} />
+            <IconChevronRight size={ 18 } stroke={ 1.5 } />
           )
         }
         leftSection={
           <FontAwesomeIcon
-            icon={icon}
+            icon={ icon }
             size="sm"
-            style={{ opacity: 0.6 }}
+            style={ { opacity: 0.6 } }
           />
         }
         mb="xs"
       >
-        <Text size="sm" fw={600} c="dimmed">
-          {title}
+        <Text size="sm" fw={ 600 } c="dimmed">
+          { title }
         </Text>
       </Button>
 
 
-      {isVisible && (
+      { isVisible && (
         <Stack mt="sm">
           <Box>
-            {children}
+            { children }
           </Box>
         </Stack>
-      )}
+      ) }
     </Box>
   );
 }

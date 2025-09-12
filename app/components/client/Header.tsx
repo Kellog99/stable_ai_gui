@@ -2,7 +2,7 @@
 
 import useStore from '@/store/dsStore';
 import useNNTrustStore from '@/store/nnTrustStore';
-import { Brain, Database, FileText, Home, Icon } from 'lucide-react';
+import { Brain, Database, FileText, Home } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
@@ -89,6 +89,11 @@ export default function Header ()
   return (
     <div className={ styles.container }>
       <div className={ styles.buttons }>
+        <img
+          src="/logo_leonardo.png"
+          alt="logo"
+          className={styles.logo}
+        />
         { btns.map( ( btnprops ) =>
           <Link
             key={ btnprops.href }
@@ -97,7 +102,7 @@ export default function Header ()
           >
             <button className={ getStyle( btnprops.id ) }>
               <btnprops.Icon />
-            <p>{btnprops.name.charAt(0).toUpperCase() + btnprops.name.slice(1)}</p>
+              <p>{ btnprops.name.charAt( 0 ).toUpperCase() + btnprops.name.slice( 1 ) }</p>
             </button>
           </Link> ) }
       </div>
