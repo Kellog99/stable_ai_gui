@@ -1,0 +1,25 @@
+.customNavbar {
+  background-color: transparent;
+  border: none;
+  padding: 16px;
+  width: 250px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  z-index: 100;
+}
+
+.navbarContent {
+  background-color: rgba(62, 129, 236, 0.2);
+  border-radius: 12px;
+  height: 100%;
+  padding-top: 80px;
+}
+
+/* Hide navbar on small screens */
+@media (max-width: 768px) {
+  .customNavbar {
+    display: none;
+  }
+}

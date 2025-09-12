@@ -1,29 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-// Color scheme for different risk levels
-const COLORS = ['#4caf50', '#03a9f4', '#ff9800', '#ef5350'];
-
-const getRiskColor = (value) => {
-    if (value <= 25) return COLORS[0];
-    if (value <= 50) return COLORS[1];
-    if (value <= 75) return COLORS[2];
-    return COLORS[3];
-};
-
-const getRiskLevel = (value) => {
-    if (value <= 25) return 'Low';
-    if (value <= 50) return 'Medium';
-    if (value <= 75) return 'High';
-    return 'Critical';
-};
-
-
+// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { RingProgress, Text } from "@mantine/core";
+import { Heatmap } from '@mantine/charts';
+import './Report.css'
 import mockData from './examples';
 import { ReportProps } from '@/interfaces/reportInterfaces';
 
+// Color scheme for different risk levels
+const COLORS = ['#4caf50', '#03a9f4', '#ff9800', '#ef5350'];
+function getRiskColor(value: number) {
+    // Clamp the value between 0 and 100
+    value = Math.max(0, Math.min(100, value));
+
+    // Normalize to 0-1 range
+    const t = value / 100;
+
+    // Light green RGB values
+    const lightGreen = { r: 144, g: 238, b: 144 };
+
+    // Dark red RGB values
+    const darkRed = { r: 139, g: 0, b: 0 };
+
+    // Interpolate between the colors
+    const r = Math.round(lightGreen.r + (darkRed.r - lightGreen.r) * t);
+    const g = Math.round(lightGreen.g + (darkRed.g - lightGreen.g) * t);
+    const b = Math.round(lightGreen.b + (darkRed.b - lightGreen.b) * t);
+
+    // Return as RGB string
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+
 const SecurityReport = () => {
     const [data, setData] = useState<ReportProps>();
-    const [selectedModel, setSelectedModel] = useState('');
     const [selectedBenchmark, setSelectedBenchmark] = useState('');
     const [selectedClassBenchmark, setSelectedClassBenchmark] = useState('');
     const [loading, setLoading] = useState<boolean>(true);
@@ -35,11 +44,7 @@ const SecurityReport = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Replace with your actual JSON file path
-                // const response = await fetch('/data/imagenet1k-2012-20250203/data.json');
-                // const jsonData = await response.json();
                 setData(mockData);
-                setSelectedModel('resnet50');
                 setSelectedBenchmark('accuracy');
                 setSelectedClassBenchmark('accuracy');
                 setLoading(false);
@@ -74,90 +79,49 @@ const SecurityReport = () => {
     });
 
     // Prepare benchmark comparison data
-    const benchmarkData = Object.entries(attacks).map(([attackName, attackData]) => ({
-        name: attackName.toUpperCase(),
-        original: data[selectedBenchmark] || 0,
-        attacked: attackData[selectedBenchmark] || 0
-    }));
+    // const benchmarkData = Object.entries(attacks).map(([attackName, attackData]) => ({
+    //     name: attackName.toUpperCase(),
+    //     original: data[selectedBenchmark] || 0,
+    //     attacked: attackData[selectedBenchmark] || 0
+    // }));
 
-    // Prepare class-level data
-    const classData = data.classNames?.slice(0, 10).map((className, index) => ({
-        name: className,
-        value: Math.random() * 100 // Replace with actual class-level metrics
-    })) || [];
-
-    const GaugeChart = ({ value, title, size = 120 }) => {
-        const circumference = 2 * Math.PI * 45;
-        const strokeDasharray = `${(value / 100) * circumference} ${circumference}`;
-
-        return (
-            <div className="gauge-container">
-                <div className="gauge-title">{title}</div>
-                <svg width={size} height={size} className="gauge">
-                    <circle
-                        cx={size / 2}
-                        cy={size / 2}
-                        r="45"
-                        fill="none"
-                        stroke="#e0e0e0"
-                        strokeWidth="10"
-                    />
-                    <circle
-                        cx={size / 2}
-                        cy={size / 2}
-                        r="45"
-                        fill="none"
-                        stroke={getRiskColor(value)}
-                        strokeWidth="10"
-                        strokeDasharray={strokeDasharray}
-                        strokeDashoffset="0"
-                        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-                    />
-                    <text x={size / 2} y={size / 2} textAnchor="middle" dy="0.3em" className="gauge-text">
-                        {value.toFixed(1)}%
-                    </text>
-                </svg>
-            </div>
-        );
-    };
+    // // Prepare class-level data
+    // const classData = data.classNames?.slice(0, 10).map((className, index) => ({
+    //     name: className,
+    //     value: Math.random() * 100 // Replace with actual class-level metrics
+    // })) || [];
 
     return (
-        <div className="report">
-            <div className="header">
-                <img src="/assets/logo_letters.png" alt="Logo" className="logo" />
-                <h1>Security Report</h1>
-            </div>
+        <div className="header">
+            <h1>Security Report</h1>
 
             {/* Model Information Section */}
             <div className="section">
                 <h2>Model Information</h2>
-                <p>Main information of the tested model <strong>{data.info?.name || selectedModel}</strong>.</p>
+                <p>Main information of the tested model <strong>{data.info?.name}</strong>.</p>
 
-                <div className="model-info">
-                    <div className="model-details">
-                        <div className="info-grid">
+                <div className="info-grid">
+                    {Object.entries(data.info).map(([key, value]) => (
+                        key !== 'confusion_matrix' ?
                             <div className="info-item">
-                                <span className="label">Model:</span>
-                                <span className="value">{data.info?.name || selectedModel}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="label">Parameters:</span>
-                                <span className="value">{data.info?.parameters || 'N/A'}</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="label">Accuracy:</span>
-                                <span className="value">{(data.accuracy * 100).toFixed(1)}%</span>
-                            </div>
-                            <div className="info-item">
-                                <span className="label">Description:</span>
-                                <span className="value">{data.info?.description || 'No description available'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="model-icon">
-                        <img src="/assets/icon.png" alt="Model Icon" />
-                    </div>
+                                <span className="label">{key}:</span>
+                                <span className="value">{value}</span>
+                            </div> : null)
+                    )}
                 </div>
+
+                <h2>Model global performance</h2>
+                <p>Information about the global metrics.</p>
+                <div className="info-grid">
+                    {Object.entries(data.metrics).map(([key, value]) => (
+                        key !== 'confusion_matrix' ?
+                            <div className="info-item">
+                                <span className="label">{key}:</span>
+                                <span className="value">{value}</span>
+                            </div> : null)
+                    )}
+                </div>
+
             </div>
 
             {/* Model Performance Section */}
@@ -172,52 +136,16 @@ const SecurityReport = () => {
                     <select
                         value={selectedBenchmark}
                         onChange={(e) => setSelectedBenchmark(e.target.value)}
-                        className="benchmark-select"
-                    >
-                        <option value="accuracy">Accuracy</option>
-                        <option value="precision">Precision</option>
-                        <option value="f1_score">F1 Score</option>
+                        className="benchmark-select">
+                        {Object.keys(data.metrics).map((key) =>
+                            key !== 'confusion_matrix' ?
+                                <option value="accuracy">{key}</option>
+                                : null
+                        )}
                     </select>
                 </div>
 
-                <div className="benchmark-chart">
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={benchmarkData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="original" fill="#4caf50" name="Original" />
-                            <Bar dataKey="attacked" fill="#ef5350" name="After Attack" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
 
-                <p>Here below it is shown the performance and the metrics associated to each class of the model.</p>
-
-                <div className="benchmark-controls">
-                    <select
-                        value={selectedClassBenchmark}
-                        onChange={(e) => setSelectedClassBenchmark(e.target.value)}
-                        className="benchmark-select"
-                    >
-                        <option value="accuracy">Class Accuracy</option>
-                        <option value="precision">Class Precision</option>
-                        <option value="f1_score">Class F1 Score</option>
-                    </select>
-                </div>
-
-                <div className="class-chart">
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={classData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="value" fill="#03a9f4" />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
             </div>
 
             {/* Vulnerability Section */}
@@ -230,38 +158,54 @@ const SecurityReport = () => {
                 </p>
 
                 <div className="vulnerability-grid">
-                    {vulnerabilityData.map((vuln, index) => (
-                        <div key={index} className="vulnerability-card">
-                            <div className="vuln-header">
-                                <h3>{vuln.name}</h3>
-                                <span className={`risk-badge risk-${getRiskLevel(vuln.risk).toLowerCase()}`}>
-                                    {getRiskLevel(vuln.risk)}
-                                </span>
-                            </div>
-
-                            <div className="vuln-metrics">
-                                <div className="metric">
-                                    <span className="metric-label">Risk Level:</span>
-                                    <span className="metric-value">{vuln.risk}%</span>
-                                </div>
-                                <div className="metric">
-                                    <span className="metric-label">Post-Attack Accuracy:</span>
-                                    <span className="metric-value">{(vuln.accuracy * 100).toFixed(1)}%</span>
-                                </div>
-                                <div className="metric">
-                                    <span className="metric-label">Misclassification:</span>
-                                    <span className="metric-value">{vuln.misclassification}%</span>
-                                </div>
-                            </div>
-
-                            <div className="vuln-gauge">
-                                <GaugeChart value={vuln.risk} title="Risk Score" />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+                    <table className="w-full">
+                        <thead className="bg-gray-100 border-b border-gray-200">
+                            <tr>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                    Vulnerabilities tested
+                                </th>
+                                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                    Risk
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                            {Object.entries(data.attacks).map(([key, value], index) => (
+                                <tr
+                                    key={key}
+                                    className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}
+                                >
+                                    <td className="px-6 py-4">
+                                        <button
+                                            // onClick={() => handleKeyClick(key)}
+                                            className="text-blue-600 hover:text-blue-800 font-medium hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded transition-colors"
+                                        >
+                                            {key}
+                                        </button>
+                                    </td>
+                                    <td className="px-6 py-4 text-center">
+                                        <div className="flex justify-center">
+                                            <RingProgress
+                                                size={125}
+                                                roundCaps
+                                                label={
+                                                    <Text size="xs" ta="center">
+                                                        {value.risk}%
+                                                    </Text>
+                                                }
+                                                sections={[{
+                                                    value: value.risk,
+                                                    color: getRiskColor(value.risk)
+                                                }]} />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div >
+            </div >
+        </div >
     );
 };
 

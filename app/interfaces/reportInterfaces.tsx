@@ -1,31 +1,35 @@
 // Report information
 interface infoProps {
     name: string;
-    description: string;
     parameters: number;
-    classNames: string[]
+    classes: number;
+    dimensionality: number[];
+
 }
 
 interface metricsProps {
-    accuracy: number;
-    precision: number;
-    f1_score: number;
-    confusion_matrix: number[][]
+    accuracy?: number;
+    precision?: number;
+    f1score?: number;
+    confusion_matrix?: number[][];
+    robustness?: number;
+    wobbliness?:number;
 }
 
 interface attacksProps {
-    accuracy: number,
-    precision: number,
-    f1_score: number,
-    misclassification: number,
-    power: number,
-    num_queries: number,
-    robustness: number[],
-    confusion_matrix: number[][]
+    risk:number,
+    accuracy?: number,
+    precision?: number,
+    f1score?: number,
+    misclassification?: number,
+    power?: number,
+    num_queries?: number,
+    robustness?: number[],
+    confusion_matrix?: number[][]
 }
 
 export interface ReportProps {
     info: infoProps;
     metrics: metricsProps;
-    attacks: { [key:string] : attacksProps }
+    attacks: { [key: string]: attacksProps }
 }
