@@ -114,9 +114,11 @@ export const sections: NavigationSection[] = [
   },
 ];
 
+{/*
 export const helpNavigation: NavigationItem = {
   key: 'help',
   label: 'Help',
   href: '/pages/dataquality/help',
   icon: faCircleQuestion,
 };
+*/}

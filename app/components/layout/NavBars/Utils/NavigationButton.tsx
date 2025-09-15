@@ -30,6 +30,17 @@ const buttonStyles = {
   gap: '8px', // spacing between icon and text
 };
 
+const buttonStylesCollapsed = {
+  width: 'calc(100% + 20px)',
+  marginLeft: '-10px',
+  marginRight: '-10px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '0px',
+  transition: 'all 0.3s ease',
+};
+
 const activeStyles = {
   backgroundColor: '#dddbdb',
   color: 'white',
@@ -66,9 +77,10 @@ export default function NavigationButton ( {
     }
   }, [ searchParams ] )
 
-  const getButtonStyles = () =>
+  const getButtonStyles = ( ) =>
   {
-    let styles = { ...buttonStyles };
+    // Start with base styles (collapsed or expanded)
+    let styles = collapsed ? { ...buttonStylesCollapsed } : { ...buttonStyles };
 
     if ( isActive && !disabled ) {
       styles = { ...styles, ...activeStyles };
@@ -77,7 +89,7 @@ export default function NavigationButton ( {
     }
 
     return styles;
-  };
+  };;
 
   const buttonContent = (
     <Button
@@ -109,21 +121,21 @@ export default function NavigationButton ( {
     return (
       <Tooltip label={ label } position="right" withArrow disabled={ disabled }>
         <RouterButton name={ datasetName } route={ href }>
-        <Button
-          fullWidth
-          variant={ isActive && !disabled ? "filled" : variant }
-          disabled={ disabled }
-          style={ {
-            ...getButtonStyles(),
-            // Add these to maintain consistent positioning
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start'
-          } }
-        >
-          { icon ? <FontAwesomeIcon icon={ icon } color="#475569" /> : undefined }
-        </Button>
+          <Button
+            fullWidth
+            variant={ isActive && !disabled ? "filled" : variant }
+            disabled={ disabled }
+            style={ {
+              ...getButtonStyles(),
+              // Add these to maintain consistent positioning
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start'
+            } }
+          >
+            { icon ? <FontAwesomeIcon icon={ icon } color="#475569" /> : undefined }
+          </Button>
         </RouterButton>
       </Tooltip>
     );

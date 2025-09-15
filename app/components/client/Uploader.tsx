@@ -146,6 +146,7 @@ const ZipUploadComponent = () =>
 
       if ( response.ok ) {
         const data = await response.json();
+        console.log("DATA FROM UPLOAD", data)
         setMessage( `Upload successful: ${data.message}` );
         setUploadStatus( 'success' );
       } else {

@@ -11,7 +11,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import CollapsibleSection from "../Utils/CollapsibleSection";
 import NavigationButton from "../Utils/NavigationButton";
 import { useNavigationState } from "../Utils/useNavigationState";
-import { helpNavigation, mainNavigation, sections } from "./navigationConfig";
+import { mainNavigation, sections } from "./navigationConfig";
 
 
 function AppNavbarDataQuality ()
@@ -160,7 +160,7 @@ function AppNavbarDataQuality ()
             </CollapsibleSection>
           ) ) }
 
-
+        {/*}
           <Box>
             <NavigationButton
               href={ helpNavigation.href }
@@ -170,6 +170,7 @@ function AppNavbarDataQuality ()
               collapsed={ collapsed }
             />
           </Box>
+          */}
         </Stack>
       </Box>
     </Box>

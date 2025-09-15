@@ -1,13 +1,12 @@
 "use client";
 
+import useStore from '@/store/dsStore';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Stack, Text, Tooltip } from "@mantine/core";
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import classes from './AppNavbar.module.css';
-import { StatementSync } from 'node:sqlite';
-import useStore from '@/store/dsStore';
 
 interface CollapsibleSectionProps
 {
@@ -28,7 +27,7 @@ export default function CollapsibleSection ( {
   collapsed = false,
 }: CollapsibleSectionProps )
 {
-  const setCollapsed = useStore((state) => state.setCollapsed);
+  const setCollapsed = useStore( ( state ) => state.setCollapsed );
   if ( collapsed ) {
     return (
       <Tooltip label={ title } position="right" withArrow>
@@ -38,17 +37,21 @@ export default function CollapsibleSection ( {
           styles={ {
             root: {
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: collapsed ? 'center' : 'flex-start',
               alignItems: 'center',
               height: '48px',
               minHeight: '48px',
               padding: '0',
+              width: collapsed ? 'calc(100% + 20px)' : 'calc(100% + 32px)',
+              marginLeft: collapsed ? '-10px' : '-16px',
+              marginRight: collapsed ? '-10px' : '-16px',
+              transition: 'all 0.3s ease',
             },
             inner: {
-              justifyContent: 'center',
+              justifyContent: collapsed ? 'center' : 'flex-start',
             },
           } }
-          onClick={() => { setCollapsed(false)  }}
+          onClick={ () => { setCollapsed( false ) } }
           mb="xs"
         >
           <FontAwesomeIcon
@@ -71,13 +74,13 @@ export default function CollapsibleSection ( {
         styles={ {
           root: {
             display: 'flex',
-            justifyContent: 'flex-start', // left-align content
+            justifyContent: 'flex-start',
             alignItems: 'center',
-            gap: '8px', // spacing between icon and text
+            gap: '8px', 
             textAlign: 'left',
           },
           inner: {
-            justifyContent: 'flex-start', // also ensures inner content aligns left
+            justifyContent: 'flex-start',
           },
         } }
         rightSection={

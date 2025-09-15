@@ -7,6 +7,13 @@
     justify-content: flex-start;
 }
 
+.navbar.collapsed {
+  width: calc(100% + 20px);
+  margin-left: -10px;
+  margin-right: -10px;
+  justify-content: center;
+}
+
 .navbar:hover {
     background-color: rgba(71, 85, 105, 0.3) !important; 
 }

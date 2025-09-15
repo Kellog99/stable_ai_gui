@@ -27,6 +27,7 @@ export default function Header ()
   const isNNTrust = pathName.includes( '/nntrust' );
   const datasetName = useStore( ( state ) => state.datasetUsed )?.name;
   const modelName = useNNTrustStore( ( state ) => state.modelName );
+  console.log("datasetName", datasetName)
 
 
   const btns = [

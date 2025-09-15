@@ -11,7 +11,7 @@ import
 import "@mantine/core/styles.css";
 import classes from "./layout.module.css";
 
-const myTheme = createTheme( {
+const myTheme = createTheme({
   defaultRadius: 0,
   fontSmoothing: true,
   fontFamily: "Roboto, sans-serif",
@@ -22,8 +22,18 @@ const myTheme = createTheme( {
         size: "xs",
       },
     },
+    Text: {
+      defaultProps: {
+        c: "white", // Mantine uses "c" for color
+      },
+    },
+    Title:{
+      defaultProps: {
+        c: "white",
+      }
+    }
   },
-} );
+});
 
 export default function RootLayout ( { children }: { children: React.ReactNode } )
 {

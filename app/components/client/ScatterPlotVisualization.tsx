@@ -597,7 +597,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
           </Alert>
         </Flex>) : (
           <>
-            <div style={{ width: '1830px', height: '600px', position: 'relative' }}>
+            <div style={{ width: '1730px', height: '600px', position: 'relative' }}>
               <Suspense>
                 <LassoDrawer>
                   <div id="deckgl-container"

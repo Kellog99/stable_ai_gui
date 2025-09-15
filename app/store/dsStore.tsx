@@ -72,7 +72,7 @@ const useStore = create<AppState>()(
   persist(
     ( set ) => ( {
       datasets: null,
-      datasetUsed: datasetMock,
+      datasetUsed: null,
       queryDataset: "",
       selectedIndexes: [],
       selectedPoints: [],

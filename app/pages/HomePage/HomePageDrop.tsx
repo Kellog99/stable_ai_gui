@@ -35,6 +35,7 @@ const HomePageDrop: React.FC<HomePageProps> = ( {
         }
     ]
     return (
+        
         <div className="file-grid">
             { homePageDropZones.map( ( dropElement: FileDropZoneProps) => (
                 <FileDropZone key={ dropElement.id } { ...dropElement } />
