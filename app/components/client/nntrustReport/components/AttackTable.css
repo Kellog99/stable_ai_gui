@@ -1,0 +1,18 @@
+.vulnerability-grid {
+    width: 100%;
+    margin-top: 20px;
+    text-align: left;
+    align-content: center;
+    align-items: center;
+}
+
+.btn-table {
+    background-color: transparent;
+    border: transparent;
+    color: gray;
+}
+
+.btn-table:hover {
+    color: white;
+    text-decoration: underline;
+}
