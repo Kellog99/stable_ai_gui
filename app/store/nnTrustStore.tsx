@@ -31,8 +31,6 @@ const useNNTrustStore = create<AppState>()(
       setDatasets: (datasets) => set({datasets}),
       setModels: (models) => set({models}),
       setAllJobs: (allJobs) => set({allJobs}),
-      
-      
     } ),
 
     {

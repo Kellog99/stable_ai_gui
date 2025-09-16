@@ -7,7 +7,8 @@ import HomePageDrop from "./pages/HomePage/HomePageDrop";
 import HomePageTask from "./pages/HomePage/HomePageTask";
 import Benchmark from './pages/nntrust/RedTeam/page';
 import { useState } from 'react';
-
+import ReportPage from './pages/nntrust/ReportPage/page';
+import SecurityReport from './pages/nntrust/ReportPage/ReportTITANN/page';
 
 
 const HomePage: React.FC<HomePageProps> = ({
@@ -15,9 +16,6 @@ const HomePage: React.FC<HomePageProps> = ({
   model,
   onFileSelect,
   onTaskSelect }) => {
-  // Button state logic
-  const canUseAnalysis = dataset !== null;
-  const canUseOtherTasks = dataset !== null && model !== null;
 
   return (
     // <div className="home-container">
@@ -40,8 +38,9 @@ const HomePage: React.FC<HomePageProps> = ({
     //     <HomePageTask />
     //   </div>
     // </div>
-    <Benchmark/>
-
+    // <Benchmark/>
+    // <ReportPage/>
+    <SecurityReport/>
   );
 }
 
