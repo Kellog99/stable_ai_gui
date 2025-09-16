@@ -1,6 +1,6 @@
 import React from 'react'
 
-import './HomePage.css';
+import styles from '@/styles/HomePage.module.css';
 import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
 import { Task } from '@/interfaces/NNInterfaces';
 import TaskButton from '@/components/client/TaskButton';
@@ -36,7 +36,7 @@ const HomePageTask = () => {
   // Since this is component almost indepenent from the page
   // in order to have a better readebility it has been created another file
   return (
-    <div className="task-grid">
+    <div className={styles.taskgrid}>
       {tasks.map((task) => <TaskButton key={task.title} {...task} />)}
     </div>
   )

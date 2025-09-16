@@ -17,6 +17,7 @@
   padding-top: 80px;
 }
 
+
 /* Hide navbar on small screens */
 @media (max-width: 768px) {
   .customNavbar {

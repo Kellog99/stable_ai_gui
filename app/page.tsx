@@ -1,12 +1,10 @@
 "use client";
-import './pages/HomePage/HomePage.css';
+import styles from '@/styles/Header.module.css';
+import './page.css';
 import { HomePageProps } from "./interfaces/NNInterfaces";
-import HomePageDrop from "./pages/HomePage/HomePageDrop";
-import HomePageTask from "./pages/HomePage/HomePageTask";
-import Benchmark from './pages/nntrust/RedTeam/page';
-import { useState } from 'react';
-import ReportPage from './pages/nntrust/ReportPage/page';
-import SecurityReport from './pages/nntrust/ReportPage/ReportTITANN/page';
+import HomePageDrop from "./components/client/homepage/HomePageDrop";
+import HomePageTask from "./components/client/homepage/HomePageTask";
+
 
 
 const HomePage: React.FC<HomePageProps> = ({
@@ -16,29 +14,26 @@ const HomePage: React.FC<HomePageProps> = ({
   onTaskSelect }) => {
 
   return (
-    // <div className="home-container">
-    //   <HomePageDrop
-    //     dataset={dataset}
-    //     model={model}
-    //     onFileSelect={onFileSelect}
-    //     onTaskSelect={onTaskSelect} />
+    <div className={styles.homecontainer}>
+      <HomePageDrop
+        dataset={dataset}
+        model={model}
+        onFileSelect={onFileSelect}
+        onTaskSelect={onTaskSelect} />
 
-    //   <div className='task'>
-    //     <div className="section-header">
-    //       <h2 className="section-title">
-    //         Analysis Tasks
-    //       </h2>
-    //       <p className="section-subtitle">
-    //         Select an analysis task to begin
-    //       </p>
-    //     </div>
+      <div className={styles.task}>
+        <div className="sectionheader">
+          <h2 className="sectiontitle">
+            Analysis Tasks
+          </h2>
+          <p className="sectionsubtitle">
+            Select an analysis task to begin
+          </p>
+        </div>
 
-    //     <HomePageTask />
-    //   </div>
-    // </div>
-    // <Benchmark/>
-    // <ReportPage/>
-    <SecurityReport/>
+        <HomePageTask />
+      </div>
+    </div>
   );
 }
 
