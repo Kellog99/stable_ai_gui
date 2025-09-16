@@ -53,7 +53,7 @@ export default function DatasetBT ( { query, datasets }: DatasetBTProps )
 
                 <Group justify="space-between" mt="md" mb="xs">
                   <Text fw={ 700 } size="lg">{ dataset.name }</Text>
-                  <Badge color="#ec777e">{ dataset.task }</Badge>
+                  <Badge color="#334155">{ dataset.task }</Badge>
                 </Group>
                 <Text size="sm" c="dimmed">
                   { dataset.n_samples } samples

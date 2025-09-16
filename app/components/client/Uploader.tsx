@@ -30,6 +30,7 @@ import
   IconX
 } from '@tabler/icons-react';
 import { useState } from 'react';
+import styles from '../../styles/Upload.module.css';
 
 const ZipUploadComponent = () =>
 {
@@ -182,8 +183,7 @@ const ZipUploadComponent = () =>
   };
 
   return (
-    <Container size="sm" py="xl">
-      <Paper shadow="md" p="xl" radius="md" withBorder>
+      
         <Stack gap="lg">
           <Center>
             <ThemeIcon size={ 60 } radius="xl" variant="light" color="red">
@@ -324,8 +324,8 @@ const ZipUploadComponent = () =>
             </Button>
           </Group>
         </Stack>
-      </Paper>
-    </Container>
+      
+   
   );
 };
 

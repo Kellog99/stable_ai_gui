@@ -1,0 +1,227 @@
+/* UploadComponent.module.css */
+
+.uploadContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.uploadCard {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+  width: 100%;
+}
+
+.iconContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.uploadIcon {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.uploadTitle {
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.uploadSubtitle {
+  color: #718096;
+  line-height: 1.6;
+}
+
+.fileInput {
+  border: 2px dashed #cbd5e0;
+  background: #f7fafc;
+  transition: all 0.3s ease;
+}
+
+.fileInput:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.fileInput input {
+  cursor: pointer;
+}
+
+.selectInput {
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.selectInput:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.switchControl {
+  background: #cbd5e0;
+  border: none;
+}
+
+.switchControl[data-checked] {
+  background: #667eea;
+}
+
+.switchThumb {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.divider {
+  color: #a0aec0;
+  border-color: #e2e8f0;
+}
+
+.divider::before,
+.divider::after {
+  border-color: #e2e8f0;
+}
+
+.fileAlert {
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.fileAlertIcon {
+  color: #667eea;
+}
+
+.fileAlertTitle {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.fileName {
+  color: #2d3748;
+  font-weight: 500;
+}
+
+.fileSize {
+  color: #718096;
+  font-size: 0.85rem;
+}
+
+.progressContainer {
+  margin-bottom: 1.5rem;
+}
+
+.progressBar {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+.progressText {
+  color: #718096;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.statusAlert {
+  border-radius: 8px;
+}
+
+.statusAlert.success {
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.2);
+  color: #2f855a;
+}
+
+.statusAlert.error {
+  background: rgba(245, 101, 101, 0.1);
+  border: 1px solid rgba(245, 101, 101, 0.2);
+  color: #c53030;
+}
+
+.statusAlert.info {
+  background: rgba(66, 153, 225, 0.1);
+  border: 1px solid rgba(66, 153, 225, 0.2);
+  color: #3182ce;
+}
+
+.uploadButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  height: 48px;
+}
+
+.uploadButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.uploadButton:disabled {
+  opacity: 0.6;
+  transform: none;
+}
+
+.formDescription {
+  color: #a0aec0;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.jsonFileInput {
+  border: 1px solid #e2e8f0;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.jsonFileInput:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.02);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .uploadContainer {
+    padding: 1rem;
+  }
+  
+  .uploadCard {
+    margin: 0;
+  }
+  
+  .uploadTitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.uploadCard {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Override Mantine default styles */
+.fileInput [data-mantine-color-scheme] {
+  --input-bd: 2px dashed #cbd5e0;
+}
+
+.selectInput [data-mantine-color-scheme] {
+  --input-bd: #e2e8f0;
+}

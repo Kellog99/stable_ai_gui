@@ -1,3 +1,5 @@
+"use client"
+
 import { CheckCircle, Database, File, FileX, Upload } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import styles from '../../styles/FileDropZone.module.css';
@@ -5,10 +7,12 @@ import styles from '../../styles/FileDropZone.module.css';
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
 import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 import useStore from '@/store/dsStore';
+import { Loader, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import SelectionButton from './utils/SelectionButtons';
-import { Flex, Loader, Text} from '@mantine/core';
 import DatasetBT from '../server/DatasetBT';
+import ZipUploader from "./Uploader";
+import SelectionButton from './utils/SelectionButtons';
+import ModelUploader from './ModelUploader';
 
 const FileDropZone: React.FC<FileDropZoneProps> = ( {
   title,
@@ -20,9 +24,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
   loadedFileName,
 } ) =>
 {
-  // This component must handle the following type of upload
-  // 1. Drag & Drop
-  // 2. Select from folder
+
 
   const datasets = useStore( ( state ) => ( state.datasets ) );
   const setDatasets = useStore( ( state ) => state.setDatasets )
@@ -107,7 +109,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
       }
     }
   };
-  const [ selection, setSelection ] = useState<"selection" | "drag&drop">( "selection" )
+  const [ selection, setSelection ] = useState<"selection" | "repository">( "selection" )
 
   const btns = [
     {
@@ -118,11 +120,11 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
       onClickHandle: () => setSelection( "selection" ),
     },
     {
-      id: 'drag&drop',
+      id: 'repository',
       name: "Dataset Repository",
       Icon: Database,
       currentPage: selection,
-      onClickHandle: () => setSelection( "drag&drop" ),
+      onClickHandle: () => setSelection( "repository" ),
     }
   ]
 
@@ -133,68 +135,74 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
       case 'selection':
         // this is the case where the selected element is the drag and drop element
         return (
-          <div
-            className={ getDropZoneClasses() }
-            onClick={ handleClickInput }
-            onDragOver={ handleDragOver }
-            onDragLeave={ handleDragLeave }
-            onDrop={ handleDrop }
-          >
-            <input
-              type="file"
-              id={ `file-${title.toLowerCase()}` }
-              accept={ acceptedTypes.join( ',' ) }
-              className={ styles.inputFile }
-            />
-
-            <div className={ styles.dropzone_content }>
-              { isLoaded ? (
-                <CheckCircle className={ styles.dropzone_icon } />
-              ) : isError ? (
-                <FileX className={ styles.dropzone_icon } />
-              ) : (
-                <Upload className={ styles.dropzone_icon } />
-              ) }
-
-              <div>
-                <div className={ styles.dropzone_title }>
-                  <Icon />
-                  <h3 >{ title }</h3>
-                </div>
-
-                <p className={ styles.dropzone_description }>{ description }</p>
-                { isLoaded && loadedFileName && (
-                  <p className={ styles.dropzone_filename }>
-                    ✓ { loadedFileName }
-                  </p>
-                ) }
-                { !isLoaded && !isError && (
-                  <p className={ styles.dropzone_accepted }>
-                    Accepted: { acceptedTypes.join( ', ' ) }
-                  </p>
-                ) }
-              </div>
-            </div>
-          </div>
-        );
-      case 'drag&drop':
-        return (
-          <div>
-            { isLoading ? (
-              <Flex
-                mih={ 150 }
-                justify="center"
-                align="center"
-                direction="column"
-                wrap="wrap"
-                style={ { width: '100%' } }
+          <>
+          
+            <div
+              className={ getDropZoneClasses() }
+            >
+              {/*
+              <div
+                onClick={ handleClickInput }
+                onDragOver={ handleDragOver }
+                onDragLeave={ handleDragLeave }
+                onDrop={ handleDrop }
               >
+                <input
+                  type="file"
+                  id={ `file-${title.toLowerCase()}` }
+                  accept={ acceptedTypes.join( ',' ) }
+                  className={ styles.inputFile }
+                />
+
+                <div className={ styles.dropzone_content }>
+                  { isLoaded ? (
+                    <CheckCircle className={ styles.dropzone_icon } />
+                  ) : isError ? (
+                    <FileX className={ styles.dropzone_icon } />
+                  ) : (
+                    <Upload className={ styles.dropzone_icon } />
+                  ) }
+
+                  <div>
+                    <div className={ styles.dropzone_title }>
+                      <Icon />
+                      <h3 >{ title }</h3>
+                    </div>
+
+                    <p className={ styles.dropzone_description }>{ description }</p>
+                    { isLoaded && loadedFileName && (
+                      <p className={ styles.dropzone_filename }>
+                        ✓ { loadedFileName }
+                      </p>
+                    ) }
+                    { !isLoaded && !isError && (
+                      <p className={ styles.dropzone_accepted }>
+                        Accepted: { acceptedTypes.join( ', ' ) }
+                      </p>
+                    ) }
+                  </div>
+                </div>
+              </div>
+              */}
+
+              { title === "Dataset" ? <ZipUploader />  : <ModelUploader /> }
+            </div>
+
+          </>
+
+        );
+      case 'repository':
+        return (
+          <div className={ styles.repositoryContainer }>
+            { isLoading ? (
+              <div className={ styles.flexLoading }>
                 <Text>Loading...</Text>
                 <Loader />
-              </Flex> ) :
-              (
-                <DatasetBT query={ query } datasets={ datasets } />
-              ) } </div>
+              </div>
+            ) : (
+              <DatasetBT query={ query } datasets={ datasets } />
+            ) }
+          </div>
         );
       default:
         return null;

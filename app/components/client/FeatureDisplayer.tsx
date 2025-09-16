@@ -57,7 +57,7 @@ export function FeatureCard(props: FeatureCardProps) {
           <>
             <Group justify="space-between" mt="md" mb="xs">
               {labelString != null ? <Text fw={700} size="lg">{labelString}</Text> : null}
-              {label != null ? (labelColor ? (<Badge color={`rgb(${labelColor.join(",")})`}> Class ID: {label} </Badge>) : (<Badge color="#ec777e"> Class ID: {label} </Badge>)
+              {label != null ? (labelColor ? (<Badge color={`rgb(${labelColor.join(",")})`}> Class ID: {label} </Badge>) : (<Badge color="#334155"> Class ID: {label} </Badge>)
               ) : null}
             </Group>
             {index || index ==0 ? 

@@ -40,7 +40,7 @@ export default function RootLayout ( { children }: { children: React.ReactNode }
   const collapsed = useStore( ( state ) => state.collapsed );
 
   return (
-    <MantineProvider theme={ myTheme }>
+    <MantineProvider >
       <AppShell withBorder={ false }>
         <Container
           size="100%"

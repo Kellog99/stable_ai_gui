@@ -60,6 +60,7 @@
 }
 
 .featureBox {
+  flex: 1;
   margin-top: 30px;
   margin-bottom: 30px;
   border: 2px solid #64748b;   /* light gray border */

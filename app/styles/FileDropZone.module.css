@@ -1,12 +1,12 @@
 .containerDropzone {
   height: 100%;
-  width: 100%;
+  width: 100vh;
   display: grid;
   row-gap: 1.5vw;
 }
 
 .dropzone {
-  width: 100%;
+  width: 100vh;
   aspect-ratio: 1.16;
   position: relative;
   border: 2px dashed #D1D5DB;
@@ -132,4 +132,18 @@
   align-items: center;
   gap: 1rem;
   height: 5vw;
+}
+
+.repositoryContainer {
+  width: 100%;
+}
+
+.flexLoading {
+  min-height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: 100%;
 }

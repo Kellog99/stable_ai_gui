@@ -40,7 +40,7 @@ export default function Header ()
     {
       id: 'ReportPage',
       Icon: FileText,
-      href: "/pages/report",
+      href: "/pages/dataquality/report",
       name: "report"
     }
   ]
