@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './Report.css'
-import { mockData } from './examples';
-import { ReportProps } from '@/interfaces/reportInterfaces';
+import { mockData, benchmarkData } from './examples';
+import { ReportProps, BenchmarkDataProps } from '@/interfaces/reportInterfaces';
 import AttackTable from './components/AttackTable';
 import BenchmarkTable from './components/BenchmarkTable';
 
+
+
 const SecurityReport = () => {
     const [data, setData] = useState<ReportProps>();
+    const [benchmark, setBenchmark] = useState<BenchmarkDataProps>();
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
 
@@ -16,6 +19,7 @@ const SecurityReport = () => {
         const fetchData = async () => {
             try {
                 setData(mockData);
+                setBenchmark(benchmarkData)
                 setLoading(false);
             } catch (err) {
                 setError('Failed to load data');
@@ -29,7 +33,7 @@ const SecurityReport = () => {
     if (loading) {
         return <div className="loading">Loading...</div>;
     }
-    if (error || typeof data === 'undefined') {
+    if (error || typeof data === 'undefined' || typeof benchmark === 'undefined') {
         return <div className="error">{error}</div>;
     }
 
@@ -73,9 +77,11 @@ const SecurityReport = () => {
                     Below, the model's performance is presented in comparison with other models on the same task.
                     The reported metrics reflect how each model performed across multiple evaluation scenarios.
                 </p>
-                {data.metrics ? <BenchmarkTable {...data.metrics} /> : null}
-
-
+                {data.metrics ?
+                    <BenchmarkTable
+                        data={data.metrics}
+                        benchmark={benchmark} />
+                    : null}
             </div>
 
             {/* Vulnerability Section */}
