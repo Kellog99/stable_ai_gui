@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './Report.css'
 import { mockData, benchmarkData } from './examples';
 import { ReportProps, BenchmarkDataProps } from '@/interfaces/reportInterfaces';
-import AttackTable from './components/AttackTable';
-import BenchmarkTable from './components/BenchmarkTable';
+import AttackTable from '../../../../components/client/nntrustReport/AttackTable';
+import BenchmarkTable from '../../../../components/client/nntrustReport/BenchmarkTable';
 
 
 
@@ -51,8 +51,8 @@ const SecurityReport = () => {
                     {Object.entries(data.info).map(([key, value]) => (
                         key !== 'confusion_matrix' ?
                             <div className="info-item">
-                                <span className="label">{key}:</span>
-                                <span className="value">{value}</span>
+                                <div className="label">{key}:</div>
+                                <div className="value">{value}</div>
                             </div> : null)
                     )}
                 </div>

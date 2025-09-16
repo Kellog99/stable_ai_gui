@@ -8,7 +8,7 @@ import HomePageTask from "./pages/HomePage/HomePageTask";
 import Benchmark from './pages/nntrust/RedTeam/page';
 import { useState } from 'react';
 import ReportPage from './pages/nntrust/ReportPage/page';
-import SecurityReport from './components/client/nntrustReport/report';
+import SecurityReport from './pages/nntrust/ReportPage/ReportTITANN/page';
 
 
 const HomePage: React.FC<HomePageProps> = ({

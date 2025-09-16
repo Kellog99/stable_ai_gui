@@ -80,7 +80,7 @@
 }
 
 .row.highlighted {
-    background-color: red;
+    background-color: gray;
     height: 100vw;    
 }
 

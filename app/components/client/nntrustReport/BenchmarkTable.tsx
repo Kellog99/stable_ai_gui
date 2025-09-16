@@ -9,15 +9,19 @@ interface BenchmarkTableProps {
     data: metricsProps;                 // metrics result from the benchmark
 }
 
-const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ benchmark, data }) => {
+const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
+    benchmark,
+    data
+}) => {
     const availableBenchmarks = Object.keys(data).filter((key) => key !== 'params');
     const [selectedBenchmark, setSelectedBenchmark] = useState<string>(availableBenchmarks[0]);
 
     if (!data || !selectedBenchmark) return <div>Loading...</div>;
 
+
     // Sort data by value, descending
-    const sortedData = benchmark?[selectedBenchmark as keyof BenchmarkDataProps].push(data?[selectedBenchmark as keyof metricsProps])
-        .sort((a, b) => b.value - a.value);
+    const sortedData = [...(benchmark[selectedBenchmark as keyof BenchmarkDataProps] ?? []), data[selectedBenchmark as keyof metricsProps]]
+        .sort((a, b) => b - a);
 
     // Chart data
     const chartData = [
@@ -41,11 +45,12 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ benchmark, data }) => {
             ],
         },
     ];
+
     const isHighlighted = (value: number) => {
         if (value === data[selectedBenchmark as keyof metricsProps]) {
             return "row highlighted"
         }
-        else{
+        else {
             return "row"
         }
     }
@@ -82,23 +87,25 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ benchmark, data }) => {
                 />
 
                 {/* Leaderboard */}
-                <div className="leaderboard">
+                < div className="leaderboard">
                     <h3 className="leaderboard-title">
                         <Trophy className="icon trophy-large" />
-                        Leaderboard - {' '}
+                        Leaderboard -{' '}
                         {selectedBenchmark.charAt(0).toUpperCase() +
                             selectedBenchmark.slice(1).replace(/_/g, ' ')}
                     </h3>
 
                     <div className="entries">
-                        {sortedData.map((item, index) => (
-                            <div className={isHighlighted(item.value)}>
+                        {sortedData.map((value, index) => (
+                            <div key={index} className={isHighlighted(value)}>
                                 <div className="row-left">
                                     <div className="rank-circle">{index + 1}</div>
-                                    <span className="row-label">Name {item.originalIndex}</span>
+                                    <span className="row-label">Name {value}</span>
                                 </div>
                                 <div className="row-right">
-                                    <span className="row-value">{Number((item.value).toFixed(3))}</span>
+                                    <span className="row-value">
+                                        {value.toFixed(3)}
+                                    </span>
                                 </div>
                             </div>
                         ))}

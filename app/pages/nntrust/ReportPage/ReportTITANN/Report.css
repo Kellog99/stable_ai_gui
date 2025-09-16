@@ -33,6 +33,7 @@
 }
 
 .info-grid {
+    width: 100%;
     display: grid;
     grid-template-rows: repeat(auto-fit, 1fr);
     column-gap: 3vw;
@@ -48,21 +49,27 @@
 }
 
 .info-item {
+    display: flex;
     width: 100%;
     gap: 3vw;
     align-items: center;
     align-content: space-between;
+    border-bottom: 1px solid grey;
+    margin-bottom: 1vw;
 }
 
 .label {
     font-weight: 600;
     color: white;
     font-size: 14px;
+    width: 100%;
 }
 
 .value {
+    width: 100%;
     color: white;
     font-size: 16px;
+    text-align: center;
 }
 
 .model-icon img {
