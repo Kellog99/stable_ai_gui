@@ -1,6 +1,4 @@
-"use client"
-
-
+"use client";
 import './pages/HomePage/HomePage.css';
 import { HomePageProps } from "./interfaces/NNInterfaces";
 import HomePageDrop from "./pages/HomePage/HomePageDrop";

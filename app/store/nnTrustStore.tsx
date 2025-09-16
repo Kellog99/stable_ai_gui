@@ -8,12 +8,14 @@ interface AppState
   datasets: string[] | null;
   models: string[] | null;
   allJobs: Job[];
+  modelName: string | null;
   
 
   setDataset: ( dataset: Object | null ) => void;
   setDatasets: (datasets: string[] | null) => void;
   setModels: (models: string[] | null) => void;
   setAllJobs: (allJobs: Job[]) => void;
+  setModelName: (modelName: string | null) => void;
   
  
 }
@@ -25,12 +27,16 @@ const useNNTrustStore = create<AppState>()(
       datasets: null,
       models: null,
       allJobs: [],
+      modelName: null,
       
      
       setDataset: ( dataset ) => set( { dataset } ),
       setDatasets: (datasets) => set({datasets}),
       setModels: (models) => set({models}),
       setAllJobs: (allJobs) => set({allJobs}),
+      setModelName: (modelName) => set({modelName}),
+      
+      
     } ),
 
     {

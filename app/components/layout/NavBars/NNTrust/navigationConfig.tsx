@@ -23,13 +23,13 @@ export interface NavigationSection {
 export const mainNavigation: NavigationItem[] = [
   {
     key: 'home',
-    label: 'Home',
+    label: 'Benchmark',
     href: '/pages/nntrust',
     icon: faHouse,
   },
   {
     key: 'report',
-    label: 'Report',
+    label: 'Test',
     href: '/pages/nntrust/report/',
     icon: faChartLine,
   },

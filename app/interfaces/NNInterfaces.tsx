@@ -1,6 +1,15 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
 
+export interface Job{
+    last_attack_performed : string,
+    progress: number,
+    is_over: boolean,
+    model: string, 
+    dataset: string,
+    id: number
+}
+
 export interface Task {
   Icon: LucideIcon,
   title: string,
@@ -40,6 +49,7 @@ export interface ButtonProps {
 }
 
 export interface FileDropZoneProps {
+  id: string,
   onFileSelect: (file: File) => void;
   title: string;
   Icon: LucideIcon;

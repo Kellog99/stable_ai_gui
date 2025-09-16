@@ -1,11 +1,7 @@
 import {
-  faBolt,
-  faChartLine,
-  faCircleQuestion,
-  faDatabase,
-  faHouse,
-  faImage
+  faHouse, faChartLine
 } from '@fortawesome/free-solid-svg-icons';
+
 
 export interface NavigationItem {
   key: string;
@@ -25,16 +21,21 @@ export interface NavigationSection {
 }
 
 export const mainNavigation: NavigationItem[] = [
-  
   {
-    key: 'description',
-    label: 'Dataset Description',
-    href: '/pages/dataquality/datasets',
-    icon: faHouse,
-    requiresDataset: true,
+    key: 'dataquality',
+    label: 'Data Quality Report',
+    href: '/pages/nntrust',
+    icon: faChartLine,
+  },
+  {
+    key: 'nntrust',
+    label: 'Titann Report',
+    href: '/pages/nntrust/report/',
+    icon: faChartLine,
   },
 ];
 
+{/*
 export const sections: NavigationSection[] = [
   {
     key: 'visualization',
@@ -114,7 +115,6 @@ export const sections: NavigationSection[] = [
   },
 ];
 
-{/*
 export const helpNavigation: NavigationItem = {
   key: 'help',
   label: 'Help',

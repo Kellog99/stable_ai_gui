@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import Dataset, { Configs } from "../interfaces/genericInterface";
+import Dataset, { Configs, datasetMock } from "../interfaces/genericInterface";
 
 interface AppState
 {
@@ -33,6 +33,7 @@ interface AppState
   labelToSamples: { label: string; samples: number }[]
 
   showOverview: boolean;
+  collapsed: boolean;
 
   
 
@@ -63,6 +64,7 @@ interface AppState
   setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => void;
 
   setShowOverview: (showOverview: boolean) => void;
+  setCollapsed: (collapsed: boolean) => void;
 
 }
 
@@ -95,6 +97,8 @@ const useStore = create<AppState>()(
       labelToSamples: [],
       showOverview: true,
 
+      collapsed: false,
+
 
       setData: ( datasetUsed ) => set( { datasetUsed } ),
       setDatasets: ( datasets: Dataset[] | null ) => set( { datasets } ),
@@ -123,7 +127,7 @@ const useStore = create<AppState>()(
       setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set( { labelToSamples } ),
 
       setShowOverview: ( showOverview: boolean ) => set( { showOverview } ),
-
+      setCollapsed: ( collapsed: boolean ) => set( { collapsed } ),
     } ),
 
     {

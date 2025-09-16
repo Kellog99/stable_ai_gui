@@ -4,11 +4,16 @@
   background-color: rgb(62, 129, 236, 0.2);
   height: 60px;
   padding: 40px;
-  border-radius: 30px;
   margin: 0 auto;
   align-items: center;
   justify-content: space-between;
 }
+
+.logo {
+  height: 25px;
+  padding-right: 50px;
+}
+
 
 .buttons {
   display: flex;

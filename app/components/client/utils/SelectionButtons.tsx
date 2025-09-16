@@ -1,6 +1,7 @@
 
+import { ButtonProps } from '@/interfaces/NNInterfaces';
 import './utils.css';
-import { ButtonProps } from '@/app/types/index';
+
 
 
 const SelectionButton: React.FC<ButtonProps> = ({

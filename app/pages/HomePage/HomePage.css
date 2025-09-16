@@ -1,3 +1,10 @@
+.home-page {
+  width: 90%;
+  height: 100vw;
+  margin: auto;
+  padding-top: 1vw;
+}
+
 .home-container {
   justify-content: center;
   align-items: center;

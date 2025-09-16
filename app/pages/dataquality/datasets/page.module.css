@@ -1,6 +1,106 @@
 .title {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center; /* Center horizontally */
-    justify-content: center; /* Center vertically (if the container has a height) */
-  }
+  display: flex;
+  flex-direction: column;
+  /* Stack elements vertically */
+  align-items: left;
+  /* Center horizontally */
+  justify-content: center;
+  /* Center vertically (if the container has a height) */
+}
+
+.schemaTitle {
+  font-size: 1.25rem;     /* text-xl */
+  font-weight: 600;       /* semi-bold */
+  text-align: center;
+  margin-bottom: 0.5rem;  /* spacing under title */
+  color: #94a3b8;         /* light gray / almost white for dark bg */
+}
+
+.datasetHeader {
+  display: flex;
+  align-items: center;
+  /* vertically centers icon & text */
+  gap: 0.5rem;
+  /* space between icon and text (same as Tailwind gap-2) */
+  position: relative;
+  /* adds relative positioning if you want to absolutely position children later */
+}
+
+.iconDatabase {
+  width: 2rem;
+  /* same as w-8 */
+  height: 2rem;
+  /* same as h-8 */
+  color: #60a5fa;
+  /* Tailwind's blue-400 */
+}
+
+.datasetTitle {
+  font-size: 2.25rem;
+  /* same as text-4xl */
+  font-weight: 700;
+  /* same as font-bold */
+  background-image: linear-gradient(to right, #93c5fd, #86efac);
+  /* from-blue-300 (#93c5fd) to-green-300 (#86efac) */
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  /* Safari support */
+  color: transparent;
+  /* same as text-transparent */
+}
+
+.datasetDivider {
+  width: 6rem;   /* Tailwind w-24 */
+  height: 0.25rem; /* Tailwind h-1 */
+  background-image: linear-gradient(to right, #3b82f6, #22c55e); 
+  /* from-blue-500 (#3b82f6) to-green-500 (#22c55e) */
+  
+  border-radius: 9999px; /* Tailwind rounded-full */
+}
+
+.featureBox {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border: 2px solid #64748b;   /* light gray border */
+  border-radius: 1rem;         /* rounded corners */
+  background-color: #334155;  
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft shadow */
+  padding: 1rem;
+}
+
+.featureContent {
+  display: flex;
+  align-items: flex-start;
+}
+
+.schemaContainer {
+  
+  height: 300px;
+  overflow: auto;
+}
+
+.featureDetails {
+  height: 24rem; /* same as h-96 */
+  overflow: auto;
+}
+
+.tooltipBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;                 /* space between icon and text */
+  background-color: #1e293b;    /* dark blue-gray */
+  color: #f1f5f9;               /* light text */
+  padding: 0.5rem 1rem;          /* vertical and horizontal padding */
+  border-radius: 9999px;         /* fully rounded like a pill */
+  font-size: 0.875rem;           /* text-sm */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* subtle shadow */
+  cursor: default;
+  user-select: none;
+}
+
+.tooltipIcon {
+  width: 1rem;   /* same as w-4 */
+  height: 1rem;  /* h-4 */
+  color: #60a5fa; /* Tailwind blue-400 for the icon */
+}

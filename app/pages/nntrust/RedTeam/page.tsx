@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useEffect } from 'react';
 import { AttackProps } from '@/interfaces/NNInterfaces';
 import AttackCard from '@/components/client/redtool/AttackCard';
