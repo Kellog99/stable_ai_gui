@@ -1,0 +1,82 @@
+.attack-list {
+  width: 100%;
+  height: 100%;
+}
+
+.attack-title {
+  display: flex;
+  width: 100%;
+  color: rgb(187, 184, 184);
+  align-content: space-between;
+  align-items: center;
+  padding-bottom: 30px;
+}
+
+.attack-header {
+  width: 100%;
+  align-items: center;
+  text-align: left;
+  color: rgb(187, 184, 184);
+}
+
+.attack-button {
+  display: flex;
+  padding: 1.2vw;
+  max-width: 300px;
+  align-items: center;
+  align-content: space-between;
+  border-radius: 2vw;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-desc {
+  width: minmax(100px, 100%);
+  font-size: clamp(10px, 1vw, 14px);
+}
+
+.attack-button:hover {
+  transform: translateY(-5px);
+}
+
+.icon {
+  width: 2vw;
+  height: 2vw;
+  max-width: 30px;
+  max-height: 30px;
+  margin: 0 auto;
+}
+
+.btn-open {
+  width: 4vw;
+  height: 100%;
+  aspect-ratio: 1;
+  background-color: transparent;
+  border: transparent;
+}
+
+.attack-list h1 {
+  text-align: center;
+  color: white;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.attacks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+
+@media (max-width: 768px) {
+  .attack-list {
+    padding: 1rem;
+  }
+
+  .attack-list h1 {
+    font-size: 2rem;
+  }
+}
