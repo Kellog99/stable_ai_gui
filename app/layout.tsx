@@ -27,9 +27,12 @@ const myTheme = createTheme({
   fontFamily: "Roboto, sans-serif",
   primaryColor: "gray",
   components: {
-    Select: {
+     Select: {
       defaultProps: {
         size: "xs",
+        labelProps: {
+          style: { color: "white" },
+        },
       },
     },
     Text: {

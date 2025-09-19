@@ -1,45 +1,110 @@
-import FileDropZone from '@/components/client/FileDropZone';
-import { FileDropZoneProps, HomePageProps } from '@/interfaces/NNInterfaces';
-import { Brain, Database } from 'lucide-react';
+
+import FileDropZone2 from '@/components/client/FileDropZone2';
+import { Database, File } from 'lucide-react';
 import React from 'react';
+import ZipUploader from "../../components/client/Uploader";
+import ModelUploader from '@/components/client/ModelUploader';
+import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
+import FileUploadComponent from '@/components/client/UploaderUnified';
+import { upload_post } from '@/properties/urls';
+import { IconFileText, IconUpload } from '@tabler/icons-react';
+import { model_upload } from '@/properties/urlsNNTrust';
 
 
-const HomePageDrop: React.FC<HomePageProps> = ( {
-    dataset,
-    model,
-    onFileSelect,
-    onTaskSelect
-} ) =>
-{
-    //This create the grid for the loading part
-    const homePageDropZones: FileDropZoneProps[] = [
+const HomePageDrop: React.FC = ({
+}) => {
+    // TO DO REFINE THE UPLOADERUNIFIED
+    const ZipUploadComponent = () => {
+        const zipConfig = {
+            fileType: 'zip' as const,
+            accept: '.zip',
+            title: 'Upload Dataset',
+            description: 'Select a .zip file from your computer to upload',
+            uploadEndpoint: upload_post,
+            formFieldName: 'folder_zip',
+            icon: <IconUpload size={30} />,
+            showArrowSwitch: true,
+            showModeSelect: true,
+            showTypeSelect: true,
+            showJsonConfig: true,
+        };
+
+        return <FileUploadComponent config={zipConfig} />;
+    };
+
+    const PthUploadComponent = () => {
+        const pthConfig = {
+            fileType: 'pth' as const,
+            accept: '.pth',
+            title: 'Upload Model',
+            description: 'Select a .pth model file from your computer to upload',
+            uploadEndpoint: model_upload,
+            formFieldName: 'model_file',
+            icon: <IconFileText size={30} />,
+            showArrowSwitch: false,
+            showModeSelect: false,
+            showTypeSelect: false,
+            showJsonConfig: false,
+        };
+
+        const handleModelUploadComplete = (success: boolean, data?: any) => {
+            if (success) {
+                console.log('Model uploaded successfully:', data);
+                
+            } else {
+                console.log('Model upload failed');
+                
+            }
+        };
+
+        return (
+            <FileUploadComponent
+                config={pthConfig}
+                onUploadComplete={handleModelUploadComplete}
+            />
+        );
+    };
+
+
+    const datasetSections = [
         {
-            id: "drop1",
-            title: "Dataset",
-            Icon: Database,
-            description: "Upload your dataset in ZIP format",
-            acceptedTypes: [ '.zip' ],
-            onFileSelect: ( file ) => onFileSelect( file, 'dataset' ),
-            isLoaded: false,
-            loadedFileName: "dataset?.name",
+            id: "selection",
+            title: "Select Dataset",
+            Icon: File,
+            currentPage: "", // Will be managed internally by FileDropZone
+            onClickHandle: () => { }, // Will be managed internally by FileDropZone
+            child: ZipUploader
         },
         {
-            id: "drop2",
-            title: "Model",
-            Icon: Brain,
-            description: "Upload your model in a `.pth` format",
-            acceptedTypes: [ '.zip' ],
-            onFileSelect: ( file ) => onFileSelect( file, 'model' ),
-            isLoaded: false,
-            loadedFileName: "dataset?.name",
+            id: "repository",
+            title: "Dataset Repository",
+            Icon: Database,
+            child: DatasetRepository
         }
-    ]
+    ];
+
+    const modelSections = [
+        {
+            id: "model",
+            title: "Upload Model",
+            Icon: File,
+            child: ModelUploader
+        }
+    ];
+
+    const listOfSections = [datasetSections, modelSections];
+
     return (
-        
+
         <div className="file-grid">
-            { homePageDropZones.map( ( dropElement: FileDropZoneProps) => (
-                <FileDropZone key={ dropElement.id } { ...dropElement } />
-            ) ) }
+            {listOfSections.map((dropElement, index) => (
+                <FileDropZone2
+                    key={index}
+                    sections={dropElement}
+                    defaultActiveSection={dropElement[0].id}
+                />
+            ))}
+
         </div>
     )
 }

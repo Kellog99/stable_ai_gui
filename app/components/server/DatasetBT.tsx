@@ -33,7 +33,7 @@ export default function DatasetBT ( { query, datasets }: DatasetBTProps )
     return (
       <div className={ classes.dataset_buttons }>
         <Grid
-          columns={ 4 }
+          columns={ 3 }
           gutter="xs"
         >
 
@@ -52,7 +52,7 @@ export default function DatasetBT ( { query, datasets }: DatasetBTProps )
                 </CardSection>
 
                 <Group justify="space-between" mt="md" mb="xs">
-                  <Text fw={ 700 } size="lg">{ dataset.name }</Text>
+                  <Text fw={ 700 } size="lg" c="#334155">{ dataset.name }</Text>
                   <Badge color="#334155">{ dataset.task }</Badge>
                 </Group>
                 <Text size="sm" c="dimmed">

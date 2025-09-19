@@ -1,31 +1,16 @@
 "use client";
 import './pages/HomePage/HomePage.css';
-import { HomePageProps } from "./interfaces/NNInterfaces";
 import HomePageDrop from "./pages/HomePage/HomePageDrop";
 import HomePageTask from "./pages/HomePage/HomePageTask";
 
 
 
-const HomePage: React.FC<HomePageProps> = ({
-  dataset,
-  model,
-  onFileSelect,
-  onTaskSelect }) => {
-  // Button state logic
-  const canUseAnalysis = dataset !== null;
-  const canUseOtherTasks = dataset !== null && model !== null;
-
+const HomePage: React.FC = ({
+ }) => {
 
   return (
     <div className="home-container">
-      <HomePageDrop
-        dataset={dataset}
-        model={model}
-        onFileSelect={onFileSelect}
-        onTaskSelect={onTaskSelect} />
-
-
-      
+      <HomePageDrop />
       <div className='task'>
         <div className="section-header">
           <h2 className="section-title">

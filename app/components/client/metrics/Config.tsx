@@ -371,6 +371,7 @@ export default function Config(props: ConfigsProps) {
                         id="feature"
                         radius="md"
                         label="Feature"
+                        
                         placeholder="Choose feature"
                         data={features}
                         value={featureName}

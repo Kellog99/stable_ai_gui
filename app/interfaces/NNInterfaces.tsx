@@ -33,13 +33,6 @@ export interface AppState {
 
 export type TaskType = 'benchmark' | 'one-image-attack' | 'analysis';
 
-export interface HomePageProps {
-  dataset: LoadedFile | null;
-  model: LoadedFile | null;
-  onFileSelect: (file: File, type: 'dataset' | 'model') => void;
-  onTaskSelect: (task: TaskType) => void;
-}
-
 export interface ButtonProps {
   id: string,
   name: string
