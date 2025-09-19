@@ -1,13 +1,13 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
 
-export interface Job{
-    last_attack_performed : string,
-    progress: number,
-    is_over: boolean,
-    model: string, 
-    dataset: string,
-    id: number
+export interface Job {
+  last_attack_performed: string,
+  progress: number,
+  is_over: boolean,
+  model: string,
+  dataset: string,
+  id: number
 }
 
 export interface Task {
@@ -15,7 +15,8 @@ export interface Task {
   title: string,
   description: string,
   footer: string,
-  color: string
+  color: string,
+  href: string          // reprenset the page to navigate to
 }
 
 export interface LoadedFile {
@@ -50,7 +51,6 @@ export interface ButtonProps {
 
 export interface FileDropZoneProps {
   id: string,
-  onFileSelect: (file: File) => void;
   title: string;
   Icon: LucideIcon;
   acceptedTypes: string[];
@@ -79,6 +79,6 @@ export interface AttackProps {
 // Settings Modal Component
 export interface ParametersWindowProps {
   isOpen: boolean,
-  onClose: ()=>void,
+  onClose: () => void,
   parameters: ParametersProps[],
 }

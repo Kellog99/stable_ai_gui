@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from 'react';
 import useStore from '../../../../store/dsStore';
 import { Vision } from '@vectopus/atlas-icons-react';
-import { GetDatasetAndSave } from '../../../../functionalities/DatasetsLoader';
+import { GetDatasetAndSave } from '../../../DatasetsLoader';
 import { useSearchParams } from 'next/navigation';
 
 function Home() {

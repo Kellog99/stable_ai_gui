@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import SearchBar from '../../../components/client/SearchBar';
 import UploadModal from '../../../components/client/UploadModal';
 import DatasetBT from '../../../components/server/DatasetBT';
-import DatasetsLoader from '../../../functionalities/DatasetsLoader';
+import DatasetsLoader from '../../DatasetsLoader';
 import useStore from '../../../store/dsStore';
 
 

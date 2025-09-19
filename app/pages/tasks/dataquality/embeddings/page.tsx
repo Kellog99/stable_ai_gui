@@ -10,7 +10,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
-import featureLoader from '../../../functionalities/FeatureLoader';
+import featureLoader from '../../FeatureLoader';
 import useStore from '../../../store/dsStore';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';

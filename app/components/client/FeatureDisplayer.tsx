@@ -4,7 +4,7 @@ import { Badge, Card, CardSection, Group, Modal, Text, Image, CloseButton } from
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 import ImageDisplayer from "../server/ImageDisplayer";
 import TextDisplayer from "../server/TextDisplayer";
-import classes from '@/pages/dataquality/embeddings/page.module.css';
+import classes from '@/pages/tasks/dataquality/embeddings/page.module.css';
 import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
 import { useMemo, useState } from "react";

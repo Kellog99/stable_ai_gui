@@ -11,7 +11,7 @@ import
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import Link from "next/link";
-import {GetDatasetAndSave} from '../../../../functionalities/DatasetsLoader';
+import {GetDatasetAndSave} from '../../../DatasetsLoader';
 
 export default function CleanDuplicates ()
 {
