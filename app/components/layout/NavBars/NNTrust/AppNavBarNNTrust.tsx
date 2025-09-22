@@ -12,10 +12,6 @@ import NavigationButton from "../Utils/NavigationButton";
 
 function AppNavBarNNTrust() {
     const pathname = usePathname();
-
-
-    const { visualVisible, metricVisible, actionVisible, toggleSection } = useNavigationState();
-
     const isActive = (path: string) => pathname === path;;
 
     return (
