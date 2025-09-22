@@ -1,19 +1,48 @@
 .title {
   display: flex;
   flex-direction: column;
-  /* Stack elements vertically */
   align-items: left;
-  /* Center horizontally */
   justify-content: center;
-  /* Center vertically (if the container has a height) */
 }
 
 .schemaTitle {
+
   font-size: 1.25rem;     /* text-xl */
   font-weight: 600;       /* semi-bold */
   text-align: center;
+  margin-top: 0;
   margin-bottom: 0.5rem;  /* spacing under title */
   color: #94a3b8;         /* light gray / almost white for dark bg */
+}
+
+.featureBox {
+  position: relative;  
+  flex: 1;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border: 2px solid #64748b;
+  border-radius: 1rem;
+  background-color: #334155;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: flex;
+  align-items: center; 
+}
+
+.fixedTitle {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10; 
+
+  
+  font-size: 1.25rem;     /* text-xl */
+  font-weight: 600;       /* semi-bold */
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 3rem;  /* spacing under title */
+  color: #94a3b8; 
 }
 
 .datasetHeader {
@@ -53,36 +82,43 @@
 .datasetDivider {
   width: 6rem;   /* Tailwind w-24 */
   height: 0.25rem; /* Tailwind h-1 */
-  background-image: linear-gradient(to right, #3b82f6, #22c55e); 
-  /* from-blue-500 (#3b82f6) to-green-500 (#22c55e) */
-  
+  background-image: linear-gradient(to right, #3b82f6, #22c55e);  
   border-radius: 9999px; /* Tailwind rounded-full */
 }
 
-.featureBox {
-  flex: 1;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  border: 2px solid #64748b;   /* light gray border */
-  border-radius: 1rem;         /* rounded corners */
-  background-color: #334155;  
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft shadow */
-  padding: 1rem;
+.datasetDividerDesc {
+  width: 4rem;   /* Tailwind w-24 */
+  height: 0.25rem; /* Tailwind h-1 */
+  background: #3b82f6;  
+  border-radius: 9999px; /* Tailwind rounded-full */
+  margin-bottom: 10px;
 }
 
+.datasetDividerNum {
+  width: 4rem;   /* Tailwind w-24 */
+  height: 0.25rem; /* Tailwind h-1 */
+  background: #86efac;  
+  border-radius: 9999px; /* Tailwind rounded-full */
+  margin-bottom: 10px;
+}
+
+
 .featureContent {
+  width: 100%;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .schemaContainer {
-  
-  height: 300px;
   overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .featureDetails {
-  height: 24rem; /* same as h-96 */
+  
   overflow: auto;
 }
 
