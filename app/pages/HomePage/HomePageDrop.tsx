@@ -9,11 +9,17 @@ import FileUploadComponent from '@/components/client/UploaderUnified';
 import { upload_post } from '@/properties/urls';
 import { IconFileText, IconUpload } from '@tabler/icons-react';
 import { model_upload } from '@/properties/urlsNNTrust';
+import { getModels } from '@/functionalities/NNTrustBackendUtils';
+import useStore from '@/store/nnTrustStore';
+import useStoreDQ from '@/store/dsStore';
+import DatasetsLoader from '@/functionalities/DatasetsLoader';
+
 
 
 const HomePageDrop: React.FC = ({
 }) => {
-    // TO DO REFINE THE UPLOADERUNIFIED
+    const setModels = useStore((state) => state.setModels)
+    const setDatasets = useStoreDQ((state) => state.setDatasets)
     const ZipUploadComponent = () => {
         const zipConfig = {
             fileType: 'zip' as const,
@@ -27,6 +33,8 @@ const HomePageDrop: React.FC = ({
             showModeSelect: true,
             showTypeSelect: true,
             showJsonConfig: true,
+            refreshFunction: DatasetsLoader,
+            setRefreshData: setDatasets
         };
 
         return <FileUploadComponent config={zipConfig} />;
@@ -45,6 +53,8 @@ const HomePageDrop: React.FC = ({
             showModeSelect: false,
             showTypeSelect: false,
             showJsonConfig: false,
+            refreshFunction: getModels,
+            setRefreshData: setModels
         };
 
         const handleModelUploadComplete = (success: boolean, data?: any) => {
@@ -71,9 +81,7 @@ const HomePageDrop: React.FC = ({
             id: "selection",
             title: "Select Dataset",
             Icon: File,
-            currentPage: "", // Will be managed internally by FileDropZone
-            onClickHandle: () => { }, // Will be managed internally by FileDropZone
-            child: ZipUploader
+            child: ZipUploadComponent
         },
         {
             id: "repository",
@@ -88,7 +96,7 @@ const HomePageDrop: React.FC = ({
             id: "model",
             title: "Upload Model",
             Icon: File,
-            child: ModelUploader
+            child: PthUploadComponent
         }
     ];
 

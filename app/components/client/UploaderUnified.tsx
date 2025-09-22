@@ -1,16 +1,10 @@
-import DatasetsLoader from '@/functionalities/DatasetsLoader';
-import { upload_post } from '@/properties/urls';
-import useStore from '@/store/dsStore';
 import {
   Alert,
   Button,
   Center,
-  Container,
   Divider,
   FileInput,
-  Flex,
   Group,
-  Paper,
   Progress,
   Select,
   Stack,
@@ -20,37 +14,17 @@ import {
   Title
 } from '@mantine/core';
 import {
-  IconCheck,
+
   IconCloudUpload,
   IconFileText,
   IconFileZip,
   IconSettings,
-  IconUpload,
-  IconX,
-  IconZip
 } from '@tabler/icons-react';
 import { useState } from 'react';
-import styles from '../../styles/Uploader.module.css';
-import { FileCheck } from 'lucide-react';
 import React from 'react';
-import { RgbaColor } from '@mantine/core/lib/components/ColorPicker/ColorPicker.types';
-import { darkenColor } from '@/functionalities/Utils';
+import { darkenColor, getStatusColor, getStatusIcon } from '@/functionalities/Utils';
+import { UploadConfig } from '@/interfaces/genericInterface';
 
-interface UploadConfig {
-  fileType: 'zip' | 'pth';
-  accept: string;
-  title: string;
-  description: string;
-  uploadEndpoint: string;
-  formFieldName: string;
-  icon: React.ReactNode;
-  showArrowSwitch?: boolean;
-  showModeSelect?: boolean;
-  showTypeSelect?: boolean;
-  showJsonConfig?: boolean;
-  refreshFunction?: () => Promise<any>;
-  setRefreshData?: (data: any) => void;
-}
 
 interface FileUploadComponentProps {
   config: UploadConfig;
@@ -69,7 +43,6 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
   const [labelDict, setLabelDict] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const setDatasets = useStore((state) => state.setDatasets);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [arrowAv, setArrowAv] = useState<boolean>(true);
 
@@ -144,7 +117,6 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
     const formData = new FormData();
     formData.append(config.formFieldName, file);
     
-    // Build query parameters (only for configurations that support them)
     const queryParams = new URLSearchParams();
     if (config.showJsonConfig) {
       if (description) {
@@ -196,38 +168,20 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
       setUploadStatus('error');
       onUploadComplete?.(false);
     } finally {
-      // Handle different refresh functions based on file type
       if (config.refreshFunction && config.setRefreshData) {
         config.refreshFunction().then(fetchedData => {
           if (config.fileType === 'pth') {
-            config.setRefreshData(fetchedData.names);
+            config.setRefreshData?.(fetchedData.names);
           } else {
-            config.setRefreshData(fetchedData);
+            config.setRefreshData?.(fetchedData);
           }
-        });
-      } else if (config.fileType === 'zip') {
-        // Fallback to original dataset loading
-        DatasetsLoader().then(fetchedData => {
-          setDatasets(fetchedData);
         });
       }
       setLoading(false);
     }
   };
 
-  const getStatusColor = () => {
-    if (uploadStatus === 'success') return '#81c498ff';
-    if (uploadStatus === 'error') return '#FF6961';
-    return '#6ca3b5ff';
-  };
-
-  const getStatusIcon = () => {
-    if (uploadStatus === 'success') return <IconCheck size={20} />;
-    if (uploadStatus === 'error') return <IconX size={20} />;
-    return <IconUpload size={20} />;
-  };
-
-  const color = getStatusColor();
+  const color = getStatusColor(uploadStatus as string);
   const darkColor = darkenColor(color, 40);
 
   return (
@@ -361,7 +315,7 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
 
       {message && !loading && (
         <Alert
-          icon={React.cloneElement(getStatusIcon(), { color: darkColor })}
+          icon={React.cloneElement(getStatusIcon(uploadStatus as string), { color: darkColor })}
           title={<span style={{ color: darkColor }}>{uploadStatus === 'success' ? 'Success' : uploadStatus === 'error' ? 'Error' : 'Info'}</span>}
           color={color}
           variant="filled"
