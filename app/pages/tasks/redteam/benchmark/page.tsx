@@ -6,7 +6,7 @@ import AttackCard from '@/components/client/redtool/AttackCard';
 import './Benchmark.css';
 import { Play, ChevronDown, ChevronUp } from 'lucide-react';
 import Status from '@/components/client/redtool/Status';
-import { listAttacks } from './prova';
+import { listAttacks } from '../prova';
 
 const Benchmark: React.FC = () => {
   const [attacks, setAttacks] = useState<AttackProps[]>([]);

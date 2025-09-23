@@ -1,30 +1,37 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Shield, Play, Loader2 } from 'lucide-react';
 import { ImageUploader } from '@/components/client/test/ImageUploader';
 import { AttackSelector } from '@/components/client/test/AttackSelector';
-import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
+import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
-import { AttackConfig, AttackResult, AttackStats, AttackType } from '@/interfaces/testInterfaces';
+import { AttackResult, AttackStats } from '@/interfaces/testInterfaces';
+import { listAttacks } from '../prova';
 
 import styles from '@/styles/Test.module.css';
+import { AttackProps } from '@/interfaces/NNInterfaces';
 
-function test() {
+function Test() { // Capitalized component name
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
-    const [selectedAttack, setSelectedAttack] = useState<AttackType>('fgsm');
-    const [attackConfig, setAttackConfig] = useState<AttackConfig>({
-        epsilon: 0.031,
-        iterations: 10,
-        stepSize: 0.007,
-        confidence: 0
-    });
+
     const [attackResult, setAttackResult] = useState<AttackResult | undefined>();
     const [attackStats, setAttackStats] = useState<AttackStats | undefined>();
 
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    // Initialize with default values, will be updated in useEffect
+    const [attackList, setAttackList] = useState<AttackProps[]>([]);
+    const [selectedAttack, setSelectedAttack] = useState<AttackProps | undefined>()
+    useEffect(() => {
+    setAttackList(listAttacks);
+    if (listAttacks.length > 0) {
+        const firstAttack = listAttacks[0];
+        setSelectedAttack(firstAttack)  // This updates selectedAttack
+    }
+}, []); // This dependency causes the effect to run again when selectedAttack changes
+
 
     const handleImageUpload = (file: File, imageUrl: string) => {
         setUploadedFile(file);
@@ -33,8 +40,6 @@ function test() {
         setAttackStats(undefined);
     };
 
-
-
     return (
         <div className={styles.test}>
             {/* Header */}
@@ -42,7 +47,7 @@ function test() {
                 <Shield className={styles.header_icon} />
                 <div className={styles.header_content}>
                     <h1>Testing Lab</h1>
-                    <p>Test on the loaded model singol attack for a specific image.</p>
+                    <p>Test on the loaded model single attack for a specific image.</p>
                 </div>
             </div>
 
@@ -55,37 +60,34 @@ function test() {
                     />
 
                     <AttackSelector
-                        selectedAttack={selectedAttack}
-                        onAttackChange={setSelectedAttack}
+                        attackList={attackList}
+                        handleSelection={setSelectedAttack}
                     />
 
-                    <ParameterControls
-                        config={attackConfig}
-                        onConfigChange={setAttackConfig}
-                        attackType={selectedAttack}
-                    />
+                    <div style={{ fontSize: "1vw" }}>
+                        <h3>Info</h3>
+                        <p style={{ color: "gray" }}>
+                            <b>Knowledge: </b>{selectedAttack?.knowledge}
+                        </p>
+                        <p style={{ color: "gray" }}>
+                            <b>Description: </b>{selectedAttack?.description}
+                        </p>
+                    </div>
+
+                    <ParameterControls parameters={selectedAttack?.parameters} />
 
                     <button
-                        disabled={!uploadedFile || isLoading}
+                        disabled={!uploadedFile}
                         className={styles.execute_button}
+                    // onClick={handleExecuteAttack} // Added click handler
                     >
-                        {isLoading ? (
-                            <>
-                                <Loader2 className={styles.button_icon} />
-                                <span>Attacking... { }%</span>
-                            </>
-                        ) : (
-                            <>
-                                <Play className={styles.button_icon} />
-                                <span>Execute Attack</span>
-                            </>
-                        )}
+                    
                     </button>
                 </div>
 
                 {/* Right Column - Results */}
-                <div className="flex-1 p-6">
-                    <div className="grid grid-cols-3 gap-6 mb-6">
+                <div className={styles.results_column}> 
+                    <div className={styles.image_grid}>
                         <ImageDisplay
                             title="Original Image"
                             imageUrl={uploadedImageUrl}
@@ -115,4 +117,4 @@ function test() {
     );
 }
 
-export default test
+export default Test;

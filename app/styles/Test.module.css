@@ -12,7 +12,6 @@
   width: 100%
 }
 
-
 .header_icon {
   width: 4vw;
   height: 4vw;
@@ -31,6 +30,13 @@
   display: grid;
   width: 100%;
   grid-template-columns: 1fr 2fr;
+  color: white;
+  column-gap: 3vw;
+}
+
+.info_attack {
+  color: gray;
+  font-size: 1vw;
 }
 
 .main {
@@ -85,6 +91,13 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.image_grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 5px;
+  width: 100%;
 }
 
 .app__progress-bar {

@@ -3,6 +3,7 @@ import { AttackProps } from "@/interfaces/NNInterfaces"
 export const listAttacks: AttackProps[] = [
   {
     "id": "fgsm",
+    knowledge: "white",
     "name": "Fast Gradient Sign Method (FGSM)",
     "description": "A single-step adversarial attack that uses the gradient of the loss function to generate adversarial examples. It adds noise in the direction of the gradient to fool the model.",
     "parameters": [
@@ -28,6 +29,7 @@ export const listAttacks: AttackProps[] = [
   },
   {
     "id": "pgd",
+    knowledge: "black",
     "name": "Projected Gradient Descent (PGD)",
     "description": "An iterative adversarial attack that applies multiple small perturbations projected onto an epsilon ball. More powerful than FGSM as it uses multiple iterations.",
     "parameters": [
@@ -71,6 +73,7 @@ export const listAttacks: AttackProps[] = [
   },
   {
     "id": "cw",
+    knowledge: "white",
     "name": "Carlini & Wagner (C&W)",
     "description": "An optimization-based attack that finds minimal perturbations by solving a constrained optimization problem. Known for generating high-quality adversarial examples.",
     "parameters": [
@@ -114,6 +117,7 @@ export const listAttacks: AttackProps[] = [
   },
   {
     "id": "deepfool",
+    knowledge: "white",
     "name": "DeepFool",
     "description": "An iterative attack that finds the minimal perturbation needed to cross the decision boundary by approximating the classifier with a linear model at each step.",
     "parameters": [
@@ -139,6 +143,7 @@ export const listAttacks: AttackProps[] = [
   },
   {
     "id": "boundary",
+    knowledge: "black",
     "name": "Boundary Attack",
     "description": "A black-box attack that starts from an adversarial example and walks along the decision boundary to find closer adversarial examples to the original input.",
     "parameters": [

@@ -59,7 +59,7 @@ export interface FileDropZoneProps {
   loadedFileName?: string;
 }
 
-interface ParametersProps {
+export interface ParametersProps {
   name: string
   label: string
   min: number
@@ -71,6 +71,7 @@ interface ParametersProps {
 
 export interface AttackProps {
   id: string
+  knowledge: string
   name: string
   description: string
   parameters: ParametersProps[]
