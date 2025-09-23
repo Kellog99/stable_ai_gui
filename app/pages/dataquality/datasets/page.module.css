@@ -48,11 +48,8 @@
 .datasetHeader {
   display: flex;
   align-items: center;
-  /* vertically centers icon & text */
   gap: 0.5rem;
-  /* space between icon and text (same as Tailwind gap-2) */
   position: relative;
-  /* adds relative positioning if you want to absolutely position children later */
 }
 
 .iconDatabase {
@@ -91,7 +88,7 @@
   height: 0.25rem; /* Tailwind h-1 */
   background: #3b82f6;  
   border-radius: 9999px; /* Tailwind rounded-full */
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .datasetDividerNum {
@@ -99,7 +96,7 @@
   height: 0.25rem; /* Tailwind h-1 */
   background: #86efac;  
   border-radius: 9999px; /* Tailwind rounded-full */
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 

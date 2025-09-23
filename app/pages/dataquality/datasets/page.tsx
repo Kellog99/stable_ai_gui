@@ -5,27 +5,22 @@ import SchemaShower from "@/components/client/SchemaShower";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { IsFeatureBond, IsFeaturePresent } from "@/functionalities/Utils";
 import Dataset, { FeatureSchema } from "@/interfaces/genericInterface";
-import { labelColorMap } from "@/properties/static";
 import { bbox_type, embedding_type, image_type, label_type, text_type } from "@/properties/types";
 import useStore from '@/store/dsStore';
-import { BarChart } from '@mantine/charts';
-import '@mantine/charts/styles.css';
 import { Box, CloseButton, Flex, Text, Title } from "@mantine/core";
 import { motion } from 'framer-motion';
 import { Database, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import classes from './page.module.css';
-
-
+import { labelColorMapType } from "@/properties/static";
+import { BarChartCustom } from "@/components/client/BarChart";
 
 interface Feature {
-
   type: string;
   name: string;
   datas: any[];
   is_logic: boolean
-
 }
 
 export default function Datasets() {
@@ -41,7 +36,6 @@ export default function Datasets() {
   const [feature, setFeature] = useState<Feature | null>(null)
   const [featureType, setFeatureType] = useState<any>("")
   const [indexes, setIndexes] = useState<number[]>([]);
-  //const [ labelToSamples, setLabelToSamples ] = useState<{ label: string; samples: number }[]>( [] );
   const labelToSamples = useStore((state) => state.labelToSamples)
   const setLabelToSamples = useStore((state) => state.setLabelToSamples)
 
@@ -50,12 +44,6 @@ export default function Datasets() {
   const [bboxesHistogramData, setBboxesHistogramData] = useState<{ label: string; samples: number }[]>([]);
   const [bboxesAreaHistogramData, setBboxesAreaHistogramData] = useState<{ label: string; samples: number }[]>([]);
   const [areEmbeddings, setAreEmbeddings] = useState<boolean>(false)
-
-  const barSize = 60;            // Width of each bar
-  const barSpacing = 30;         // Space between each bar
-  const numberOfBars = labelToSamples.length;
-  const chartWidth = numberOfBars * (barSize + barSpacing);
-  const dynamicChartWidth = Math.max(chartWidth, bboxesHistogramData.length * barSize * 1.5);
 
 
   const datasets = useStore((state) => (state.datasets))
@@ -324,7 +312,7 @@ export default function Datasets() {
           </div>
           <div className={classes.featureContent}>
 
-            <div style={{ flex: 1, position: 'relative', overflow: 'hidden'}}>
+            <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
 
               <Flex direction='column' align='center'>
                 <motion.div
@@ -344,7 +332,7 @@ export default function Datasets() {
                     <SchemaShower
                       features={features}
                       connections={connections}
-                      labelColorMap={labelColorMap}
+                      labelColorMap={labelColorMapType}
                       clickable={true}
                     />
                   </div>
@@ -455,20 +443,9 @@ export default function Datasets() {
                     maxWidth: '100%',
                   }}
                 >
-                  <BarChart
-                    h={400}
-                    w={chartWidth}
+                  <BarChartCustom
                     data={labelToSamples}
-                    dataKey="label"
-                    series={[{ name: 'samples', color: '#a9adb9' }]}
-                    barProps={{
-                      barSize: barSize,
-                      onClick: (bar) => {
-                        console.log('Clicked bar data:', bar.label);
-                      }
-                    }}
-                    style={{ paddingRight: barSpacing / 2, paddingBottom: "20px", overflow:"hidden" }}
-                  />
+                    keyL="labels" />
                 </Box>
               </Flex>
             </div>
@@ -490,10 +467,15 @@ export default function Datasets() {
               minWidth: '500px',
               maxWidth: 'calc(50% - 10px)'
             }}>
-              <Title order={2} style={{ textAlign: 'center', marginBottom:"15px" }}>
-                Number of Bounding Boxes per Image
-              </Title>
-              
+              <div style={{ textAlign: "center" }}>
+                <div style={{ display: "inline-block", textAlign: "left" }}>
+                  <Title order={2}>
+                    Number of Bounding Boxes per Image
+                  </Title>
+                  <div className={classes.datasetDividerDesc}></div>
+                </div>
+              </div>
+
 
               <div style={{ width: '100%' }}>
                 <Flex
@@ -513,44 +495,14 @@ export default function Datasets() {
                     }}
                   >
                     <Flex direction="column" align="center">
-                      <BarChart
-                        h={400}
-                        w={Math.min(dynamicChartWidth, 500)}
+                      <BarChartCustom
                         data={bboxesHistogramData}
-                        dataKey="label"
-                        series={[{ name: 'samples', color: '#a9adb9' }]}
-                        barProps={{
-                          barSize: barSize,
-                          onClick: (bar) => {
-                            console.log('Clicked bin:', bar.label);
-                          }
-                        }}
-                        withTooltip
-                        tooltipProps={{
-                          content: ({ label, payload }) => {
-                            if (payload && payload.length > 0) {
-                              return (
-                                <div style={{
-                                  backgroundColor: 'white',
-                                  padding: '8px 12px',
-                                  border: '1px solid #ccc',
-                                  borderRadius: '4px',
-                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}>
-                                  <p style={{ margin: 0, fontWeight: 'bold' }}>
-                                    {label} bounding boxes
-                                  </p>
-                                  <p style={{ margin: 0, color: '#666' }}>
-                                    Samples: {payload[0].value}
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }
-                        }}
-                        style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
+                        keyL="bboxesHis"
+                        dynamicWidth={true}
+                        tooltipsSets={true}
+                        tooltipsUM="bounding boxes"
                       />
+
                       <Text size="sm" mt="xs" c="dimmed">
                         Bounding Boxes per Image
                       </Text>
@@ -567,9 +519,16 @@ export default function Datasets() {
               minWidth: '500px',
               maxWidth: 'calc(50% - 10px)'
             }}>
-              <Title order={2} style={{ textAlign: 'center',  marginBottom:"15px"}}>
-                Number of Bounding Boxes per Area
-              </Title>
+
+              <div style={{ textAlign: "center" }}>
+                <div style={{ display: "inline-block", textAlign: "left" }}>
+                  <Title order={2}>
+                    Number of Bounding Boxes per Image
+                  </Title>
+                  <div className={classes.datasetDividerNum}></div>
+                </div>
+              </div>
+
               <div style={{ width: '100%' }}>
                 <Flex
                   justify="center"
@@ -588,56 +547,13 @@ export default function Datasets() {
                     }}
                   >
                     <Flex direction="column" align="center">
-                      <BarChart
-                        h={400}
-                        w={Math.min(dynamicChartWidth, 500)}
+                      <BarChartCustom
                         data={bboxesAreaHistogramData}
-                        dataKey="label"
-                        series={[{ name: 'samples', color: '#a9adb9' }]}
-                        xAxisProps={{
-                          ticks: ticks,
-                          tickFormatter: (label: string) => {
-                            if (label.includes('-')) {
-                              const [min, max] = label.split('-').map(Number);
-                              const midpoint = Math.round((min + max) / 2);
-                              // Trova il multiplo di 200 più vicino
-                              const nearestMultiple = Math.round(midpoint / 200) * 200;
-                              return nearestMultiple.toString();
-                            }
-                            return label;
-                          }
-                        }}
-                        barProps={{
-                          barSize: barSize,
-                          onClick: (bar) => {
-                            console.log('Clicked bin:', bar.label);
-                          }
-                        }}
-                        withTooltip
-                        tooltipProps={{
-                          content: ({ label, payload }) => {
-                            if (payload && payload.length > 0) {
-                              return (
-                                <div style={{
-                                  backgroundColor: 'white',
-                                  padding: '8px 12px',
-                                  border: '1px solid #ccc',
-                                  borderRadius: '4px',
-                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                                }}>
-                                  <p style={{ margin: 0, fontWeight: 'bold' }}>
-                                    {label} px²
-                                  </p>
-                                  <p style={{ margin: 0, color: '#666' }}>
-                                    Samples: {payload[0].value}
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }
-                        }}
-                        style={{ paddingRight: barSpacing / 2, paddingBottom: "20px" }}
+                        keyL="bboxesHis"
+                        dynamicWidth={true}
+                        xAxisSets={true}
+                        tooltipsSets={true}
+                        tooltipsUM="px²"
                       />
                       <Text size="sm" mt="xs" c="dimmed">
                         Bounding Box Area (px²)
