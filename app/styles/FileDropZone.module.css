@@ -1,6 +1,7 @@
 .containerDropzone {
   height: 100%;
-  width: 100vh;
+  width: 100%;
+  max-width: 35vw;
   display: grid;
   row-gap: 1.5vw;
 }

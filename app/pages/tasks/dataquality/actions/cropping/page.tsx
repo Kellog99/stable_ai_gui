@@ -11,7 +11,7 @@ import
 import { cropper_get } from '@/properties/urls';
 import Link from "next/link";
 import {ModelInfo} from '@/interfaces/genericInterface';
-import {GetDatasetAndSave} from '../../../../functionalities/DatasetsLoader';
+import {GetDatasetAndSave} from '../../../DatasetsLoader';
 
 function Home ()
 {

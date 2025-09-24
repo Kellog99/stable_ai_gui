@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./components/client/Header";
 import "@mantine/core/styles.css";
 import "./globals.css";
-import './pages/HomePage/HomePage.css';
+import styles from '@/styles/HomePage.module.css'
 
 const geistSans = Geist( {
   variable: "--font-geist-sans",
@@ -56,18 +56,14 @@ export default function RootLayout ( {
 {
   return (
     <html lang="en">
-      <body
-        className={ `${geistSans.variable} ${geistMono.variable} antialiased` }
-      >
+      <body className={ `${geistSans.variable} ${geistMono.variable} antialiased` }>
         <MantineProvider theme={ myTheme }>
-          <AppShell withBorder={ false }>
-            <div className="home-page">
-              <Header />
-              <main className="flex-1 ">
-                { children }
-              </main>
-            </div>
-          </AppShell>
+        <div className= {styles.homepage}>
+          <Header />
+          <main className="flex-1 ">
+            { children }
+          </main>
+        </div>
         </MantineProvider>
       </body>
     </html>

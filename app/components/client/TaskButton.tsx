@@ -1,36 +1,34 @@
 import { ChevronRight } from 'lucide-react';
 import React from 'react';
-import styles from '../../styles/TaskButton.module.css';
-//import { useNavigate } from "react-router-dom";
+import styles from '@/styles/TaskButton.module.css';
 import { Task } from '@/interfaces/NNInterfaces';
 import RouterButton from './buttons/RouterButton';
 
-const TaskButton: React.FC<Task> = ( {
+const TaskButton: React.FC<Task> = ({
   Icon,
   title,
   description,
   footer,
-  color } ) =>
-{
-  //const navigate = useNavigate();
+  color,
+  href
+}) => {
 
-"/pages/dataquality/datasets"
-  
   // #TODO: change the route 
 
   return (
-    <RouterButton name={ "Animals" } route={title == "Data Quality Tool" ? "/pages/dataquality/datasets" : "/pages/nntrust/RedTeam"}>
-      <div className={ styles.card }
-        onClick={ () => {/*navigate("/redtool")*/ } }>
-        <div className={ styles.card_header }>
-          <div className={ styles.card_icon } style={ { background: color } }>
-            <Icon style={ { width: "2vw" } } />
+    <RouterButton
+      name={"Animals"}
+      route={href ? href : ''}>
+      <div className={styles.card}>
+        <div className={styles.card_header}>
+          <div className={styles.card_icon} style={{ background: color }}>
+            <Icon style={{ width: "2vw" }} />
           </div>
-          <p className={ styles.card_title }>{ title }</p>
+          <p className={styles.card_title}>{title}</p>
         </div>
-        <p className={ styles.card_description }>{ description }</p>
-        <div className={ styles.card_link }>
-          <p>{ footer }</p>
+        <p className={styles.card_description}>{description}</p>
+        <div className={styles.card_link}>
+          <p>{footer}</p>
           <ChevronRight />
         </div>
       </div>

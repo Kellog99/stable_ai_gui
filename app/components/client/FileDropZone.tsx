@@ -2,106 +2,95 @@
 
 import { CheckCircle, Database, File, FileX, Upload } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
-import styles from '../../styles/FileDropZone.module.css';
+import styles from '@/styles/FileDropZone.module.css';
 
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
 import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 import useStore from '@/store/dsStore';
-import { Loader, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { Flex, Loader, Text } from '@mantine/core';
 import DatasetBT from '../server/DatasetBT';
 import ZipUploader from "./Uploader";
 import SelectionButton from './utils/SelectionButtons';
 import ModelUploader from './ModelUploader';
 
-const FileDropZone: React.FC<FileDropZoneProps> = ( {
+const FileDropZone: React.FC<FileDropZoneProps> = ({
   title,
   Icon,
-  onFileSelect,
   acceptedTypes,
   description,
   isLoaded,
   loadedFileName,
-} ) =>
-{
+}) => {
+  // This component must handle the following type of upload
+  // 1. Drag & Drop
+  // 2. Select from folder
+
+  const datasets = useStore((state) => (state.datasets));
+  const setDatasets = useStore((state) => state.setDatasets)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    setIsLoading(true)
+    DatasetsLoader().then(fetchedData => {
+      setDatasets(fetchedData);
+    }).finally(() => {
+      setIsLoading(false)
+    });
+  }, []);
 
 
-  const datasets = useStore( ( state ) => ( state.datasets ) );
-  const setDatasets = useStore( ( state ) => state.setDatasets )
-  const [ isLoading, setIsLoading ] = useState<boolean>( false )
-  const [ opened, { open, close } ] = useDisclosure( false );
+  const query = useStore((state) => (state.queryDataset));
 
-  useEffect( () =>
-  {
-    setIsLoading( true )
-    DatasetsLoader().then( fetchedData =>
-    {
-      setDatasets( fetchedData );
-    } ).finally( () =>
-    {
-      setIsLoading( false )
-    } );
-  }, [] );
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-
-  console.log( "Server Response:", datasets )
-  const query = useStore( ( state ) => ( state.queryDataset ) );
-
-  const [ isDragOver, setIsDragOver ] = useState( false );
-  const [ isError, setIsError ] = useState( false );
-
-  const handleDragOver = useCallback( ( e: React.DragEvent ) =>
-  {
+  const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver( true );
-  }, [] );
+    setIsDragOver(true);
+  }, []);
 
-  const handleDragLeave = useCallback( ( e: React.DragEvent ) =>
-  {
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver( false );
-  }, [] );
+    setIsDragOver(false);
+  }, []);
 
-  const validateFile = ( file: File ) =>
-  {
-    const extension = '.' + file.name.split( '.' ).pop()?.toLowerCase();
-    return acceptedTypes.includes( extension );
+  const validateFile = (file: File) => {
+    const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+    return acceptedTypes.includes(extension);
   };
 
-  const handleDrop = useCallback( ( e: React.DragEvent ) =>
-  {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver( false );
-    setIsError( false );
+    setIsDragOver(false);
+    setIsError(false);
 
-    const files = Array.from( e.dataTransfer.files );
-    if ( files.length > 0 ) {
-      const file = files[ 0 ];
-      if ( validateFile( file ) ) {
-        onFileSelect( file );
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      const file = files[0];
+      if (validateFile(file)) {
+        console.log("validato")
       } else {
-        setIsError( true );
-        setTimeout( () => setIsError( false ), 3000 );
+        setIsError(true);
+        setTimeout(() => setIsError(false), 3000);
       }
     }
-  }, [ onFileSelect, acceptedTypes ] );
+  }, []);
 
-  const handleClickInput = ( ( e: React.MouseEvent ) =>
-  {
-    const inputFile = document.getElementById( `file-${title.toLowerCase()}` )
+  const handleClickInput = ((e: React.MouseEvent) => {
+    const inputFile = document.getElementById(`file-${title.toLowerCase()}`)
     inputFile?.click()
-  } )
-  const getDropZoneClasses = () =>
-  {
+  })
+  const getDropZoneClasses = () => {
     // Changing the class 
-    if ( isError ) {
+    if (isError) {
       return styles.dropzone_error;
     }
     else {
-      if ( isLoaded ) {
+      if (isLoaded) {
         return styles.loaded;
       }
-      else if ( isDragOver ) {
+      else if (isDragOver) {
         return styles.dragOvver;
       }
       else {
@@ -109,7 +98,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
       }
     }
   };
-  const [ selection, setSelection ] = useState<"selection" | "repository">( "selection" )
+  const [selection, setSelection] = useState<"selection" | "drag&drop">("selection")
 
   const btns = [
     {
@@ -117,35 +106,79 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
       name: "Select Dataset",
       Icon: File,
       currentPage: selection,
-      onClickHandle: () => setSelection( "selection" ),
+      onClickHandle: () => setSelection("selection"),
     },
     {
       id: 'repository',
       name: "Dataset Repository",
       Icon: Database,
       currentPage: selection,
-      onClickHandle: () => setSelection( "repository" ),
+      onClickHandle: () => setSelection("drag&drop"),
     }
   ]
 
-  const renderLoadingPage = () =>
-  {
+  const renderLoadingPage = () => {
 
-    switch ( selection ) {
+    switch (selection) {
       case 'selection':
         // this is the case where the selected element is the drag and drop element
         return (
-          <>
-          
-            <div
-              className={ getDropZoneClasses() }
-            >
-              {/*
-              <div
-                onClick={ handleClickInput }
-                onDragOver={ handleDragOver }
-                onDragLeave={ handleDragLeave }
-                onDrop={ handleDrop }
+          <div
+            className={getDropZoneClasses()}
+            onClick={handleClickInput}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <input
+              type="file"
+              id={`file-${title.toLowerCase()}`}
+              accept={acceptedTypes.join(',')}
+              className={styles.inputFile}
+            />
+
+            <div className={styles.dropzone_content}>
+              {isLoaded ? (
+                <CheckCircle className={styles.dropzone_icon} />
+              ) : isError ? (
+                <FileX className={styles.dropzone_icon} />
+              ) : (
+                <Upload className={styles.dropzone_icon} />
+              )}
+
+              <div>
+                <div className={styles.dropzone_title}>
+                  <Icon />
+                  <h3 >{title}</h3>
+                </div>
+
+                <p className={styles.dropzone_description}>{description}</p>
+                {isLoaded && loadedFileName && (
+                  <p className={styles.dropzone_filename}>
+                    ✓ {loadedFileName}
+                  </p>
+                )}
+                {!isLoaded && !isError && (
+                  <p className={styles.dropzone_accepted}>
+                    Accepted: {acceptedTypes.join(', ')}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      case 'drag&drop':
+        return (
+          <div>
+            {/*
+            {isLoading ? (
+              <Flex
+                mih={150}
+                justify="center"
+                align="center"
+                direction="column"
+                wrap="wrap"
+                style={{ width: '100%' }}
               >
                 <input
                   type="file"
@@ -188,10 +221,10 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
               { title === "Dataset" ? <ZipUploader />  : <ModelUploader /> }
             </div>
 
-          </>
+        
 
         );
-      case 'repository':
+      case "drag&drop":
         return (
           <div className={ styles.repositoryContainer }>
 
@@ -200,23 +233,24 @@ const FileDropZone: React.FC<FileDropZoneProps> = ( {
               <div className={ styles.flexLoading }>
                 <Text>Loading...</Text>
                 <Loader />
+              </div>) :
+              (
+                <DatasetBT query={query} datasets={datasets} />
+              )} 
+              
               </div>
-            ) : (
-              <DatasetBT query={ query } datasets={ datasets } />
-            ) }
-          </div>
         );
       default:
         return null;
     }
   }
   return (
-    <div className={ styles.containerDropzone }>
-      <div className={ styles.buttons }>
-        { btns.map( ( btnprop ) =>
-          <SelectionButton key={ btnprop.id } { ...btnprop } /> ) }
+    <div className={styles.containerDropzone}>
+      <div className={styles.buttons}>
+        {btns.map((btnprop) =>
+          <SelectionButton key={btnprop.id} {...btnprop} />)}
       </div>
-      { renderLoadingPage() }
+      {renderLoadingPage()}
     </div>
   );
 }
