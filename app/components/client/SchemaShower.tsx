@@ -16,6 +16,7 @@ import "@xyflow/react/dist/style.css";
 import React, { useCallback, useEffect, useRef } from "react";
 import tinycolor from "tinycolor2";
 import useStore from "../../store/dsStore";
+import { labelColorMapType } from "@/properties/static";
 
 
 interface SchemaVisualizationProps
@@ -68,7 +69,7 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
     const nameParts = featureName.includes( "_" ) ? featureName.split( "_" ) : [ featureName ];
     const formattedParts = nameParts.map( part => part.includes( "embeddings" ) ? part.replace( "embeddings", "embs" ) : part );
 
-    const backgroundColor = labelColorMap[ feature.name ] || "#FFABAB";
+    const backgroundColor = labelColorMapType[ feature.type ] || "#FFF5BA";
     const darkerColor = darkenHexColor( backgroundColor );
 
 

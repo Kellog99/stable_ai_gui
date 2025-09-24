@@ -7,14 +7,13 @@
 }
 
 .dropzone {
-  width: 100%;
+  width: 80vh;
   aspect-ratio: 1.16;
   position: relative;
   border: 2px dashed #D1D5DB;
   border-radius: 0.75rem;
   padding: 2rem;
   text-align: center;
-  cursor: pointer;
   transition: all 0.3s ease-in-out;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(8px);
@@ -133,4 +132,18 @@
   align-items: center;
   gap: 1rem;
   height: 5vw;
+}
+
+.repositoryContainer {
+  width: 100%;
+}
+
+.flexLoading {
+  min-height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: 100%;
 }

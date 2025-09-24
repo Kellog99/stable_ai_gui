@@ -1,3 +1,5 @@
+"use client"
+
 import { CheckCircle, Database, File, FileX, Upload } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import styles from '@/styles/FileDropZone.module.css';
@@ -5,9 +7,12 @@ import styles from '@/styles/FileDropZone.module.css';
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
 import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 import useStore from '@/store/dsStore';
-import SelectionButton from './utils/SelectionButtons';
+import { useDisclosure } from '@mantine/hooks';
 import { Flex, Loader, Text } from '@mantine/core';
 import DatasetBT from '../server/DatasetBT';
+import ZipUploader from "./Uploader";
+import SelectionButton from './utils/SelectionButtons';
+import ModelUploader from './ModelUploader';
 
 const FileDropZone: React.FC<FileDropZoneProps> = ({
   title,
@@ -104,7 +109,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
       onClickHandle: () => setSelection("selection"),
     },
     {
-      id: 'drag&drop',
+      id: 'repository',
       name: "Dataset Repository",
       Icon: Database,
       currentPage: selection,
@@ -165,6 +170,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
       case 'drag&drop':
         return (
           <div>
+            {/*
             {isLoading ? (
               <Flex
                 mih={150}
@@ -174,12 +180,65 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
                 wrap="wrap"
                 style={{ width: '100%' }}
               >
+                <input
+                  type="file"
+                  id={ `file-${title.toLowerCase()}` }
+                  accept={ acceptedTypes.join( ',' ) }
+                  className={ styles.inputFile }
+                />
+
+                <div className={ styles.dropzone_content }>
+                  { isLoaded ? (
+                    <CheckCircle className={ styles.dropzone_icon } />
+                  ) : isError ? (
+                    <FileX className={ styles.dropzone_icon } />
+                  ) : (
+                    <Upload className={ styles.dropzone_icon } />
+                  ) }
+
+                  <div>
+                    <div className={ styles.dropzone_title }>
+                      <Icon />
+                      <h3 >{ title }</h3>
+                    </div>
+
+                    <p className={ styles.dropzone_description }>{ description }</p>
+                    { isLoaded && loadedFileName && (
+                      <p className={ styles.dropzone_filename }>
+                        ✓ { loadedFileName }
+                      </p>
+                    ) }
+                    { !isLoaded && !isError && (
+                      <p className={ styles.dropzone_accepted }>
+                        Accepted: { acceptedTypes.join( ', ' ) }
+                      </p>
+                    ) }
+                  </div>
+                </div>
+              </div>
+              */}
+
+              { title === "Dataset" ? <ZipUploader />  : <ModelUploader /> }
+            </div>
+
+        
+
+        );
+      case "drag&drop":
+        return (
+          <div className={ styles.repositoryContainer }>
+
+            
+            { isLoading ? (
+              <div className={ styles.flexLoading }>
                 <Text>Loading...</Text>
                 <Loader />
-              </Flex>) :
+              </div>) :
               (
                 <DatasetBT query={query} datasets={datasets} />
-              )} </div>
+              )} 
+              
+              </div>
         );
       default:
         return null;

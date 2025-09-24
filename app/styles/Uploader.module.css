@@ -1,0 +1,30 @@
+.container {
+  background-color: #ecfdf5; /* emerald-50 */
+  border: 1px solid #a7f3d0; /* emerald-200 */
+  padding: 1rem; /* p-4 */
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+}
+
+.icon {
+  color: #059669; /* emerald-600 */
+  width: 1.25rem; /* w-5 */
+  height: 1.25rem; /* h-5 */
+}
+
+.title {
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500; /* font-medium */
+  color: #065f46; /* emerald-800 */
+  margin-bottom: 0.25rem; /* mb-1 */
+}
+
+.filename {
+  font-size: 1rem; /* text-base */
+  font-weight: 500; /* font-medium */
+  color: #047857; /* emerald-700 */
+}
+
+.filesize {
+  font-size: 0.875rem; /* text-sm */
+  color: #059669; /* emerald-600 */
+}

@@ -22,6 +22,7 @@ import { outliers_modes } from "./utils";
 import { IsFeatureBond } from "@/functionalities/Utils";
 import { getCompletenessOK } from "@/functionalities/BackendUtils";
 import Link from "next/link";
+import classes from "../../../styles/Config.module.css"
 
 
 
@@ -131,8 +132,8 @@ export default function Config(props: ConfigsProps) {
         setComputeNow(false)
     }, [featureName, outliers_mode, labelFeatureName, configs])
 
-    
-    
+
+
     useEffect(() => {
         if (featureName && datasetName) {
             getCompletenessOK(datasetName, featureName)
@@ -145,7 +146,7 @@ export default function Config(props: ConfigsProps) {
                 })
         }
     }, [featureName])
-    
+
 
 
     {/*
@@ -326,96 +327,141 @@ export default function Config(props: ConfigsProps) {
     const MetricDisplayerComponent = metricDisplayerMap[props.metricName];
 
     return (
-        <div style={{
-            marginLeft: "100px",
-            marginRight: "100px"
-        }}>
-            {props.metricName === "completeness" && (
-                <>
-                    <Alert
-                        variant="light"
-                        color="yellow"
-                        radius="md"
-                        title="Attention"
-                        icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-                        style={{ display: 'inline-block', width: '800px', marginBottom:"30px" }}
-                    >
-                    This metric can only be computed if the available embeddings were generated using the following model: <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
-                    Please ensure that embeddings from this model are available for the selected feature.
-                    </Alert>
-
-                    {!isCompletenessOK && (
+        <div>
+            <div className={classes.featureBox}>
+                {props.metricName === "completeness" && (
+                    <>
                         <Alert
-                        variant="light"
-                        color="red"
-                        radius="md"
-                        title="Ops!"
-                        icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-                        style={{ display: 'inline-block', width: '800px', marginBottom:"30px" }}
-                    >
-                        The selected feature has not embeddings computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>! You can compute them on 
-                        the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
-                        
-                    </Alert>
-                    )}
-                </>
-            )}
-            <Flex
-                direction="row"
-                align="flex-end"
-                gap="md"
-            >
-
-                <Box style={{ position: "relative" }}>
-                    <Select
-                        id="feature"
-                        radius="md"
-                        label="Feature"
-                        placeholder="Choose feature"
-                        data={features}
-                        value={featureName}
-                        onChange={(value) => {
-                            setFeatureName(value);
-                            if (showFeatureError) setShowFeatureError(false);
-                        }}
-                        required
-                        styles={(theme) => ({
-                            input: {
-                                borderColor: showFeatureError ? theme.colors.red[6] : undefined,
-                                '&:hover': {
-                                    borderColor: showFeatureError ? theme.colors.red[6] : undefined,
-                                },
-                            },
-                        })}
-                    />
-
-                    {showFeatureError && (
-                        <Text
-                            size="xs"
-                            style={{ position: "absolute", top: "100%", marginTop: 4, color: "red" }}
-                        >
-                            Choose a feature to continue
-                        </Text>
-                    )}
-                </Box>
-
-                <Box style={{ position: "relative" }}>
-                    {props?.labelFeatureReq ? (
-                        <Select
-                            id="labelFeature"
+                            variant="light"
+                            color="yellow"
                             radius="md"
-                            label="Label Feature"
-                            placeholder="Choose label"
-                            data={labelFeatures}
-                            value={labelFeatureName}
+                            title="Attention"
+                            icon={<FontAwesomeIcon icon={faCircleExclamation} />}
+                            style={{ display: 'inline-block', width: '800px', marginBottom: "30px" }}
+                        >
+                            This metric can only be computed if the available embeddings were generated using the following model: <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
+                            Please ensure that embeddings from this model are available for the selected feature.
+                        </Alert>
+
+                        {!isCompletenessOK && (
+                            <Alert
+                                variant="light"
+                                color="red"
+                                radius="md"
+                                title="Ops!"
+                                icon={<FontAwesomeIcon icon={faCircleExclamation} />}
+                                style={{ display: 'inline-block', width: '800px', marginBottom: "30px" }}
+                            >
+                                The selected feature has not embeddings computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>! You can compute them on
+                                the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
+
+                            </Alert>
+                        )}
+                    </>
+                )}
+                <Flex
+                    direction="row"
+                    align="flex-end"
+                    gap="md"
+                >
+
+                    <Box style={{ position: "relative" }}>
+                        <Select
+                            id="feature"
+                            radius="md"
+                            label="Feature"
+
+                            placeholder="Choose feature"
+                            data={features}
+                            value={featureName}
                             onChange={(value) => {
-                                setLabelFeatureName(value as string);
-                                if (showLabelError) setShowLabelError(false);
+                                setFeatureName(value);
+                                if (showFeatureError) setShowFeatureError(false);
+                            }}
+                            required
+                            styles={(theme) => ({
+                                input: {
+                                    borderColor: showFeatureError ? theme.colors.red[6] : undefined,
+                                    borderWidth: showFeatureError ? 2.5 : 1,   // ✅ thicker border on error
+                                    '&:hover': {
+                                        borderColor: showFeatureError ? theme.colors.red[6] : undefined,
+                                    },
+                                },
+                            })}
+                        />
+
+                        {showFeatureError && (
+                            <Text
+                                size="xs"
+                                c="red"
+                                style={{ position: "absolute", top: "100%", marginTop: 4 }}
+                            >
+                                Choose a feature to continue
+                            </Text>
+                        )}
+                    </Box>
+
+                    <Box style={{ position: "relative" }}>
+                        {props?.labelFeatureReq ? (
+                            <Select
+                                id="labelFeature"
+                                radius="md"
+                                label="Label Feature"
+                                placeholder="Choose label"
+                                data={labelFeatures}
+                                value={labelFeatureName}
+                                onChange={(value) => {
+                                    setLabelFeatureName(value as string);
+                                    if (showLabelError) setShowLabelError(false);
+                                }}
+                                required={true}
+                                styles={(theme) => ({
+                                    input: {
+                                        borderColor: showLabelError ? theme.colors.red[6] : undefined,
+                                        borderWidth: showLabelError ? 2.5 : 1,
+                                        '&:hover': {
+                                            borderColor: showLabelError ? theme.colors.red[6] : undefined,
+                                        },
+                                    },
+                                })}
+                            />) : null}
+
+                        {showLabelError && (
+                            <Text
+                                size="xs"
+                                c="red"
+                                style={{ position: "absolute", top: "100%", marginTop: 4 }}
+                            >
+                                Choose a label to continue
+                            </Text>
+                        )}
+
+                    </Box>
+
+                    <Box style={{ position: "relative" }}>
+                        {props?.metricName == "outliers" ? (<Select
+                            id="outliers-mode"
+                            radius="md"
+                            label="Mode"
+                            placeholder="Choose a mode to compute outliers"
+                            data={outliers_modes}
+                            value={outliers_mode}
+                            onChange={(value) => {
+                                setOutliersMode(value as string);
+
+                                if (value) {
+                                    if (!showOutliersConfig) {
+                                        setShowOutliersConfig(true);
+                                    }
+                                } else {
+                                    setShowOutliersConfig(false);
+                                }
                             }}
                             required={true}
                             styles={(theme) => ({
                                 input: {
                                     borderColor: showLabelError ? theme.colors.red[6] : undefined,
+                                    borderWidth: showLabelError ? 2.5 : 1,
                                     '&:hover': {
                                         borderColor: showLabelError ? theme.colors.red[6] : undefined,
                                     },
@@ -423,119 +469,86 @@ export default function Config(props: ConfigsProps) {
                             })}
                         />) : null}
 
-                    {showLabelError && (
-                        <Text
-                            size="xs"
-                            style={{ position: "absolute", top: "100%", marginTop: 4, color: "red" }}
-                        >
-                            Choose a label to continue
-                        </Text>
-                    )}
-
-                </Box>
-
-                <Box style={{ position: "relative" }}>
-                    {props?.metricName == "outliers" ? (<Select
-                        id="outliers-mode"
-                        radius="md"
-                        label="Mode"
-                        placeholder="Choose a mode to compute outliers"
-                        data={outliers_modes}
-                        value={outliers_mode}
-                        onChange={(value) => {
-                            setOutliersMode(value as string);
-
-                            if (value) {
-                                if (!showOutliersConfig) {
-                                    setShowOutliersConfig(true);
-                                }
-                            } else {
-                                setShowOutliersConfig(false);
-                            }
-                        }}
-                        required={true}
-                        styles={(theme) => ({
-                            input: {
-                                borderColor: showLabelError ? theme.colors.red[6] : undefined,
-                                '&:hover': {
-                                    borderColor: showLabelError ? theme.colors.red[6] : undefined,
-                                },
-                            },
-                        })}
-                    />) : null}
-
-                </Box>
-                {props.metricName == "completeness" ? (
-                    <Box style={{ position: "relative" }}>
-                        <Textarea
-                            label="Requirements"
-                            radius="md"
-                            size="xs"
-                            placeholder="Write each requirement in a different line."
-                            autosize
-                            required={true}
-                            value={inputReq}
-                            disabled={!isCompletenessOK}
-                            onChange={handleRequirements}
-                            styles={(theme) => ({
-                                input: {
-                                    width: "400px",
-                                    borderColor: showRequirementsError ? theme.colors.red[6] : undefined,
-                                    '&:hover': {
-                                        borderColor: showRequirementsError ? theme.colors.red[6] : undefined,
-                                    },
-                                },
-                            })} />
-                        {showRequirementsError && (
-                            <Text
-                                size="xs"
-                                style={{ position: "absolute", top: "100%", marginTop: 4, color: "red" }}
-                            >
-                                Write at least one requirement to continue
-                            </Text>
-                        )}
                     </Box>
-                ) :
-                    (<>
-                        <Modal opened={opened} onClose={close} title="Configurations">
-                            {MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div>}
-                        </Modal>
+                    {props.metricName == "completeness" ? (
+                        <Box style={{ position: "relative" }}>
+                            <Textarea
+                                label="Requirements"
+                                radius="md"
+                                size="xs"
+                                placeholder="Write each requirement in a different line."
+                                autosize
+                                required={true}
+                                value={inputReq}
+                                disabled={!isCompletenessOK}
+                                onChange={handleRequirements}
+                                styles={(theme) => ({
+                                    input: {
+                                        width: "400px",
+                                        borderColor: showRequirementsError ? theme.colors.red[6] : undefined,
+                                        borderWidth: showRequirementsError ? 2.5 : 1,
+                                        '&:hover': {
+                                            borderColor: showRequirementsError ? theme.colors.red[6] : undefined,
+                                        },
+                                    },
+                                    label: {
+                                        color:"white"
+                                    }
+                                })} />
+                            {showRequirementsError && (
+                                <Text
+                                    size="xs"
+                                    c="red"
+                                    style={{ position: "absolute", top: "100%", marginTop: 4 }}
+                                >
+                                    Write at least one requirement to continue
+                                </Text>
+                            )}
+                        </Box>
+                    ) :
+                        (<>
+                            <Modal opened={opened} onClose={close} title="Configurations">
+                                {MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div>}
+                            </Modal>
 
-                        <Button variant="default" onClick={open} size="xs" radius="md" disabled={props.metricName == "outliers" && showOutliersConfig == false}>
-                            Configs
-                        </Button>
-                    </>)
-                }
-            </Flex>
-            <Space h="xl" />
-            <Flex
-                direction="row"
-                justify="start"
-                gap="md">
-                <Button
-                    onClick={handleSaveToReport}
-                    disabled={!computed}
-                >
-                    {clicked && !isDuplicate ? (<>
-                        <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
-                        <span>Saved</span></>)
-                        : "Save to report"}
-                </Button>
+                            <Button variant="default" onClick={open} size="xs" radius="md" disabled={props.metricName == "outliers" && showOutliersConfig == false}>
+                                Configs
+                            </Button>
+                        </>)
+                    }
+                </Flex>
+                <Space h="xl" />
+                <Flex
+                    direction="row"
+                    justify="end"
+                    gap="md">
+                    <Button
+                        onClick={handleSaveToReport}
+                        disabled={!computed}
+                    >
+                        {clicked && !isDuplicate ? (<>
+                            <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
+                            <span>Saved</span></>)
+                            : "Save to report"}
+                    </Button>
 
-                <Button 
-                    onClick={handleClickCompute}
-                    disabled={props.metricName=="completeness" && !isCompletenessOK}>
-                    Compute now
-                </Button>
-            </Flex>
+                    <Button
+                        onClick={handleClickCompute}
+                        disabled={props.metricName == "completeness" && !isCompletenessOK}>
+                        Compute now
+                    </Button>
+                </Flex>
 
-            {isDuplicate ? (
-                <>
-                    <Space h="md" />
-                    <Alert variant="light" color="red" withCloseButton onClose={() => { setIsDuplicate(false); setClicked(false) }} title="Attention" icon={icon}>
-                        A metric with this same configuration has been already computed. Please change something or choose another metric.
-                    </Alert>
-                </>) : null}
+                {isDuplicate ? (
+                    <>
+                        <Space h="md" />
+                        <Alert variant="light" color="red" withCloseButton onClose={() => { setIsDuplicate(false); setClicked(false) }} title="Attention" icon={icon}>
+                            A metric with this same configuration has been already computed. Please change something or choose another metric.
+                        </Alert>
+                    </>) : null}
+
+            </div>
+
 
             {computeNow ? (
                 isLoading ? (
@@ -547,7 +560,7 @@ export default function Config(props: ConfigsProps) {
                         wrap="wrap"
                         style={{ width: '100%' }}
                     >
-                        <p>Loading...</p>
+                        <Text>Loading...</Text>
                         <Loader />
                     </Flex>
                 ) : (

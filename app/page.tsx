@@ -1,6 +1,6 @@
 "use client";
 import styles from '@/styles/HomePage.module.css';
-import { HomePageProps, FileDropZoneProps } from "./interfaces/NNInterfaces";
+import { FileDropZoneProps } from "./interfaces/NNInterfaces";
 import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
 import { Task } from '@/interfaces/NNInterfaces';
 import TaskButton from '@/components/client/TaskButton';
@@ -58,7 +58,7 @@ const homePageDropZones: FileDropZoneProps[] = [
   }]
 
 
-const HomePage: React.FC<HomePageProps> = ({ }) => {
+const HomePage: React.FC = ({ }) => {
   return (
     <div className={styles.homecontainer}>
 

@@ -5,11 +5,13 @@ import { getPrototypes } from "@/functionalities/BackendUtils";
 import { IsFeatureBond, IsFeatureSameLength } from "@/functionalities/Utils";
 import Dataset, { PrototypesInt } from "@/interfaces/genericInterface";
 import { image_type, label_type, text_type } from "@/properties/types";
-import { Button, Flex, Loader, Select, Text } from "@mantine/core";
+import { Button, Center, Flex, Loader, Select, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useStore from '../../../store/dsStore';
 import featureLoader from "@/functionalities/FeatureLoader";
+import classes from './page.module.css';
+import { MousePointerClick } from "lucide-react";
 
 
 
@@ -129,90 +131,95 @@ export default function Prototypes() {
 
     return (
         <div className="w-full h-screen">
-            <div style={{
-                marginTop: "50px",
-                marginLeft: "100px",
-                marginRight: "100px",
-            }}>
 
-                <div style={{ width: '300px', position: 'relative', marginBottom: '20px' }}>
-                    <Flex
-                        direction="row"
-                        gap="xs">
+            <div className={classes.featureBox}>
+                <Flex
+                    direction="row"
+                    gap="xs">
 
+                    <Select
+                        id="feature"
+                        radius="md"
+                        label="Feature"
+                        placeholder="Choose feature to visualize"
+                        data={features}
+                        value={featureName}
+                        onChange={(value) => setFeatureName(value)}
+                        required={true}
+                    />
+
+                    {datasetUsed?.task != "single_feature" ? (
                         <Select
-                            id="feature"
+                            id="labelFeature"
                             radius="md"
-                            label="Feature"
-                            placeholder="Choose feature to visualize"
-                            data={features}
-                            value={featureName}
-                            onChange={(value) => setFeatureName(value)}
+                            label="Label Feature"
+                            placeholder="Choose label"
+                            data={labelFeatures}
+                            value={labelFeatureName}
+                            onChange={(value) => setLabelFeatureName(value as string)}
                             required={true}
-                        />
+                        />) : null}
 
-                        {datasetUsed?.task != "single_feature" ? (
-                            <Select
-                                id="labelFeature"
-                                radius="md"
-                                label="Label Feature"
-                                placeholder="Choose label"
-                                data={labelFeatures}
-                                value={labelFeatureName}
-                                onChange={(value) => setLabelFeatureName(value as string)}
-                                required={true}
-                            />) : null}
+                </Flex>
 
-                    </Flex>
-
-                    <Button mt="md" size="sm"
-                        onClick={handleClick}
-                        disabled={
-                            (datasetUsed?.task === "single_feature" && !featureName) ||
-                            (datasetUsed?.task !== "single_feature" && (!featureName || !labelFeatureName))
-                        }
-                    >
-                        Get Prototypes
-                    </Button>
-                </div>
-                {isLoading ? (
-                    <>
-                        <Flex
-                            mih={150}
-                            justify="center"
-                            align="center"
-                            direction="column"
-                            wrap="wrap"
-                            style={{ width: '100%' }}
-                        >
-                            <p>Loading...</p>
-                            <Loader />
-                        </Flex>
-                    </>
-                ) : (<>
-                    {prototypes && featureData && labelData ? (
-                        <>
-                            <Flex
-                                mih={150}
-                                justify="center"
-                                align="center"
-                                direction="column"
-                                wrap="wrap"
-                                style={{ width: '100%' }}
-                            >
-                                <div ref={containerRef} className="h-[600px] overflow-auto">
-                                    <FeatureDisplayer featureData={featureData} featureType={featureType} labelData={labelData} label_dict={labelDict as { [key: number]: string }} columns={4} />
-                                </div>
-                            </Flex>
-
-                        </>
-                    ) : (datasetUsed?.task == "single_feature" ? 
-                        (<Text size="xs">Select Feature</Text>) :
-                        (<Text size="xs">Select Feature and Label</Text>)
-                    )}
-                </>)}
-
+                <Button mt="md" size="sm"
+                    onClick={handleClick}
+                    disabled={
+                        (datasetUsed?.task === "single_feature" && !featureName) ||
+                        (datasetUsed?.task !== "single_feature" && (!featureName || !labelFeatureName))
+                    }
+                >
+                    Get Prototypes
+                </Button>
             </div>
+            {isLoading ? (
+                <Flex
+                    mih={150}
+                    justify="center"
+                    align="center"
+                    direction="column"
+                    wrap="wrap"
+                    style={{ width: "100%" }}
+                >
+                    <Text>Loading...</Text>
+                    <Loader />
+                </Flex>
+            ) : prototypes && featureData && labelData ? (
+                <Flex
+                    mih={150}
+                    justify="center"
+                    align="center"
+                    direction="column"
+                    wrap="wrap"
+                    style={{ width: "100%" }}
+                >
+                    <div ref={containerRef} className="h-[600px] overflow-auto">
+                        <FeatureDisplayer
+                            featureData={featureData}
+                            featureType={featureType}
+                            labelData={labelData}
+                            label_dict={labelDict as { [key: number]: string }}
+                            columns={4}
+                        />
+                    </div>
+                </Flex>
+            ) : (
+                <Center>
+                    <span
+                        style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+                    >
+                        <MousePointerClick size={22} color="white" />
+                        <Text size="xs">
+                            {datasetUsed?.task === "single_feature"
+                                ? "Select a feature "
+                                : "Select a feature and a label "}
+                            to see the prototypes
+                        </Text>
+                    </span>
+                </Center>
+            )}
+
+
         </div>
     )
 }

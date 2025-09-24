@@ -560,7 +560,7 @@ export default function ScatterPlotVisualization(props: propsTypes) {
           wrap="wrap"
           style={{ width: '100%' }}
         >
-          <p>Loading...</p>
+          <Text>Loading...</Text>
           <Loader />
         </Flex>
       ) : noEmbAvailable===true ? (
