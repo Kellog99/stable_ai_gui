@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, CloseButton, Flex, RingProgress, Text } from "@mantine/core";
+import { Box, Button, CloseButton, Flex, RingProgress, Text, Title } from "@mantine/core";
 import
 {
     ChartData,
@@ -357,11 +357,12 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
 
     return (
         <Flex direction="column" align="center" style={ { width: '100%', maxWidth: '100%' } }>
-            <h3>Score computed on { featureName } with { mode } mode</h3>
+            <Title order={3}>Score computed on { featureName } with { mode } mode</Title>
             <RingProgress
                 size={ 180 }
                 roundCaps
                 sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
+                rootColor="transparent"
                 transitionDuration={ 1000 }
                 label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
             />

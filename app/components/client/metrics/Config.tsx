@@ -23,6 +23,7 @@ import { IsFeatureBond } from "@/functionalities/Utils";
 import { getCompletenessOK } from "@/functionalities/BackendUtils";
 import Link from "next/link";
 import classes from "../../../styles/Config.module.css"
+import { AlertCust } from "../AlertCustom";
 
 
 
@@ -331,19 +332,27 @@ export default function Config(props: ConfigsProps) {
             <div className={classes.featureBox}>
                 {props.metricName === "completeness" && (
                     <>
-                        <Alert
-                            variant="light"
-                            color="yellow"
-                            radius="md"
-                            title="Attention"
-                            icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-                            style={{ display: 'inline-block', width: '800px', marginBottom: "30px" }}
-                        >
-                            This metric can only be computed if the available embeddings were generated using the following model: <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
-                            Please ensure that embeddings from this model are available for the selected feature.
-                        </Alert>
+                        <div style={{ marginBottom: "15px" }}>
+                            <AlertCust result={"warning"}
+                                textToDisplay={
+                                    <>
+                                        This metric can only be computed if the available embeddings were generated using the following model: <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
+                                        Please ensure that embeddings from this model are available for the selected feature.
+                                    </>} />
+                        </div>
+
 
                         {!isCompletenessOK && (
+                            <>
+                                <div style={{ marginBottom: "15px" }}>
+                                    <AlertCust
+                                        result={"error"}
+                                        textToDisplay={<>
+                                            The selected feature has not embeddings computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>! You can compute them on
+                                            the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
+                                        </>} />
+                                </div>
+                                {/*
                             <Alert
                                 variant="light"
                                 color="red"
@@ -356,6 +365,8 @@ export default function Config(props: ConfigsProps) {
                                 the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
 
                             </Alert>
+                            */}
+                            </>
                         )}
                     </>
                 )}
@@ -492,7 +503,7 @@ export default function Config(props: ConfigsProps) {
                                         },
                                     },
                                     label: {
-                                        color:"white"
+                                        color: "white"
                                     }
                                 })} />
                             {showRequirementsError && (
@@ -507,9 +518,65 @@ export default function Config(props: ConfigsProps) {
                         </Box>
                     ) :
                         (<>
-                            <Modal opened={opened} onClose={close} title="Configurations">
+
+                            <Modal.Root
+                                opened={opened}
+                                onClose={close}
+                                centered
+                            >
+                                <Modal.Overlay
+                                    backgroundOpacity={0.55}
+                                    blur={3} />
+                                <Modal.Content
+                                    style={{
+                                        borderRadius: "12px",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    <Modal.Header
+                                        style={{
+                                            backgroundColor: "#334155",
+                                            justifyContent: "center", // centers title
+                                            borderBottom: "1px solid white", // white divider line
+                                            padding: "16px",
+                                        }}
+                                    >
+                                        <Modal.Title style={{ fontWeight: 700, fontSize: "1.25rem", color:"white" }}>
+                                            Configurations
+                                        </Modal.Title>
+                                        <Modal.CloseButton
+                                            style={{ position: "absolute", right: "16px", top: "16px", color: "white" }}
+                                        />
+                                    </Modal.Header>
+
+                                    <Modal.Body style={{ padding: "20px", backgroundColor: "#334155", }}>
+                                        {MetricConfigComponent ? (
+                                            <MetricConfigComponent />
+                                        ) : (
+                                            <div>Unsupported metric</div>
+                                        )}
+                                    </Modal.Body>
+                                </Modal.Content>
+                            </Modal.Root>
+
+
+                            {/*
+                            <Modal
+                                opened={opened}
+                                onClose={close}
+                                title="Configurations"
+                                centered
+                                overlayProps={{
+                                    backgroundOpacity: 0.55,
+                                    blur: 3,
+                                }}>
+
+
+
+
                                 {MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div>}
                             </Modal>
+                            */}
 
                             <Button variant="default" onClick={open} size="xs" radius="md" disabled={props.metricName == "outliers" && showOutliersConfig == false}>
                                 Configs
@@ -542,9 +609,14 @@ export default function Config(props: ConfigsProps) {
                 {isDuplicate ? (
                     <>
                         <Space h="md" />
+                        <AlertCust
+                            result={"error"}
+                            textToDisplay={"A metric with this same configuration has been already computed. Please change something or choose another metric."} />
+                        {/*
                         <Alert variant="light" color="red" withCloseButton onClose={() => { setIsDuplicate(false); setClicked(false) }} title="Attention" icon={icon}>
                             A metric with this same configuration has been already computed. Please change something or choose another metric.
                         </Alert>
+                        */}
                     </>) : null}
 
             </div>

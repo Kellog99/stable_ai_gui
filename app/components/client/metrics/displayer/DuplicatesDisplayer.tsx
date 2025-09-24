@@ -11,9 +11,10 @@ import
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Alert, Flex, RingProgress, Text } from "@mantine/core";
+import { Alert, Flex, RingProgress, Text, Title } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AlertCust } from "../../AlertCustom";
 
 
 
@@ -62,7 +63,7 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
         direction="column"
         align="center"
       >
-        <h3>Score on the { featureName } feature</h3>
+        <Title order={3}>Score on the { featureName } feature</Title>
         { feature && duplicatesImages.length > 0 ? (
           <>
             <RingProgress
@@ -70,6 +71,7 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
               roundCaps
               sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
               transitionDuration={ 1000 }
+              rootColor="transparent"
               label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
             />
             <FeatureDisplayer indexes={ indicesFlat } featureData={ duplicatesImages } featureType={ type } columns={ 2 } />
@@ -80,8 +82,11 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
                 roundCaps
                 sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
                 transitionDuration={ 1000 }
+                rootColor="transparent"
                 label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
               />
+              <AlertCust result={"success"} textToDisplay={`The ${ featureName } feature has 0 duplicates.`} />
+              {/*
               <Alert
                 variant="light"
                 color="green"
@@ -92,6 +97,7 @@ export default function DuplicatesDisplayer ( props: { duplicates: DuplicatesDTO
               >
                 The { featureName } feature has 0 duplicates.
               </Alert>
+              */}
             </>
           )
           : null }

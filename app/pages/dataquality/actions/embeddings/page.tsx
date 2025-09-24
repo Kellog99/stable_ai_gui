@@ -12,9 +12,13 @@ import { Alert, Box, Button, Center, Flex, Loader, Progress, Select, Table, Text
 import Link from "next/link";
 import { useEffect, useRef, useState } from 'react';
 import useStore from '../../../../store/dsStore';
-import { Vision } from '@vectopus/atlas-icons-react';
+import classes from "../../datasets/page.module.css"
 import { GetDatasetAndSave } from '../../../../functionalities/DatasetsLoader';
 import { useSearchParams } from 'next/navigation';
+import { MousePointerClick, Zap } from 'lucide-react';
+import styles from "./page.module.css"
+import { AnyKindOfDictionary } from 'lodash';
+import { AlertCust } from '@/components/client/AlertCustom';
 
 function Home() {
   const socketRef = useRef<WebSocket | null>(null);
@@ -66,6 +70,7 @@ function Home() {
 
 
   async function computeEmbeddings(model: string) {
+    console.log("La chiamata è partita :))))")
     const baseUrl = embedder_get
 
     const url = new URL(baseUrl);
@@ -177,249 +182,277 @@ function Home() {
     }
   }
 
+  const formatValue = (value: any) => {
+    if (value === null) {
+      return <span className={styles.nullValue}>-</span>;
+    }
+    if (typeof value === 'boolean') {
+      return (
+        <span className={value ? styles.trueValue : styles.falseValue}>
+          {value.toString()}
+        </span>
+      );
+    }
+    return value;
+  };
+
 
 
   return (
     <div className="w-full h-screen">
 
-      <div style={{
-        marginTop: "50px",
-        marginLeft: "100px",
-        marginRight: "100px"
-      }}>
+      <Box
+        className={classes.title}
+        style={{ display: "flex", flexDirection: "column", gap: "0px" }}
+      >
+        <div className={classes.datasetHeader}>
+          <Zap className={classes.iconDatabase} />
+          <h1 className={classes.datasetTitle}>
+            Embeddings computation
+          </h1>
+        </div>
+        <div className={classes.datasetDivider}></div>
+
+      </Box>
 
 
-        <div style={{ width: '100%', position: 'relative' }}>
 
-          <Flex direction="column" justify="space-between" align="flex-start">
-            <Flex
-              direction="row"
-              gap="xs">
+      <Flex direction="column">
+        <div className={classes.featureBox}>
+          <Flex
+            direction="row"
+            gap="xs">
 
-              <Select
-                id="feature"
-                radius="md"
-                label="Feature"
-                placeholder="Choose feature to embed"
-                data={features}
-                value={featureName}
-                onChange={(value) => setFeatureName(value)}
-                allowDeselect={false}
-                clearable={!isConnected}
-                required={true}
-              />
+            <Select
+              id="feature"
+              radius="md"
+              label="Feature"
+              placeholder="Choose feature to embed"
+              data={features}
+              value={featureName}
+              onChange={(value) => setFeatureName(value)}
+              allowDeselect={false}
+              clearable={!isConnected}
+              required={true}
+            />
 
-              <Select
-                id="feature"
-                radius="md"
-                label="Model name"
-                placeholder="Choose model to use"
-                data={[
-                  "sentence-transformers/all-MiniLM-L6-v2",
-                  "openai/clip-vit-base-patch32",
-                  "google/vit-base-patch16-224",
-                  "bert-base-uncased",
-                  "apple/DFN5B-CLIP-ViT-H-14-378"
-                ]}
-                value={modelName}
-                onChange={(value) => connectAndAssingModel(value as string)}
-                allowDeselect={false}
-                clearable={!isConnected}
-                required={true}
-                onClear={() => {
-                  setShowModelInfo(false);
-                  setModelInfo(null);
-                  setComputing(false);
-                }}
-              />
+            <Select
+              id="feature"
+              radius="md"
+              label="Model name"
+              placeholder="Choose model to use"
+              data={[
+                "sentence-transformers/all-MiniLM-L6-v2",
+                "openai/clip-vit-base-patch32",
+                "google/vit-base-patch16-224",
+                "bert-base-uncased",
+                "apple/DFN5B-CLIP-ViT-H-14-378"
+              ]}
+              value={modelName}
+              onChange={(value) => connectAndAssingModel(value as string)}
+              allowDeselect={false}
+              clearable={!isConnected}
+              required={true}
+              onClear={() => {
+                setShowModelInfo(false);
+                setModelInfo(null);
+                setComputing(false);
+              }}
+            />
+          </Flex>
 
-            </Flex>
-
-            {showModelInfo && modelInfo ? (
-              <>
-                <Flex direction="row" gap="md" align="center" wrap="nowrap">
-                  <Table variant="vertical" layout="fixed" withTableBorder
-                    style={{
-                      marginTop: "20px",
-
-                      width: "30%",
-
-                    }}>
-
-                    <Table.Tbody>
-                      <Table.Tr>
-                        <Table.Td colSpan={2} style={{ textAlign: "center", fontWeight: "bold", fontSize: "14px", paddingBottom: "10px" }}>
-                          Model Info
-                        </Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th w={160}>Name</Table.Th>
-                        <Table.Td>{modelInfo.name}</Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th>Model Type</Table.Th>
-                        <Table.Td>{modelInfo.model_type}</Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th>Architecture</Table.Th>
-                        <Table.Td>{modelInfo.architecture}</Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th>Support Text</Table.Th>
-                        <Table.Td>{modelInfo.supports_text.toString()}</Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th>Support Images</Table.Th>
-                        <Table.Td>{modelInfo.supports_images.toString()}</Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th>Support Audio</Table.Th>
-                        <Table.Td>{modelInfo.supports_audio.toString()}</Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th>Embedding Dimension</Table.Th>
-                        <Table.Td>{modelInfo.embedding_dim}</Table.Td>
-                      </Table.Tr>
-
-                      <Table.Tr>
-                        <Table.Th>Max Length</Table.Th>
-                        <Table.Td>{modelInfo.max_length}</Table.Td>
-                      </Table.Tr>
-
-                    </Table.Tbody>
-                  </Table>
-
-                  {!checkModelFeatureCompatibility(modelInfo, featureName) && (
-                    <Alert
-                      variant="light"
-                      color="orange"
-                      radius="md"
-                      title="Warning"
-                      icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-                      style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}
-                    >
-                      Check the compatibility between the selected model and the feature type.
-                    </Alert>
-                  )}
-                </Flex>
-              </>) : loadingInfo ? (
-                <>
-                  <Flex
-                    mih={150}
-                    justify="center"
-                    align="center"
-                    direction="column"
-                    wrap="wrap"
-                  >
-                    <Loader size={30} />
-                  </Flex>
-                </>
-              ) : null}
+          <Flex
+            direction="row"
+            justify="end"
+            gap="md">
 
             <Button style={{ marginTop: "20px" }}
               onClick={handleCompute}
               disabled={!featureName || !modelName || !checkModelFeatureCompatibility(modelInfo as ModelInfo, featureName) || computing}>
               Compute Embeddings
             </Button>
-
           </Flex>
-
 
         </div>
 
+        {showModelInfo && modelInfo ? (
+          <>
+            <Flex direction="row" gap="md" align="center" wrap="nowrap">
+              <div className={styles.container}>
+                <div className={styles.header}>
+                  Model Info
+                </div>
+                <table className={styles.table}>
+                  <tbody>
+                    <tr>
+                      <td className={styles.label}>Name</td>
+                      <td className={styles.value}>{modelInfo.name}</td>
+                    </tr>
+                    <tr>
+                      <td className={styles.label}>Model Type</td>
+                      <td className={styles.value}>{modelInfo.model_type}</td>
+                    </tr>
+                    <tr>
+                      <td className={styles.label}>Architecture</td>
+                      <td className={styles.value}>{modelInfo.architecture}</td>
+                    </tr>
+                    <tr>
+                      <td className={styles.label}>Support Text</td>
+                      <td className={styles.value}>{formatValue(modelInfo.supports_text)}</td>
+                    </tr>
+                    <tr>
+                      <td className={styles.label}>Support Images</td>
+                      <td className={styles.value}>{formatValue(modelInfo.supports_images)}</td>
+                    </tr>
+                    <tr>
+                      <td className={styles.label}>Support Audio</td>
+                      <td className={styles.value}>{formatValue(modelInfo.supports_audio)}</td>
+                    </tr>
+                    <tr>
+                      <td className={styles.label}>Embedding Dimension</td>
+                      <td className={styles.value}>{formatValue(modelInfo.embedding_dim)}</td>
+                    </tr>
+                    <tr>
+                      <td className={`${styles.label} ${styles.lastRow}`}>Max Length</td>
+                      <td className={`${styles.value} ${styles.lastRow}`}>{formatValue(modelInfo.max_length)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-        {!computing ? (<>
-          <Text size="sm" style={{ marginTop: "20px" }}>Select a feature and the model to compute embeddings </Text>
-        </>
-        ) : featureName !== "" && result === null && modelName !== "" ? (
+              {!checkModelFeatureCompatibility(modelInfo, featureName) && (
+                <>
+                  <AlertCust result={'warning'} textToDisplay="Check the compatibility between the selected model and the feature type." />
 
-          <div className="my-animation-container w-full md:w-3/4 lg:w-1/2 mx-auto p-4 bg-gray-200 rounded-lg">
-            <Center>
-              {projecting ?
-                <Text size="sm" style={{ marginTop: "60px" }}>Projecting embeddings...</Text>
-                : <Text size="sm" style={{ marginTop: "60px" }}>Computing embeddings...</Text>}
-
-            </Center>
-
-
-
-            <Box style={{ position: 'relative', marginTop: 60 }}>
-              <Progress
-                value={progress}
-                size="xl"
-                radius="xl"
-                color="red"
-                striped
-                animated
-                style={{
-                  height: "30px"
-                }}
-              />
-              <Text
-                size="sm"
-                fw={700}
-                c="black"
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  pointerEvents: 'none',
-                }}
+                </>
+              )}
+            </Flex>
+          </>) : loadingInfo ? (
+            <>
+              <Flex
+                mih={150}
+                justify="center"
+                align="center"
+                direction="column"
+                wrap="wrap"
               >
-                {progress}%
-              </Text>
-            </Box>
+                <Loader size={30} />
+              </Flex>
+            </>
+          ) :
+          <Center>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+              <MousePointerClick size={22} color="white" />
+              <Text size="sm">Select a feature and a model to compute embeddings</Text>
+            </span>
+          </Center>}
+
+      </Flex>
+
+      {computing && result==null? (
+
+        <div>
+          <Center>
+            {projecting ?
+              <Text size="sm" style={{ marginTop: "60px" }}>Projecting embeddings...</Text>
+              : <Text size="sm" style={{ marginTop: "60px" }}>Computing embeddings...</Text>}
+
+          </Center>
 
 
-          </div>
-        ) :
-          result == "Complete!" ? (
 
-            <Alert
-              variant="light"
-              color="green"
-              radius="md"
-              title={result}
-              icon={<FontAwesomeIcon icon={faCheck} />}
-              style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}>
-
-              The {featureName} feature has been correctly embedded and added to schema.
-            </Alert>
-
-
-          ) : result == "Feature is already embedded!" ? (
-            <Alert
-              variant="light"
-              color="orange"
-              radius="md"
-              title="Attention!"
-              icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-              style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}
+          <Box style={{ position: 'relative', marginTop: 60 }}>
+            <Progress
+              value={progress}
+              size="xl"
+              radius="xl"
+              color="red"
+              striped
+              animated
+              style={{
+                height: "30px"
+              }}
+            />
+            <Text
+              size="sm"
+              fw={700}
+              c="black"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                pointerEvents: 'none',
+              }}
             >
-              The {featureName} feature is already embedded. Check the dataset schema{" "}
-              <Link
-                href={{
-                  pathname: "/pages/dataquality/datasets",
-                  query: { datasetName: datasetName }
-                }}
-                style={{ color: 'blue' }}
-              >
-                here
-              </Link>.
-            </Alert>
+              {progress}%
+            </Text>
+          </Box>
 
 
-          ) : null}
-      </div>
-    </div>
+        </div>
+      ) :
+        result == "Complete!" ? (<>
+          <AlertCust result={'success'} textToDisplay={`The ${featureName} feature has been correctly embedded and added to schema.`} />
+          {/*
+          <Alert
+            variant="light"
+            color="green"
+            radius="md"
+            title={result}
+            icon={<FontAwesomeIcon icon={faCheck} />}
+            style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}>
+
+            The {featureName} feature has been correctly embedded and added to schema.
+          </Alert>
+          */}
+        </>
+
+
+        ) : result == "Feature is already embedded!" ? (
+          <>
+            <AlertCust
+              result={'warning'}
+              textToDisplay={<>
+                The {featureName} feature is already embedded. Check the dataset schema{" "}
+                <Link
+                  href={{
+                    pathname: "/pages/dataquality/datasets",
+                    query: { datasetName: datasetName }
+                  }}
+                  style={{ color: 'blue' }}
+                >
+                  here
+                </Link>.
+
+              </>} />
+            {/*
+          <Alert
+            variant="light"
+            color="orange"
+            radius="md"
+            title="Attention!"
+            icon={<FontAwesomeIcon icon={faCircleExclamation} />}
+            style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}
+          >
+            The {featureName} feature is already embedded. Check the dataset schema{" "}
+            <Link
+              href={{
+                pathname: "/pages/dataquality/datasets",
+                query: { datasetName: datasetName }
+              }}
+              style={{ color: 'blue' }}
+            >
+              here
+            </Link>.
+          </Alert>
+          */}
+          </>
+
+
+        ) : null
+      }
+    </div >
   );
 }
 

@@ -6,84 +6,87 @@ import useStore from '@/store/dsStore';
 import { Alert, Box, Center, Flex, Progress, Select, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import
-{
+import {
   faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import Link from "next/link";
-import {GetDatasetAndSave} from '../../../../functionalities/DatasetsLoader';
+import { GetDatasetAndSave } from '../../../../functionalities/DatasetsLoader';
+import classes from "../../datasets/page.module.css"
+import { Copy, MousePointerClick } from 'lucide-react';
+import { MagicWandSparkles } from '@vectopus/atlas-icons-react';
+import { darkenColor, getStatusIcon } from '@/functionalities/Utils';
+import React from 'react';
+import { AlertCust } from '@/components/client/AlertCustom';
 
-export default function CleanDuplicates ()
-{
-    const [ features, setFeatures ] = useState<string[]>( [] )
-    const [ featureName, setFeatureName ] = useState<any>( "" )
+export default function CleanDuplicates() {
+  const [features, setFeatures] = useState<string[]>([])
+  const [featureName, setFeatureName] = useState<any>("")
 
-    const [ progress, setProgress ] = useState( 0 );
-    const [ result, setResult ] = useState<string | null>( null );
+  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<string | null>(null);
 
-    const datasetUsed = useStore( ( state ) => state.datasetUsed )
-    const setData = useStore( ( state ) => ( state.setData ) );
+  const datasetUsed = useStore((state) => state.datasetUsed)
+  const setData = useStore((state) => (state.setData));
 
 
-async function prova (name : string)
-  {
+  async function prova(name: string) {
     const baseUrl = cleaner_get
 
-    const url = new URL( baseUrl );
+    const url = new URL(baseUrl);
 
-    
-    url.searchParams.append( 'featureName', name );
-    url.searchParams.append( 'datasetName', datasetUsed?.name as string );
-    
-    const response = await fetch( url );
+
+    url.searchParams.append('featureName', name);
+    url.searchParams.append('datasetName', datasetUsed?.name as string);
+
+    const response = await fetch(url);
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
 
-    if ( reader ) {
+    if (reader) {
       try {
-        while ( true ) {
+        while (true) {
           // Read a chunk from the stream
 
           const { done, value } = await reader.read();
 
-          if ( done ) {
-            console.log( "Stream complete" );
+          if (done) {
+            console.log("Stream complete");
             break;
           }
 
           // Decode the bytes to string
-          const text = decoder.decode( value, { stream: true } );
-          console.log( text )
+          const text = decoder.decode(value, { stream: true });
+          console.log(text)
           // Process the SSE format (data: {...})
-          const lines = text.split( '\n\n' );
-          for ( const line of lines ) {
-            if ( line.startsWith( 'data: ' ) ) {
+          const lines = text.split('\n\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
               try {
-                const jsonData = JSON.parse( line.substring( 6 ) );
-                console.log( 'Received progress update:', jsonData );
+                const jsonData = JSON.parse(line.substring(6));
+                console.log('Received progress update:', jsonData);
 
                 // Handle the progress update
-                if ( jsonData.status === "complete" ) {
-                  console.log( "Process completed:", jsonData.result );
-                  if ( jsonData.dataset ) {
-                      const dataset = await GetDatasetAndSave(jsonData.dataset)
-                      setData(dataset)
-                    }
-                  setResult( jsonData.result )
-                } else if ( jsonData.progress !== undefined ) {
+                if (jsonData.status === "complete") {
+                  console.log("Process completed:", jsonData.result);
+                  if (jsonData.dataset) {
+                    const dataset = await GetDatasetAndSave(jsonData.dataset)
+                    setData(dataset)
+                  }
+                  setResult(jsonData.result)
+                } else if (jsonData.progress !== undefined) {
                   // Update progress if available
-                  console.log( `Progress: ${jsonData.progress}%` );
-                  setProgress( jsonData.progress )
+                  console.log(`Progress: ${jsonData.progress}%`);
+                  setProgress(jsonData.progress)
                 }
-              } catch ( e ) {
+              } catch (e) {
                 // Handle potential JSON parsing errors
-                console.error( 'Error parsing SSE data:', e );
+                console.error('Error parsing SSE data:', e);
               }
             }
           }
         }
-      } catch ( error ) {
-        console.error( 'Error reading stream:', error );
+      } catch (error) {
+        console.error('Error reading stream:', error);
       } finally {
         reader.releaseLock();
       }
@@ -91,141 +94,139 @@ async function prova (name : string)
   }
 
 
-useEffect( () =>
-{
-    if ( Array.isArray( datasetUsed?.features ) ) {
-        const extractedFeatures = datasetUsed.features
-            .filter( ( { type } ) => type === image_type || type === text_type )
-            .map( ( { name } ) => name );
+  useEffect(() => {
+    if (Array.isArray(datasetUsed?.features)) {
+      const extractedFeatures = datasetUsed.features
+        .filter(({ type }) => type === image_type || type === text_type)
+        .map(({ name }) => name);
 
-        setFeatures( extractedFeatures );
+      setFeatures(extractedFeatures);
     }
-}, [ datasetUsed ] )
+  }, [datasetUsed])
 
 
-const handleCleaner = ( name: string ) =>
-  {
+  const handleCleaner = (name: string) => {
     console.log("feature name:", name)
-    setFeatureName( name )
+    setFeatureName(name)
     if (name) {
       prova(name)
     }
   }
 
 
-return (
+  return (
     <div className="w-full h-screen">
-
-        <div style={ {
-            marginTop: "50px",
-            marginLeft: "100px",
-            marginRight: "100px"
-        } }>
-
-
-            <div style={ { width: '100%', position: 'relative' } }>
-
-                <Flex direction="row" justify="space-between" align="flex-start">
-                    <Flex
-                        direction="row"
-                        gap="xs">
-
-                        <Select
-                            id="feature"
-                            radius="md"
-                            label="Feature"
-                            placeholder="Choose feature to embed"
-                            data={ features }
-                            value={ featureName }
-                            onChange={ ( value ) => handleCleaner( value as string ) }
-                            allowDeselect={ false }
-                            clearable={ true }
-                            required={ true }
-                        />
-                    </Flex>
-                </Flex>
-
-                { !featureName ? (
-                          <Text size="sm" style={ { marginTop: "20px" } }>Select a feature to clean </Text>
-                        ) : featureName !== "" && result === null? (
-                
-                          <div className="my-animation-container w-full md:w-3/4 lg:w-1/2 mx-auto p-4 bg-gray-200 rounded-lg">
-                            <Center>
-                              <Text size="sm" style={ { marginTop: "60px" } }>Cleaning Duplicates...</Text>
-                            </Center>
-                
-                
-                
-                            <Box style={ { position: 'relative', marginTop: 60 } }>
-                              <Progress
-                                value={ progress }
-                                size="xl"
-                                radius="xl"
-                                color="red"
-                                striped
-                                animated
-                                style={ {
-                                  height: "30px"
-                                } }
-                              />
-                              <Text
-                                size="sm"
-                                fw={ 700 }
-                                c="black"
-                                style={ {
-                                  position: 'absolute',
-                                  top: '50%',
-                                  left: '50%',
-                                  transform: 'translate(-50%, -50%)',
-                                  pointerEvents: 'none',
-                                } }
-                              >
-                                { progress }%
-                              </Text>
-                            </Box>
-                          </div>
-                        ) : result == "Complete!" ? (
-                
-                          <Alert
-                            variant="light"
-                            color="green"
-                            radius="md"
-                            title={ result }
-                            icon={ <FontAwesomeIcon icon={ faCheck } /> }
-                            style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }>
-                
-                            The { featureName } feature has been correctly cleaned from duplicates.
-                          </Alert>
-                
-                
-                        ) : result == "Feature image is already embedded!" ? (
-                          <Alert
-                            variant="light"
-                            color="green"
-                            radius="md"
-                            title="Perfect!"
-                            icon={ <FontAwesomeIcon icon={ faCheck } /> }
-                            style={ { display: 'inline-block', maxWidth: '100%', marginTop: "30px" } }
-                          >
-                            The { featureName } feature is already cleaned. Check the number of duplicates
-                            <Link
-                              href={ {
-                                pathname: "/pages/dataquality/metrics/duplicates",
-                                query: { datasetName: datasetUsed?.name }
-                              } }
-                              style={ { color: 'blue' } }
-                            >
-                              here
-                            </Link>.
-                          </Alert>
-                
-                
-                        ) : null }
-
-            </div>
+      <Box
+        className={classes.title}
+        style={{ display: "flex", flexDirection: "column", gap: "0px" }}
+      >
+        <div className={classes.datasetHeader}>
+          <MagicWandSparkles className={classes.iconDatabase} />
+          <h1 className={classes.datasetTitle}>
+            Duplicates Cleaning
+          </h1>
         </div>
+        <div className={classes.datasetDivider}></div>
+
+      </Box>
+
+      <div className={classes.featureBox}>
+        <Flex direction="row" justify="space-between" align="flex-start">
+          <Flex
+            direction="row"
+            gap="xs">
+
+            <Select
+              id="feature"
+              radius="md"
+              label="Feature"
+              placeholder="Choose feature to embed"
+              data={features}
+              value={featureName}
+              onChange={(value) => handleCleaner(value as string)}
+              allowDeselect={false}
+              clearable={true}
+              required={true}
+            />
+          </Flex>
+        </Flex>
+
+      </div>
+      {!featureName ? (
+        <Center>
+          <span
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+          >
+            <MousePointerClick size={22} color="white" />
+            <Text size="xs">
+              Select a feature to clean
+            </Text>
+          </span>
+        </Center>
+      ) : featureName !== "" && result === null ? (
+
+        <>
+          <Center>
+            <Text size="sm" style={{ marginTop: "60px" }}>Cleaning Duplicates...</Text>
+          </Center>
+
+          <Box style={{ position: 'relative', marginTop: 30 }}>
+            <Progress
+              value={progress}
+              size="xl"
+              radius="xl"
+              color="red"
+              striped
+              animated
+              style={{
+                height: "30px"
+              }}
+            />
+            <Text
+              size="sm"
+              fw={700}
+              c="black"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                pointerEvents: 'none',
+              }}
+            >
+              {progress}%
+            </Text>
+          </Box>
+        </>
+      ) : result == "Complete!" ? (
+        <>
+          <AlertCust result={'success'} textToDisplay={`The ${featureName} feature has been correctly cleaned from duplicates.`} />
+
+        </>
+
+      ) : result == "Feature image is already embedded!" ? (
+        <>
+          <AlertCust
+            result={'success'}
+            textToDisplay={
+              <>
+                The {featureName} feature is already cleaned. Check the number of duplicates{" "}
+                <Link
+                  href={{
+                    pathname: "/pages/dataquality/metrics/duplicates",
+                    query: { datasetName: datasetUsed?.name },
+                  }}
+                  style={{ color: "blue" }}
+                >
+                  here
+                </Link>.
+              </>
+            } />
+        </>
+      ) : null}
+
     </div>
-)
+  )
 }
 
 
