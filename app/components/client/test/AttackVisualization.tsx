@@ -52,7 +52,7 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
   return (
     <div className="bg-gray-800 rounded-lg border border-gray-600 p-6">
       <h3 className="text-lg font-semibold text-white mb-4">Attack Analysis</h3>
-      
+
       <div className="grid grid-cols-2 gap-4 mb-6">
         {metrics.map((metric, index) => (
           <div key={index} className="bg-gray-700 rounded-lg p-4">
@@ -73,7 +73,7 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
             Perturbation Strength
           </label>
           <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-green-400 to-red-500 transition-all duration-500"
               style={{ width: `${Math.min(result.linfinityDistance * 1000, 100)}%` }}
             />
@@ -88,7 +88,7 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
             Attack Progress
           </label>
           <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
-            <div 
+            <div
               className="h-full bg-blue-500 transition-all duration-500"
               style={{ width: `${(result.iterations / 50) * 100}%` }}
             />

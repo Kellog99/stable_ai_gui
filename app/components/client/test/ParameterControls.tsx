@@ -30,9 +30,9 @@ export function ParameterControls({ parameters }: { parameters: ParametersProps[
                 min={parameter.min}
                 max={parameter.max}
                 step={(parameter.max - parameter.min) / 100}
-                value={values[index] ? values[index].toFixed(2) : parameter.default}
+                value={values[index] ? values[index].toFixed(3) : parameter.default}
                 onChange={(e) => handleChange(index, parseFloat(e.target.value))} />
-              <div>{values[index].toFixed(2)}</div>
+              <div>{values[index] ? values[index].toFixed(3) : parameter.default}</div>
             </div>
           </div>
         ))}
