@@ -76,3 +76,10 @@ export interface ParametersWindowProps {
   onClose: () => void,
   parameters: ParametersProps[],
 }
+
+
+export interface MetricsProps {
+  name: string,
+  id: string,
+  description: string
+}

@@ -3,7 +3,6 @@ import React from 'react';
 import styles from '@/styles/TaskButton.module.css';
 import { Task } from '@/interfaces/NNInterfaces';
 import { useRouter } from 'next/navigation';
-import { hover } from 'framer-motion';
 
 const TaskButton: React.FC<Task> = ({
   Icon,
