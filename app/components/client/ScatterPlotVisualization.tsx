@@ -5,17 +5,15 @@ import DeckGL from '@deck.gl/react';
 import { IconLayer, ScatterplotLayer } from '@deck.gl/layers';
 import getData, { getModelInfo, RetrieveSamples } from '../../functionalities/BackendUtils';
 import useStore from "../../store/dsStore";
-import { OrthographicView } from 'deck.gl';
-import { Flex, Loader, Text, Textarea, CloseButton, Box, Slider, Alert } from '@mantine/core';
+import { OrthographicView, OrthographicViewState } from 'deck.gl';
+import { Flex, Loader, Text, Textarea, Box, Slider } from '@mantine/core';
 import featureLoader from '@/functionalities/FeatureLoader';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-faCircleExclamation
-} from '@fortawesome/free-solid-svg-icons';
+
 import Link from "next/link";
 import LassoDrawer from './Lasso';
 import { ModelInfo } from '@/interfaces/genericInterface';
 import { image_type, text_type } from '@/properties/types';
+import { AlertCust } from './AlertCustom';
 // No need for 'style' from 'styled-jsx/style' if not used for actual styling
 
 
@@ -38,7 +36,7 @@ interface Point {
 interface Info {
   index: number;
   object: any;
-  layer: { id: string }; // Add layer info for tooltip check
+  layer: { id: string };
 }
 
 interface propsTypes {
@@ -66,40 +64,38 @@ export default function ScatterPlotVisualization(props: propsTypes) {
   const setIsLoading = useStore((state) => state.setIsLoadingEmbs)
   const [isLoadingRetr, setIsLoadingRetr] = useState<boolean>(false)
   const [noEmbAvailable, setNoEmbAvailable] = useState<boolean>(false)
-  const [viewState, setViewState] = useState<OrbitViewState>({
+  const [viewState, setViewState] = useState<OrthographicViewState>({
     target: [0, 0, 0],
-    rotationX: 0,
-    rotationOrbit: 0,
     zoom: -5,
   });
   const selectedPoints = useStore((state) => state.selectedPoints)
   const setSelectedPoints = useStore((state) => state.setSelectedPoints)
   const [enableTextArea, setEnableTextArea] = useState<boolean>(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
-  const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number } | null>([]);
+  const [dragCurrent, setDragCurrent] = useState<{ x: number; y: number }[]>([]);
   const [originalColors, setOriginalColors] = useState<Map<number, [number, number, number]>>(new Map());
   const setUqColors = useStore((state) => state.setUqColors)
-  // const uqColors = useStore((state) => state.uqColors) // Not directly used in render, so can be omitted if not needed elsewhere in component
+
 
   const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
 
   const setSelectedIndexes = useStore((state) => state.setSelectedIndexes);
   const selectedIndexes = useStore((state) => state.selectedIndexes)
-  const hoverIndex = useStore((state) => state.hoverIndex) // Get hoverIndex from store
-  const setHoverIndex = useStore((state) => state.setHoverIndex); // Setter for hoverIndex
+  const hoverIndex = useStore((state) => state.hoverIndex)
+  const setHoverIndex = useStore((state) => state.setHoverIndex);
   const datasetUsed = useStore((state) => state.datasetUsed)
 
   const lassoMode = useStore((state) => state.lazoMode);
   const lazoModeSetter = useStore((state) => state.setLazoMode);
   const filteredLabels = useStore((state) => state.filteredLabels)
-  
+
   const [queryRetrieve, setQueryRetrieve] = useState<string>("")
   const [queryTop_k, setQueryTop_k] = useState<number>(10)
 
   const [queries, setQueries] = useState<string[]>([])
 
 
-  function getAllKeysByValues(object, valuesList) {
+  function getAllKeysByValues(object: any, valuesList: any[]) {
     return valuesList.flatMap(value =>
       Object.keys(object).filter(key => object[key] === value)
     );
@@ -113,22 +109,23 @@ export default function ScatterPlotVisualization(props: propsTypes) {
     try {
       getData(props.datasetName, props.featureName, props.show_uq, props.labelFeatureName, getAllKeysByValues(labelDict, filteredLabels as string[]), props.modelUsed, queries)
         .then((fetched) => {
-          if (fetched.points.length !=0){
-          console.log("AAAAAAAAAAAAAAAA",fetched)  
-          setData(fetched.points);
-          setColorMap(fetched.color_map);
-          setOriginalColors(new Map(fetched.points.map((item, index) => [index, item.color])));
-          const colors = fetched.points.map(item => item.color)
-          setUqColors(colors)
-          setQueryData(fetched.query_points) 
-          setNoEmbAvailable(false)
-          const enable = !checkMultiModalCompatibility(modelInfo, props.featureName);
-          setEnableTextArea(enable);
-        } else {
-          setData(null)
-          setNoEmbAvailable(true)
-          setEnableTextArea(false);
-        }
+          if (fetched.points.length != 0) {
+            setData(fetched.points);
+            setColorMap(fetched.color_map);
+            setOriginalColors(new Map(fetched.points.map((item: any, index: number) => [index, item.color])));
+            const colors = Array.isArray(fetched.points)
+              ? fetched.points.map((item: Point) => item.color)
+              : [];
+            setUqColors(colors)
+            setQueryData(fetched.query_points)
+            setNoEmbAvailable(false)
+            const enable = !checkMultiModalCompatibility(modelInfo, props.featureName);
+            setEnableTextArea(enable);
+          } else {
+            setData(null)
+            setNoEmbAvailable(true)
+            setEnableTextArea(false);
+          }
         })
         .finally(() => {
           setIsLoading(false);
@@ -152,7 +149,6 @@ export default function ScatterPlotVisualization(props: propsTypes) {
       loadFeature();
     }
   }, [props.labelFeatureName]);
-  const labelsList: string[] = labelDict ? Object.values(labelDict) : [];
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
@@ -183,12 +179,13 @@ export default function ScatterPlotVisualization(props: propsTypes) {
     console.log("lassoMode changed:", lassoMode);
   }, [lassoMode]);
 
-  const handlePointClick = useCallback((info: Info): void => {
+  const handlePointClick = useCallback((info: any): void => {
     // Only allow clicks if not in lasso mode and not focusing the textarea
-    if (info.index !== -1 && !lassoMode && !isTextareaFocused) {
-      const newSelectedPoints = selectedPoints.includes(info.index)
-        ? selectedPoints.filter((i) => i !== info.index)
-        : [...selectedPoints, info.index];
+    const index = info.index;
+    if (index !== undefined && index !== -1 && !lassoMode && !isTextareaFocused) {
+      const newSelectedPoints = selectedPoints.includes(index)
+        ? selectedPoints.filter((i) => i !== index)
+        : [...selectedPoints, index];
 
       setSelectedPoints(newSelectedPoints);
       setSelectedIndexes(newSelectedPoints);
@@ -199,11 +196,11 @@ export default function ScatterPlotVisualization(props: propsTypes) {
   //  if (queryRetrieve !== "") {
   //    setSelectedIndexes([]);
   //    setSelectedPoints([])
-//
+  //
   //    let loadingTimeout = setTimeout(() => {
   //      setIsLoadingRetr(true);
   //    }, 500);
-//
+  //
   //    // Use a Set to avoid duplicate queries, then convert back to array
   //    setQueries(prevQueries => Array.from(new Set([...prevQueries, queryRetrieve])));
   //    RetrieveSamples(props.datasetName, props.featureName, queryRetrieve, queryTop_k, props.modelUsed as string)
@@ -266,7 +263,9 @@ export default function ScatterPlotVisualization(props: propsTypes) {
       index === hoverIndex ? HIGHLIGHT_RADIUS_METERS : BASE_RADIUS_METERS,
     getFillColor: (d: Point) => d.color,
     getLineColor: (d: Point, { index }: { index: number }) =>
-      index === hoverIndex ? HIGHLIGHT_STROKE_COLOR : d.color,
+      index === hoverIndex
+        ? new Uint8ClampedArray(HIGHLIGHT_STROKE_COLOR)
+        : new Uint8ClampedArray(d.color),
     getLineWidth: (d: Point, { index }: { index: number }) =>
       index === hoverIndex ? HIGHLIGHT_STROKE_WIDTH : STROKE_WIDTH,
     onClick: handlePointClick,
@@ -466,11 +465,11 @@ export default function ScatterPlotVisualization(props: propsTypes) {
       if (queryRetrieve !== "") {
         setSelectedIndexes([]);
         setSelectedPoints([])
-  
+
         let loadingTimeout = setTimeout(() => {
           setIsLoadingRetr(true);
         }, 500);
-  
+
         // Use a Set to avoid duplicate queries, then convert back to array
         setQueries(prevQueries => Array.from(new Set([...prevQueries, queryRetrieve])));
         RetrieveSamples(props.datasetName, props.featureName, queryRetrieve, queryTop_k, props.modelUsed as string)
@@ -504,24 +503,24 @@ export default function ScatterPlotVisualization(props: propsTypes) {
     }
   }, [props.modelUsed]);
 
-  function checkMultiModalCompatibility ( modelInfo: ModelInfo | null, featureName: string ) {
-    if ( Array.isArray( datasetUsed?.features ) && modelInfo) {
-      const feature = datasetUsed.features.find( f => f.name === featureName );
+  function checkMultiModalCompatibility(modelInfo: ModelInfo | null, featureName: string) {
+    if (Array.isArray(datasetUsed?.features) && modelInfo) {
+      const feature = datasetUsed.features.find(f => f.name === featureName);
       const type = feature?.type;
-      if ( type === image_type && modelInfo.supports_images == true && modelInfo.supports_text == true) { // Removed `&& modelInfo.supports_text == true` for image_type
-        
+      if (type === image_type && modelInfo.supports_images == true && modelInfo.supports_text == true) { // Removed `&& modelInfo.supports_text == true` for image_type
+
         return true;
-      } else if ( type === text_type && modelInfo.supports_text == true ) {
-        
+      } else if (type === text_type && modelInfo.supports_text == true) {
+
         return true;
       }
     }
-    
+
     return false; // Default return if conditions are not met
   }
 
-  console.log("compatibility:", checkMultiModalCompatibility(modelInfo,props.featureName))
-  console.log("UUUUUUUUUUUUUUU",noEmbAvailable)
+  console.log("compatibility:", checkMultiModalCompatibility(modelInfo, props.featureName))
+  console.log("UUUUUUUUUUUUUUU", noEmbAvailable)
   // New: Handlers for textarea focus/blur
   const handleTextareaFocus = useCallback(() => {
     setIsTextareaFocused(true);
@@ -535,19 +534,19 @@ export default function ScatterPlotVisualization(props: propsTypes) {
   const deckGLController =
     lassoMode || isTextareaFocused
       ? {
-          scrollZoom: false,
-          dragRotate: false,
-          dragPan: false,
-          doubleClickZoom: false,
-          keyboard: false, // Disables keyboard navigation for DeckGL when textarea is focused
-        }
+        scrollZoom: false,
+        dragRotate: false,
+        dragPan: false,
+        doubleClickZoom: false,
+        keyboard: false, // Disables keyboard navigation for DeckGL when textarea is focused
+      }
       : {
-          scrollZoom: true,
-          dragRotate: true,
-          dragPan: true,
-          doubleClickZoom: false, // Keep double click zoom disabled if that's the desired default
-          keyboard: true,
-        };
+        scrollZoom: true,
+        dragRotate: true,
+        dragPan: true,
+        doubleClickZoom: false, // Keep double click zoom disabled if that's the desired default
+        keyboard: true,
+      };
 
   return (
     <>
@@ -563,205 +562,185 @@ export default function ScatterPlotVisualization(props: propsTypes) {
           <Text>Loading...</Text>
           <Loader />
         </Flex>
-      ) : noEmbAvailable===true ? (
+      ) : noEmbAvailable === true ? (
         <Text> No Embs Available </Text>
       )
-      : (<>
-        {!data ? (
-        <Flex
-          mih={150}
-          justify="center"
-          align="center"
-          direction="column"
-          wrap="wrap"
-          style={{ width: '100%' }}
-        >
-          <Alert
-            variant="light"
-            color="red"
-            radius="md"
-            title="Ops!"
-            icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-            style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}
-          >
-            Something occured while trying to get the data. Check if the embeddings are correctly loaded to the dataset. Otherwise you can compute them {" "}
-            <Link
-              href={{
-                pathname: "/pages/dataquality/actions/embeddings",
-                query: { datasetName: datasetUsed?.name }
-              }}
-              style={{ color: 'blue' }}
+        : (<>
+          {!data ? (
+            <Flex
+              mih={150}
+              justify="center"
+              align="center"
+              direction="column"
+              wrap="wrap"
+              style={{ width: '100%' }}
             >
-              here
-            </Link>.
-          </Alert>
-        </Flex>) : (
-          <>
-            <div style={{ width: '1730px', height: '600px', position: 'relative' }}>
-              <Suspense>
-                <LassoDrawer>
-                  <div id="deckgl-container"
-                    onContextMenu={handleContextMenu}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      border: '2px solid #9a9a9a',
-                      background: 'white',
-                      overflow: 'hidden',
-                      zIndex: 10,
-                      // The pointerEvents on the container might need to be dynamic
-                      // but for now, let's rely on the controller prop for interaction.
-                      pointerEvents: 'auto', // Keep this as auto, controller will manage disabling
-                    }}>
-                    <DeckGL
-                      ref={deckRef}
-                      views={new OrthographicView({ fovy: 50 })}
-                      viewState={viewState}
-                      onViewStateChange={({ viewState }) => setViewState(viewState)}
-                      onHover={info => {
-                        // Only update hoverIndex if the textarea is NOT focused
-                        if (!isTextareaFocused) {
-                            if (info.index !== undefined && info.index !== -1) {
-                                setHoverIndex(info.index);
-                            } else {
-                                setHoverIndex(null); // Clear hover when not on an object
-                            }
-                        } else {
-                            setHoverIndex(null); // Explicitly clear hover if textarea is focused
-                        }
+              <AlertCust result={'error'}
+                textToDisplay={
+                  <>
+                    Something occured while trying to get the data. Check if the embeddings are correctly loaded to the dataset. Otherwise you can compute them {" "}
+                    <Link
+                      href={{
+                        pathname: "/pages/dataquality/actions/embeddings",
+                        query: { datasetName: datasetUsed?.name }
                       }}
-                      getTooltip={() =>
-                        hoverIndex !== null && data && data[hoverIndex] && !isTextareaFocused // Also check isTextareaFocused for tooltip visibility
-                          ? {
-                            html: `<div class="custom-tooltip">Index: ${hoverIndex}</div>`, // Use hoverIndex from store
-                            style: {
-                              borderRadius: '10px',
-                              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                              color: '#fff',
-                              padding: '8px',
-                              pointerEvents: 'none',
+                      style={{ color: 'blue' }}
+                    >
+                      here
+                    </Link>.
+                  </>} />
+            </Flex>) : (
+            <>
+              <div style={{ width: '100%', height: '600px', position: 'relative' }}>
+                <Suspense>
+                  <LassoDrawer>
+                    <div id="deckgl-container"
+                      onContextMenu={handleContextMenu}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '2px solid #9a9a9a',
+                        background: 'white',
+                        overflow: 'hidden',
+                        zIndex: 10,
+                        // The pointerEvents on the container might need to be dynamic
+                        // but for now, let's rely on the controller prop for interaction.
+                        pointerEvents: 'auto', // Keep this as auto, controller will manage disabling
+                      }}>
+                      <DeckGL
+                        ref={deckRef}
+                        views={new OrthographicView()}
+                        viewState={viewState}
+                        onViewStateChange={({ viewState }) => setViewState(viewState)}
+                        onHover={info => {
+                          // Only update hoverIndex if the textarea is NOT focused
+                          if (!isTextareaFocused) {
+                            if (info.index !== undefined && info.index !== -1) {
+                              setHoverIndex(info.index);
+                            } else {
+                              setHoverIndex(null); // Clear hover when not on an object
                             }
+                          } else {
+                            setHoverIndex(null); // Explicitly clear hover if textarea is focused
                           }
-                          : null
-                      }
-                      layers={[layer, queryLayer]}
-                      controller={deckGLController} // Dynamically set controller
-                      onDragStart={handleDragStart}
-                      onDrag={handleDrag}
-                      onDragEnd={handleDragEnd}
-                      style={{ zIndex: "100" }} />
-                  </div>
-                </LassoDrawer>
-              </Suspense>
-            </div>
+                        }}
+                        getTooltip={() =>
+                          hoverIndex !== null && data && data[hoverIndex] && !isTextareaFocused // Also check isTextareaFocused for tooltip visibility
+                            ? {
+                              html: `<div class="custom-tooltip">Index: ${hoverIndex}</div>`, // Use hoverIndex from store
+                              style: {
+                                borderRadius: '10px',
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                color: '#fff',
+                                padding: '8px',
+                                pointerEvents: 'none',
+                              }
+                            }
+                            : null
+                        }
+                        layers={[layer, queryLayer]}
+                        controller={deckGLController} // Dynamically set controller
+                        onDragStart={handleDragStart}
+                        onDrag={handleDrag}
+                        onDragEnd={handleDragEnd}
+                        style={{ zIndex: "100" }} />
+                    </div>
+                  </LassoDrawer>
+                </Suspense>
+              </div>
 
-            {datasetUsed?.name !== "military" ? (
-              <Flex
-                direction="column"
-                align="center"
-                justify="center">
-                <Box style={{ width: "600px", marginTop: "12px" }}>
-                  <Text size="sm" style={{ textAlign: 'center', width: '100%', marginTop: "1px" }}>Semantic Search</Text>
-                  <Textarea
-                    id="search-input"
-                    ref={textareaRef}
-                    placeholder="Write something..."
-                    radius="md"
-                    value={inputValue}
-                    onChange={(event) => setInputValue(event.currentTarget.value)}
-                    disabled={!enableTextArea}
-                    onFocus={handleTextareaFocus} // New: Set focus state
-                    onBlur={handleTextareaBlur}   // New: Clear focus state
-                    onKeyDown={handleKeyDown}
-                    style={{
-                      width: "100%",
-                      pointerEvents: 'auto', // Ensure textarea can capture events
-                      touchAction: 'auto',
-                      paddingRight: "6px",
-                      marginTop: "6px",
-                      zIndex: 1000 // Ensure textarea is above DeckGL canvas
-                    }}
+              {datasetUsed?.name !== "military" ? (
+                <Flex
+                  direction="column"
+                  align="center"
+                  justify="center">
+                  <Box style={{ width: "600px", marginTop: "12px" }}>
+                    <Text size="sm" style={{ textAlign: 'center', width: '100%', marginTop: "1px" }}>Semantic Search</Text>
+                    <Textarea
+                      id="search-input"
+                      ref={textareaRef}
+                      placeholder="Write something..."
+                      radius="md"
+                      value={inputValue}
+                      onChange={(event) => setInputValue(event.currentTarget.value)}
+                      disabled={!enableTextArea}
+                      onFocus={handleTextareaFocus} // New: Set focus state
+                      onBlur={handleTextareaBlur}   // New: Clear focus state
+                      onKeyDown={handleKeyDown}
+                      style={{
+                        width: "100%",
+                        pointerEvents: 'auto', // Ensure textarea can capture events
+                        touchAction: 'auto',
+                        paddingRight: "6px",
+                        marginTop: "6px",
+                        zIndex: 1000 // Ensure textarea is above DeckGL canvas
+                      }}
                     // The onClick and onFocus here were remnants of previous attempts to stop propagation.
                     // With dynamic controller and z-index, they might be redundant or counterproductive.
                     // Removing them for cleaner event flow.
-                    
-                  />
-                  {queryRetrieve !== "" ?
 
-                    (<>
-                      <Text size="sm" style={{ marginBottom: 0 }}>Number of best guesses</Text>
-                      <Slider
-                        defaultValue={10}
-                        min={0}
-                        max={data?.length || 100} // Added null check for data.length
-                        step={1}
-                        marks={[
-                          { value: 0, label: '0' },
-                          { value: data?.length || 100, label: `${data?.length || 100}` }, // Added null check
-                        ]}
-                        value={inputTopK}
-                        onChange={(value) => setInputTopK(value)}
-                      /> </>) : null}
+                    />
+                    {queryRetrieve !== "" ?
 
-                </Box>
-                {isLoadingRetr ? (<><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></>) : null}
-              </Flex>
-            ) : null}
+                      (<>
+                        <Text size="sm" style={{ marginBottom: 0 }}>Number of best guesses</Text>
+                        <Slider
+                          defaultValue={10}
+                          min={0}
+                          max={data?.length || 100} // Added null check for data.length
+                          step={1}
+                          marks={[
+                            { value: 0, label: '0' },
+                            { value: data?.length || 100, label: `${data?.length || 100}` }, // Added null check
+                          ]}
+                          value={inputTopK}
+                          onChange={(value) => setInputTopK(value)}
+                        /> </>) : null}
 
-
-          </>
-        )}
+                  </Box>
+                  {isLoadingRetr ? (<><Text>Initializing</Text> <Loader type="dots" size="sm"></Loader></>) : null}
+                </Flex>
+              ) : null}
 
 
-        {contextMenu.visible && (
-          <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-            <div
-              style={{
-                position: 'absolute',
-                top: contextMenu.y,
-                left: contextMenu.x,
-                zIndex: 2000,
-                pointerEvents: 'auto',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                backgroundColor: 'white',
-                minWidth: '150px',
-              }}
-            >
-              {menuItems.map((item, index) => (
-                <div
-                  key={index}
-                  onClick={item.action}
-                  style={{
-                    padding: '8px 12px',
-                    cursor: 'pointer',
-                  }}
-                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
-                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  {item.label}
-                </div>
-              ))}
+            </>
+          )}
+
+
+          {contextMenu.visible && (
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: contextMenu.y,
+                  left: contextMenu.x,
+                  zIndex: 2000,
+                  pointerEvents: 'auto',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  backgroundColor: 'white',
+                  minWidth: '150px',
+                }}
+              >
+                {menuItems.map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={item.action}
+                    style={{
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+        </>
         )}
-      </>
-      )}
     </>
   );
-}import {project} from '@deck.gl/core';
-import controller from '@deck.gl/core/dist/controllers/controller';
-import deck from '@deck.gl/core/dist/lib/deck';
-import {layer,icon} from '@fortawesome/fontawesome-svg-core';
-import {getRadius,getSize} from '@mantine/core';
-import {transitions} from '@mantine/core/lib/components/Transition/transitions';
-import {log} from 'console';
-import {color} from 'framer-motion';
-import {get} from 'http';
-import {flatMap,keys,filter,map,includes,has,min,floor,forEach,find,size,max} from 'lodash';
-import {wrap} from 'module';
-import {type} from 'os';
-import {features,title} from 'process';
-import {CSSProperties} from 'react';
-import style from 'styled-jsx/style';
-import {isArray} from 'util';
+}

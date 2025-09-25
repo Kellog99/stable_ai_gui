@@ -1,29 +1,28 @@
 "use client";
 
-import Dataset, { ReportMetric } from "@/interfaces/genericInterface";
+import { ReportMetric } from "@/interfaces/genericInterface";
 import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
-import { embedding_type, image_type, label_type, text_type } from "@/properties/types";
-import { faCheck, faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { image_type, label_type, text_type } from "@/properties/types";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Box, Button, Code, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
+import { Box, Button, Code, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import useStore from '../../../store/dsStore';
 import metricsFetcher from "../../server/metricsFetcher";
-import CompletenessConfig from "./CompletenessConfig";
 import CompletenessDisplayer from "./displayer/CompletenessDisplayer";
 import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
 import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import DuplicatesConfigs from "./DuplicatesConfig";
 import OutliersConfig from "./OutliersConfig";
 import { outliers_modes } from "./utils";
-import { IsFeatureBond } from "@/functionalities/Utils";
 import { getCompletenessOK } from "@/functionalities/BackendUtils";
 import Link from "next/link";
 import classes from "../../../styles/Config.module.css"
 import { AlertCust } from "../AlertCustom";
+import { Settings } from "lucide-react";
 
 
 
@@ -116,6 +115,7 @@ export default function Config(props: ConfigsProps) {
     const [showLabelError, setShowLabelError] = useState(false);
     const [showRequirementsError, setShowRequirementsError] = useState(false);
     const [showOutliersConfig, setShowOutliersConfig] = useState(false);
+    const [showOutliersModeError, setShowOutliersModeError] = useState(false)
     const [clicked, setClicked] = useState(false);
     const [isDuplicate, setIsDuplicate] = useState(false);
     const [computeNow, setComputeNow] = useState(false);
@@ -227,6 +227,11 @@ export default function Config(props: ConfigsProps) {
             hasValidationErrors = true;
         }
 
+        if (props.metricName === "outliers" && !outliers_mode){
+            setShowOutliersModeError(true);
+            hasValidationErrors = true
+        }
+
         if (props?.labelFeatureReq && !labelFeatureName) {
             setShowLabelError(true);
             hasValidationErrors = true;
@@ -312,8 +317,7 @@ export default function Config(props: ConfigsProps) {
 
     const metricComponentMap: Record<string, React.ComponentType> = {
         "duplicates": () => <DuplicatesConfigs />,
-        "outliers": () => <OutliersConfig mode={outliers_mode} />,
-        "completeness": () => <CompletenessConfig />
+        "outliers": () => <OutliersConfig mode={outliers_mode} />
     };
 
     const MetricConfigComponent = metricComponentMap[props.metricName];
@@ -459,7 +463,7 @@ export default function Config(props: ConfigsProps) {
                             value={outliers_mode}
                             onChange={(value) => {
                                 setOutliersMode(value as string);
-
+                                if (showOutliersModeError) setShowOutliersModeError(false);
                                 if (value) {
                                     if (!showOutliersConfig) {
                                         setShowOutliersConfig(true);
@@ -471,14 +475,24 @@ export default function Config(props: ConfigsProps) {
                             required={true}
                             styles={(theme) => ({
                                 input: {
-                                    borderColor: showLabelError ? theme.colors.red[6] : undefined,
-                                    borderWidth: showLabelError ? 2.5 : 1,
+                                    borderColor: showOutliersModeError ? theme.colors.red[6] : undefined,
+                                    borderWidth: showOutliersModeError ? 2.5 : 1,
                                     '&:hover': {
-                                        borderColor: showLabelError ? theme.colors.red[6] : undefined,
+                                        borderColor: showOutliersModeError ? theme.colors.red[6] : undefined,
                                     },
                                 },
                             })}
                         />) : null}
+
+                        {showOutliersModeError && (
+                            <Text
+                                size="xs"
+                                c="red"
+                                style={{ position: "absolute", top: "100%", marginTop: 4 }}
+                            >
+                                Choose a mode to continue
+                            </Text>
+                        )}
 
                     </Box>
                     {props.metricName == "completeness" ? (
@@ -541,11 +555,11 @@ export default function Config(props: ConfigsProps) {
                                             padding: "16px",
                                         }}
                                     >
-                                        <Modal.Title style={{ fontWeight: 700, fontSize: "1.25rem", color:"white" }}>
+                                        <Modal.Title style={{ fontWeight: 700, fontSize: "1.25rem", color: "white" }}>
                                             Configurations
                                         </Modal.Title>
                                         <Modal.CloseButton
-                                            style={{ position: "absolute", right: "16px", top: "16px", color: "white" }}
+                                            style={{ position: "absolute", right: "16px", top: "16px" }}
                                         />
                                     </Modal.Header>
 
@@ -579,30 +593,39 @@ export default function Config(props: ConfigsProps) {
                             */}
 
                             <Button variant="default" onClick={open} size="xs" radius="md" disabled={props.metricName == "outliers" && showOutliersConfig == false}>
+                                <Settings size={18} style={{ marginRight: "8px" }} />
                                 Configs
                             </Button>
                         </>)
                     }
                 </Flex>
                 <Space h="xl" />
-                <Flex
-                    direction="row"
-                    justify="end"
-                    gap="md">
+                <Flex direction="row" justify="end" gap="md">
+                    {/* Save to Report Button */}
                     <Button
                         onClick={handleSaveToReport}
                         disabled={!computed}
+                        className={`${classes.buttonBase} ${classes.saveReport}`}
                     >
-                        {clicked && !isDuplicate ? (<>
-                            <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
-                            <span>Saved</span></>)
-                            : "Save to report"}
+                        {clicked && !isDuplicate ? (
+                            <>
+                                <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
+                                <span>Saved</span>
+                            </>
+                        ) : (
+                            "Save to report"
+                        )}
+                        <div className={classes.saveReportHighlight}></div>
                     </Button>
 
+                    {/* Compute Now Button */}
                     <Button
                         onClick={handleClickCompute}
-                        disabled={props.metricName == "completeness" && !isCompletenessOK}>
+                        disabled={props.metricName === "completeness" && !isCompletenessOK}
+                        className={`${classes.buttonBase} ${classes.computeNow}`}
+                    >
                         Compute now
+                        <div className={classes.computeNowHighlight}></div>
                     </Button>
                 </Flex>
 
@@ -612,11 +635,7 @@ export default function Config(props: ConfigsProps) {
                         <AlertCust
                             result={"error"}
                             textToDisplay={"A metric with this same configuration has been already computed. Please change something or choose another metric."} />
-                        {/*
-                        <Alert variant="light" color="red" withCloseButton onClose={() => { setIsDuplicate(false); setClicked(false) }} title="Attention" icon={icon}>
-                            A metric with this same configuration has been already computed. Please change something or choose another metric.
-                        </Alert>
-                        */}
+
                     </>) : null}
 
             </div>

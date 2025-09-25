@@ -7,25 +7,25 @@ interface AppState
   datasets: Dataset[] | null;
   datasetUsed: Dataset | null;
   queryDataset: string | '';
-  selectedIndexes: number[] | [];
-  selectedPoints: number[] | [];
+  selectedIndexes: number[];
+  selectedPoints: number[];
 
   hoverIndex: number | null;
   selectedFeature: string | null;
   lazoMode: boolean;
   featureToDisplay: string | null;
-  metricsConfig: Configs[] | [];
+  metricsConfig: Configs[];
   internalConfigs: Object;
   labelDict: { [key: number]: string } | null;
 
   addToReport: boolean;
   isLoadingEmbs: boolean;
 
-  report: Object[] | [];
+  report: Object[];
   colorMap: Partial<Record<number, number[]>>;
   uqColors: [ number, number, number ][] | null;
 
-  filteredLabels: string[] | [];
+  filteredLabels: string[];
   size: { width: number, height: number }
 
   prototypesData: string[] | null;

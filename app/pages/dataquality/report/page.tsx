@@ -196,7 +196,7 @@ export default function Report() {
                         withArrow
                         transitionProps={{ duration: 200 }}
                         label="Here you can adjust your final report: you can eventually eliminate some sections and metrics or also re-order them">
-                        <InfoCircle size={17} />
+                        <InfoCircle size={17} color="white" />
                     </Tooltip>
                 </span>
                 <Flex direction="row" gap="sm">
@@ -252,13 +252,20 @@ export default function Report() {
                             />
 
                             <Box style={{ marginBottom: '70px' }}>
-                                <Text fw={600} component="span">
-                                    {datasetUsed?.name || ""}
-                                </Text>{" "}
-                                is a dataset for {datasetUsed?.task || ""}.
-                                {datasetUsed?.n_classes ? <> {" "} It has {datasetUsed?.n_classes || ""} classes and {datasetUsed?.n_samples} samples.{" "}</> : <>It has {datasetUsed?.n_samples}{" "}</>}{descriptions?.map((description, index) => (
-                                    <span key={index}>{description} </span>
-                                ))}
+                                <Text>
+                                    <span style={{ fontWeight: 600 }}>
+                                        {datasetUsed?.name || ""}
+                                    </span>{" "}
+                                    is a dataset for {datasetUsed?.task || ""}.
+                                    {datasetUsed?.n_classes ? (
+                                        <> {" "} It has {datasetUsed?.n_classes || ""} classes and {datasetUsed?.n_samples} samples.{" "}</>
+                                    ) : (
+                                        <>It has {datasetUsed?.n_samples}{" "}</>
+                                    )}
+                                    {descriptions?.map((description, index) => (
+                                        <span key={index}>{description} </span>
+                                    ))}
+                                </Text>
                             </Box>
                             <Title order={4} mb="sm">Prototypes Preview</Title>
                             <ScrollArea >
