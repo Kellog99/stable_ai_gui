@@ -34,7 +34,7 @@
   width: 100%;
   padding: clamp(1vw, 5vw, 30px);
   grid-template-columns: 1fr 1fr;
-  column-gap: 2rem;
+  column-gap: 4rem;
   place-items: center;
 }
 
@@ -45,8 +45,10 @@
 }
 
 .taskgrid {
-  width: 80%;
-  margin: auto;
+  width: 100%;
+  aspect-ratio: 3.14;
+  max-height: 250px;
+  padding:  0 7vw 0 7vw;;
   display: grid;
   grid-auto-columns: minmax(0, 1fr);
   grid-auto-flow: column;

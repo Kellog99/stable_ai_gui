@@ -1,7 +1,6 @@
 /* Navigation cards on home page */
 .card {
   display: grid;
-  width: 100%;
   height: 100%;
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -28,7 +27,7 @@
 }
 
 .card_title {
-  font-size: 1.5vw;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #1f2937;
 }
@@ -52,10 +51,8 @@
 .card_description {
   color: #6b7280;
   padding: 6px;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
   text-align: justify;
-  font-size: 1.1vw;
+  font-size: 0.8rem
 }
 
 .card_link {
@@ -64,14 +61,10 @@
   font-weight: 600;
   font-size: 1.3vw;
   color: black;
-  transition: color 0.2s ease;
+  transition: color 0.3s ease;
 }
 
-.card_link svg {
-  margin-left: 0.5rem;
-  transition: transform 0.2s ease;
-}
 
-.card:hover .card_link svg {
+.card:hover .card_link {
   transform: translateX(4px);
 }
