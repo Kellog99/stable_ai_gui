@@ -303,16 +303,14 @@ function EmbeddingsPage() {
 
   const renderedComponent = () => (
     <>
-      <Flex direction="column" align="center" style={{ width: '100%' }}>
+      <Flex direction="column" align="left" justify="flex-start" style={{ width: '100%' }}>
         <div style={{ position: 'relative', width: '100%' }}>
           <Suspense>
             <Box style={{ pointerEvents: 'none' }}>
               <div style={{ pointerEvents: 'auto' }}>
                 <Flex
-                  justify="left"
+                  justify="flex-start"
                   align="center"
-                  direction="column"
-                  wrap="wrap"
                   style={{ width: '100%' }}
                 >
                   {!isLoadingEmbs ? (
@@ -378,7 +376,7 @@ function EmbeddingsPage() {
         <div className={classes.datasetDivider}></div>
 
       </Box>
-      <div className={classes.featureBox}>
+      <div className={classes.featureBox} style={{marginTop:"30px"}}>
         <Flex direction="row" justify="space-between">
           <Group>
             <Flex

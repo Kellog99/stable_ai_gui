@@ -12,6 +12,7 @@ import useStore from '../../../store/dsStore';
 import featureLoader from "@/functionalities/FeatureLoader";
 import classes from './page.module.css';
 import { Layers, MousePointerClick } from "lucide-react";
+import buttonsStyles from "../../../styles/Config.module.css"
 
 
 
@@ -91,6 +92,7 @@ export default function Prototypes() {
             if (labelFeatureName) {
                 const fetchedData = await getPrototypes(datasetName as string, featureName, labelFeatureName);
                 setPrototypes(fetchedData);
+                console.log("fetched prototypes", fetchedData)
             }
             else {
                 const fetchedData = await getPrototypes(datasetName as string, featureName);
@@ -180,6 +182,7 @@ export default function Prototypes() {
                             (datasetUsed?.task === "single_feature" && !featureName) ||
                             (datasetUsed?.task !== "single_feature" && (!featureName || !labelFeatureName))
                         }
+                        className={`${buttonsStyles.buttonBase} ${buttonsStyles.computeNow}`}
                     >
                         Get Prototypes
                     </Button>

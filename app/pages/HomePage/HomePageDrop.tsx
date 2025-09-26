@@ -13,6 +13,7 @@ import { getModels } from '@/functionalities/NNTrustBackendUtils';
 import useStore from '@/store/nnTrustStore';
 import useStoreDQ from '@/store/dsStore';
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
+import { DragDrop } from '@/components/client/UploaderUnifiedDragDrop';
 
 
 
@@ -20,6 +21,8 @@ const HomePageDrop: React.FC = ({
 }) => {
     const setModels = useStore((state) => state.setModels)
     const setDatasets = useStoreDQ((state) => state.setDatasets)
+    
+    
     const ZipUploadComponent = () => {
         const zipConfig = {
             fileType: 'zip' as const,
@@ -105,6 +108,11 @@ const HomePageDrop: React.FC = ({
     return (
 
         <div className="file-grid">
+            <DragDrop config={ {
+                fileType: '.zip',
+                accept: ['.zip'],
+                description: 'Upload a .zip file'
+            } } />
             {listOfSections.map((dropElement, index) => (
                 <FileDropZone2
                     key={index}

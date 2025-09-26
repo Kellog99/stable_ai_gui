@@ -3,21 +3,16 @@ import { useState, useRef, useEffect } from 'react';
 import { Progress, Flex, Select, Text, Box, Center, Alert, Button } from '@mantine/core';
 import useStore from '../../../../store/dsStore';
 import { bbox_type, image_type, label_type, text_type } from '@/properties/types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faCheck, faCircleExclamation
-} from '@fortawesome/free-solid-svg-icons';
 import { cropper_get } from '@/properties/urls';
 import Link from "next/link";
-import { ModelInfo } from '@/interfaces/genericInterface';
 import { GetDatasetAndSave } from '../../../../functionalities/DatasetsLoader';
 import classes from "../../datasets/page.module.css"
 import { CropPathfinder } from '@vectopus/atlas-icons-react';
 import { MousePointerClick } from 'lucide-react';
 import { AlertCust } from '@/components/client/AlertCustom';
+import buttonsStyles from "../../../../styles/Config.module.css"
 
 function Home() {
-  const socketRef = useRef<WebSocket | null>(null);
 
   const [featureName, setFeatureName] = useState<any>("")
   const [bboxFeatureName, setBboxFeatureName] = useState<any>("")
@@ -29,9 +24,9 @@ function Home() {
   const [isConnected, setIsConnected] = useState(false);
   const [isCropping, setIsCropping] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('Idle');
+
   const [result, setResult] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+
   const [progressColor, setProgressColor] = useState<string | null>("red");
 
   const datasetUsed = useStore((state) => state.datasetUsed)
@@ -193,7 +188,8 @@ function Home() {
               ssl_crop(bboxFeatureName);
               setIsCropping(true);
             }}
-            disabled={!featureName || !bboxFeatureName || result == "Complete!" || isCropping || result == "Feature image is already cropped!"}>
+            disabled={!featureName || !bboxFeatureName || result == "Complete!" || isCropping || result == "Feature image is already cropped!"}
+            className={`${buttonsStyles.buttonBase} ${buttonsStyles.computeNow}`}>
             Crop Image
           </Button>
         </Flex>

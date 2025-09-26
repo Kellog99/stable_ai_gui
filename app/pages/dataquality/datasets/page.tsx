@@ -285,6 +285,8 @@ export default function Datasets() {
   }
 
 
+  
+
   return (
     <div className="w-full h-screen">
       <div className="max-w-4xl mx-auto px-4">
@@ -317,7 +319,7 @@ export default function Datasets() {
               <Flex direction='column' align='center'>
                 <motion.div
                   animate={{
-                    x: featureToDisplay && feature ? -100 : 0,
+                    x: featureToDisplay && feature ? -200 : 0,
                   }}
                   transition={{ duration: 0.5, ease: 'easeInOut' }}
                   style={{
@@ -349,7 +351,7 @@ export default function Datasets() {
             {featureToDisplay && feature && (
               <div
                 style={{
-                  width: '50%',
+                  
                   position: 'relative',
                   overflow: 'auto',
                   visibility: featureToDisplay && feature ? 'visible' : 'hidden',
@@ -367,7 +369,7 @@ export default function Datasets() {
                   style={{ willChange: "transform, opacity" }}
                 >
                   <Flex direction="column" align="center" gap="xs" style={{ marginTop: "20px" }}>
-                    <Flex justify="center" align="center" style={{ width: "100%" }}>
+                    <Flex justify="center" align="center" gap="sm">
                       <Title order={4} c="#94a3b8" style={{ textAlign: "center", flex: 1 }}>
                         Explore the {feature.name} feature
                       </Title>

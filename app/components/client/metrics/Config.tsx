@@ -601,7 +601,7 @@ export default function Config(props: ConfigsProps) {
                 </Flex>
                 <Space h="xl" />
                 <Flex direction="row" justify="end" gap="md">
-                    {/* Save to Report Button */}
+                
                     <Button
                         onClick={handleSaveToReport}
                         disabled={!computed}
@@ -618,7 +618,7 @@ export default function Config(props: ConfigsProps) {
                         <div className={classes.saveReportHighlight}></div>
                     </Button>
 
-                    {/* Compute Now Button */}
+                
                     <Button
                         onClick={handleClickCompute}
                         disabled={props.metricName === "completeness" && !isCompletenessOK}

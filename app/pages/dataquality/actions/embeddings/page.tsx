@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from 'react';
 import useStore from '../../../../store/dsStore';
 import classes from "../../datasets/page.module.css"
+import buttonsStyles from "../../../../styles/Config.module.css"
 import { GetDatasetAndSave } from '../../../../functionalities/DatasetsLoader';
 import { useSearchParams } from 'next/navigation';
 import { MousePointerClick, Zap } from 'lucide-react';
@@ -268,7 +269,8 @@ function Home() {
 
             <Button style={{ marginTop: "20px" }}
               onClick={handleCompute}
-              disabled={!featureName || !modelName || !checkModelFeatureCompatibility(modelInfo as ModelInfo, featureName) || computing}>
+              disabled={!featureName || !modelName || !checkModelFeatureCompatibility(modelInfo as ModelInfo, featureName) || computing}
+              className={`${buttonsStyles.buttonBase} ${buttonsStyles.computeNow}`}>
               Compute Embeddings
             </Button>
           </Flex>
