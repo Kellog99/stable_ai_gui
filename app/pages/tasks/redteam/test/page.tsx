@@ -9,11 +9,10 @@ import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
 import { AttackResult, AttackStats } from '@/interfaces/testInterfaces';
 import { listAttacks } from '../prova';
-
 import styles from '@/styles/Test.module.css';
 import { AttackProps } from '@/interfaces/NNInterfaces';
 
-function Test() { // Capitalized component name
+function Test() {
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
 
@@ -24,13 +23,17 @@ function Test() { // Capitalized component name
     // Initialize with default values, will be updated in useEffect
     const [attackList, setAttackList] = useState<AttackProps[]>([]);
     const [selectedAttack, setSelectedAttack] = useState<AttackProps | undefined>()
+
+    // fetch the attack list
+
     useEffect(() => {
-    setAttackList(listAttacks);
-    if (listAttacks.length > 0) {
-        const firstAttack = listAttacks[0];
-        setSelectedAttack(firstAttack)  // This updates selectedAttack
-    }
-}, []); // This dependency causes the effect to run again when selectedAttack changes
+
+        setAttackList(listAttacks);
+        if (listAttacks.length > 0) {
+            const firstAttack = listAttacks[0];
+            setSelectedAttack(firstAttack)  // This updates selectedAttack
+        }
+    }, []); // This dependency causes the effect to run again when selectedAttack changes
 
 
     const handleImageUpload = (file: File, imageUrl: string) => {
@@ -81,12 +84,12 @@ function Test() { // Capitalized component name
                         className={styles.execute_button}
                     // onClick={handleExecuteAttack} // Added click handler
                     >
-                    
+
                     </button>
                 </div>
 
                 {/* Right Column - Results */}
-                <div className={styles.results_column}> 
+                <div className={styles.results_column}>
                     <div className={styles.image_grid}>
                         <ImageDisplay
                             title="Original Image"

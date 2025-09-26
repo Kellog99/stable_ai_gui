@@ -18,26 +18,55 @@ const Benchmark: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // this function has to be updated to make a backend call
-    // to get the list of all the available attacks
+  console.log("AAASSSS");
 
-    const loadAttacks = async () => {
+  useEffect(() => {
+    async function fetchItem() {
       try {
-        setAttacks(listAttacks);
-        if (listAttacks.length > 0) {
-          const allIds = listAttacks.map(attack => attack.id);
+        console.log("prima")
+        const response = await fetch('http://127.0.0.1:8000/attacks/getInfo');
+        console.log("dopo")
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const json = await response.json();
+        setAttacks(json);
+
+        if (json.length > 0) {
+          const allIds = json.map((attack: AttackProps) => attack.id);
           setSelectedAttacks(new Set(allIds));
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
-    };
-
-    loadAttacks();
+    }
+    fetchItem();
   }, []);
+
+
+  // useEffect(() => {
+  //   // this function has to be updated to make a backend call
+  //   // to get the list of all the available attacks
+
+  //   const loadAttacks = async () => {
+  //     try {
+  //       setAttacks(listAttacks);
+  //       if (listAttacks.length > 0) {
+  //         const allIds = listAttacks.map(attack => attack.id);
+  //         setSelectedAttacks(new Set(allIds));
+  //       }
+  //     } catch (err) {
+  //       setError(err instanceof Error ? err.message : 'An error occurred');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   loadAttacks();
+  // }, []);
 
   const handleAttackSelect = (attackId: string) => {
     setSelectedAttacks(prev => {
@@ -107,7 +136,7 @@ const Benchmark: React.FC = () => {
             <div>
               <div className='option-attacks'>
                 <h2>Vulnearbility selection</h2>
-                <p style={{color:'gray'}}> Here it is possible to choose the vulnerabilities to test on the selected target model.</p>
+                <p style={{ color: 'gray' }}> Here it is possible to choose the vulnerabilities to test on the selected target model.</p>
               </div>
               <div className="attacks-grid">
                 {attacks.map((attack) => (
@@ -123,7 +152,7 @@ const Benchmark: React.FC = () => {
               </div>
               <div className='option-attacks'>
                 <h2>Metric Selection</h2>
-                <p style={{color:'gray'}}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
+                <p style={{ color: 'gray' }}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
               </div>
               <div className="attacks-grid">
                 {metrics.map((metrics) => (
