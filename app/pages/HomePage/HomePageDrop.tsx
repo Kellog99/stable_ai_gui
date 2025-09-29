@@ -43,6 +43,22 @@ const HomePageDrop: React.FC = ({
         return <FileUploadComponent config={zipConfig} />;
     };
 
+    const ZipDragDrop = () =>{
+        return (<DragDrop config={ {
+            fileType: 'zip',
+            accept: 'application/zip',
+            description: 'Make sure your zip contains raw data and a json config file.',
+            title: 'Upload Dataset',
+            icon: <IconUpload size={30} />,
+        } } />)
+    }
+
+    const ModelRepo = () =>{
+        return (
+            <div>Model repo :))</div>
+        )
+    }
+
     const PthUploadComponent = () => {
         const pthConfig = {
             fileType: 'pth' as const,
@@ -82,9 +98,9 @@ const HomePageDrop: React.FC = ({
     const datasetSections = [
         {
             id: "selection",
-            title: "Select Dataset",
+            title: "Upload Dataset",
             Icon: File,
-            child: ZipUploadComponent
+            child: ZipDragDrop
         },
         {
             id: "repository",
@@ -100,6 +116,12 @@ const HomePageDrop: React.FC = ({
             title: "Upload Model",
             Icon: File,
             child: PthUploadComponent
+        },
+        {
+            id: "modrepository",
+            title: "Model Repository",
+            Icon: Database,
+            child: ModelRepo
         }
     ];
 
@@ -108,11 +130,6 @@ const HomePageDrop: React.FC = ({
     return (
 
         <div className="file-grid">
-            <DragDrop config={ {
-                fileType: '.zip',
-                accept: ['.zip'],
-                description: 'Upload a .zip file'
-            } } />
             {listOfSections.map((dropElement, index) => (
                 <FileDropZone2
                     key={index}
