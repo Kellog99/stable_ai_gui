@@ -9,6 +9,7 @@ import Status from '@/components/client/redtool/Status';
 import { listAttacks } from '../prova';
 
 const Benchmark: React.FC = () => {
+  // variables for executing an attack
   const [attacks, setAttacks] = useState<AttackProps[]>([]);
   const [metrics, setMetrics] = useState<MetricsProps[]>([]);
 
@@ -17,8 +18,6 @@ const Benchmark: React.FC = () => {
   const [selectedMetrics, setSelectedMetrics] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  console.log("AAASSSS");
 
   useEffect(() => {
     async function fetchItem() {
