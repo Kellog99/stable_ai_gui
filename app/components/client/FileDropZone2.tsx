@@ -50,7 +50,7 @@ export function FileDropZone ( { sections, defaultActiveSection }: FileDropZoneP
             </div>
 
             <div style={ {
-                width:"80vh",
+                width:"30vw",
                 minHeight:"40vh",
                 border: "1px solid #ccc",
                 borderRadius: "8px",

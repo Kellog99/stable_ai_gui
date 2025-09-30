@@ -1,30 +1,36 @@
-import { ActionIcon, Box, Button, Code, Divider, Flex, Group, Modal, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { ActionIcon, Box, Button, Code, Collapse, Divider, Flex, Group, List, Stack, Text, ThemeIcon } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useDisclosure } from '@mantine/hooks';
-import { IconCloudUpload, IconDatabase, IconFileText, IconFileZip, IconTrash, IconUpload, IconX } from '@tabler/icons-react';
-import { InfoIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { IconChevronDown, IconCloudUpload, IconDatabase, IconFileText, IconFileZip, IconTrash, IconUpload, IconX } from '@tabler/icons-react';
+import { CheckIcon, FolderIcon } from 'lucide-react';
+import { useState } from 'react';
 import classes from '../../styles/FileDropZone.module.css';
 
 type Props = {
     config: {
+        name: string;
         fileType: string;
         accept: string;
         description?: string;
-        title: string;
-        icon: React.ReactNode;
+        uploadUrl: string;
+        refreshFunction: () => Promise<any>; //ex: "DatasetsLoader" is the function the reloads the data with the new upload
+        setRefreshData: ( data: any ) => void;
+
     };
+    infoModal: React.ReactNode
 };
 
 
 
-export function DragDrop ( { config }: Props )
+export function DragDrop ( { config, infoModal }: Props )
 {
     const [ file, setFile ] = useState<File | null>( null );
     const [ message, setMessage ] = useState<string>( '' );
     const [ loading, setLoading ] = useState<boolean>( false );
     const [ uploadStatus, setUploadStatus ] = useState<string | null>( null );
-    const [ opened, { toggle } ] = useDisclosure( false );
+    const [jsonUploaded, setJsonUploaded] = useState<Object>({})
+
+    const [ openedJs, { toggle: toggleJs } ] = useDisclosure( false );
 
     const validateFile = ( selectedFile: File ): boolean =>
     {
@@ -59,79 +65,59 @@ export function DragDrop ( { config }: Props )
 
     const handleUpload = async () =>
     {
-        console.log( "file uploaded :))" )
-    }
-
-    useEffect( () =>
-    {
-        console.log( "message updated:", message );
-        if ( file ) {
-            console.log( 'File ready for upload:', file );
+        if ( !file ) {
+            setMessage( `Please select a ${config.fileType} file first.` );
+            setUploadStatus( 'error' );
+            return;
         }
 
-    }, [ file, message ] )
+        setMessage( `Uploading ${file.name}...` );
+        setLoading( true );
+        setUploadStatus( null );
 
-    const jsonExample = `{
-    "arrow": false,
-    "task": "classification",
-    "type": "image",
-    "description": "Some text",
-    "label_dict": {
-        "0": "antelope",
-        "1": "badger"
-    }
-}`;
+        const formData = new FormData();
+        formData.append( config.name, file );
+
+        try {
+            const response = await fetch( config.uploadUrl, {
+                method: 'POST',
+                body: formData,
+            } );
+
+            if ( response.ok ) {
+                const data = await response.json();
+                setJsonUploaded(data)
+                setMessage( `Upload successful` );
+                setUploadStatus( 'success' );
+            }
+        } catch ( error ) {
+            console.error( 'Error uploading:', error );
+            setMessage( `An error occurred: ${error}` );
+            setUploadStatus( 'error' );
+
+        } finally {
+            if ( config.refreshFunction && config.setRefreshData ) {
+                config.refreshFunction().then( fetchedData =>
+                {
+                    if ( config.fileType === 'pth' ) {
+                        config.setRefreshData?.( fetchedData.names );
+                    } else {
+                        config.setRefreshData?.( fetchedData );
+                    }
+                } );
+            }
+            setLoading( false );
+        }
+    };
+
+
 
     return (
         <>
-            <Stack>
-                <Box style={ {
-                    padding: '10px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    width: '100%'
-                } }
-                    onClick={ toggle }
-            
-                >
-                    <Group justify='space-between' >
-                        <Group justify='flex-start' style={ { cursor: 'pointer' } }>
-                            <InfoIcon size={ 12 } />
-                            <Text size="sm" c="var(--mantine-color-gray-7)">Info about the zip to upload</Text>
-                        </Group>
-                        {/*<IconChevronDown size={ 16 } style={ { color: "var(--mantine-color-gray-7)", marginLeft: 10, transform: opened ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' } } />*/ }
-                    </Group>
-                    <Modal opened={ opened } onClose={ toggle } title="Upload Information" >
-                        
-                        <Divider my="xs" color="var(--mantine-color-gray-7)" />
-                        <Text size="sm" c="var(--mantine-color-gray-7)" mb="8px">
-                            The zip you are going to upload must contain the raw data files and a json config file, optionally it could contain the pre-injested arrow file.
-                            The json config file must contain the following fields:
-                        </Text>
-                        <Code color="var(--mantine-color-gray-8)" c="white" block>
-                            { jsonExample }
-                        </Code>
-                        <Text size="sm" c="var(--mantine-color-gray-7)" mt="8px">
-                            The fields <Code color="var(--mantine-color-gray-8)" c="white">task</Code> and <Code color="var(--mantine-color-gray-8)" c="white">type</Code> are mandatory in case the arrow file is not supplied.
-                        </Text>
-                    </Modal>
-                    {/*
-                                        <Collapse in={ opened }>
-                        <Divider my="xs" color="var(--mantine-color-gray-7)"/>
-                        <Text size="sm" c="var(--mantine-color-gray-7)" mb="8px">
-                            The zip you are going to upload must contain the raw data files and a json config file, optionally it could contain the pre-injested arrow file.
-                            The json config file must contain the following fields:
-                        </Text>
-                        <Code color="var(--mantine-color-gray-8)" c="white" block>
-                            { jsonExample }
-                        </Code>
-                        <Text size="sm" c="var(--mantine-color-gray-7)" mt="8px">
-                            The fields <Code color="var(--mantine-color-gray-8)" c="white">task</Code> and <Code color="var(--mantine-color-gray-8)" c="white">type</Code> are mandatory in case the arrow file is not supplied.
-                        </Text>
+            <Stack
+                justify="space-around">
 
-                    </Collapse>
-                    */}
-                </Box>
+                { infoModal }
 
                 <div className={ classes.dropzone }>
                     { file ? (
@@ -182,7 +168,7 @@ export function DragDrop ( { config }: Props )
                             <Flex direction="column" justify="center" align="center" gap="xl" mih={ 180 } style={ { pointerEvents: 'none' } }>
                                 <Dropzone.Accept>
                                     <ThemeIcon size={ 65 } radius="xl" variant="light" color="var(--mantine-color-blue-6)" >
-                                        <IconUpload size={ 48 } stroke={ 1.5 } />,
+                                        <IconUpload size={ 50 } stroke={ 1.5 } />,
                                     </ThemeIcon>
                                     <Text size="lg" fw={ 600 } mt="20px" c="#333333" inline>
                                         Release to load
@@ -210,11 +196,11 @@ export function DragDrop ( { config }: Props )
                                     ) }
 
 
-                                    <Text size="xl" fw={ 600 } c="#1e293b" mt="20px" inline >
+                                    <Text size="1vw" fw={ 600 } c="#1e293b" mt="20px" inline >
                                         Drag a { config.fileType } file here or click to select
                                     </Text>
 
-                                    <Text size="sm" c="#475569" inline mt={ 7 }>
+                                    <Text size="0.6vw" c="#475569" inline mt={ 7 }>
                                         { config.description }
                                     </Text>
 
@@ -226,6 +212,74 @@ export function DragDrop ( { config }: Props )
 
                 </div>
 
+                <Box style={ {
+                    padding: '10px',
+                    backgroundColor: 'rgba(53, 216, 61, 0.2)',
+                    borderRadius: '8px',
+                    width: '100%',
+
+                    visibility: file ? "visible" : "hidden"
+                } }
+
+
+                >
+                    <Group justify='space-between' onClick={ toggleJs } style={ { cursor: 'pointer' } }  >
+                        <Group justify='flex-start'>
+                            <CheckIcon size={ 12 } />
+                            <Text size="sm" c="var(--mantine-color-gray-7)">Data you loaded:</Text>
+                        </Group>
+                        <IconChevronDown size={ 16 } style={ { color: "var(--mantine-color-gray-7)", marginLeft: 10, transform: openedJs ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' } } />
+                    </Group>
+
+                    <Collapse in={ openedJs }>
+                        <Divider my="xs" color="rgba(30, 120, 40, 0.9)" />
+
+                        <Box
+                            p="md"
+                            style={ {
+                                backgroundColor: 'rgba(30, 120, 40, 0.05)',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(30, 120, 40, 0.2)'
+                            } }
+                        >
+                            <List
+                                spacing="sm"
+                                size="sm"
+                                icon={
+                                    <ThemeIcon
+                                        color="rgba(30, 120, 40, 0.9)"
+                                        size={ 8 }
+                                        radius="xl"
+                                    />
+                                }
+                            >
+                                <List.Item>
+                                    <Group gap="xs">
+                                        <FolderIcon size={ 16 } style={ { color: 'rgba(30, 120, 40, 0.9)' } } />
+                                        <Text c="var(--mantine-color-gray-7)" size="sm" fw={ 600 }>Data Folder Name:</Text>
+                                        <Text c="var(--mantine-color-gray-7)" size="sm" style={ { fontFamily: 'monospace' } }>{ file?.name?.split( '.' ).slice( 0, -1 ).join( '.' ) }</Text>
+                                    </Group>
+                                </List.Item>
+
+                                <List.Item>
+                                    <Group gap="xs">
+                                        <FolderIcon size={ 16 } style={ { color: 'rgba(30, 120, 40, 0.9)' } } />
+                                        <Text c="var(--mantine-color-gray-7)" size="sm" fw={ 600 }>JSON Content:</Text>
+                                    </Group>
+                                </List.Item>
+                            </List>
+
+                            <Box ml="xl" mt="sm">
+                                <Code block style={ { fontSize: '0.75rem', backgroundColor: "rgba(30, 120, 40, 0.3)" } }>
+                                    {JSON.stringify(jsonUploaded, null, 2)}
+                                </Code>
+                            </Box>
+
+                        </Box>
+                    </Collapse>
+
+                </Box >
+
                 <Group justify="center" mt="md">
                     <Button
                         leftSection={ <IconCloudUpload size={ 16 } /> }
@@ -236,10 +290,10 @@ export function DragDrop ( { config }: Props )
                         variant="gradient"
                         gradient={ { from: "#1e293b", to: "red", deg: 90 } }
                     >
-                        { loading ? 'Uploading...' : 'Upload File' }
+                        { loading ? 'Uploading...' : 'Upload' }
                     </Button>
                 </Group>
-            </Stack>
+            </Stack >
         </>
 
 

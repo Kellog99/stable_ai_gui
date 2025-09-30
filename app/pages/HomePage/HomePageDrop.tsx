@@ -1,29 +1,31 @@
 
+import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
 import FileDropZone2 from '@/components/client/FileDropZone2';
+import { ModalUploadDataset } from '@/components/client/ModalUploadDataset';
+import { ModalUploadModel } from '@/components/client/ModalUploadModel';
+import FileUploadComponent from '@/components/client/UploaderUnified';
+import { DragDrop } from '@/components/client/UploaderUnifiedDragDrop';
+import DatasetsLoader from '@/functionalities/DatasetsLoader';
+import { getModels } from '@/functionalities/NNTrustBackendUtils';
+import { upload_post } from '@/properties/urls';
+import { model_upload } from '@/properties/urlsNNTrust';
+import useStoreDQ from '@/store/dsStore';
+import useStore from '@/store/nnTrustStore';
+import { IconFileText, IconUpload } from '@tabler/icons-react';
 import { Database, File } from 'lucide-react';
 import React from 'react';
-import ZipUploader from "../../components/client/Uploader";
-import ModelUploader from '@/components/client/ModelUploader';
-import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
-import FileUploadComponent from '@/components/client/UploaderUnified';
-import { upload_post } from '@/properties/urls';
-import { IconFileText, IconUpload } from '@tabler/icons-react';
-import { model_upload } from '@/properties/urlsNNTrust';
-import { getModels } from '@/functionalities/NNTrustBackendUtils';
-import useStore from '@/store/nnTrustStore';
-import useStoreDQ from '@/store/dsStore';
-import DatasetsLoader from '@/functionalities/DatasetsLoader';
-import { DragDrop } from '@/components/client/UploaderUnifiedDragDrop';
 
 
 
-const HomePageDrop: React.FC = ({
-}) => {
-    const setModels = useStore((state) => state.setModels)
-    const setDatasets = useStoreDQ((state) => state.setDatasets)
-    
-    
-    const ZipUploadComponent = () => {
+const HomePageDrop: React.FC = ( {
+} ) =>
+{
+    const setModels = useStore( ( state ) => state.setModels )
+    const setDatasets = useStoreDQ( ( state ) => state.setDatasets )
+
+
+    const ZipUploadComponent = () =>
+    {
         const zipConfig = {
             fileType: 'zip' as const,
             accept: '.zip',
@@ -31,7 +33,7 @@ const HomePageDrop: React.FC = ({
             description: 'Select a .zip file from your computer to upload',
             uploadEndpoint: upload_post,
             formFieldName: 'folder_zip',
-            icon: <IconUpload size={30} />,
+            icon: <IconUpload size={ 30 } />,
             showArrowSwitch: true,
             showModeSelect: true,
             showTypeSelect: true,
@@ -40,26 +42,11 @@ const HomePageDrop: React.FC = ({
             setRefreshData: setDatasets
         };
 
-        return <FileUploadComponent config={zipConfig} />;
+        return <FileUploadComponent config={ zipConfig } />;
     };
 
-    const ZipDragDrop = () =>{
-        return (<DragDrop config={ {
-            fileType: 'zip',
-            accept: 'application/zip',
-            description: 'Make sure your zip contains raw data and a json config file.',
-            title: 'Upload Dataset',
-            icon: <IconUpload size={30} />,
-        } } />)
-    }
-
-    const ModelRepo = () =>{
-        return (
-            <div>Model repo :))</div>
-        )
-    }
-
-    const PthUploadComponent = () => {
+    const PthUploadComponent = () =>
+    {
         const pthConfig = {
             fileType: 'pth' as const,
             accept: '.pth',
@@ -67,7 +54,7 @@ const HomePageDrop: React.FC = ({
             description: 'Select a .pth model file from your computer to upload',
             uploadEndpoint: model_upload,
             formFieldName: 'model_file',
-            icon: <IconFileText size={30} />,
+            icon: <IconFileText size={ 30 } />,
             showArrowSwitch: false,
             showModeSelect: false,
             showTypeSelect: false,
@@ -76,23 +63,69 @@ const HomePageDrop: React.FC = ({
             setRefreshData: setModels
         };
 
-        const handleModelUploadComplete = (success: boolean, data?: any) => {
-            if (success) {
-                console.log('Model uploaded successfully:', data);
-                
+        const handleModelUploadComplete = ( success: boolean, data?: any ) =>
+        {
+            if ( success ) {
+                console.log( 'Model uploaded successfully:', data );
+
             } else {
-                console.log('Model upload failed');
-                
+                console.log( 'Model upload failed' );
+
             }
         };
 
         return (
             <FileUploadComponent
-                config={pthConfig}
-                onUploadComplete={handleModelUploadComplete}
+                config={ pthConfig }
+                onUploadComplete={ handleModelUploadComplete }
             />
         );
     };
+
+    const ZipDragDrop = () =>
+    {
+        return (
+            <DragDrop
+                config={ {
+                    name: "dataset",
+                    fileType: 'zip',
+                    accept: 'application/zip',
+                    description: 'Make sure your zip contains raw data and a json config file.',
+                    uploadUrl: "...",
+                    refreshFunction: DatasetsLoader,
+                    setRefreshData: setDatasets
+                } }
+                infoModal={ <ModalUploadDataset /> } /> )
+    }
+
+    const ZipModelDragDrop = () =>
+    {
+        return (
+            <DragDrop
+                config={ {
+                    name: "model",
+                    fileType: 'zip',
+                    accept: 'application/zip',
+                    description: 'Make sure your zip contains raw data and a json config file.',
+                    uploadUrl: "...",
+                    refreshFunction: getModels,
+                    setRefreshData: setModels
+
+                } }
+                infoModal={ <ModalUploadModel /> } /> )
+    }
+
+
+
+
+    const ModelRepo = () =>
+    {
+        return (
+            <div>Model repo :))</div>
+        )
+    }
+
+
 
 
     const datasetSections = [
@@ -115,7 +148,7 @@ const HomePageDrop: React.FC = ({
             id: "model",
             title: "Upload Model",
             Icon: File,
-            child: PthUploadComponent
+            child: ZipModelDragDrop
         },
         {
             id: "modrepository",
@@ -125,18 +158,18 @@ const HomePageDrop: React.FC = ({
         }
     ];
 
-    const listOfSections = [datasetSections, modelSections];
+    const listOfSections = [ datasetSections, modelSections ];
 
     return (
 
         <div className="file-grid">
-            {listOfSections.map((dropElement, index) => (
+            { listOfSections.map( ( dropElement, index ) => (
                 <FileDropZone2
-                    key={index}
-                    sections={dropElement}
-                    defaultActiveSection={dropElement[0].id}
+                    key={ index }
+                    sections={ dropElement }
+                    defaultActiveSection={ dropElement[ 0 ].id }
                 />
-            ))}
+            ) ) }
 
         </div>
     )

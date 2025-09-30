@@ -1,13 +1,13 @@
 .containerDropzone {
-  height: 100%;
-  width: 100vh;
-  display: grid;
-  row-gap: 0.1vw;
-
+  justify-content: space-between;
+  flex-wrap: wrap;  /* if you want items to wrap to next line */
+  row-gap: 0.1vw;   /* vertical spacing between rows */
 }
 
+
+
 .dropzone {
-  width: 75vh;
+  width: 28vw;
   aspect-ratio: 4;
   position: relative;
   border: 3px dashed #D1D5DB;
