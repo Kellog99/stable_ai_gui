@@ -18,7 +18,7 @@ export default function RootLayout ( { children }: { children: React.ReactNode }
   return (
     <MantineProvider >
       <AppShell withBorder={ false }>
-        <Container
+        {/* <Container
           size="100%"
           className={`${classes.mainContainer} ${collapsed ? classes.collapsed : ""}`}
         >
@@ -27,8 +27,8 @@ export default function RootLayout ( { children }: { children: React.ReactNode }
               <AppNavbar />
             </div>
           </div>
-          { children }
-        </Container>
+          
+        </Container> */}{ children }
       </AppShell>
     </MantineProvider>
   );

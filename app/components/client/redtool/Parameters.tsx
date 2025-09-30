@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Settings, X } from 'lucide-react';
 import './Parameters.css';
 import { ParametersWindowProps } from '@/interfaces/NNInterfaces';

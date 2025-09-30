@@ -7,8 +7,8 @@
 }
 
 .dropzone {
-  width: 80vh;
-  aspect-ratio: 1.16;
+  width: 100%;
+  aspect-ratio: 1;
   position: relative;
   border: 2px dashed #D1D5DB;
   border-radius: 0.75rem;

@@ -2,7 +2,7 @@ import { ChevronRight } from 'lucide-react';
 import React from 'react';
 import styles from '@/styles/TaskButton.module.css';
 import { Task } from '@/interfaces/NNInterfaces';
-import RouterButton from './buttons/RouterButton';
+import { useRouter } from 'next/navigation';
 
 const TaskButton: React.FC<Task> = ({
   Icon,
@@ -12,27 +12,27 @@ const TaskButton: React.FC<Task> = ({
   color,
   href
 }) => {
-
-  // #TODO: change the route 
-
+  const router = useRouter();
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault()
+    router.push(href)
+  }
   return (
-    <RouterButton
-      name={"Animals"}
-      route={href ? href : ''}>
-      <div className={styles.card}>
-        <div className={styles.card_header}>
-          <div className={styles.card_icon} style={{ background: color }}>
-            <Icon style={{ width: "2vw" }} />
-          </div>
-          <p className={styles.card_title}>{title}</p>
+    <button
+      className={styles.card}
+      onClick={handleClick}>
+      <div className={styles.card_header}>
+        <div className={styles.card_icon} style={{ background: color }}>
+          <Icon style={{ width: "2vw" }} />
         </div>
-        <p className={styles.card_description}>{description}</p>
-        <div className={styles.card_link}>
-          <p>{footer}</p>
-          <ChevronRight />
-        </div>
+        <p className={styles.card_title}>{title}</p>
       </div>
-    </RouterButton>
+      <p className={styles.card_description}>{description}</p>
+      <div className={styles.card_link} >
+        {footer}
+        <ChevronRight />
+      </div>
+    </button>
   );
 }
 

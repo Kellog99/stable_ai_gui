@@ -1,17 +1,20 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { AttackProps } from '@/interfaces/NNInterfaces';
-import AttackCard from '@/components/client/redtool/AttackCard';
+import { AttackProps, MetricsProps } from '@/interfaces/NNInterfaces';
+import OptionCard from '@/components/client/redtool/OptionCard';
 import './Benchmark.css';
 import { Play, ChevronDown, ChevronUp } from 'lucide-react';
 import Status from '@/components/client/redtool/Status';
-import { listAttacks } from './prova';
+import { listAttacks } from '../prova';
 
 const Benchmark: React.FC = () => {
   const [attacks, setAttacks] = useState<AttackProps[]>([]);
+  const [metrics, setMetrics] = useState<MetricsProps[]>([]);
+
   const [open, setOpen] = useState<boolean>(false)
   const [selectedAttacks, setSelectedAttacks] = useState<Set<string>>(new Set());
+  const [selectedMetrics, setSelectedMetrics] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,7 +91,7 @@ const Benchmark: React.FC = () => {
         <Status attackList={Array.from(selectedAttacks)} />
 
         <div className='attack-title'>
-          <div className='attack-header'>Vulnearbility selection</div>
+          Advance options
           <button className='btn-open'
             onClick={() => setOpen((prev) => !prev)}>
             {open ?
@@ -101,16 +104,38 @@ const Benchmark: React.FC = () => {
 
         {
           open ?
-
-            <div className="attacks-grid">
-              {attacks.map((attack) => (
-                <AttackCard
-                  key={attack.id}
-                  attack={attack}
-                  isSelected={selectedAttacks.has(attack.id)}
-                  onSelect={handleAttackSelect}
-                />
-              ))}
+            <div>
+              <div className='option-attacks'>
+                <h2>Vulnearbility selection</h2>
+                <p style={{color:'gray'}}> Here it is possible to choose the vulnerabilities to test on the selected target model.</p>
+              </div>
+              <div className="attacks-grid">
+                {attacks.map((attack) => (
+                  <OptionCard
+                    id={attack.id}
+                    name={attack.name}
+                    description={attack.description}
+                    parameters={attack.parameters}
+                    isSelected={selectedAttacks.has(attack.id)}
+                    onSelect={handleAttackSelect}
+                  />
+                ))}
+              </div>
+              <div className='option-attacks'>
+                <h2>Metric Selection</h2>
+                <p style={{color:'gray'}}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
+              </div>
+              <div className="attacks-grid">
+                {metrics.map((metrics) => (
+                  <OptionCard
+                    id={metrics.id}
+                    name={metrics.name}
+                    description={metrics.description}
+                    isSelected={selectedMetrics.has(metrics.id)}
+                    onSelect={handleAttackSelect}
+                  />
+                ))}
+              </div>
             </div>
             : null
         }

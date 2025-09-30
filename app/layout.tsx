@@ -6,15 +6,15 @@ import "@mantine/core/styles.css";
 import "./globals.css";
 import styles from '@/styles/HomePage.module.css'
 
-const geistSans = Geist( {
+const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: [ "latin" ],
-} );
+  subsets: ["latin"],
+});
 
-const geistMono = Geist_Mono( {
+const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: [ "latin" ],
-} );
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "TrustWorthy",
@@ -27,7 +27,7 @@ const myTheme = createTheme({
   fontFamily: "Roboto, sans-serif",
   primaryColor: "gray",
   components: {
-     Select: {
+    Select: {
       defaultProps: {
         size: "xs",
         labelProps: {
@@ -37,10 +37,10 @@ const myTheme = createTheme({
     },
     Text: {
       defaultProps: {
-        c: "white", 
+        c: "white",
       },
     },
-    Title:{
+    Title: {
       defaultProps: {
         c: "white",
       }
@@ -48,22 +48,21 @@ const myTheme = createTheme({
   },
 });
 
-export default function RootLayout ( {
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}> )
-{
+}>) {
   return (
     <html lang="en">
-      <body className={ `${geistSans.variable} ${geistMono.variable} antialiased` }>
-        <MantineProvider theme={ myTheme }>
-        <div className= {styles.homepage}>
-          <Header />
-          <main className="flex-1 ">
-            { children }
-          </main>
-        </div>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <MantineProvider theme={myTheme}>
+          <div className={styles.homepage}>
+            <Header />
+            <main className="flex-1 ">
+              {children}
+            </main>
+          </div>
         </MantineProvider>
       </body>
     </html>

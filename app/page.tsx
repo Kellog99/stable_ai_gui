@@ -10,12 +10,12 @@ import FileDropZone from '@/components/client/FileDropZone';
 // major information about the tasks
 const tasks: Task[] = [
   {
-    title: "Red Team Tool",
+    title: "Benchmark",
     Icon: BarChart3,
     footer: "Start Benchmark",
     color: "linear-gradient(to bottom right, #3b82f6, red)",
     description: 'Test all the possible vulnerabilities and generate a detailed performance reports across multiple attack vectors.',
-    href: "/pages/tasks/RedTeam"
+    href: "/pages/tasks/redteam/benchmark"
   },
   {
     title: "Test",
@@ -23,7 +23,7 @@ const tasks: Task[] = [
     description: 'Test individual adversarial attacks with custom parameters and visualize the results.',
     footer: "Execute Test",
     color: "linear-gradient(to bottom right, #9333ea, #7c3aed)",
-    href: "/pages/tasks/Test"
+    href: "/pages/tasks/redteam/test"
   },
   {
     title: "Data Quality Tool",
