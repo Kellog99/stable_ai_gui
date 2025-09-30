@@ -14,17 +14,25 @@
     color: white;
 }
 
+.table-container {
+    height: 100%;
+    max-height: 40vw;
+    overflow-y: auto;
+    border-radius: 2vw;
+}
+
 .task-table {
     width: 100%;
     border-collapse: collapse;
     background-color: white;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
     overflow: hidden;
 }
 
 .task-table-header {
     background-color: #f8f9fa;
+    position: sticky;
+    top: 0;
 }
 
 .task-table th {

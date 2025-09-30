@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Settings } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import './AttackCard.css';
 import ParametersWindow from './Parameters';
@@ -7,10 +7,11 @@ import ParametersWindow from './Parameters';
 interface AttackCardProps {
   id: string,
   name: string,
-  description: string,
+  description?: string,
   parameters?: ParametersProps[],
   isSelected: boolean;
   onSelect: (attackId: string) => void;
+  Icon: LucideIcon
 }
 
 const OptionCard: React.FC<AttackCardProps> = ({
@@ -20,36 +21,32 @@ const OptionCard: React.FC<AttackCardProps> = ({
   description,
   isSelected,
   onSelect,
+  Icon
 }) => {
   const [openSettings, setIsExpanded] = useState(false);
-  if (typeof parameters === "undefined") {
-    return
-  }
   return (
-    <>{typeof parameters !== "undefined" ?
-      <div className="attack-card">
-        <input
-          className='checkbox'
-          type="checkbox"
-          onClick={() => onSelect(id)}
-          defaultChecked={isSelected} />
-        <div className='card-body'>
-          <div className="card-header" >
-            <span className='title'>{name}</span>
-            <div
-              className='open'
-              onClick={() => setIsExpanded(true)} >
-              <Settings className='icon' />
-            </div>
+    <><div className="attack-card">
+      <input
+        className='checkbox'
+        type="checkbox"
+        onClick={() => onSelect(id)}
+        defaultChecked={isSelected} />
+      <div className='card-body'>
+        <div className="card-header" >
+          <span className='title'>{name}</span>
+          <div
+            className='open'
+            onClick={() => setIsExpanded(true)} >
+            <Icon className='icon' />
           </div>
+        </div>
+        {description ?
           <div className='description'>
             {description}
           </div>
-        </div>
-      </div> :
-      <div style={{ color: "white" }}> No parameters has been passed for {name}</div>
-    }
-
+          : null}
+      </div>
+    </div>
       {
         parameters ? <ParametersWindow
           isOpen={openSettings}

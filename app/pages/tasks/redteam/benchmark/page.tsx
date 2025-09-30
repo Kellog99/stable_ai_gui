@@ -4,9 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { AttackProps, MetricsProps } from '@/interfaces/NNInterfaces';
 import OptionCard from '@/components/client/redtool/OptionCard';
 import './Benchmark.css';
-import { Play, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, ChevronDown, ChevronUp, Settings, Ruler } from 'lucide-react';
 import Status from '@/components/client/redtool/Status';
-import { listAttacks } from '../prova';
 
 const Benchmark: React.FC = () => {
   const [attacks, setAttacks] = useState<AttackProps[]>([]);
@@ -15,79 +14,60 @@ const Benchmark: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false)
   const [selectedAttacks, setSelectedAttacks] = useState<Set<string>>(new Set());
   const [selectedMetrics, setSelectedMetrics] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchItem() {
+      // fetching the attacks
       try {
-        console.log("prima")
         const response = await fetch('http://127.0.0.1:8000/attacks/getInfo');
-        console.log("dopo")
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error for the attack List! Status: ${response.status}`);
         }
-
         const json = await response.json();
         setAttacks(json);
-
         if (json.length > 0) {
           const allIds = json.map((attack: AttackProps) => attack.id);
           setSelectedAttacks(new Set(allIds));
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
+      }
+      // fetching the metrics
+      try {
+        const response = await fetch('http://127.0.0.1:8000/metrics/getInfo');
+        if (!response.ok) {
+          throw new Error(`HTTP error for the metric List! Status: ${response.status}`);
+        }
+        const json = await response.json();
+        setMetrics(json);
+        if (json.length > 0) {
+          const allIds = json.map((metric: MetricsProps) => metric.id);
+          setSelectedMetrics(new Set(allIds));
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
       }
     }
     fetchItem();
   }, []);
 
 
-  // useEffect(() => {
-  //   // this function has to be updated to make a backend call
-  //   // to get the list of all the available attacks
-
-  //   const loadAttacks = async () => {
-  //     try {
-  //       setAttacks(listAttacks);
-  //       if (listAttacks.length > 0) {
-  //         const allIds = listAttacks.map(attack => attack.id);
-  //         setSelectedAttacks(new Set(allIds));
-  //       }
-  //     } catch (err) {
-  //       setError(err instanceof Error ? err.message : 'An error occurred');
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   loadAttacks();
-  // }, []);
-
-  const handleAttackSelect = (attackId: string) => {
-    setSelectedAttacks(prev => {
+  const handleSelection = (
+    id: string,
+    setFunction: React.Dispatch<React.SetStateAction<Set<string>>>
+  ) => {
+    setFunction(prev => {
       const newSelected = new Set(prev);
-      if (newSelected.has(attackId)) {
-        newSelected.delete(attackId);
+      if (newSelected.has(id)) {
+        newSelected.delete(id);
       } else {
-        newSelected.add(attackId);
+        newSelected.add(id);
       }
       return newSelected;
     });
   };
 
-  function loadingPage() {
-    // handle the page while the attacks are being loaded.
-    return (
-      <div className="attack-list">
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-white text-xl">Loading adversarial attacks...</div>
-        </div>
-      </div>
-    );
-  }
 
   function errorPage() {
     // handle the page if there are some problems during the loading of the attacks.
@@ -144,7 +124,8 @@ const Benchmark: React.FC = () => {
                     description={attack.description}
                     parameters={attack.parameters}
                     isSelected={selectedAttacks.has(attack.id)}
-                    onSelect={handleAttackSelect}
+                    onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
+                    Icon={Settings}
                   />
                 ))}
               </div>
@@ -159,7 +140,8 @@ const Benchmark: React.FC = () => {
                     name={metrics.name}
                     description={metrics.description}
                     isSelected={selectedMetrics.has(metrics.id)}
-                    onSelect={handleAttackSelect}
+                    onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
+                    Icon={Ruler}
                   />
                 ))}
               </div>
@@ -173,12 +155,8 @@ const Benchmark: React.FC = () => {
     return errorPage();
   }
   else {
-    if (loading) {
-      return loadingPage()
-    }
-    else {
-      return attackPage();
-    }
+
+    return attackPage();
   }
 };
 
