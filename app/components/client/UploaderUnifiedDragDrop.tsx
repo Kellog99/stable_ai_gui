@@ -13,6 +13,7 @@ type Props = {
         accept: string;
         description?: string;
         uploadUrl: string;
+        formFieldName: string;
         refreshFunction: () => Promise<any>; //ex: "DatasetsLoader" is the function the reloads the data with the new upload
         setRefreshData: ( data: any ) => void;
 
@@ -76,7 +77,7 @@ export function DragDrop ( { config, infoModal }: Props )
         setUploadStatus( null );
 
         const formData = new FormData();
-        formData.append( config.name, file );
+        formData.append( config.formFieldName, file );
 
         try {
             const response = await fetch( config.uploadUrl, {
