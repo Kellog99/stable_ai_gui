@@ -15,7 +15,7 @@ import useStore from '../../../store/dsStore';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classes from './page.module.css';
-import { MousePointerClick } from 'lucide-react';
+import { MousePointerClick, ScanSearch } from 'lucide-react';
 
 interface Feature {
 
@@ -245,12 +245,12 @@ function EmbeddingsPage() {
 
 
   const legendData = labelDict && colorMap
-    ? Object.keys(colorMap).map((key) => {
+    ? Object.entries(colorMap).map(([key, rgb]) => {
       const numKey = Number(key);
       return {
         value: labelDict[numKey],
         label: labelDict[numKey],
-        color: `rgb(${colorMap[key].join(',')})`,
+        color: `rgb(${rgb?.join(',')})`,
       };
     })
     : [];
@@ -303,22 +303,21 @@ function EmbeddingsPage() {
 
   const renderedComponent = () => (
     <>
-      <Flex direction="column" align="center">
-        <div style={{ position: 'relative' }}>
+      <Flex direction="column" align="left" justify="flex-start" style={{ width: '100%' }}>
+        <div style={{ position: 'relative', width: '100%' }}>
           <Suspense>
             <Box style={{ pointerEvents: 'none' }}>
               <div style={{ pointerEvents: 'auto' }}>
                 <Flex
-                  justify="left"
+                  justify="flex-start"
                   align="center"
-                  direction="column"
-                  wrap="wrap"
                   style={{ width: '100%' }}
                 >
                   {!isLoadingEmbs ? (
-                    <Text>
-                      {indexes.length} point{indexes.length !== 1 ? 's' : ''} selected
-                    </Text>
+                    <div className={classes.tooltipBox}>
+                      <Text>{indexes.length} point{indexes.length !== 1 ? 's' : ''} selected</Text>
+                    </div>
+                  
                   ) : null}
                 </Flex>
 
@@ -363,10 +362,21 @@ function EmbeddingsPage() {
   );
 
   return (
-    <div className="w-full h-screen">
+    <div>
+      <Box
+        className={classes.title}
+        style={{ display: "flex", flexDirection: "column", gap: "0px" }}
+      >
+        <div className={classes.datasetHeader}>
+          <ScanSearch className={classes.iconDatabase} />
+          <h1 className={classes.datasetTitle}>
+            Embeddings exploration
+          </h1>
+        </div>
+        <div className={classes.datasetDivider}></div>
 
-
-      <div className={classes.featureBox}>
+      </Box>
+      <div className={classes.featureBox} style={{marginTop:"30px"}}>
         <Flex direction="row" justify="space-between">
           <Group>
             <Flex
@@ -383,7 +393,7 @@ function EmbeddingsPage() {
                 value={featureName}
                 onChange={(value) => {
                   setFeatureName(value);
-                  setModelUsed(datasetUsed?.default_embedding_model);
+                  setModelUsed(datasetUsed?.default_embedding_model as string);
                 }}
                 clearable
                 required={true}

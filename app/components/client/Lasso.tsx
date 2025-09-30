@@ -112,5 +112,5 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   );
 };
 
-export default LassoDrawer;import {ReactNode,FC,CSSProperties} from 'react';
+export default LassoDrawer;
 

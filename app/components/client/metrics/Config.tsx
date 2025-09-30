@@ -1,28 +1,28 @@
 "use client";
 
-import Dataset, { ReportMetric } from "@/interfaces/genericInterface";
+import { ReportMetric } from "@/interfaces/genericInterface";
 import { CompletenessDTO, DuplicatesDTO, MetricType, OutliersDTO } from "@/interfaces/metricsInterface";
-import { embedding_type, image_type, label_type, text_type } from "@/properties/types";
-import { faCheck, faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { image_type, label_type, text_type } from "@/properties/types";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, Box, Button, Code, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
+import { Box, Button, Code, Flex, Loader, Modal, Select, Space, Text, Textarea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import useStore from '../../../store/dsStore';
 import metricsFetcher from "../../server/metricsFetcher";
-import CompletenessConfig from "./CompletenessConfig";
 import CompletenessDisplayer from "./displayer/CompletenessDisplayer";
 import DuplicatesDisplayer from "./displayer/DuplicatesDisplayer";
 import OutlierDisplayer from "./displayer/OutlierDisplayer";
 import DuplicatesConfigs from "./DuplicatesConfig";
 import OutliersConfig from "./OutliersConfig";
 import { outliers_modes } from "./utils";
-import { IsFeatureBond } from "@/functionalities/Utils";
 import { getCompletenessOK } from "@/functionalities/BackendUtils";
 import Link from "next/link";
 import classes from "../../../styles/Config.module.css"
+import { AlertCust } from "../AlertCustom";
+import { Settings } from "lucide-react";
 
 
 
@@ -115,6 +115,7 @@ export default function Config(props: ConfigsProps) {
     const [showLabelError, setShowLabelError] = useState(false);
     const [showRequirementsError, setShowRequirementsError] = useState(false);
     const [showOutliersConfig, setShowOutliersConfig] = useState(false);
+    const [showOutliersModeError, setShowOutliersModeError] = useState(false)
     const [clicked, setClicked] = useState(false);
     const [isDuplicate, setIsDuplicate] = useState(false);
     const [computeNow, setComputeNow] = useState(false);
@@ -226,6 +227,11 @@ export default function Config(props: ConfigsProps) {
             hasValidationErrors = true;
         }
 
+        if (props.metricName === "outliers" && !outliers_mode){
+            setShowOutliersModeError(true);
+            hasValidationErrors = true
+        }
+
         if (props?.labelFeatureReq && !labelFeatureName) {
             setShowLabelError(true);
             hasValidationErrors = true;
@@ -311,8 +317,7 @@ export default function Config(props: ConfigsProps) {
 
     const metricComponentMap: Record<string, React.ComponentType> = {
         "duplicates": () => <DuplicatesConfigs />,
-        "outliers": () => <OutliersConfig mode={outliers_mode} />,
-        "completeness": () => <CompletenessConfig />
+        "outliers": () => <OutliersConfig mode={outliers_mode} />
     };
 
     const MetricConfigComponent = metricComponentMap[props.metricName];
@@ -331,19 +336,27 @@ export default function Config(props: ConfigsProps) {
             <div className={classes.featureBox}>
                 {props.metricName === "completeness" && (
                     <>
-                        <Alert
-                            variant="light"
-                            color="yellow"
-                            radius="md"
-                            title="Attention"
-                            icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-                            style={{ display: 'inline-block', width: '800px', marginBottom: "30px" }}
-                        >
-                            This metric can only be computed if the available embeddings were generated using the following model: <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
-                            Please ensure that embeddings from this model are available for the selected feature.
-                        </Alert>
+                        <div style={{ marginBottom: "15px" }}>
+                            <AlertCust result={"warning"}
+                                textToDisplay={
+                                    <>
+                                        This metric can only be computed if the available embeddings were generated using the following model: <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>.
+                                        Please ensure that embeddings from this model are available for the selected feature.
+                                    </>} />
+                        </div>
+
 
                         {!isCompletenessOK && (
+                            <>
+                                <div style={{ marginBottom: "15px" }}>
+                                    <AlertCust
+                                        result={"error"}
+                                        textToDisplay={<>
+                                            The selected feature has not embeddings computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>! You can compute them on
+                                            the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
+                                        </>} />
+                                </div>
+                                {/*
                             <Alert
                                 variant="light"
                                 color="red"
@@ -356,6 +369,8 @@ export default function Config(props: ConfigsProps) {
                                 the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
 
                             </Alert>
+                            */}
+                            </>
                         )}
                     </>
                 )}
@@ -448,7 +463,7 @@ export default function Config(props: ConfigsProps) {
                             value={outliers_mode}
                             onChange={(value) => {
                                 setOutliersMode(value as string);
-
+                                if (showOutliersModeError) setShowOutliersModeError(false);
                                 if (value) {
                                     if (!showOutliersConfig) {
                                         setShowOutliersConfig(true);
@@ -460,14 +475,24 @@ export default function Config(props: ConfigsProps) {
                             required={true}
                             styles={(theme) => ({
                                 input: {
-                                    borderColor: showLabelError ? theme.colors.red[6] : undefined,
-                                    borderWidth: showLabelError ? 2.5 : 1,
+                                    borderColor: showOutliersModeError ? theme.colors.red[6] : undefined,
+                                    borderWidth: showOutliersModeError ? 2.5 : 1,
                                     '&:hover': {
-                                        borderColor: showLabelError ? theme.colors.red[6] : undefined,
+                                        borderColor: showOutliersModeError ? theme.colors.red[6] : undefined,
                                     },
                                 },
                             })}
                         />) : null}
+
+                        {showOutliersModeError && (
+                            <Text
+                                size="xs"
+                                c="red"
+                                style={{ position: "absolute", top: "100%", marginTop: 4 }}
+                            >
+                                Choose a mode to continue
+                            </Text>
+                        )}
 
                     </Box>
                     {props.metricName == "completeness" ? (
@@ -492,7 +517,7 @@ export default function Config(props: ConfigsProps) {
                                         },
                                     },
                                     label: {
-                                        color:"white"
+                                        color: "white"
                                     }
                                 })} />
                             {showRequirementsError && (
@@ -507,44 +532,110 @@ export default function Config(props: ConfigsProps) {
                         </Box>
                     ) :
                         (<>
-                            <Modal opened={opened} onClose={close} title="Configurations">
+
+                            <Modal.Root
+                                opened={opened}
+                                onClose={close}
+                                centered
+                            >
+                                <Modal.Overlay
+                                    backgroundOpacity={0.55}
+                                    blur={3} />
+                                <Modal.Content
+                                    style={{
+                                        borderRadius: "12px",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    <Modal.Header
+                                        style={{
+                                            backgroundColor: "#334155",
+                                            justifyContent: "center", // centers title
+                                            borderBottom: "1px solid white", // white divider line
+                                            padding: "16px",
+                                        }}
+                                    >
+                                        <Modal.Title style={{ fontWeight: 700, fontSize: "1.25rem", color: "white" }}>
+                                            Configurations
+                                        </Modal.Title>
+                                        <Modal.CloseButton
+                                            style={{ position: "absolute", right: "16px", top: "16px" }}
+                                        />
+                                    </Modal.Header>
+
+                                    <Modal.Body style={{ padding: "20px", backgroundColor: "#334155", }}>
+                                        {MetricConfigComponent ? (
+                                            <MetricConfigComponent />
+                                        ) : (
+                                            <div>Unsupported metric</div>
+                                        )}
+                                    </Modal.Body>
+                                </Modal.Content>
+                            </Modal.Root>
+
+
+                            {/*
+                            <Modal
+                                opened={opened}
+                                onClose={close}
+                                title="Configurations"
+                                centered
+                                overlayProps={{
+                                    backgroundOpacity: 0.55,
+                                    blur: 3,
+                                }}>
+
+
+
+
                                 {MetricConfigComponent ? <MetricConfigComponent /> : <div>Unsupported metric</div>}
                             </Modal>
+                            */}
 
                             <Button variant="default" onClick={open} size="xs" radius="md" disabled={props.metricName == "outliers" && showOutliersConfig == false}>
+                                <Settings size={18} style={{ marginRight: "8px" }} />
                                 Configs
                             </Button>
                         </>)
                     }
                 </Flex>
                 <Space h="xl" />
-                <Flex
-                    direction="row"
-                    justify="end"
-                    gap="md">
+                <Flex direction="row" justify="end" gap="md">
+                
                     <Button
                         onClick={handleSaveToReport}
                         disabled={!computed}
+                        className={`${classes.buttonBase} ${classes.saveReport}`}
                     >
-                        {clicked && !isDuplicate ? (<>
-                            <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
-                            <span>Saved</span></>)
-                            : "Save to report"}
+                        {clicked && !isDuplicate ? (
+                            <>
+                                <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
+                                <span>Saved</span>
+                            </>
+                        ) : (
+                            "Save to report"
+                        )}
+                        <div className={classes.saveReportHighlight}></div>
                     </Button>
 
+                
                     <Button
                         onClick={handleClickCompute}
-                        disabled={props.metricName == "completeness" && !isCompletenessOK}>
+                        disabled={props.metricName === "completeness" && !isCompletenessOK}
+                        className={`${classes.buttonBase} ${classes.computeNow}`}
+                    >
                         Compute now
+                        <div className={classes.computeNowHighlight}></div>
                     </Button>
                 </Flex>
 
                 {isDuplicate ? (
                     <>
                         <Space h="md" />
-                        <Alert variant="light" color="red" withCloseButton onClose={() => { setIsDuplicate(false); setClicked(false) }} title="Attention" icon={icon}>
-                            A metric with this same configuration has been already computed. Please change something or choose another metric.
-                        </Alert>
+                        <AlertCust
+                            result={"error"}
+                            textToDisplay={"A metric with this same configuration has been already computed. Please change something or choose another metric."} />
+
                     </>) : null}
 
             </div>

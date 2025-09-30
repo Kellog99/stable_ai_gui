@@ -78,7 +78,7 @@ export function FeatureCard(props: FeatureCardProps) {
             ) : null}</>) : (outlier && score ? (
               <>
                 <Group justify="space-between" mt="md" mb="xs">
-                  <Text fw={500}>Score: {score.toFixed(3)}</Text>
+                  <Text fw={600} c="#334155">Score: {score.toFixed(3)}</Text>
                   <Badge color={outlier == "Outlier" ? "#fa5252" : "#228be6"}>{outlier}</Badge>
                 </Group>
               </>

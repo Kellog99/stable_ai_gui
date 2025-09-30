@@ -16,26 +16,62 @@
 }
 
 .title {
-  
   display: flex;
-  flex-direction: column; 
-  align-items: center;
+  flex-direction: column;
+  align-items: left;
   justify-content: center;
-  margin-right: "200px";
+}
+
+
+.datasetHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.iconDatabase {
+  width: 2rem;
+  /* same as w-8 */
+  height: 2rem;
+  /* same as h-8 */
+  color: #60a5fa;
+  /* Tailwind's blue-400 */
+}
+
+.datasetTitle {
+  font-size: 2.25rem;
+  /* same as text-4xl */
+  font-weight: 700;
+  /* same as font-bold */
+  background-image: linear-gradient(to right, #93c5fd, #86efac);
+  /* from-blue-300 (#93c5fd) to-green-300 (#86efac) */
+
+  background-clip: text;
+  -webkit-background-clip: text;
+  /* Safari support */
+  color: transparent;
+  /* same as text-transparent */
+}
+
+.datasetDivider {
+  width: 6rem;   /* Tailwind w-24 */
+  height: 0.25rem; /* Tailwind h-1 */
+  background-image: linear-gradient(to right, #3b82f6, #22c55e);  
+  border-radius: 9999px; /* Tailwind rounded-full */
 }
 
 .featureBox {
   position: relative;  
   flex: 1;
-  margin-top: 30px;
+  
   margin-bottom: 30px;
   border: 2px solid #64748b;
   border-radius: 1rem;
   background-color: #334155;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 1rem;
-  display: flex;
-  align-items: center; 
+  
 }
 
 .ImageDisplayer {
@@ -62,4 +98,26 @@
   text-align: left;
   overflow-wrap: break-word;
   white-space: pre-wrap; 
+}
+
+.tooltipBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  gap: 0.5rem;                 /* space between icon and text */
+  background-color: #1e293b;    /* dark blue-gray */
+  color: #f1f5f9;               /* light text */
+  padding: 0.5rem 1rem;          /* vertical and horizontal padding */
+  border-radius: 9999px;         /* fully rounded like a pill */
+  font-size: 1rem;           /* text-sm */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2); /* subtle shadow */
+  cursor: default;
+  user-select: none;
+}
+
+.tooltipIcon {
+  width: 1rem;   /* same as w-4 */
+  height: 1rem;  /* h-4 */
+  color: #60a5fa; /* Tailwind blue-400 for the icon */
 }

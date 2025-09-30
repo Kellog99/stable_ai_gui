@@ -5,13 +5,14 @@ import { getPrototypes } from "@/functionalities/BackendUtils";
 import { IsFeatureBond, IsFeatureSameLength } from "@/functionalities/Utils";
 import Dataset, { PrototypesInt } from "@/interfaces/genericInterface";
 import { image_type, label_type, text_type } from "@/properties/types";
-import { Button, Center, Flex, Loader, Select, Text } from "@mantine/core";
+import { Button, Center, Flex, Loader, Select, Text, Box } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import useStore from '../../../store/dsStore';
 import featureLoader from "@/functionalities/FeatureLoader";
 import classes from './page.module.css';
-import { MousePointerClick } from "lucide-react";
+import { Layers, MousePointerClick } from "lucide-react";
+import buttonsStyles from "../../../styles/Config.module.css"
 
 
 
@@ -91,6 +92,7 @@ export default function Prototypes() {
             if (labelFeatureName) {
                 const fetchedData = await getPrototypes(datasetName as string, featureName, labelFeatureName);
                 setPrototypes(fetchedData);
+                console.log("fetched prototypes", fetchedData)
             }
             else {
                 const fetchedData = await getPrototypes(datasetName as string, featureName);
@@ -130,8 +132,20 @@ export default function Prototypes() {
 
 
     return (
-        <div className="w-full h-screen">
+        <div>
+            <Box
+                className={classes.title}
+                style={{ display: "flex", flexDirection: "column", gap: "0px" }}
+            >
+                <div className={classes.datasetHeader}>
+                    <Layers className={classes.iconDatabase} />
+                    <h1 className={classes.datasetTitle}>
+                        Prototypes visualization
+                    </h1>
+                </div>
+                <div className={classes.datasetDivider}></div>
 
+            </Box>
             <div className={classes.featureBox}>
                 <Flex
                     direction="row"
@@ -161,16 +175,18 @@ export default function Prototypes() {
                         />) : null}
 
                 </Flex>
-
-                <Button mt="md" size="sm"
-                    onClick={handleClick}
-                    disabled={
-                        (datasetUsed?.task === "single_feature" && !featureName) ||
-                        (datasetUsed?.task !== "single_feature" && (!featureName || !labelFeatureName))
-                    }
-                >
-                    Get Prototypes
-                </Button>
+                <Flex justify="end">
+                    <Button mt="md" size="sm"
+                        onClick={handleClick}
+                        disabled={
+                            (datasetUsed?.task === "single_feature" && !featureName) ||
+                            (datasetUsed?.task !== "single_feature" && (!featureName || !labelFeatureName))
+                        }
+                        className={`${buttonsStyles.buttonBase} ${buttonsStyles.computeNow}`}
+                    >
+                        Get Prototypes
+                    </Button>
+                </Flex>
             </div>
             {isLoading ? (
                 <Flex

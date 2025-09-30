@@ -99,7 +99,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
                 <Modal.Header>
                     <Modal.Title>
                         <span style={{ display: 'flex', alignItems: 'center', gap: "8px" }}>
-                            <Text fw={600}>PDF Preview</Text>
+                            <Text fw={600} c="black">PDF Preview</Text>
                             <Tooltip
                                 multiline
                                 w={220}

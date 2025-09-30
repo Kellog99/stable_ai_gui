@@ -9,3 +9,121 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 1rem
 }
+
+
+.buttonBase {
+  position: relative;
+  border-radius: 0.75rem; /* rounded-xl */
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px); /* backdrop-blur-sm */
+  box-shadow: 0 1px 2px rgba(0,0,0,0.25); /* shadow-lg */
+  transform: scale(1);
+}
+
+.buttonBase:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.35); /* hover:shadow-xl */
+}
+
+.buttonBase:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.5); /* Tailwind's focus:ring-slate-400/50 equivalent */
+}
+
+/* --- Save to Report Button --- */
+.saveReport {
+  background: linear-gradient(to right, rgba(51,65,85,0.6), rgba(71,85,105,0.6));
+  border: 1px solid rgba(71,85,105,0.5);
+  color: rgb(203,213,225); /* text-slate-300 */
+  font-weight: 500;
+}
+
+.saveReport:hover {
+  background: linear-gradient(to right, rgba(71,85,105,0.7), rgba(100,116,139,0.7));
+  border-color: rgba(100,116,139,0.7);
+  color: white;
+}
+
+.saveReportIcon {
+  padding: 0.375rem; /* p-1.5 */
+  border-radius: 0.5rem;
+  background: rgba(71,85,105,0.3);
+  transition: background-color 0.3s ease;
+}
+
+.saveReport:hover .saveReportIcon {
+  background: rgba(100,116,139,0.4);
+}
+
+.saveReportIcon svg {
+  width: 1rem;
+  height: 1rem;
+  color: rgb(148,163,184); /* text-slate-400 */
+  transition: color 0.3s ease;
+}
+
+.saveReport:hover .saveReportIcon svg {
+  color: rgb(226,232,240); /* text-slate-200 */
+}
+
+.saveReportHighlight {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.saveReport:hover .saveReportHighlight {
+  opacity: 1;
+}
+
+/* --- Compute Now Button --- */
+.computeNow {
+  background: linear-gradient(to right, rgba(37,99,235,0.8), rgba(59,130,246,0.8));
+  border: 1px solid rgba(59,130,246,0.5);
+  color: white;
+  font-weight: 600;
+}
+
+.computeNow:hover {
+  background: linear-gradient(to right, rgba(59,130,246,0.9), rgba(96,165,250,0.9));
+  border-color: rgba(96,165,250,0.7);
+  box-shadow: 0 8px 12px rgba(59,130,246,0.25);
+}
+
+.computeNowIcon {
+  padding: 0.375rem;
+  border-radius: 0.5rem;
+  background: rgba(59,130,246,0.3);
+  transition: background-color 0.3s ease;
+}
+
+.computeNow:hover .computeNowIcon {
+  background: rgba(96,165,250,0.4);
+}
+
+.computeNowIcon svg {
+  width: 1rem;
+  height: 1rem;
+  color: rgb(191,219,254); /* text-blue-200 */
+  transition: color 0.3s ease;
+}
+
+.computeNow:hover .computeNowIcon svg {
+  color: white;
+}
+
+.computeNowHighlight {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.computeNow:hover .computeNowHighlight {
+  opacity: 1;
+}

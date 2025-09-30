@@ -1,7 +1,7 @@
 import Dataset from "@/interfaces/genericInterface";
 import { label_type } from "@/properties/types";
 import featureLoader from "./FeatureLoader";
-import { IconCheck, IconUpload, IconX } from "@tabler/icons-react";
+import { IconAlertTriangle, IconCheck, IconUpload, IconX } from "@tabler/icons-react";
 
 export function getScoreColor(score: number) {
   if (score >= 0.8) {
@@ -114,11 +114,13 @@ export const darkenColor = (color: any, percent: number) => {
 export const getStatusColor = (uploadStatus: string) => {
   if (uploadStatus === 'success') return '#81c498ff';
   if (uploadStatus === 'error') return '#FF6961';
+  if (uploadStatus === 'warning') return "#FFB347"
   return '#6ca3b5ff';
 };
 
 export const getStatusIcon = (uploadStatus: string) => {
   if (uploadStatus === 'success') return <IconCheck size={20} />;
   if (uploadStatus === 'error') return <IconX size={20} />;
+  if (uploadStatus === "warning") return <IconAlertTriangle size={20} />;
   return <IconUpload size={20} />;
 };
