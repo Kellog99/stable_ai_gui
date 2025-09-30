@@ -18,13 +18,13 @@ export default function AppNavbar() {
         
     return (
         <>
-            {/* {
+            {
                 isNNTrust ?
                     <AppNavbarNNTrust />
                     : isDQ ?
                         <AppNavbarDataQuality />
                         : <AppNavBarReport />
-            } */}
+            }
             <Navbar></Navbar>
         </>
     )
