@@ -9,7 +9,6 @@ import Status from '@/components/client/redtool/Status';
 import { listAttacks } from '../prova';
 
 const Benchmark: React.FC = () => {
-  // variables for executing an attack
   const [attacks, setAttacks] = useState<AttackProps[]>([]);
   const [metrics, setMetrics] = useState<MetricsProps[]>([]);
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Shield, Play, Loader2 } from 'lucide-react';
+import { Play, Shield } from 'lucide-react';
 import { ImageUploader } from '@/components/client/test/ImageUploader';
 import { AttackSelector } from '@/components/client/test/AttackSelector';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
@@ -23,11 +23,7 @@ function Test() {
     // Initialize with default values, will be updated in useEffect
     const [attackList, setAttackList] = useState<AttackProps[]>([]);
     const [selectedAttack, setSelectedAttack] = useState<AttackProps | undefined>()
-
-    // fetch the attack list
-
     useEffect(() => {
-
         setAttackList(listAttacks);
         if (listAttacks.length > 0) {
             const firstAttack = listAttacks[0];
@@ -43,6 +39,18 @@ function Test() {
         setAttackStats(undefined);
     };
 
+    const [clicked, setClicked] = useState<Boolean>(false);
+    const [loading, setLoading] = useState<Boolean>(false)
+    const handleClick = () => {
+        // The button has to execute an attack only if there is no attack already running in the background
+        if (!loading) {
+            if (clicked) {
+                //logic for executing the attacks following all the previous variables
+                // it must has 
+            }
+            setClicked(!clicked)
+        }
+    }
     return (
         <div className={styles.test}>
             {/* Header */}
@@ -82,9 +90,12 @@ function Test() {
                     <button
                         disabled={!uploadedFile}
                         className={styles.execute_button}
-                    // onClick={handleExecuteAttack} // Added click handler
+                        onClick={handleClick} // Added click handler
                     >
-
+                        <div>
+                            <Play />
+                            <p>Execute attack</p>
+                        </div>
                     </button>
                 </div>
 
@@ -94,19 +105,16 @@ function Test() {
                         <ImageDisplay
                             title="Original Image"
                             imageUrl={uploadedImageUrl}
-                            placeholder="Upload an image to begin"
                         />
 
                         <ImageDisplay
                             title="Adversarial Perturbation"
                             imageUrl={attackResult?.perturbation}
-                            placeholder="Run attack to see perturbation"
                         />
 
                         <ImageDisplay
                             title="Adversarial Example"
                             imageUrl={attackResult?.adversarialImage}
-                            placeholder="Run attack to see result"
                         />
                     </div>
 

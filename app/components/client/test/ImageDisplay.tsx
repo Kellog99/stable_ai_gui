@@ -1,6 +1,6 @@
 import React from 'react';
-import { Download } from 'lucide-react';
-
+import { Image } from 'lucide-react';
+import './test.css'
 interface ImageDisplayProps {
   title: string;
   imageUrl?: string;
@@ -12,31 +12,24 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   title,
   imageUrl,
   onDownload,
-  placeholder = "No image available"
+  placeholder = "No image loaded"
 }) => {
+
   return (
-    <div className="bg-gray-800 rounded-lg border border-gray-600 overflow-hidden">
-      <div className="p-3 border-b border-gray-600 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-300">{title}</h3>
-        {imageUrl && onDownload && (
-          <button
-            onClick={onDownload}
-            className="text-gray-400 hover:text-white transition-colors"
-            title="Download"
-          >
-            <Download className="w-4 h-4" />
-          </button>
-        )}
-      </div>
-      <div className="aspect-square bg-gray-900 flex items-center justify-center">
+    <div className="image-wrapper">
+      <h3 className="image-title">Display {title}</h3>
+      <div className="image">
         {imageUrl ? (
           <img
             src={imageUrl}
-            alt={title}
-            className="max-w-full max-h-full object-contain"
+            alt={`Loaded image`}
+            className="image-img"
           />
         ) : (
-          <span className="text-gray-500 text-sm">{placeholder}</span>
+          <div className="image-placeholder">
+            <Image className="image-icon" />
+            <p className="image-text">{placeholder}</p>
+          </div>
         )}
       </div>
     </div>
