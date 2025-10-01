@@ -7,8 +7,8 @@ import { embedder_get } from '@/properties/urls';
 import { Box, Button, Center, Flex, Loader, Progress, Select, Text } from '@mantine/core';
 import Link from "next/link";
 import { useEffect, useRef, useState } from 'react';
-import classes from "../../datasets/page.module.css"
-import buttonsStyles from "../../../../styles/Config.module.css"
+import classes from "@/pages/tasks/dataquality/datasets/page.module.css"
+import buttonsStyles from "@/styles/Config.module.css"
 import { useSearchParams } from 'next/navigation';
 import { MousePointerClick, Zap } from 'lucide-react';
 import styles from "./page.module.css"
@@ -16,25 +16,20 @@ import { AlertCust } from '@/components/client/AlertCustom';
 import useStore from '@/store/dsStore';
 import { GetDatasetAndSave } from '@/functionalities/DatasetsLoader';
 
-function Home() {
-  const socketRef = useRef<WebSocket | null>(null);
+export default function Embedder() {
 
-  const [featureName, setFeatureName] = useState<any>("")
+  const [featureName, setFeatureName] = useState<string>("")
   const [modelName, setModelName] = useState<string | null>("")
   const [features, setFeatures] = useState<string[]>([])
-  const [datasetName, setDatasetName] = useState<string | null>("")
-
-
-  const [isConnected, setIsConnected] = useState(false);
+  const datasetName = useStore((state) => state.datasetUsed)?.name
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('Idle');
   const [result, setResult] = useState<string | null>(null);
   const [projecting, setProjecting] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
   const [computing, setComputing] = useState<boolean>(false);
   const [loadingInfo, setLoadingInfo] = useState<boolean>(false);
   const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
   const [showModelInfo, setShowModelInfo] = useState<boolean>(false);
+  
 
   const searchParams = useSearchParams();
   const showPrecompiled = searchParams.get('autoSelectModel') === 'true';
@@ -59,14 +54,12 @@ function Home() {
     }
   }, [showPrecompiled]);
 
-
-
   const datasetUsed = useStore((state) => state.datasetUsed)
   const setData = useStore((state) => (state.setData));
 
 
   async function computeEmbeddings(model: string) {
-    console.log("La chiamata è partita :))))")
+  
     const baseUrl = embedder_get
 
     const url = new URL(baseUrl);
@@ -192,10 +185,8 @@ function Home() {
     return value;
   };
 
-
-
   return (
-    <div className="w-full h-screen">
+    <div>
 
       <Box
         className={classes.title}
@@ -211,8 +202,6 @@ function Home() {
 
       </Box>
 
-
-
       <Flex direction="column">
         <div className={classes.featureBox}>
           <Flex
@@ -226,9 +215,9 @@ function Home() {
               placeholder="Choose feature to embed"
               data={features}
               value={featureName}
-              onChange={(value) => setFeatureName(value)}
+              onChange={(value) => setFeatureName(value as string)}
               allowDeselect={false}
-              clearable={!isConnected}
+              clearable
               required={true}
             />
 
@@ -247,7 +236,7 @@ function Home() {
               value={modelName}
               onChange={(value) => connectAndAssingModel(value as string)}
               allowDeselect={false}
-              clearable={!isConnected}
+              clearable
               required={true}
               onClear={() => {
                 setShowModelInfo(false);
@@ -356,8 +345,6 @@ function Home() {
 
           </Center>
 
-
-
           <Box style={{ position: 'relative', marginTop: 60 }}>
             <Progress
               value={progress}
@@ -391,21 +378,7 @@ function Home() {
       ) :
         result == "Complete!" ? (<>
           <AlertCust result={'success'} textToDisplay={`The ${featureName} feature has been correctly embedded and added to schema.`} />
-          {/*
-          <Alert
-            variant="light"
-            color="green"
-            radius="md"
-            title={result}
-            icon={<FontAwesomeIcon icon={faCheck} />}
-            style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}>
-
-            The {featureName} feature has been correctly embedded and added to schema.
-          </Alert>
-          */}
         </>
-
-
         ) : result == "Feature is already embedded!" ? (
           <>
             <AlertCust
@@ -423,27 +396,6 @@ function Home() {
                 </Link>.
 
               </>} />
-            {/*
-          <Alert
-            variant="light"
-            color="orange"
-            radius="md"
-            title="Attention!"
-            icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-            style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}
-          >
-            The {featureName} feature is already embedded. Check the dataset schema{" "}
-            <Link
-              href={{
-                pathname: "/pages/dataquality/datasets",
-                query: { datasetName: datasetName }
-              }}
-              style={{ color: 'blue' }}
-            >
-              here
-            </Link>.
-          </Alert>
-          */}
           </>
 
 
@@ -453,10 +405,3 @@ function Home() {
   );
 }
 
-export default function Embedder() {
-  return (
-
-    <Home />
-
-  )
-}

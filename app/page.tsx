@@ -1,10 +1,10 @@
 "use client";
-import styles from '@/styles/HomePage.module.css';
-import { FileDropZoneProps } from "./interfaces/NNInterfaces";
-import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
+import TaskButton from '@/components/client/buttons/TaskButton';
 import { Task } from '@/interfaces/NNInterfaces';
-import TaskButton from '@/components/client/TaskButton';
-import FileDropZone from '@/components/client/FileDropZone';
+import styles from '@/styles/HomePage.module.css';
+import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
+import { FileDropZoneProps } from "./interfaces/NNInterfaces";
+import HomePageDrop from './pages/HomePage/HomePageDrop';
 
 
 // major information about the tasks
@@ -43,7 +43,7 @@ const homePageDropZones: FileDropZoneProps[] = [
     title: "Dataset",
     Icon: Database,
     description: "Upload your dataset in ZIP format",
-    acceptedTypes: ['.zip'],
+    acceptedTypes: [ '.zip' ],
     isLoaded: false,
     loadedFileName: "dataset?.name",
   },
@@ -52,17 +52,18 @@ const homePageDropZones: FileDropZoneProps[] = [
     title: "Model",
     Icon: Brain,
     description: "Upload your model in a `.pth` format",
-    acceptedTypes: ['.zip'],
+    acceptedTypes: [ '.zip' ],
     isLoaded: false,
     loadedFileName: "dataset?.name",
-  }]
+  } ]
 
 
-const HomePage: React.FC = ({ }) => {
+const HomePage: React.FC = ( { } ) =>
+{
   return (
-    <div className={styles.homecontainer}>
+    <div className={ styles.homecontainer }>
 
-      {/* This part has to deal with the drop zone Elements */}
+      {/* This part has to deal with the drop zone Elements 
       <div className={styles.filegrid}>
         {
           homePageDropZones.map((dropElement: FileDropZoneProps) => (
@@ -71,25 +72,26 @@ const HomePage: React.FC = ({ }) => {
               {...dropElement} />
           ))
         }
-      </div>
+      </div>*/}
 
-      {/* This part has to deal with the Task part */}
-      <div className={styles.task}>
-        <div className={styles.sectionheader}>
-          <h2 className={styles.sectiontitle}>
+      <HomePageDrop />
+      {/* This part has to deal with the Task part */ }
+      <div className={ styles.task }>
+        <div className={ styles.sectionheader }>
+          <h2 className={ styles.sectiontitle }>
             Analysis Tasks
           </h2>
-          <p className={styles.sectionsubtitle}>
+          <p className={ styles.sectionsubtitle }>
             Select an analysis task to begin
           </p>
         </div>
 
-        <div className={styles.taskgrid}>
+        <div className={ styles.taskgrid }>
           {
-            tasks.map((task) =>
+            tasks.map( ( task ) =>
               <TaskButton
-                key={task.title}
-                {...task} />)
+                key={ task.title }
+                { ...task } /> )
           }
         </div>
       </div>

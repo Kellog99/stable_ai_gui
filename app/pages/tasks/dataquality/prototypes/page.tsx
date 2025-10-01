@@ -2,17 +2,17 @@
 
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import { getPrototypes } from "@/functionalities/BackendUtils";
-import { IsFeatureBond, IsFeatureSameLength } from "@/functionalities/Utils";
+import { IsFeatureSameLength } from "@/functionalities/Utils";
 import Dataset, { PrototypesInt } from "@/interfaces/genericInterface";
 import { image_type, label_type, text_type } from "@/properties/types";
 import { Button, Center, Flex, Loader, Select, Text, Box } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import useStore from '../../../store/dsStore';
 import featureLoader from "@/functionalities/FeatureLoader";
 import classes from './page.module.css';
 import { Layers, MousePointerClick } from "lucide-react";
-import buttonsStyles from "../../../styles/Config.module.css"
+import useStore from "@/store/dsStore";
+import buttonsStyles from "@/styles/Config.module.css"
 
 
 
@@ -29,7 +29,6 @@ export default function Prototypes() {
     const [prototypes, setPrototypes] = useState<PrototypesInt | null>(null)
     const labelDict = useStore((state) => state.labelDict)
     const setLabelDict = useStore((state) => state.setLabelDict)
-    //const [labelDict, setLabelDict] = useState<{ [key: number]: string } | null>(null)
 
     const featureData = useStore((state) => state.prototypesData)
     const setFeatureData = useStore((state) => state.setPrototypesData)
@@ -56,10 +55,6 @@ export default function Prototypes() {
                 .filter(({ type }) => type === image_type || type === text_type)
                 .map(({ name }) => name);
 
-            //const extractedlabelFeatures = datasetUsed.features
-            //    .filter( ( { type } ) => type === label_type )
-            //    .map( ( { name } ) => name );
-
             if (featureName !== "") {
                 const load_labels = async () => {
                     const feature = await featureLoader(datasetUsed.name, featureName)
@@ -68,20 +63,12 @@ export default function Prototypes() {
                 };
                 load_labels()
 
-
-                //const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
-                //setLabelFeatures( labelFeatures as string[] )
                 const labelFeature = datasetUsed.features.find(feature => feature.type === label_type);
                 if (labelFeature?.label_dict) {
                     setLabelDict(labelFeature.label_dict)
                 }
-
             }
-
             setFeatures(extractedFeatures);
-            //setLabelFeatures( extractedlabelFeatures )
-
-
         }
     }, [datasetUsed, featureName])
 
@@ -102,22 +89,6 @@ export default function Prototypes() {
             setIsLoading(false);
         }
     };
-
-    {/*
-    useEffect(() => {
-        if (featureName) {
-            setIsLoading(true);
-            getPrototypes(datasetName as string, featureName, labelFeatureName)
-                .then(fetchedData => {
-                    setPrototypes(fetchedData);
-
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
-        }
-    }, [featureName, labelFeatureName]);
-    */}
 
     useEffect(() => {
         if (prototypes) {

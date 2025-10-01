@@ -9,9 +9,9 @@ import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 import useStore from '@/store/dsStore';
 import { Loader, Text } from '@mantine/core';
 import DatasetBT from '../server/DatasetBT';
-import ZipUploader from "./Uploader";
+import ZipUploader from "./upload/Uploader";
 import SelectionButton from './utils/SelectionButtons';
-import ModelUploader from './ModelUploader';
+import ModelUploader from './upload/ModelUploader';
 
 const FileDropZone: React.FC<FileDropZoneProps> = ({
   title,

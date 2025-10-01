@@ -274,10 +274,6 @@ export default function Datasets() {
     }
   }, [feature]);
 
-  {/*
-  const handleClick: (bar) => {
-  }
-*/}
 
   const handleonClose = () => {
     setFeatureToDisplay(null);
@@ -285,11 +281,8 @@ export default function Datasets() {
   }
 
 
-  
-
   return (
-    <div className="w-full h-screen">
-      <div className="max-w-4xl mx-auto px-4">
+    <div >
         <Box
           className={classes.title}
           style={{ display: "flex", flexDirection: "column", gap: "0px" }}
@@ -567,7 +560,7 @@ export default function Datasets() {
             </div>
           ) : null}
         </div>
-      </div>
+      
     </div>
   );
 }

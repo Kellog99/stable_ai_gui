@@ -1,10 +1,10 @@
 import { ActionIcon, Box, Button, Code, Collapse, Divider, Flex, Group, List, Stack, Text, ThemeIcon } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useDisclosure } from '@mantine/hooks';
-import { IconChevronDown, IconCloudUpload, IconDatabase, IconFileText, IconFileZip, IconTrash, IconUpload, IconX } from '@tabler/icons-react';
-import { CheckIcon, FolderIcon } from 'lucide-react';
+import { IconChevronDown, IconCloudUpload, IconDatabase, IconTrash, IconUpload, IconX } from '@tabler/icons-react';
+import { Brain, CheckIcon, Database, FileText, FolderIcon } from 'lucide-react';
 import { useState } from 'react';
-import classes from '../../styles/FileDropZone.module.css';
+import classes from '@/styles/FileDropZone.module.css';
 
 type Props = {
     config: {
@@ -29,7 +29,7 @@ export function DragDrop ( { config, infoModal }: Props )
     const [ message, setMessage ] = useState<string>( '' );
     const [ loading, setLoading ] = useState<boolean>( false );
     const [ uploadStatus, setUploadStatus ] = useState<string | null>( null );
-    const [jsonUploaded, setJsonUploaded] = useState<Object>({})
+    const [ jsonUploaded, setJsonUploaded ] = useState<Object>( {} )
 
     const [ openedJs, { toggle: toggleJs } ] = useDisclosure( false );
 
@@ -52,12 +52,49 @@ export function DragDrop ( { config, infoModal }: Props )
             return;
         }
 
+        const formData = new FormData();
+        formData.append( config.formFieldName, selectedFile );
+
+        try {
+            const response = await fetch( config.uploadUrl, {
+                method: 'POST',
+                body: formData,
+            } );
+
+            if ( response.ok ) {
+                const data = await response.json();
+                setJsonUploaded( data )
+                setMessage( `Load successful` );
+                setUploadStatus( 'success' );
+            }
+
+        } catch ( error ) {
+            console.error( 'Error uploading:', error );
+            setMessage( `An error occurred: ${error}` );
+            setUploadStatus( 'error' );
+
+        } finally {
+            if ( config.refreshFunction && config.setRefreshData ) {
+                config.refreshFunction().then( fetchedData =>
+                {
+                    if ( config.fileType === 'pth' ) {
+                        config.setRefreshData?.( fetchedData.names );
+                    } else {
+                        config.setRefreshData?.( fetchedData );
+                    }
+                } );
+            }
+            setLoading( false );
+        }
+
+{/*
         if ( !validateFile( selectedFile ) ) {
-            console.log( "sono qui" )
+            
             setMessage( `Please select a ${config.accept} file.` );
             setUploadStatus( 'error' );
             return;
         }
+            */}
 
         setFile( selectedFile );
         setMessage( `Selected file: ${selectedFile.name}. Ready to upload.` );
@@ -76,21 +113,16 @@ export function DragDrop ( { config, infoModal }: Props )
         setLoading( true );
         setUploadStatus( null );
 
-        const formData = new FormData();
-        formData.append( config.formFieldName, file );
-
+        const url = new URL(`http://localhost:8000/upload_folder?datasetName=${file.name}`)
+        
         try {
-            const response = await fetch( config.uploadUrl, {
-                method: 'POST',
-                body: formData,
-            } );
+            const response = await fetch( url );
 
             if ( response.ok ) {
-                const data = await response.json();
-                setJsonUploaded(data)
                 setMessage( `Upload successful` );
                 setUploadStatus( 'success' );
             }
+            
         } catch ( error ) {
             console.error( 'Error uploading:', error );
             setMessage( `An error occurred: ${error}` );
@@ -186,18 +218,34 @@ export function DragDrop ( { config, infoModal }: Props )
 
                                 </Dropzone.Reject>
                                 <Dropzone.Idle>
-                                    { config.fileType === 'zip' ? (
+                                    { config.name === 'dataset' ? ( <>
                                         <ThemeIcon size={ 65 } radius="xl" variant="light" color="#475569" >
-                                            <IconFileZip size={ 48 } stroke={ 1.5 } />
+                                            <Database size={ 48 } />
                                         </ThemeIcon>
-                                    ) : (
+                                        <Text size="1vw" fw={ 600 } c="#1e293b" mt="20px" inline >
+                                            Dataset
+                                        </Text>
+                                    </>
+
+                                    ) : ( config.name === 'model' ? (<>
                                         <ThemeIcon size={ 65 } radius="xl" variant="light" color="#475569" >
-                                            <IconFileText size={ 48 } stroke={ 1.5 } />
+                                            <Brain size={ 48 } />
                                         </ThemeIcon>
-                                    ) }
+                                        <Text size="1vw" fw={ 600 } c="#1e293b" mt="20px" inline >
+                                            Model
+                                        </Text>
+                                        </>
+                                    ) : ( config.name === 'report' ? (<>
+                                        <ThemeIcon size={ 65 } radius="xl" variant="light" color="#475569" >
+                                            <FileText size={ 48 } />
+                                        </ThemeIcon>
+                                        <Text size="1vw" fw={ 600 } c="#1e293b" mt="20px" inline >
+                                            Report
+                                        </Text>
+                                        </>) : null))}
 
 
-                                    <Text size="1vw" fw={ 600 } c="#1e293b" mt="20px" inline >
+                                    <Text size="0.7vw" fw={ 600 } c="#1e293b" mt="16px" inline >
                                         Drag a { config.fileType } file here or click to select
                                     </Text>
 
@@ -272,7 +320,7 @@ export function DragDrop ( { config, infoModal }: Props )
 
                             <Box ml="xl" mt="sm">
                                 <Code block style={ { fontSize: '0.75rem', backgroundColor: "rgba(30, 120, 40, 0.3)" } }>
-                                    {JSON.stringify(jsonUploaded, null, 2)}
+                                    { JSON.stringify( jsonUploaded, null, 2 ) }
                                 </Code>
                             </Box>
 

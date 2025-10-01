@@ -1,7 +1,7 @@
 "use client"
 import { LucideIcon } from 'lucide-react';
 import React, { useState } from 'react';
-import styles from '../../styles/FileDropZone.module.css';
+import styles from '@/styles/FileDropZone.module.css';
 import SelectionButton from './utils/SelectionButtons';
 
 interface Section

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { InfoCircle } from "@vectopus/atlas-icons-react";
 import useStore from "@/store/dsStore";
 import {report_post} from "@/properties/urls";
-import { fetchExternalImage } from "next/dist/server/image-optimizer";
 
 interface PDFPreviewModalProps {
     opened: boolean;
@@ -118,24 +117,6 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
                 <Modal.Body>
                     <Box style={{ position: 'relative', minHeight: 400 }}>
                         <LoadingOverlay visible={loading} />
-                        {/*
-                        {!pdfData && !error && (
-                            <Box style={{ 
-                                display: 'flex', 
-                                flexDirection: 'column', 
-                                alignItems: 'center', 
-                                justifyContent: 'center', 
-                                minHeight: 300,
-                                gap: 16
-                            }}>
-                                <Text size="lg" c="dimmed">No PDF loaded</Text>
-                                <Button onClick={fetchPDFData} disabled={loading}>
-                                    Generate PDF
-                                </Button>
-                            </Box>
-                        )}
-                            */}
-
                         {error && (
                             <Alert color="red" title="Error" mb="md">
                                 {error}

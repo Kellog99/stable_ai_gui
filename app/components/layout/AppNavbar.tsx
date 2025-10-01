@@ -25,7 +25,7 @@ export default function AppNavbar() {
                         <AppNavbarDataQuality />
                         : <AppNavBarReport />
             }
-            <Navbar></Navbar>
+            
         </>
     )
 }
