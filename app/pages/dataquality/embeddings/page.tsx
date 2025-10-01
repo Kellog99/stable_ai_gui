@@ -5,7 +5,7 @@ import MovableWindow from '@/components/client/MovableWindow';
 import { IsFeatureBond, IsFeatureSameLength } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/genericInterface';
 import { embedding_type, image_type, numberic_type, text_type } from '@/properties/types';
-import { Alert, Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Space, Text } from '@mantine/core';
+import { Alert, Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
