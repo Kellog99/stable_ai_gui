@@ -11,6 +11,7 @@ import useStore from '@/store/nnTrustStore';
 import { Database, Upload } from 'lucide-react';
 import React from 'react';
 import styles from '@/styles/HomePage.module.css';
+import ModelDisplayer from '@/components/client/ModelDisplayer';
 
 
 
@@ -27,7 +28,7 @@ const HomePageDrop: React.FC = ( {
                 config={ {
                     name: "dataset",
                     fileType: 'zip',
-                    accept: 'application/zip',
+                    accept: 'application/x-zip-compressed',
                     formFieldName: "folder_zip",
                     description: 'Make sure your zip contains raw data and a json config file.',
                     uploadUrl: "http://localhost:8000/upload_folder/check",
@@ -47,7 +48,7 @@ const HomePageDrop: React.FC = ( {
                     accept: 'application/zip',
                     formFieldName: "file",
                     description: 'Make sure your zip contains raw data and a json config file.',
-                    uploadUrl: "http://localhost:8000/model/upload",
+                    uploadUrl: "http://localhost:8082/upload/check",
                     refreshFunction: getModels,
                     setRefreshData: setModels
 
@@ -58,7 +59,7 @@ const HomePageDrop: React.FC = ( {
     const ModelRepo = () =>
     {
         return (
-            <div>Model repo</div>
+            <div><ModelDisplayer modelName="resnet50"/></div>
         )
     }
 
