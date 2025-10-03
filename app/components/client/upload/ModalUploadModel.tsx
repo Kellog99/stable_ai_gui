@@ -58,7 +58,13 @@ export function ModalUploadModel ()
                 <Modal opened={ opened } onClose={ toggle } title="Upload Information" size="lg" >
                     <Divider my="xs" color="var(--mantine-color-gray-7)" />
                     <Text size="sm" c="var(--mantine-color-gray-7)" mb="8px">
-                        The zip you are going to upload must contain the raw data files and a json config file, optionally it could contain the pre-injested arrow file.
+                        The zip you are going to upload must contain the <Code>.pth</Code> file and a json config file. In particular the following scaffolding must be followed:
+                        <div style={{ fontFamily: "monospace", fontSize: "14px", lineHeight: "20px", marginTop: "8px", marginBottom: "8px", backgroundColor: "var(--mantine-color-gray-0)", padding: "8px", borderRadius: "4px" }}>
+                            <div>modelName.zip</div>
+                            <div style={{ marginLeft: "20px" }}>|__ model.pth</div>
+                            <div style={{ marginLeft: "20px" }}>|__ modelName.json</div>
+                        </div>
+
                         The json config file must contain the following fields:
                     </Text>
                     <Table>

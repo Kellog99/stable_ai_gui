@@ -356,20 +356,6 @@ export default function Config(props: ConfigsProps) {
                                             the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
                                         </>} />
                                 </div>
-                                {/*
-                            <Alert
-                                variant="light"
-                                color="red"
-                                radius="md"
-                                title="Ops!"
-                                icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-                                style={{ display: 'inline-block', width: '800px', marginBottom: "30px" }}
-                            >
-                                The selected feature has not embeddings computed with this model <Code>apple/DFN5B-CLIP-ViT-H-14-378</Code>! You can compute them on
-                                the dedicated page <Link href="/pages/dataquality/actions/embeddings?autoSelectModel=true">here</Link>
-
-                            </Alert>
-                            */}
                             </>
                         )}
                     </>

@@ -11,8 +11,9 @@ type Props = {
     config: {
         name: string;
         fileType: string;
-        accept: string;
+        accept: string;  // for a zip file in linux the MIME type is "application/zip" while for windows is "application/x-zip-compressed"
         description?: string;
+        uploadUrlCheck: string;
         uploadUrl: string;
         formFieldName: string;
         refreshFunction: () => Promise<any>; //ex: "DatasetsLoader" is the function the reloads the data with the new upload
@@ -21,8 +22,6 @@ type Props = {
     };
     infoModal: React.ReactNode
 };
-
-
 
 export function DragDrop({ config, infoModal }: Props) {
     const [file, setFile] = useState<File | null>(null);
@@ -33,16 +32,6 @@ export function DragDrop({ config, infoModal }: Props) {
     const [loadingHC, setLoadingHC] = useState<boolean>(false)
 
     const [openedJs, { toggle: toggleJs }] = useDisclosure(false);
-
-    const validateFile = (selectedFile: File): boolean => {
-
-        const expectedExtension = `.${config.fileType}`;
-        const expectedMimeType = config.fileType === 'zip' ? 'application/zip' : 'application/octet-stream';
-
-        return selectedFile.name.endsWith(expectedExtension) ||
-            (config.fileType === 'zip' && selectedFile.type === expectedMimeType);
-    };
-
 
     const handleFileChange = async (selectedFile: File) => {
         if (!selectedFile) {
@@ -55,7 +44,7 @@ export function DragDrop({ config, infoModal }: Props) {
         formData.append(config.formFieldName, selectedFile);
         setLoadingHC(true)
         try {
-            const response = await fetch(config.uploadUrl, {
+            const response = await fetch(config.uploadUrlCheck, {
                 method: 'POST',
                 body: formData,
             });
@@ -101,7 +90,13 @@ export function DragDrop({ config, infoModal }: Props) {
         setLoading(true);
         setUploadStatus(null);
         const fileName = file.name.split('.').slice(0, -1).join('.')
-        const url = new URL(`http://localhost:8082/upload?model_name=${fileName}`)
+
+        const url = new URL(config.uploadUrl);
+        if (config.name == "dataset") {
+            url.searchParams.append("dataset_name", fileName);
+        } else if (config.name == "model") {
+            url.searchParams.append("model_name", fileName);
+        }
 
         try {
             const response = await fetch(url);
