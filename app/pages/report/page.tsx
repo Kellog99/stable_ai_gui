@@ -1,9 +1,10 @@
 "use client"
 import { useState } from "react";
-import { Eye, Trash2, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
-import './report.css';
+import styles from '@/styles/HomePage.module.css'
 import { LoadedFile } from "@/interfaces/NNInterfaces";
+import FileDropZone from "@/components/client/FileDropZone";
 
 
 interface ReportPageProps {
@@ -29,16 +30,17 @@ export default function ReportPage({ reportFiles, onFileSelect, onFileDelete }: 
     }
   };
 
-  const handleDelete = (index: number) => {
-    onFileDelete(index);
-    if (selectedFileIndex === index) {
-      setSelectedFileIndex(null);
-      setJsonData(null);
-    }
-  };
 
   return (
-    <div> ciao sto funzionando :)</div>
-   
+    <div className={styles.reportContainer}>
+      <FileDropZone
+        id="drop3"
+        title="Report"
+        Icon={FileText}
+        description="Upload the JSON file for seeing the report."
+        acceptedTypes={['json']}
+      />
+    </div>
+
   );
 }

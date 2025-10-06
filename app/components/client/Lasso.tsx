@@ -1,5 +1,5 @@
+import useStore from '@/store/dsStore';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import useStore from "../../store/dsStore";
 
 interface LassoDrawerProps {
   children: React.ReactNode;
@@ -12,9 +12,6 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   const [isDrawing, setIsDrawing] = useState(false);
   
   const lassoMode = useStore((state) => state.lazoMode);
-  //const lassoModeRef = useRef(lassoMode);
-  //const [lassoMode,setLassoMode] = useState<boolean>(false)
-  
 
   useEffect(() => {
     console.log("USEEFFECT",lassoMode)

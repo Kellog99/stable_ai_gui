@@ -12,16 +12,11 @@ import NavigationButton from "../Utils/NavigationButton";
 
 function AppNavBarNNTrust() {
     const pathname = usePathname();
-
-
-    const { visualVisible, metricVisible, actionVisible, toggleSection } = useNavigationState();
-
     const isActive = (path: string) => pathname === path;;
 
     return (
         <Box p="md" style={{ height: '100%' }}>
             <Stack h="100%" gap="md">
-
                 <Box>
                     {mainNavigation.map((item) => (
                         <React.Fragment key={item.key}>

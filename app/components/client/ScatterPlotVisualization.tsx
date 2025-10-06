@@ -6,42 +6,20 @@ import DeckGL from '@deck.gl/react';
 import { Box, Flex, Loader, Slider, Text, Textarea } from '@mantine/core';
 import { OrthographicView, OrthographicViewState } from 'deck.gl';
 import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import getData, { getModelInfo, RetrieveSamples } from '../../functionalities/BackendUtils';
-import useStore from "../../store/dsStore";
-
 import { ModelInfo } from '@/interfaces/genericInterface';
 import { image_type, text_type } from '@/properties/types';
 import { Search } from 'lucide-react';
 import Link from "next/link";
-import classes from "../../pages/dataquality/embeddings/page.module.css";
+import classes from "@/pages/tasks/dataquality/embeddings/page.module.css";
 import { AlertCust } from './AlertCustom';
 import LassoDrawer from './Lasso';
-// No need for 'style' from 'styled-jsx/style' if not used for actual styling
-
-
-interface OrbitViewState
-{
-  target: [ number, number, number ]; // This ensures 'target' has exactly 3 elements
-  rotationX?: number;
-  rotationOrbit?: number;
-  zoom: number;
-  minZoom?: number;
-  maxZoom?: number;
-  minRotationX?: number;
-  maxRotationX?: number;
-}
+import useStore from '@/store/dsStore';
+import getData, { getModelInfo, RetrieveSamples } from '@/functionalities/BackendUtils';
 
 interface Point
 {
   position: [ number, number ];
   color: [ number, number, number ];
-}
-
-interface Info
-{
-  index: number;
-  object: any;
-  layer: { id: string };
 }
 
 interface propsTypes
@@ -83,7 +61,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ originalColors, setOriginalColors ] = useState<Map<number, [ number, number, number ]>>( new Map() );
   const setUqColors = useStore( ( state ) => state.setUqColors )
 
-
   const [ contextMenu, setContextMenu ] = useState( { visible: false, x: 0, y: 0 } );
 
   const setSelectedIndexes = useStore( ( state ) => state.setSelectedIndexes );
@@ -101,14 +78,12 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   const [ queries, setQueries ] = useState<string[]>( [] )
 
-
   function getAllKeysByValues ( object: any, valuesList: any[] )
   {
     return valuesList.flatMap( value =>
       Object.keys( object ).filter( key => object[ key ] === value )
     );
   }
-
 
   useEffect( () =>
   {
@@ -210,28 +185,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       setSelectedIndexes( newSelectedPoints );
     }
   }, [ lassoMode, isTextareaFocused, selectedPoints, setSelectedPoints, setSelectedIndexes ] );
-
-  //useEffect(() => {
-  //  if (queryRetrieve !== "") {
-  //    setSelectedIndexes([]);
-  //    setSelectedPoints([])
-  //
-  //    let loadingTimeout = setTimeout(() => {
-  //      setIsLoadingRetr(true);
-  //    }, 500);
-  //
-  //    // Use a Set to avoid duplicate queries, then convert back to array
-  //    setQueries(prevQueries => Array.from(new Set([...prevQueries, queryRetrieve])));
-  //    RetrieveSamples(props.datasetName, props.featureName, queryRetrieve, queryTop_k, props.modelUsed as string)
-  //      .then((fetched) => {
-  //        setSelectedIndexes(fetched.indexes);
-  //      })
-  //      .finally(() => {
-  //        clearTimeout(loadingTimeout);
-  //        setIsLoadingRetr(false);
-  //      });
-  //  }
-  //}, [queryRetrieve, queryTop_k]);
 
   useEffect( () =>
   {
@@ -389,8 +342,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     isDraggingRef.current = false;
   };
 
-  // Lasso style is conditional on dragStart and dragCurrent, and doesn't directly impact the DeckGL interaction issue.
-  // Kept as is.
   let lassoStyle: React.CSSProperties = {};
   if ( dragStart && dragCurrent ) {
     const left = Math.min( dragStart.x, dragCurrent[ 0 ]?.x || 0 ); // Use first point for initial x
@@ -410,7 +361,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     };
   }
 
-  // Context menu logic
   useEffect( () =>
   {
     document.addEventListener( 'click', handleClick );
@@ -438,23 +388,16 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     }
   ];
 
-  // Modified: Textarea event handling - simplified to focus/blur
-  // This useEffect previously tried to stop propagation which might be redundant
-  // when pointer-events are managed. We need onFocus/onBlur for `isTextareaFocused`.
   useEffect( () =>
   {
     const textarea = textareaRef.current;
     if ( !textarea ) return;
 
-    // These styles are fine as they ensure the textarea is interactive
     textarea.style.pointerEvents = 'auto';
     textarea.style.touchAction = 'auto';
 
-    // The core issue is DeckGL capturing events.
-    // We handle focus/blur directly to manage DeckGL's controller.
   }, [] );
 
-  // Updated handleClick to just handle context menu closure
   const handleClick = ( e: MouseEvent ) =>
   {
     if ( contextMenu.visible ) {
@@ -466,7 +409,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
   const [ inputTopK, setInputTopK ] = useState( queryTop_k )
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>( null );
 
-  // Update queryRetrieve after user stops typing for 500ms
   useEffect( () =>
   {
     if ( typingTimeoutRef.current ) {
@@ -476,7 +418,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     {
       setQueryRetrieve( inputValue );
       setQueryTop_k( inputTopK )
-    }, 1 ); // adjust delay as needed
+    }, 1 );
   }, [ inputValue, inputTopK ] );
 
   console.log( "queries saved:", queries )
@@ -488,14 +430,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       setSelectedPoints( [] )
     }
   }, [ queryRetrieve ] )
-
-  const handleClearSearch = () =>
-  {
-    setInputValue( "" );
-    setSelectedIndexes( [] )
-    setSelectedPoints( [] )
-    setQueryRetrieve( "" )
-  }
 
   const handleKeyDown = ( event: React.KeyboardEvent<HTMLTextAreaElement> ) =>
   {
@@ -552,7 +486,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     if ( Array.isArray( datasetUsed?.features ) && modelInfo ) {
       const feature = datasetUsed.features.find( f => f.name === featureName );
       const type = feature?.type;
-      if ( type === image_type && modelInfo.supports_images == true && modelInfo.supports_text == true ) { // Removed `&& modelInfo.supports_text == true` for image_type
+      if ( type === image_type && modelInfo.supports_images == true && modelInfo.supports_text == true ) {
 
         return true;
       } else if ( type === text_type && modelInfo.supports_text == true ) {
@@ -561,10 +495,9 @@ export default function ScatterPlotVisualization ( props: propsTypes )
       }
     }
 
-    return false; // Default return if conditions are not met
+    return false; 
   }
 
-  // New: Handlers for textarea focus/blur
   const handleTextareaFocus = useCallback( () =>
   {
     setIsTextareaFocused( true );
@@ -575,7 +508,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
     setIsTextareaFocused( false );
   }, [] );
 
-  // New: Dynamic controller based on lassoMode and isTextareaFocused
   const deckGLController =
     lassoMode || isTextareaFocused
       ? {
@@ -595,8 +527,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
   return (
     <>
-
-
       { isLoading ? (
         <Flex
           mih={ 150 }
@@ -651,8 +581,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                           background: 'white',
                           overflow: 'hidden',
                           zIndex: 10,
-                          // The pointerEvents on the container might need to be dynamic
-                          // but for now, let's rely on the controller prop for interaction.
                           pointerEvents: 'auto', // Keep this as auto, controller will manage disabling
                         } }>
                         <DeckGL
@@ -730,9 +658,6 @@ export default function ScatterPlotVisualization ( props: propsTypes )
                             marginTop: "6px",
                             zIndex: 1000 // Ensure textarea is above DeckGL canvas
                           } }
-                        // The onClick and onFocus here were remnants of previous attempts to stop propagation.
-                        // With dynamic controller and z-index, they might be redundant or counterproductive.
-                        // Removing them for cleaner event flow.
 
                         />
                         { queryRetrieve !== "" ?
@@ -761,8 +686,7 @@ export default function ScatterPlotVisualization ( props: propsTypes )
 
             </>
           ) }
-
-
+          
           { contextMenu.visible && (
             <div style={ { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' } }>
               <div

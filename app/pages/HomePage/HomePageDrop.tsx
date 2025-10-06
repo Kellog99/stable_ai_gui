@@ -1,19 +1,17 @@
 
 import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
 import FileDropZone2 from '@/components/client/FileDropZone2';
-import { ModalUploadDataset } from '@/components/client/ModalUploadDataset';
-import { ModalUploadModel } from '@/components/client/ModalUploadModel';
-import FileUploadComponent from '@/components/client/UploaderUnified';
-import { DragDrop } from '@/components/client/UploaderUnifiedDragDrop';
+import { ModalUploadDataset } from '@/components/client/upload/ModalUploadDataset';
+import { ModalUploadModel } from '@/components/client/upload/ModalUploadModel';
+import { DragDrop } from '@/components/client/upload/UploaderUnifiedDragDrop';
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
 import { getModels } from '@/functionalities/NNTrustBackendUtils';
-import { upload_post } from '@/properties/urls';
-import { model_upload } from '@/properties/urlsNNTrust';
 import useStoreDQ from '@/store/dsStore';
 import useStore from '@/store/nnTrustStore';
-import { IconFileText, IconUpload } from '@tabler/icons-react';
-import { Database, File } from 'lucide-react';
+import { Database, Upload } from 'lucide-react';
 import React from 'react';
+import styles from '@/styles/HomePage.module.css';
+import ModelDisplayer from '@/components/client/ModelDisplayer';
 
 
 
@@ -23,65 +21,6 @@ const HomePageDrop: React.FC = ( {
     const setModels = useStore( ( state ) => state.setModels )
     const setDatasets = useStoreDQ( ( state ) => state.setDatasets )
 
-
-    const ZipUploadComponent = () =>
-    {
-        const zipConfig = {
-            fileType: 'zip' as const,
-            accept: '.zip',
-            title: 'Upload Dataset',
-            description: 'Select a .zip file from your computer to upload',
-            uploadEndpoint: upload_post,
-            formFieldName: 'folder_zip',
-            icon: <IconUpload size={ 30 } />,
-            showArrowSwitch: true,
-            showModeSelect: true,
-            showTypeSelect: true,
-            showJsonConfig: true,
-            refreshFunction: DatasetsLoader,
-            setRefreshData: setDatasets
-        };
-
-        return <FileUploadComponent config={ zipConfig } />;
-    };
-
-    const PthUploadComponent = () =>
-    {
-        const pthConfig = {
-            fileType: 'pth' as const,
-            accept: '.pth',
-            title: 'Upload Model',
-            description: 'Select a .pth model file from your computer to upload',
-            uploadEndpoint: model_upload,
-            formFieldName: 'model_file',
-            icon: <IconFileText size={ 30 } />,
-            showArrowSwitch: false,
-            showModeSelect: false,
-            showTypeSelect: false,
-            showJsonConfig: false,
-            refreshFunction: getModels,
-            setRefreshData: setModels
-        };
-
-        const handleModelUploadComplete = ( success: boolean, data?: any ) =>
-        {
-            if ( success ) {
-                console.log( 'Model uploaded successfully:', data );
-
-            } else {
-                console.log( 'Model upload failed' );
-
-            }
-        };
-
-        return (
-            <FileUploadComponent
-                config={ pthConfig }
-                onUploadComplete={ handleModelUploadComplete }
-            />
-        );
-    };
-
     const ZipDragDrop = () =>
     {
         return (
@@ -89,10 +28,10 @@ const HomePageDrop: React.FC = ( {
                 config={ {
                     name: "dataset",
                     fileType: 'zip',
-                    accept: 'application/zip',
+                    accept: 'application/x-zip-compressed',
                     formFieldName: "folder_zip",
                     description: 'Make sure your zip contains raw data and a json config file.',
-                    uploadUrl: "http://localhost:8000/upload_folder",
+                    uploadUrl: "http://localhost:8000/upload_folder/check",
                     refreshFunction: DatasetsLoader,
                     setRefreshData: setDatasets
                 } }
@@ -109,7 +48,7 @@ const HomePageDrop: React.FC = ( {
                     accept: 'application/zip',
                     formFieldName: "file",
                     description: 'Make sure your zip contains raw data and a json config file.',
-                    uploadUrl: "http://localhost:8000/model/upload",
+                    uploadUrl: "http://localhost:8082/upload/check",
                     refreshFunction: getModels,
                     setRefreshData: setModels
 
@@ -117,13 +56,10 @@ const HomePageDrop: React.FC = ( {
                 infoModal={ <ModalUploadModel /> } /> )
     }
 
-
-
-
     const ModelRepo = () =>
     {
         return (
-            <div>Model repo :))</div>
+            <div><ModelDisplayer modelName="resnet50"/></div>
         )
     }
 
@@ -134,7 +70,7 @@ const HomePageDrop: React.FC = ( {
         {
             id: "selection",
             title: "Upload Dataset",
-            Icon: File,
+            Icon: Upload,
             child: ZipDragDrop
         },
         {
@@ -149,7 +85,7 @@ const HomePageDrop: React.FC = ( {
         {
             id: "model",
             title: "Upload Model",
-            Icon: File,
+            Icon: Upload,
             child: ZipModelDragDrop
         },
         {
@@ -164,7 +100,7 @@ const HomePageDrop: React.FC = ( {
 
     return (
 
-        <div className="file-grid">
+        <div className={ styles.filegrid }>
             { listOfSections.map( ( dropElement, index ) => (
                 <FileDropZone2
                     key={ index }

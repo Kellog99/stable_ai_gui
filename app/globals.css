@@ -21,16 +21,12 @@
   --navy-50: #f8fafc;
 }
 
+
+
 body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 25%, var(--navy-700) 50%, var(--navy-600) 75%, var(--navy-500) 100%);;
-  align-items: center;
-  align-content: center;
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
+  background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 25%, var(--navy-700) 50%, var(--navy-600) 75%, var(--navy-500) 100%);
+  padding: 4vw;
 }

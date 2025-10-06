@@ -15,8 +15,8 @@ import
 import "@xyflow/react/dist/style.css";
 import React, { useCallback, useEffect, useRef } from "react";
 import tinycolor from "tinycolor2";
-import useStore from "../../store/dsStore";
 import { labelColorMapType } from "@/properties/static";
+import useStore from "@/store/dsStore";
 
 
 interface SchemaVisualizationProps
@@ -110,7 +110,6 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
         border: `2px solid ${darkerColor}`,
         pointerEvents: "auto",
         cursor: clickable ? "pointer" :  "default",
-        //cursor: "pointer"
       },
       sourcePosition: Position.Right,
       targetPosition: Position.Left,

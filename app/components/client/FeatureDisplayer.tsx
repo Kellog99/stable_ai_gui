@@ -1,15 +1,15 @@
 "use client";
 
-import { Badge, Card, CardSection, Group, Modal, Text, Image, CloseButton } from "@mantine/core";
+import { Badge, Card, CardSection, Group, Modal, Text, CloseButton } from "@mantine/core";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
-import ImageDisplayer from "../server/ImageDisplayer";
-import TextDisplayer from "../server/TextDisplayer";
-import classes from '@/pages/dataquality/embeddings/page.module.css';
+import classes from '@/pages/tasks/dataquality/embeddings/page.module.css';
 import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
 import { useMemo, useState } from "react";
 import path from 'path';
 import datasets_folder from "@/properties/static";
+import ImageDisplayer from "@/components/server/ImageDisplayer"
+import TextDisplayer from "@/components/server/TextDisplayer"
 
 interface FeatureCardProps {
   index?: number,
