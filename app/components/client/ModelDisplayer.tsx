@@ -11,11 +11,11 @@ interface ModelDisplayerProps {
 
 export default function ModelDisplayer(props: ModelDisplayerProps) {
     const models = useStore((state) => state.models)
-    
+    console.log("MODELS LOADED", models)
     return (
         <>
         
-        <Text>{models}</Text>
+       <Text>you made it </Text>
         {/*
             <Card shadow="sm" padding="lg" radius="md" withBorder style={{ backgroundColor: '#f8f9fa' }}>
                 <Card.Section>

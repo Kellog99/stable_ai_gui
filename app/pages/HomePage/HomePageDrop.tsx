@@ -31,7 +31,8 @@ const HomePageDrop: React.FC = ( {
                     accept: 'application/x-zip-compressed',
                     formFieldName: "folder_zip",
                     description: 'Make sure your zip contains raw data and a json config file.',
-                    uploadUrl: "http://localhost:8000/upload_folder/check",
+                    uploadUrlCheck: "http://localhost:8000/upload_folder/check",
+                    uploadUrl: "http://localhost:8000/upload_folder",
                     refreshFunction: DatasetsLoader,
                     setRefreshData: setDatasets
                 } }
@@ -48,7 +49,8 @@ const HomePageDrop: React.FC = ( {
                     accept: 'application/zip',
                     formFieldName: "file",
                     description: 'Make sure your zip contains raw data and a json config file.',
-                    uploadUrl: "http://localhost:8082/upload/check",
+                    uploadUrlCheck: "http://localhost:8082/model/upload/check",
+                    uploadUrl:"http://localhost:8082/model/upload",
                     refreshFunction: getModels,
                     setRefreshData: setModels
 
