@@ -32,8 +32,7 @@ interface ConfigsProps {
 }
 
 export default function Config(props: ConfigsProps) {
-    const searchParams = useSearchParams();
-    const [datasetName, setDatasetName] = useState<string | null>("")
+
     const [features, setFeatures] = useState<string[]>([])
     const [labelFeatures, setLabelFeatures] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -52,6 +51,7 @@ export default function Config(props: ConfigsProps) {
 
 
     const datasetUsed = useStore((state) => state.datasetUsed)
+    const datasetName = datasetUsed?.name
 
     const configs = useStore((state) => state.metricsConfig)
     const setConfigs = useStore((state) => state.setMetricsConfigs)
@@ -84,12 +84,6 @@ export default function Config(props: ConfigsProps) {
 
     }, [inputReq])
 
-
-    useEffect(() => {
-        if (searchParams.get("datasetName")) {
-            setDatasetName(searchParams.get("datasetName"))
-        }
-    }, [searchParams])
 
 
     useEffect(() => {

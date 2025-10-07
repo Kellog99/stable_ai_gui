@@ -17,10 +17,7 @@ import buttonsStyles from "@/styles/Config.module.css"
 
 
 export default function Prototypes() {
-    const searchParams = useSearchParams();
     const containerRef = useRef<HTMLDivElement>(null);
-
-    const [datasetName, setDatasetName] = useState<string | null>("")
     const [features, setFeatures] = useState<string[]>([])
     const [labelFeatures, setLabelFeatures] = useState<string[]>([])
     const [featureName, setFeatureName] = useState<any>("")
@@ -42,11 +39,8 @@ export default function Prototypes() {
 
     const datasetUsed = useStore((state) => state.datasetUsed)
 
-    useEffect(() => {
-        if (searchParams.get("datasetName")) {
-            setDatasetName(searchParams.get("datasetName"))
-        }
-    }, [searchParams])
+    const datasetName = datasetUsed?.name
+
 
 
     useEffect(() => {

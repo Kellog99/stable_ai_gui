@@ -42,7 +42,7 @@ interface AppState
   setSelectedPoints: ( selectedPoints: number[] ) => void;
   setHoverIndex: ( hoverIndex: number | null ) => void
   setSelectedFeature: ( selectedFeature: string ) => void;
-  setData: ( datasetUsed: Dataset ) => void;
+  setData: ( datasetUsed: Dataset | null ) => void;
   setDatasets: ( datasets: Dataset[] | null ) => void;
   setLazoMode: ( lazoMode: boolean ) => void;
   setQueryDataset: ( queryDataset: string ) => void;

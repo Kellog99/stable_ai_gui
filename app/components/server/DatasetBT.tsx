@@ -1,3 +1,4 @@
+import useStore from '@/store/dsStore';
 import
 {
   faCircleExclamation
@@ -6,10 +7,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Alert, Badge, Card, CardSection, Grid, GridCol, Group, Text } from '@mantine/core';
 import Dataset from "../../interfaces/genericInterface";
 import { image_type, text_type } from "../../properties/types";
-import RouterButton from "../client/buttons/RouterButton";
 import classes from './DatasetBT.module.css';
 import ImageDisplayer from "./ImageDisplayer";
 import TextDisplayer from "./TextDisplayer";
+
 
 interface DatasetBTProps
 {
@@ -20,15 +21,29 @@ interface DatasetBTProps
 
 export default function DatasetBT ( { query, datasets }: DatasetBTProps )
 {
+  const datasetName = useStore( ( state ) => state.datasetUsed )?.name
+  const datasetUsed = useStore( ( state ) => state.datasetUsed )
+  const setDatasetUsed = useStore( ( state ) => state.setData )
+
 
   if ( !datasets ) {
     return null
   } else {
+    console.log( "DATASETS LOADED", datasets );
     const filteredDatasets = query
       ? datasets?.filter( dataset =>
         dataset.name.toLowerCase().includes( query.toLowerCase() )
       )
       : datasets;
+
+    const handleClick = ( dataset: Dataset ) =>
+    {
+      setDatasetUsed( dataset );
+      if ( dataset.name === datasetName ) {
+        setDatasetUsed( null );
+      }
+    }
+
 
     return (
       <div className={ classes.dataset_buttons }>
@@ -40,15 +55,18 @@ export default function DatasetBT ( { query, datasets }: DatasetBTProps )
           { filteredDatasets.length > 0 ? ( filteredDatasets.map( ( dataset, index ) => (
 
             <GridCol span={ 1 } key={ index }>
-              <Card className={ classes.card } shadow="sm" padding="lg" radius="md" withBorder>
+              <Card
+                className={ `${classes.card} ${datasetName === dataset.name ? classes.cardSelected : ""
+                  }` }
+                onClick={ () => handleClick( dataset ) }
+              >
                 <CardSection className={ classes.cardsection }>
-                  <RouterButton name={ dataset.name } route="/pages/tasks/dataquality/datasets">
-                    { dataset.prototype.type === image_type ? (
-                      <ImageDisplayer className={ classes.ImageDisplayer } data={ dataset.prototype.datas[ 0 ] } alt={ dataset.name } />
-                    ) : dataset.prototype.type === text_type ? (
-                      <TextDisplayer className={ classes.TextDisplayer } data={ dataset.prototype.datas[ 0 ] } />
-                    ) : null }
-                  </RouterButton>
+
+                  { dataset.prototype.type === image_type ? (
+                    <ImageDisplayer className={ classes.ImageDisplayer } data={ dataset.prototype.datas[ 0 ] } alt={ dataset.name } />
+                  ) : dataset.prototype.type === text_type ? (
+                    <TextDisplayer className={ classes.TextDisplayer } data={ dataset.prototype.datas[ 0 ] } />
+                  ) : null }
                 </CardSection>
 
                 <Group justify="space-between" mt="md" mb="xs">

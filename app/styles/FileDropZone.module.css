@@ -1,7 +1,7 @@
 .containerDropzone {
   justify-content: space-between;
-  flex-wrap: wrap;  /* if you want items to wrap to next line */
-  row-gap: 0.1vw;   /* vertical spacing between rows */
+  flex-wrap: wrap;  
+  row-gap: 0.1vw;  
 }
 
 

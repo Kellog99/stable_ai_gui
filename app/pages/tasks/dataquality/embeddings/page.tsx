@@ -26,7 +26,6 @@ interface Feature {
 
 function EmbeddingsPage() {
 
-  const searchParams = useSearchParams();
   const [feature, setFeature] = useState<Feature | null>(null)
   const [featureData, setFeatureData] = useState<string[]>([])
   const [labelFeature, setLabelFeature] = useState<Feature | null>(null)
@@ -46,7 +45,7 @@ function EmbeddingsPage() {
 
   const [features, setFeatures] = useState<string[]>([])
   const [labelFeatures, setLabelFeatures] = useState<string[]>([])
-  const [datasetName, setDatasetName] = useState<string | null>("")
+  
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -82,11 +81,9 @@ function EmbeddingsPage() {
     }
   }, [datasetUsed, featureName, feature])
 
-  useEffect(() => {
-    if (searchParams.get("datasetName")) {
-      setDatasetName(searchParams.get("datasetName"))
-    }
-  }, [searchParams])
+  
+
+  const datasetName = useStore((state) => state.datasetUsed)?.name
 
 
   useEffect(() => {
