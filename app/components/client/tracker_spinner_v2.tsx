@@ -36,7 +36,6 @@ const AsyncTaskTracker = ({ startEndpoint, startParams, startBody, progressEndpo
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
-  // Start the task
   const startTask = useCallback(async () => {
     try {
       setStatus('starting');
@@ -111,7 +110,7 @@ const AsyncTaskTracker = ({ startEndpoint, startParams, startBody, progressEndpo
     };
 
     const intervalId = setInterval(pollProgress, pollInterval);
-    pollProgress(); // Poll immediately
+    pollProgress();
 
     return () => clearInterval(intervalId);
   }, [taskId, status, progressEndpoint, pollInterval, onComplete, onError]);
@@ -144,7 +143,6 @@ const AsyncTaskTracker = ({ startEndpoint, startParams, startBody, progressEndpo
     });
   }
 
-  // Default UI
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       {status === 'idle' && (

@@ -4,10 +4,9 @@ import { InfoIcon } from "lucide-react";
 
 
 
-export function ModalUploadModel ()
-{
-    const [ opened, { toggle } ] = useDisclosure( false );
-    
+export function ModalUploadModel() {
+    const [opened, { toggle }] = useDisclosure(false);
+
     const jsonFields = [
         {
             field: "name",
@@ -15,49 +14,73 @@ export function ModalUploadModel ()
             description: 'The name of the model. This field in mandatory.'
         },
         {
-            field: "ecc",
+            field: "type",
             type: "string",
-            description: "Specify if you want"
+            description: (<>Specify the type of the model. E.g., <Code>timm</Code> for models from the timm library.</>)
         },
-    ];
+        {
+            field: "pretrained",
+            type: "boolean",
+            description: "Whether the model is pretrained or not."
+        },
 
-    const rows = jsonFields.map( ( element ) => (
-        <Table.Tr key={ element.field }>
-            <Table.Td>{ element.field }</Table.Td>
-            <Table.Td c="blue" fw={ 500 } ff="monospace">
-                { element.type }
+        {
+            field: "num_classes",
+            type: "number",
+            description: "Specify the number of classes for the model."
+        },
+        {
+            field: "task",
+            type: "string",
+            description: (<>Specify the task for the model. E.g., <Code>classification</Code>, <Code>object detection</Code>, etc.</>)
+        }];
+
+    const rows = jsonFields.map((element) => (
+        <Table.Tr key={element.field}>
+            <Table.Td>{element.field}</Table.Td>
+            <Table.Td c="blue" fw={500} ff="monospace">
+                {element.type}
             </Table.Td>
-            <Table.Td>{ element.description }</Table.Td>
+            <Table.Td>{element.description}</Table.Td>
         </Table.Tr>
-    ) );
+    ));
 
     const jsonExample = `{
-    "name": "resnet50",
-    "ecc": "bla bla",
+    "name": "resnet50c",
+    "type": "timm",
+    "pretrained": true,
+    "num_classes": 1000,
+    "task": "classification"
 }`
 
     return (
         <>
-            <Box style={ {
+            <Box style={{
                 padding: '10px',
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 borderRadius: '8px',
                 width: '100%',
                 cursor: 'pointer'
-            } }
-                onClick={ toggle }
+            }}
+                onClick={toggle}
 
             >
                 <Group justify='space-between' >
                     <Group justify='flex-start'>
-                        <InfoIcon size={ 12 } />
+                        <InfoIcon size={12} />
                         <Text size="0.6vw" c="var(--mantine-color-gray-7)">Info about the zip to upload</Text>
                     </Group>
                 </Group>
 
-                <Modal opened={ opened } onClose={ toggle } title="Upload Information" size="lg" >
+                <Modal opened={opened} onClose={toggle} title="Upload Information" size="lg" >
                     <Divider my="xs" color="var(--mantine-color-gray-7)" />
-                    <Text size="sm" c="var(--mantine-color-gray-7)" mb="8px">
+                    <div
+                        style={{
+                            fontSize: "0.875rem", // Mantine "sm" ≈ 14px
+                            color: "var(--mantine-color-gray-7)",
+                            marginBottom: "8px",
+                        }}
+                    >
                         The zip you are going to upload must contain the <Code>.pth</Code> file and a json config file. In particular the following scaffolding must be followed:
                         <div style={{ fontFamily: "monospace", fontSize: "14px", lineHeight: "20px", marginTop: "8px", marginBottom: "8px", backgroundColor: "var(--mantine-color-gray-0)", padding: "8px", borderRadius: "4px" }}>
                             <div>modelName.zip</div>
@@ -66,7 +89,7 @@ export function ModalUploadModel ()
                         </div>
 
                         The json config file must contain the following fields:
-                    </Text>
+                    </div>
                     <Table>
                         <Table.Thead>
                             <Table.Tr>
@@ -74,11 +97,11 @@ export function ModalUploadModel ()
                                 <Table.Th>Ecc</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
-                        <Table.Tbody>{ rows }</Table.Tbody>
+                        <Table.Tbody>{rows}</Table.Tbody>
                     </Table>
                     <Text size="sm" c="var(--mantine-color-gray-7)" m="8px">An example of json file is the following:</Text>
                     <Code color="var(--mantine-color-gray-8)" c="white" block>
-                        { jsonExample }
+                        {jsonExample}
                     </Code>
                 </Modal>
             </Box>
