@@ -47,9 +47,14 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
         <button
           onClick={handleClick}
           className={`${isActive(section.key) ? "button active" : "button"}`}
+          style={{ gap: `${collapsed ? '0px' : '1vw'}` }}
         >
-          <section.icon size={25 * (10 - level) / 10} />
-          {!collapsed ? <p style={{ fontSize: `${(10 - level) / 10}rem` }}>{section.title}</p> : null}
+          <section.icon size={30*(10 - level) / 10} />
+          {
+            !collapsed ?
+              <p style={{ fontSize: `${(10 - level) / 10}rem` }}>{section.title}</p>
+              : null
+          }
           {section.items ? (
             <button
               className='action-button'

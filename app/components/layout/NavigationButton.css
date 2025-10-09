@@ -1,13 +1,14 @@
 /* Base button styles */
 .button {
   width: 100%;
+  height: 5vw;
+  min-width: 5vw;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  /* Changed from align-content */
-  gap: 1vw;
-  position: relative;
+  align-content: center;
   background-color: transparent;
+  justify-content: space-between;
+  position: relative;
   border-radius: 1vw;
   padding: 1vw;
   color: white;
@@ -17,6 +18,13 @@
 .button .active {
   background-color: white;
   color: black;
+}
+
+.button-icon {
+  height: 100%;
+  aspect-ratio: 1;
+  align-items: center;
+  align-content: center;
 }
 
 .action-button {
