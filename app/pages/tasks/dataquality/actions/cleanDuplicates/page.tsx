@@ -24,7 +24,7 @@ export default function CleanDuplicates() {
   const setData = useStore((state) => (state.setData));
 
 
-  async function prova(name: string) {
+  async function Cleaning(name: string) {
     const baseUrl = cleaner_get
 
     const url = new URL(baseUrl);
@@ -40,7 +40,6 @@ export default function CleanDuplicates() {
     if (reader) {
       try {
         while (true) {
-          // Read a chunk from the stream
 
           const { done, value } = await reader.read();
 
@@ -49,7 +48,6 @@ export default function CleanDuplicates() {
             break;
           }
 
-          // Decode the bytes to string
           const text = decoder.decode(value, { stream: true });
           console.log(text)
           // Process the SSE format (data: {...})
@@ -99,18 +97,16 @@ export default function CleanDuplicates() {
     }
   }, [datasetUsed])
 
-
   const handleCleaner = (name: string) => {
-    console.log("feature name:", name)
     setFeatureName(name)
     if (name) {
-      prova(name)
+      Cleaning(name)
     }
   }
 
 
   return (
-    <div className="w-full h-screen">
+    <div>
       <Box
         className={classes.title}
         style={{ display: "flex", flexDirection: "column", gap: "0px" }}

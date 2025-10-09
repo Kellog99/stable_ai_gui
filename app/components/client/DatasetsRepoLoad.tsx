@@ -1,6 +1,6 @@
 import DatasetsLoader from "@/functionalities/DatasetsLoader";
 import useStore from "@/store/dsStore";
-import { Loader, Text} from "@mantine/core";
+import { Loader, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import DatasetBT from "../server/DatasetBT";
 
@@ -23,12 +23,11 @@ export const DatasetRepository: React.FC = () =>
             setIsLoading( false )
         } );
     }, [] );
-    
+
     const query = useStore( ( state ) => ( state.queryDataset ) );
-    
+
     return (
         <>
-        
             {
                 isLoading ? (
                     <div >
@@ -37,10 +36,8 @@ export const DatasetRepository: React.FC = () =>
                     </div >
                 ) : (
                     <DatasetBT query={ query } datasets={ datasets } />
-
                 )
-            } 
-            
-         
-            </> )
+            }
+        </> 
+        )
 }

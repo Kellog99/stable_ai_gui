@@ -1,4 +1,3 @@
-/* Navigation cards on home page */
 .card {
   display: grid;
   height: 100%;
@@ -17,6 +16,15 @@
   background: rgba(255, 255, 255, 1);
   transform: translateY(-8px);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.card:disabled {
+  background: rgba(200, 200, 200, 0.5);
+  border: 1px solid rgba(200, 200, 200, 0.3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .card_header {
@@ -49,6 +57,10 @@
   transform: scale(1.1);
 }
 
+.card:disabled .card_icon {
+  transform: none
+}
+
 .card_description {
   color: #6b7280;
   padding: 6px;
@@ -64,10 +76,5 @@
   font-size: 1.3vw;
   color: black;
   transition: color 0.3s ease;
-
 }
 
-
-.card:hover .card_link {
-  transform: translateX(4px);
-}

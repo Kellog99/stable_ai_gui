@@ -1,23 +1,23 @@
 'use client';
 import React, { Suspense } from "react";
 import Link from 'next/link'
+import useStore from "@/store/dsStore";
 
 interface ClickableImageProps {
-  name: string | undefined | null;
   route: string;
 }
 
 export default function RouterButton({
-  name,
   route,
   children
 }: React.PropsWithChildren<ClickableImageProps>) {
+  const name = useStore((state) => state.datasetUsed)?.name
   return (
     <Suspense>
       <Link
         href={{
           pathname: route,
-          query: { datasetName: name },
+          
         }}
         style={{ textDecoration: 'none', color: 'inherit' }}
       >

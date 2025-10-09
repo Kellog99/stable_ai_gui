@@ -5,17 +5,15 @@ import MovableWindow from '@/components/client/MovableWindow';
 import { IsFeatureBond, IsFeatureSameLength } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/genericInterface';
 import { embedding_type, image_type, numberic_type, text_type } from '@/properties/types';
-import { Alert, Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Space, Text } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Text } from '@mantine/core';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import ScatterPlotVisualization from '../../../components/client/ScatterPlotVisualization';
-import featureLoader from '../../FeatureLoader';
-import useStore from '../../../store/dsStore';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import classes from './page.module.css';
 import { MousePointerClick, ScanSearch } from 'lucide-react';
+import useStore from '@/store/dsStore';
+import featureLoader from '@/functionalities/FeatureLoader';
+import ScatterPlotVisualization from '@/components/client/ScatterPlotVisualization';
+import { AlertCust } from '@/components/client/AlertCustom';
 
 interface Feature {
 
@@ -28,8 +26,6 @@ interface Feature {
 
 function EmbeddingsPage() {
 
-  const searchParams = useSearchParams();
-  const [opened, { open, close }] = useDisclosure(false);
   const [feature, setFeature] = useState<Feature | null>(null)
   const [featureData, setFeatureData] = useState<string[]>([])
   const [labelFeature, setLabelFeature] = useState<Feature | null>(null)
@@ -42,7 +38,6 @@ function EmbeddingsPage() {
   const [embFeatures, setEmbFeatures] = useState<string[] | null>(null)
   const [modelUsed, setModelUsed] = useState<string | "">("")
   const [numericFeature, setNumericFeature] = useState<FeatureDTO | null>(null)
-  const [queryRetrieve, setQueryRetrieve] = useState<string>("")
   const colorMap = useStore((state) => state.colorMap)
 
   const filteredLabels = useStore((state) => state.filteredLabels)
@@ -50,7 +45,7 @@ function EmbeddingsPage() {
 
   const [features, setFeatures] = useState<string[]>([])
   const [labelFeatures, setLabelFeatures] = useState<string[]>([])
-  const [datasetName, setDatasetName] = useState<string | null>("")
+  
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -73,12 +68,7 @@ function EmbeddingsPage() {
         .filter(({ type }) => type === image_type || type === text_type)
         .map(({ name }) => name);
 
-      //const extractedlabelFeatures = datasetUsed.features
-      //  .filter( ( { type } ) => type === label_type )
-      //  .map( ( { name } ) => name );
-
       if (featureName !== "" && feature) {
-        //const labelFeatures = IsFeatureBond( datasetUsed as Dataset, featureName, label_type )
         const load_labels = async () => {
           const lb_feature = await IsFeatureSameLength(datasetUsed as Dataset, feature.datas.length);
           console.log("LX", feature.datas.length)
@@ -88,20 +78,12 @@ function EmbeddingsPage() {
       }
 
       setFeatures(extractedFeatures);
-      //setLabelFeatures( extractedlabelFeatures )
-      //console.log( labelFeatures )
     }
   }, [datasetUsed, featureName, feature])
 
-  console.log("PAGE", datasetUsed)
-  console.log("PAGE", features)
-  console.log("PAGE", labelFeatures)
+  
 
-  useEffect(() => {
-    if (searchParams.get("datasetName")) {
-      setDatasetName(searchParams.get("datasetName"))
-    }
-  }, [searchParams])
+  const datasetName = useStore((state) => state.datasetUsed)?.name
 
 
   useEffect(() => {
@@ -189,7 +171,6 @@ function EmbeddingsPage() {
   }, [labelFeatureName]);
 
 
-  console.log("LABEL DICT page:", labelDict)
   useEffect(() => {
     // Only proceed if indexes is not null
     if (indexes != null && feature != null) {
@@ -218,22 +199,6 @@ function EmbeddingsPage() {
       filterFeature();
     }
   }, [indexes, labelFeatureName]); // Still keep indexes and featureName in the dependency array
-
-  const handleTextareaKeyDown = useCallback((event: any) => {
-    // Prevent the keydown event from bubbling up to DeckGL listeners
-    event.stopPropagation();
-    setQueryRetrieve(event.target.value)
-    // You can add other logic here if needed
-    // console.log('Textarea KeyDown:', event.key);
-  }, []);
-
-
-  console.log("LABEL DATA:", labelData)
-  console.log("FEATURE DATA", feature)
-  console.log("FILTERED", featureData)
-
-  console.log("indexes:", indexes)
-
 
   useEffect(() => {
 
@@ -592,16 +557,7 @@ function EmbeddingsPage() {
           : featureName && embFeatures && embFeatures.length == 1
             ? renderedComponent()
             : featureName && embFeatures && embFeatures.length == 0 ? (
-              <Alert
-                variant="light"
-                color="orange"
-                radius="md"
-                title="Attention!"
-                icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-                style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px", marginLeft: "50px" }}
-              >
-                The {featureName} feature is not embedded. You can embed it in the Action menù.
-              </Alert>
+              <AlertCust result={ 'warning' } textToDisplay={ `The ${featureName} feature is not embedded. You can embed it in the Action menù. `}/>
             )
               : (
                 <>

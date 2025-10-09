@@ -48,6 +48,7 @@ const Header = () => {
       <div className={styles.buttons}>
         {btns.map((btnprops) =>
           <button
+            key={btnprops.id}
             className={`${styles.button} ${page === btnprops.id ? styles.active : styles.inactive}`}
             onClick={() => {
               setPage(btnprops.id);

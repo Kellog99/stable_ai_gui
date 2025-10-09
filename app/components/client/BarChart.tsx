@@ -85,9 +85,6 @@ export function BarChartCustom({ data, keyL, dynamicWidth = false, xAxisSets = f
             series={[{ name: 'samples', color: '#a9adb9' }]}
             barProps={{
                 barSize: barSize,
-                onClick: (bar) => {
-                    console.log('Clicked bar data:', bar.label);
-                }
             }}
             xAxisProps={xAxisSets ? xAxisConf : undefined}
             withTooltip

@@ -1,34 +1,30 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Progress, Flex, Select, Text, Box, Center, Button } from '@mantine/core';
-
 import { bbox_type, image_type } from '@/properties/types';
 import { cropper_get } from '@/properties/urls';
 import Link from "next/link";
 import { GetDatasetAndSave } from '@/functionalities/DatasetsLoader';
-import classes from "../../datasets/page.module.css"
+import classes from "@/pages/tasks/dataquality/datasets/page.module.css"
 import { CropPathfinder } from '@vectopus/atlas-icons-react';
 import { MousePointerClick } from 'lucide-react';
 import { AlertCust } from '@/components/client/AlertCustom';
 import buttonsStyles from "@/styles/Config.module.css"
 import useStore from '@/store/dsStore';
 
-function Home() {
+export default function Crop() {
 
   const [featureName, setFeatureName] = useState<any>("")
   const [bboxFeatureName, setBboxFeatureName] = useState<any>("")
   const [features, setFeatures] = useState<string[]>([])
   const [bboxFeatures, setBboxFeatures] = useState<string[]>([])
-  const [datasetName, setDatasetName] = useState<string | null>("")
 
+  const datasetName = useStore((state) => state.datasetUsed)?.name
 
-  const [isConnected, setIsConnected] = useState(false);
   const [isCropping, setIsCropping] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const [result, setResult] = useState<string | null>(null);
-
-  const [progressColor, setProgressColor] = useState<string | null>("red");
 
   const datasetUsed = useStore((state) => state.datasetUsed)
   const setData = useStore((state) => (state.setData));
@@ -39,7 +35,6 @@ function Home() {
 
     const url = new URL(baseUrl);
 
-    // Option 1: Pass datasets as a single comma-separated list
     url.searchParams.append('featureName', featureName);
     url.searchParams.append('datasetName', datasetUsed?.name as string);
     url.searchParams.append('bboxName', bboxFeatureName);
@@ -51,7 +46,6 @@ function Home() {
     if (reader) {
       try {
         while (true) {
-          // Read a chunk from the stream
 
           const { done, value } = await reader.read();
 
@@ -70,11 +64,7 @@ function Home() {
               try {
                 const jsonData = JSON.parse(line.substring(6));
                 console.log('Received progress update:', jsonData);
-                if (jsonData.type === "conversion") {
-                  setProgressColor("blue")
-                } else {
-                  setProgressColor("red")
-                }
+
                 // Handle the progress update
                 if (jsonData.status === "complete") {
                   setIsCropping(false)
@@ -120,16 +110,9 @@ function Home() {
     }
   }, [datasetUsed])
 
-  const startCropping = (bboxFeatureName: string) => {
-    setBboxFeatureName(bboxFeatureName)
-    if (bboxFeatureName) {
-      ssl_crop(bboxFeatureName)
-    }
-  }
-
 
   return (
-    <div className="w-full h-screen">
+    <div>
 
       <Box
         className={classes.title}
@@ -162,7 +145,7 @@ function Home() {
               value={featureName}
               onChange={(value) => setFeatureName(value)}
               allowDeselect={false}
-              clearable={!isConnected}
+              clearable
               required={true}
             />
 
@@ -175,7 +158,7 @@ function Home() {
               value={bboxFeatureName}
               onChange={(value) => setBboxFeatureName(value)}
               allowDeselect={false}
-              clearable={!isConnected}
+              clearable
               required={true}
             />
 
@@ -250,18 +233,6 @@ function Home() {
       ) : result == "Complete!" ? (
         <>
           <AlertCust result={'success'} textToDisplay={`The ${featureName} feature has been correctly cropped and added to schema.`} />
-          {/*
-        <Alert
-          variant="light"
-          color="green"
-          radius="md"
-          title={result}
-          icon={<FontAwesomeIcon icon={faCheck} />}
-          style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}>
-
-          The {featureName} feature has been correctly cropped and added to schema.
-        </Alert>
-*/}
         </>
 
       ) : result == "Feature image is already cropped!" ? (
@@ -279,27 +250,6 @@ function Home() {
                 here
               </Link>.
             </>} />
-          {/*
-        <Alert
-          variant="light"
-          color="orange"
-          radius="md"
-          title="Attention!"
-          icon={<FontAwesomeIcon icon={faCircleExclamation} />}
-          style={{ display: 'inline-block', maxWidth: '100%', marginTop: "30px" }}
-        >
-          The {featureName} feature is already cropped. Check the dataset schema{" "}
-          <Link
-            href={{
-              pathname: "/pages/dataquality/datasets",
-              query: { datasetName: datasetName }
-            }}
-            style={{ color: 'blue' }}
-          >
-            here
-          </Link>.
-        </Alert>
-*/}
         </>
       ) : null}
 
@@ -307,10 +257,3 @@ function Home() {
   );
 }
 
-export default function Cropper() {
-  return (
-
-    <Home />
-
-  )
-}

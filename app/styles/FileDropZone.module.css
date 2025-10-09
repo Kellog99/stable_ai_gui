@@ -1,7 +1,7 @@
 .containerDropzone {
   justify-content: space-between;
-  flex-wrap: wrap;  /* if you want items to wrap to next line */
-  row-gap: 0.1vw;   /* vertical spacing between rows */
+  flex-wrap: wrap;  
+  row-gap: 20vw;  
 }
 
 
@@ -9,10 +9,10 @@
 .dropzone {
   width: 28vw;
   aspect-ratio: 4;
+  margin-top:10px;
   position: relative;
   border: 3px dashed #D1D5DB;
   border-radius: 0.75rem;
-  padding: 2rem;
   text-align: center;
   transition: all 0.3s ease-in-out;
   background: rgba(255, 255, 255, 0.4);

@@ -1,6 +1,12 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
-
+export interface ModelSpecs {
+    name: string;
+    task: string;
+    numClasses: number;
+    pretrained: boolean;
+    mode: string;
+}
 export interface Job {
   last_attack_performed: string,
   progress: number,

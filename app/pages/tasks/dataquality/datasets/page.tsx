@@ -1,20 +1,19 @@
 "use client";
 
+import { BarChartCustom } from "@/components/client/BarChart";
 import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import SchemaShower from "@/components/client/SchemaShower";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { IsFeatureBond, IsFeaturePresent } from "@/functionalities/Utils";
 import Dataset, { FeatureSchema } from "@/interfaces/genericInterface";
+import { labelColorMapType } from "@/properties/static";
 import { bbox_type, embedding_type, image_type, label_type, text_type } from "@/properties/types";
 import useStore from '@/store/dsStore';
-import { Box, CloseButton, Flex, Text, Title } from "@mantine/core";
 import { motion } from 'framer-motion';
 import { Database, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import classes from './page.module.css';
-import { labelColorMapType } from "@/properties/static";
-import { BarChartCustom } from "@/components/client/BarChart";
 
 interface Feature {
   type: string;
@@ -25,11 +24,10 @@ interface Feature {
 
 export default function Datasets() {
 
-  const searchParams = useSearchParams();
+
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const [datasetName, setDatasetName] = useState<string | null>("")
   const [features, setFeatures] = useState<FeatureSchema[]>([])
   const [connections, setConnections] = useState<[string, string][]>([])
   const [descriptions, setDescriptions] = useState<string[]>([])
@@ -49,6 +47,8 @@ export default function Datasets() {
   const datasets = useStore((state) => (state.datasets))
   const setDatasets: (datasets: null) => void = useStore((state) => state.setDatasets);
   const datasetUsed = useStore((state) => state.datasetUsed)
+
+  const datasetName = datasetUsed?.name
   const setData = useStore((state) => (state.setData));
   const setReport = useStore((state) => state.setReport)
 
@@ -111,26 +111,24 @@ export default function Datasets() {
   }
 
   useEffect(() => {
-    if (searchParams.get("datasetName")) {
-      setDatasetName(searchParams.get("datasetName"));
 
-      const filteredDataset = datasets?.find(dataset =>
-        dataset.name === searchParams.get("datasetName")
-      );
+    const filteredDataset = datasets?.find(dataset =>
+      dataset.name === datasetName
+    );
 
-      if (filteredDataset) {
-        setData(filteredDataset);
-        setDatasets(null)
-        setReport([])
+    if (filteredDataset) {
+      setData(filteredDataset);
+      setDatasets(null)
+      setReport([])
 
-        setPrototypesData(null)
-        setLabelProtoData(null)
-        setLabelToSamples([])
+      setPrototypesData(null)
+      setLabelProtoData(null)
+      setLabelToSamples([])
 
-      }
     }
 
-  }, [searchParams, datasets, setData, setDatasets, datasetName]);
+
+  }, [datasets, setData, setDatasets, datasetName]);
 
   console.log("datasetUsed:", datasetUsed)
 
@@ -274,10 +272,6 @@ export default function Datasets() {
     }
   }, [feature]);
 
-  {/*
-  const handleClick: (bar) => {
-  }
-*/}
 
   const handleonClose = () => {
     setFeatureToDisplay(null);
@@ -285,289 +279,324 @@ export default function Datasets() {
   }
 
 
-  
+
 
   return (
-    <div className="w-full h-screen">
-      <div className="max-w-4xl mx-auto px-4">
-        <Box
-          className={classes.title}
-          style={{ display: "flex", flexDirection: "column", gap: "0px" }}
-        >
-          <div className={classes.datasetHeader}>
-            <Database className={classes.iconDatabase} />
-            <h1 className={classes.datasetTitle}>
-              {datasetUsed?.name
-                ? datasetUsed.name.charAt(0).toUpperCase() + datasetUsed.name.slice(1)
-                : ''} dataset
-            </h1>
-          </div>
-          <div className={classes.datasetDivider}></div>
+    <div>
+      <div
+        className={classes.title}
+        style={{ display: "flex", flexDirection: "column", gap: "0px" }}
+      >
+        <div className={classes.datasetHeader}>
+          <Database className={classes.iconDatabase} />
+          <h1 className={classes.datasetTitle}>
+            {datasetUsed?.name
+              ? datasetUsed.name.charAt(0).toUpperCase() + datasetUsed.name.slice(1)
+              : ''} dataset
+          </h1>
+        </div>
+        <div className={classes.datasetDivider}></div>
 
-        </Box>
+      </div>
 
-        <div className={classes.featureBox}>
-          <div className={classes.fixedTitle}>
-            <Title order={3} c="#94a3b8" style={{ textAlign: "center" }}>
-              Dataset schema
-            </Title>
-          </div>
-          <div className={classes.featureContent}>
+      <div className={classes.featureBox}>
+        <div className={classes.fixedTitle}>
+          <h3 style={{ textAlign: "center", color: "#94a3b8" }}>
+            Dataset schema
+          </h3>
+        </div>
+        <div className={classes.featureContent}>
 
-            <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-
-              <Flex direction='column' align='center'>
-                <motion.div
-                  animate={{
-                    x: featureToDisplay && feature ? -200 : 0,
-                  }}
-                  transition={{ duration: 0.5, ease: 'easeInOut' }}
-                  style={{
-                    width: '100%',
-                    willChange: 'transform',
-                  }}
-                >
-                  <div
-                    ref={containerRef}
-                    className={classes.schemaContainer}
-                  >
-                    <SchemaShower
-                      features={features}
-                      connections={connections}
-                      labelColorMap={labelColorMapType}
-                      clickable={true}
-                    />
-                  </div>
-                </motion.div>
-                {!featureToDisplay && (
-                  <div className={classes.tooltipBox}>
-                    <Search className={classes.tooltipIcon} />
-                    <span>Click on the schema to explore the features!</span>
-                  </div>
-                )}
-              </Flex>
-            </div>
-
-            {featureToDisplay && feature && (
-              <div
+          <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <motion.div
+                animate={{
+                  x: featureToDisplay && feature ? -200 : 0,
+                }}
+                transition={{ duration: 0.5, ease: 'easeInOut' }}
                 style={{
-                  
-                  position: 'relative',
-                  overflow: 'auto',
-                  visibility: featureToDisplay && feature ? 'visible' : 'hidden',
-                  pointerEvents: featureToDisplay && feature ? 'auto' : 'none',
+                  width: '100%',
+                  willChange: 'transform',
                 }}
               >
-                <motion.div
-                  initial={{ opacity: 0, transform: "translateX(100px)" }}
-                  animate={{
-                    opacity: featureToDisplay && feature ? 1 : 0,
-                    transform:
-                      featureToDisplay && feature ? "translateX(0)" : "translateX(100px)",
-                  }}
-                  transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
-                  style={{ willChange: "transform, opacity" }}
+                <div
+                  ref={containerRef}
+                  className={classes.schemaContainer}
                 >
-                  <Flex direction="column" align="center" gap="xs" style={{ marginTop: "20px" }}>
-                    <Flex justify="center" align="center" gap="sm">
-                      <Title order={4} c="#94a3b8" style={{ textAlign: "center", flex: 1 }}>
-                        Explore the {feature.name} feature
-                      </Title>
-                      <CloseButton onClick={handleonClose} />
-                    </Flex>
-
-
-                    <div className={classes.featureDetails}>
-                      {labelFeature ? (
-                        <FeatureDisplayer
-                          indexes={indexes}
-                          featureData={feature.datas}
-                          featureType={featureType}
-                          labelData={labelFeature.datas}
-                          label_dict={labelDict as { [key: number]: string }}
-                          columns={2}
-                        />
-                      ) : (
-                        <FeatureDisplayer
-                          indexes={indexes}
-                          featureData={feature.datas}
-                          featureType={featureType}
-                          columns={2}
-                        />
-                      )}
-                    </div>
-                  </Flex>
-                </motion.div>
-              </div>
-            )}
+                  <SchemaShower
+                    features={features}
+                    connections={connections}
+                    labelColorMap={labelColorMapType}
+                    clickable={true}
+                  />
+                </div>
+              </motion.div>
+              {!featureToDisplay && (
+                <div className={classes.tooltipBox}>
+                  <Search className={classes.tooltipIcon} />
+                  <span>Click on the schema to explore the features!</span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
+          {featureToDisplay && feature && (
+            <div
+              style={{
 
-        <Title order={2} >Description</Title>
-        <div className={classes.datasetDividerDesc}></div>
-
-        <Box style={{ display: 'flex', marginBottom: '30px' }}>
-          <Text>
-            <span style={{ fontWeight: 600 }}>
-              {datasetUsed?.name || ""}
-            </span>{" "}
-            is a dataset for {datasetUsed?.task || ""}.
-            {datasetUsed?.n_classes ? (
-              <> {" "} It has {datasetUsed?.n_classes || ""} classes and {datasetUsed?.n_samples} samples.{" "}</>
-            ) : (
-              <>It has {datasetUsed?.n_samples}{" "}</>
-            )}
-            {descriptions?.map((description, index) => (
-              <span key={index}>{description} </span>
-            ))}
-          </Text>
-        </Box>
-
-
-        {datasetUsed?.samples_per_class ? (
-          <>
-            <Title order={2}>Numerosity per class</Title>
-            <div className={classes.datasetDividerNum}></div>
-            <div style={{ margin: '20px' }}>
-              <Flex
-                justify="center"
-                align="center"
-                direction="column"
-                wrap="wrap"
+                position: 'relative',
+                overflow: 'auto',
+                visibility: featureToDisplay && feature ? 'visible' : 'hidden',
+                pointerEvents: featureToDisplay && feature ? 'auto' : 'none',
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, transform: "translateX(100px)" }}
+                animate={{
+                  opacity: featureToDisplay && feature ? 1 : 0,
+                  transform:
+                    featureToDisplay && feature ? "translateX(0)" : "translateX(100px)",
+                }}
+                transition={{ type: "tween", duration: 0.5, ease: "easeInOut" }}
+                style={{ willChange: "transform, opacity" }}
               >
-                <Box
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                    marginTop: "20px",
+                  }}
+                >
+                  <div style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: "0.5rem"
+                  }}>
+                    <h4 style={{ textAlign: "center", flex: 1, color: "#94a3b8" }}>
+                      Explore the {feature.name} feature
+                    </h4>
+                    <button
+                      onClick={handleonClose}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "28px",
+                        height: "28px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        fontSize: "16px",
+                      }}
+                    >
+                      ×
+                    </button>
+
+                  </div>
+                  <div className={classes.featureDetails}>
+                    {labelFeature ? (
+                      <FeatureDisplayer
+                        indexes={indexes}
+                        featureData={feature.datas}
+                        featureType={featureType}
+                        labelData={labelFeature.datas}
+                        label_dict={labelDict as { [key: number]: string }}
+                        columns={2}
+                      />
+                    ) : (
+                      <FeatureDisplayer
+                        indexes={indexes}
+                        featureData={feature.datas}
+                        featureType={featureType}
+                        columns={2}
+                      />
+                    )}
+                  </div>
+
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </div>
+      </div>
+
+
+      <h2 style={{ color: "white" }}>Description</h2>
+      <div className={classes.datasetDividerDesc}></div>
+
+      <div style={{ display: 'flex', marginBottom: '30px' }}>
+        <p style={{ color: "white" }}>
+          <span style={{ fontWeight: 600 }}>
+            {datasetUsed?.name || ""}
+          </span>{" "}
+          is a dataset for {datasetUsed?.task || ""}.
+          {datasetUsed?.n_classes ? (
+            <> {" "} It has {datasetUsed?.n_classes || ""} classes and {datasetUsed?.n_samples} samples.{" "}</>
+          ) : (
+            <>It has {datasetUsed?.n_samples}{" "}</>
+          )}
+          {descriptions?.map((description, index) => (
+            <span key={index}>{description} </span>
+          ))}
+        </p>
+      </div>
+
+
+      {datasetUsed?.samples_per_class ? (
+        <>
+          <h2 style={{ color: "white" }}>Numerosity per class</h2>
+          <div className={classes.datasetDividerNum}></div>
+          <div style={{ margin: '20px' }}>
+            <div style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              flexWrap: "wrap",
+            }}>
+              <div
+                style={{
+                  marginLeft: "30px",
+                  marginRight: "30px",
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                  maxWidth: '100%',
+                }}
+              >
+                <BarChartCustom
+                  data={labelToSamples}
+                  keyL="labels" />
+              </div>
+            </div>
+          </div>
+        </>
+      ) : null}
+
+      <div style={{
+        display: 'flex',
+        gap: '20px',
+        margin: '20px auto',
+        maxWidth: '2040px',
+        overflowX: 'auto',
+        overflow: "hidden",
+        paddingBottom: '10px'
+      }}>
+
+        {datasetUsed?.bboxes_per_sample && bboxesHistogramData.length > 0 ? (
+          <div style={{
+            flex: '1',
+            minWidth: '500px',
+            maxWidth: 'calc(50% - 10px)'
+          }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ display: "inline-block", textAlign: "left" }}>
+                <h2 style={{ color: "white" }}>
+                  Number of Bounding Boxes per Image
+                </h2>
+                <div className={classes.datasetDividerDesc}></div>
+              </div>
+            </div>
+
+
+            <div style={{ width: '100%' }}>
+              <div style={{ display: "flex", alignContent: "center", flexDirection: "column", flexWrap: "wrap" }}>
+
+                <div
                   style={{
                     marginLeft: "30px",
                     marginRight: "30px",
                     overflowX: 'auto',
                     overflowY: 'hidden',
+                    width: '100%',
                     maxWidth: '100%',
                   }}
                 >
-                  <BarChartCustom
-                    data={labelToSamples}
-                    keyL="labels" />
-                </Box>
-              </Flex>
+                  <div style={{ display: "flex", flexDirection: "column", alignContent: "center" }}>
+                    <BarChartCustom
+                      data={bboxesHistogramData}
+                      keyL="bboxesHis"
+                      dynamicWidth={true}
+                      tooltipsSets={true}
+                      tooltipsUM="bounding boxes"
+                    />
+
+                    <p
+                      style={{
+                        fontSize: "0.875rem",
+                        marginTop: "0.25rem",
+                        color: "#868e96",
+                      }}
+                    >
+                      Bounding Boxes per Image
+                    </p>
+                  </div>
+                </div>
+
+              </div>
             </div>
-          </>
+          </div>
         ) : null}
 
-        <div style={{
-          display: 'flex',
-          gap: '20px',
-          margin: '20px auto',
-          maxWidth: '2040px',
-          overflowX: 'auto',
-          overflow: "hidden",
-          paddingBottom: '10px'
-        }}>
-          {datasetUsed?.bboxes_per_sample && bboxesHistogramData.length > 0 ? (
-            <div style={{
-              flex: '1',
-              minWidth: '500px',
-              maxWidth: 'calc(50% - 10px)'
-            }}>
-              <div style={{ textAlign: "center" }}>
-                <div style={{ display: "inline-block", textAlign: "left" }}>
-                  <Title order={2}>
-                    Number of Bounding Boxes per Image
-                  </Title>
-                  <div className={classes.datasetDividerDesc}></div>
-                </div>
-              </div>
+        {datasetUsed?.bboxes_areas && bboxesAreaHistogramData.length > 0 ? (
+          <div style={{
+            flex: '1',
+            minWidth: '500px',
+            maxWidth: 'calc(50% - 10px)'
+          }}>
 
-
-              <div style={{ width: '100%' }}>
-                <Flex
-                  justify="center"
-                  align="center"
-                  direction="column"
-                  wrap="wrap"
-                >
-                  <Box
-                    style={{
-                      marginLeft: "30px",
-                      marginRight: "30px",
-                      overflowX: 'auto',
-                      overflowY: 'hidden',
-                      width: '100%',
-                      maxWidth: '100%',
-                    }}
-                  >
-                    <Flex direction="column" align="center">
-                      <BarChartCustom
-                        data={bboxesHistogramData}
-                        keyL="bboxesHis"
-                        dynamicWidth={true}
-                        tooltipsSets={true}
-                        tooltipsUM="bounding boxes"
-                      />
-
-                      <Text size="sm" mt="xs" c="dimmed">
-                        Bounding Boxes per Image
-                      </Text>
-                    </Flex>
-                  </Box>
-                </Flex>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ display: "inline-block", textAlign: "left" }}>
+                <h2 style={{ color: "white" }}>
+                  Number of Bounding Boxes per Image
+                </h2>
+                <div className={classes.datasetDividerNum}></div>
               </div>
             </div>
-          ) : null}
 
-          {datasetUsed?.bboxes_areas && bboxesAreaHistogramData.length > 0 ? (
-            <div style={{
-              flex: '1',
-              minWidth: '500px',
-              maxWidth: 'calc(50% - 10px)'
-            }}>
+            <div style={{ width: '100%' }}>
+              <div style={{ display: "flex", flexDirection: "column", alignContent: "center", justifyContent: "center", flexWrap: "wrap" }}>
+                <div
+                  style={{
+                    marginLeft: "30px",
+                    marginRight: "30px",
+                    overflowX: 'auto',
+                    overflowY: 'hidden',
+                    width: '100%', // Usa tutta la larghezza disponibile
+                    maxWidth: '100%',
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", alignContent: "center" }}>
 
-              <div style={{ textAlign: "center" }}>
-                <div style={{ display: "inline-block", textAlign: "left" }}>
-                  <Title order={2}>
-                    Number of Bounding Boxes per Image
-                  </Title>
-                  <div className={classes.datasetDividerNum}></div>
+                    <BarChartCustom
+                      data={bboxesAreaHistogramData}
+                      keyL="bboxesHis"
+                      dynamicWidth={true}
+                      xAxisSets={true}
+                      tooltipsSets={true}
+                      tooltipsUM="px²"
+                    />
+                    <p
+                      style={{
+                        fontSize: "0.875rem",
+                        marginTop: "0.25rem",
+                        color: "#868e96",
+                      }}
+                    >
+                      Bounding Box Area (px²)
+                    </p>
+
+                  </div>
                 </div>
               </div>
-
-              <div style={{ width: '100%' }}>
-                <Flex
-                  justify="center"
-                  align="center"
-                  direction="column"
-                  wrap="wrap"
-                >
-                  <Box
-                    style={{
-                      marginLeft: "30px",
-                      marginRight: "30px",
-                      overflowX: 'auto',
-                      overflowY: 'hidden',
-                      width: '100%', // Usa tutta la larghezza disponibile
-                      maxWidth: '100%',
-                    }}
-                  >
-                    <Flex direction="column" align="center">
-                      <BarChartCustom
-                        data={bboxesAreaHistogramData}
-                        keyL="bboxesHis"
-                        dynamicWidth={true}
-                        xAxisSets={true}
-                        tooltipsSets={true}
-                        tooltipsUM="px²"
-                      />
-                      <Text size="sm" mt="xs" c="dimmed">
-                        Bounding Box Area (px²)
-                      </Text>
-                    </Flex>
-                  </Box>
-                </Flex>
-              </div>
             </div>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
-    </div>
+
+    </div >
   );
 }

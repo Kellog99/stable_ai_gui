@@ -1,7 +1,7 @@
 "use client"
 import { LucideIcon } from 'lucide-react';
 import React, { useState } from 'react';
-import styles from '../../styles/FileDropZone.module.css';
+import styles from '@/styles/FileDropZone.module.css';
 import SelectionButton from './utils/SelectionButtons';
 
 interface Section
@@ -51,7 +51,7 @@ export function FileDropZone ( { sections, defaultActiveSection }: FileDropZoneP
 
             <div style={ {
                 width:"30vw",
-                minHeight:"40vh",
+                height:"45vh",
                 border: "1px solid #ccc",
                 borderRadius: "8px",
                 background: "rgba(255, 255, 255, 0.4)",
