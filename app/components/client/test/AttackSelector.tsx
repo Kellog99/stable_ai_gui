@@ -13,9 +13,8 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
 }) => {
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-300 mb-3">
-        Attack Algorithm
-
+      <label style={{color:'grey'}}>
+        Choose the vulnerability to test:
       </label>
       <div className="relative">
         <select
@@ -31,7 +30,7 @@ export const AttackSelector: React.FC<AttackSelectorProps> = ({
             <option
               value={attack.id}
               key={attack.id}>
-              {attack.name}
+              {attack.name.charAt(0).toUpperCase()+attack.name.slice(1)}
             </option>
           ))}
         </select>

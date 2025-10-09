@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
 :root {
   --navy-900: #0f172a;
@@ -23,7 +18,7 @@
 
 html,
 body {
-  height: 100%;
+  height: 100vw;
   width: 100%;
 }
 
@@ -31,6 +26,10 @@ body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 25%, var(--navy-700) 50%, var(--navy-600) 75%, var(--navy-500) 100%);
-  padding: 4vw;
+  background: linear-gradient(135deg,
+      var(--navy-900) 0%,
+      var(--navy-800) 25%,
+      var(--navy-700) 50%,
+      var(--navy-600) 75%,
+      var(--navy-500) 100%);
 }

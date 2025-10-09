@@ -1,17 +1,13 @@
 .container {
   display: flex;
+  height: 5.5vw;
   width: 100%;
   background-color: rgb(62, 129, 236, 0.2);
-  height: 60px;
   padding: 40px;
   margin: 0 auto;
   align-items: center;
   justify-content: space-between;
   border-radius: 2vw;
-}
-
-.logo {
-  height: 1.4vw;
 }
 
 
@@ -22,12 +18,21 @@
 }
 
 .title {
+  display: flex;
+  flex-direction: column;
   color: white;
-  font-size: 1.5;
+  gap: 2px
+}
+
+.title p {
+  font-size: 1.7vw;
   font-weight: 900;
-  align-items: center;
-  align-content: center;
-  text-align: center;
+  margin: 0;
+}
+
+.logo {
+  height:1.4vw;
+  margin: 0 1vw 0 1vw;
 }
 
 .indicators {

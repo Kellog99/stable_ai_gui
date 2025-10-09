@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Play, Shield } from 'lucide-react';
+import { Play, Settings2, Shield } from 'lucide-react';
 import { ImageUploader } from '@/components/client/test/ImageUploader';
 import { AttackSelector } from '@/components/client/test/AttackSelector';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
 import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
 import { AttackResult, AttackStats } from '@/interfaces/testInterfaces';
-import { listAttacks } from '../prova';
 import styles from '@/styles/Test.module.css';
 import { AttackProps } from '@/interfaces/NNInterfaces';
 
@@ -23,13 +22,24 @@ function Test() {
     // Initialize with default values, will be updated in useEffect
     const [attackList, setAttackList] = useState<AttackProps[]>([]);
     const [selectedAttack, setSelectedAttack] = useState<AttackProps | undefined>()
+
     useEffect(() => {
-        setAttackList(listAttacks);
-        if (listAttacks.length > 0) {
-            const firstAttack = listAttacks[0];
-            setSelectedAttack(firstAttack)  // This updates selectedAttack
+        async function fetchItem() {
+            // fetching the attacks
+            try {
+                const response = await fetch('http://127.0.0.1:8000/attacks/getInfo');
+                if (!response.ok) {
+                    throw new Error(`HTTP error for the attack List! Status: ${response.status}`);
+                }
+                const json = await response.json();
+                setAttackList(json);
+
+            } catch (err) {
+                console.log(err instanceof Error ? err.message : "An error occurred");
+            }
         }
-    }, []); // This dependency causes the effect to run again when selectedAttack changes
+        fetchItem();
+    }, []);
 
 
     const handleImageUpload = (file: File, imageUrl: string) => {
@@ -51,6 +61,7 @@ function Test() {
             setClicked(!clicked)
         }
     }
+    const [advanceOption, setAdvanceOption] = useState<boolean>(false)
     return (
         <div className={styles.test}>
             {/* Header */}
@@ -84,9 +95,19 @@ function Test() {
                             <b>Description: </b>{selectedAttack?.description}
                         </p>
                     </div>
-
-                    <ParameterControls parameters={selectedAttack?.parameters} />
-
+                    <div className={styles.advance_option}>
+                        <h2>Advance Settings  </h2>
+                        <button
+                            onClick={() => setAdvanceOption(!advanceOption)}
+                            className={styles.option_button}>
+                            <Settings2 size={27} color='gray' />
+                        </button>
+                    </div>
+                    {
+                        advanceOption ?
+                            <ParameterControls parameters={selectedAttack?.parameters} />
+                            : null
+                    }
                     <button
                         disabled={!uploadedFile}
                         className={styles.execute_button}

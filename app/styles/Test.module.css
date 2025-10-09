@@ -74,12 +74,37 @@
   }
 }
 
-.results_column{
+.results_column {
   display: flex;
   flex-direction: column;
 }
-.image_grid{
+
+.image_grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   column-gap: 2vw;
+}
+
+
+.advance_option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+}
+
+.option_button {
+  height: 100%;
+  width: 100;
+  background-color: transparent;
+  align-items: center;
+  align-self: center;
+  border-color: transparent;
+  transform: translate(0, 2px);
+
+}
+
+.option_button:hover {
+  transform: translate(0, 4px);
 }

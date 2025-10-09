@@ -25,6 +25,12 @@
     outline: none;
 }
 
+/* ################# Image display ################# */
+.container-parameters{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 .block-parameters {
     display: flex;
     flex-direction: column;
@@ -49,16 +55,17 @@
 
 /* ################# Image display ################# */
 .image-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    height: 100%;
+    width: 100%;
 }
 
 .image-title {
-    font-size: 1.25rem;
+    font-size: 1.2vw;
     font-weight: 600;
     color: white;
     text-align: center;
+    align-content: center;
+    height: 5vw;
 }
 
 .image {

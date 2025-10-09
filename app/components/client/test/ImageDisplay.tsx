@@ -17,7 +17,9 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
 
   return (
     <div className="image-wrapper">
-      <h3 className="image-title">Display {title}</h3>
+      <h3 className="image-title">
+        {title}
+      </h3>
       <div className="image">
         {imageUrl ? (
           <img
