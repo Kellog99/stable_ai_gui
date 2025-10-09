@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
+
 export interface ModelSpecs {
     name: string;
     task: string;

@@ -2,7 +2,7 @@ import { getModels } from "@/functionalities/NNTrustBackendUtils";
 import useStore from "@/store/nnTrustStore";
 import styles from "@/styles/ModelCard.module.css";
 import { Brain } from 'lucide-react';
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export function ModelCard ()
 {

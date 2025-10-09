@@ -35,6 +35,8 @@ interface AppState
   showOverview: boolean;
   collapsed: boolean;
 
+  activeTask: string;
+
   
 
 
@@ -65,6 +67,8 @@ interface AppState
 
   setShowOverview: (showOverview: boolean) => void;
   setCollapsed: (collapsed: boolean) => void;
+
+  setActiveTask: ( activeTask: string ) => void;
 
 }
 
@@ -99,6 +103,8 @@ const useStore = create<AppState>()(
 
       collapsed: false,
 
+      activeTask: "",
+
 
       setData: ( datasetUsed ) => set( { datasetUsed } ),
       setDatasets: ( datasets: Dataset[] | null ) => set( { datasets } ),
@@ -128,6 +134,8 @@ const useStore = create<AppState>()(
 
       setShowOverview: ( showOverview: boolean ) => set( { showOverview } ),
       setCollapsed: ( collapsed: boolean ) => set( { collapsed } ),
+
+      setActiveTask: ( activeTask: string ) => set( { activeTask } ),
     } ),
 
     {
@@ -141,6 +149,7 @@ const useStore = create<AppState>()(
         prototypesData: state.prototypesData,
         labelProtoData:state.labelProtoData,
         labelToSamples: state.labelToSamples,
+        activeTask: state.activeTask,
         //featureToDisplay: state.featureToDisplay
         // queryDataset is NOT included, so it won't be persisted
       } ),
