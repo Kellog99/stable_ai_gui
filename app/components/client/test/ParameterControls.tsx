@@ -14,14 +14,18 @@ export function ParameterControls({ parameters }: { parameters: ParametersProps[
     setValues(newValues);
   }
   return (
-    <div className="mb-6">
-      <h3 className="text-sm font-medium text-gray-300 mb-3">Attack Parameters</h3>
+    <div className='container-parameters'>
+      <div>
+        <p style={{ color: 'gray' }}>
+          Here it is possible to set manually some parameters that characterize the attack.
+        </p>
+      </div>
       <div className='block-parameters'>
         {parameters.map((parameter, index) => (
           <div
             className='parameter'
             key={parameter.name}>
-            <h3> {parameter.name}</h3>
+            <h4> {parameter.name.charAt(0).toUpperCase() + parameter.name.slice(1)}</h4>
             <p style={{ fontSize: "1vw" }}>{parameter.description}</p>
             <div className='value'>
               <input

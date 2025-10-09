@@ -61,7 +61,7 @@ const Header = () => {
 
       {/* Title */}
       <div className={styles.title}>
-        <h1 >TrustWorthy</h1>
+        <p>TrustWorthy</p>
         <img
           src="/logo_leonardo.png"
           alt="logo"

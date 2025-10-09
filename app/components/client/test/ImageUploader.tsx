@@ -10,35 +10,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   onImageUpload,
   uploadedImage
 }) => {
-  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        onImageUpload(file, imageUrl);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, [onImageUpload]);
+  
 
-  const handleDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const file = event.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target?.result as string;
-        onImageUpload(file, imageUrl);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, [onImageUpload]);
-
-  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  }, []);
-
+  
   return (
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -46,9 +20,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       </label>
       {uploadedImage ? (
         <div className="relative">
-          <img 
-            src={uploadedImage} 
-            alt="Uploaded" 
+          <img
+            src={uploadedImage}
+            alt="Uploaded"
             className="w-full h-48 object-cover rounded-lg border border-gray-600"
           />
           <div className="absolute top-2 right-2">
@@ -57,7 +31,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               <input
                 type="file"
                 accept="image/*"
-                onChange={handleFileChange}
+                // onChange={handleFileChange}
                 className="hidden"
               />
             </label>
@@ -65,8 +39,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         </div>
       ) : (
         <div
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
+          // onDrop={handleDrop}
+          // onDragOver={handleDragOver}
           className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer"
         >
           <label className="cursor-pointer">
@@ -76,7 +50,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             <input
               type="file"
               accept="image/*"
-              onChange={handleFileChange}
+              // onChange={handleFileChange}
               className="hidden"
             />
           </label>

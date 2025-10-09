@@ -1,5 +1,5 @@
 "use client";
-import AppNavbar from "@/components/layout/AppNavbar";
+import Navbar from "@/components/layout/Navbar";
 import useStore from "@/store/dsStore";
 import {
   AppShell,
@@ -7,7 +7,6 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import "@mantine/core/styles.css";
-import classes from "./layout.module.css";
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -16,18 +15,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <MantineProvider >
       <AppShell withBorder={false}>
-        <Container
-          size="100%"
-          className={`${classes.mainContainer} ${collapsed ? classes.collapsed : ""}`}
-        >
-          <div className={`${classes.customNavbar} ${collapsed ? classes.collapsed : ""}`}>
-            <div className={classes.navbarContent}>
-              <AppNavbar />
-            </div>
-          </div>
-
-        </Container>{children}
-      </AppShell>
-    </MantineProvider>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          gap: '3vw',
+          height: '100%',
+          paddingTop: '20px'
+        }}>
+        <Navbar />
+        {children}
+      </div>
+    </AppShell>
+    </MantineProvider >
   );
 }

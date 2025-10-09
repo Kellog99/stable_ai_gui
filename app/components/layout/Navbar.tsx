@@ -1,100 +1,60 @@
-import React, { useState } from 'react'
-import { Box, Burger, Divider, Space, Stack, Text } from "@mantine/core";
+"use client";
 
-interface NavbarProps {
+import { usePathname } from "next/navigation";
+import { DQsections, NavigationSection, TitannSections } from "./config";
+import { useEffect, useState } from "react";
+import { Burger } from "@mantine/core";
+import React from "react";
+import NavigationButton from "./NavigationButton";
+import './Navbar.css'
 
-}
+export default function Navbar() {
+    const pathName = usePathname();
+    const isNNTrust = pathName.includes('/redteam');
+    const [sections, setSections] = useState<NavigationSection[]>([])
+    const [isClosed, setIsClosed] = useState<boolean>(true)
+    const [key, setKey] = useState<string>("")
+    // selecting the relative Navbar
+    useEffect(() => {
+        setSections(isNNTrust ? TitannSections : DQsections)
+    }, [isNNTrust])
+
+    // updating the starting section every time the "sections" variable is changed
+    useEffect(() => {
+        if (sections.length > 0) {
+            setKey(sections[0].key)
+        }
+    }, [sections])
 
 
-const Navbar: React.FC<NavbarProps> = () => {
-    // handle the burger button
-    const [collapsed, setCollapsed] = useState<boolean>(true)
-
+    const getTooltipLabel = (requiresDataset?: boolean, requiresEmbeddings?: boolean) => {
+        if (requiresDataset) return "Requires dataset";
+        if (requiresEmbeddings) return "Requires embeddings";
+        return "";
+    }
+    const isActive = (id: string) => {
+        return id === key
+    }
     return (
-        <Box
-            style={{
-                height: '100%',
-                width: collapsed ? '50px' : '250px',
-                transition: 'width 0.3s ease',
+        <div className="navbar-container">
 
-            }}
-        >
-            <Box
-                p="sm"
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: collapsed ? 'center' : 'space-between'
-                }}
-            >
+            <Burger
+                opened={!isClosed}
+                onClick={() => setIsClosed(!isClosed)}
+                aria-label="Toggle navigation"
+                lineSize={4}
+            />
 
-                <Burger
-                    opened={collapsed}
-                    // onClick={toggleCollapsed}
-                    aria-label="Toggle navigation"
-                    size="sm"
-                    color="white"
+            {sections.map((item) => (
+                <NavigationButton
+                    section={item}
+                    isActive={isActive}
+                    collapsed={isClosed}
+                    handlekey={setKey}
+                    level={0}
                 />
-            </Box>
+            ))}
 
-            {/* <Box p={collapsed ? "xs" : "md"}>
-                {!collapsed && <Divider />}
-                <Stack h="100%" gap="md" mt="md">
-                    <Box>
-                        {mainNavigation.map((item) => (
-                            <React.Fragment key={item.key}>
-                                <NavigationButton
-                                    href={item.href}
-                                    icon={item.icon}
-                                    label={item.label}
-                                    isActive={isActive(item.href)}
-                                    disabled={isItemDisabled(item)}
-                                    tooltipLabel={getTooltipLabel(item.requiresDataset, item.requiresEmbeddings)}
-                                    collapsed={collapsed}
-                                />
-                                {item.key === 'datasets' && <Space h="xs" />}
-                            </React.Fragment>
-                        ))}
-                    </Box>
-
-                    {!collapsed && <Divider />}
-
-
-                    {sections.map((section) => (
-                        <CollapsibleSection
-                            key={section.key}
-                            title={section.title}
-                            icon={section.icon}
-                            isVisible={
-                                section.key === 'visualization' ? visualVisible :
-                                    section.key === 'metrics' ? metricVisible :
-                                        section.key === 'actions' ? actionVisible : false
-                            }
-                            onToggle={() => toggleSection(
-                                section.key === 'visualization' ? 'visualVisible' :
-                                    section.key === 'metrics' ? 'metricVisible' : 'actionVisible'
-                            )}
-                            collapsed={collapsed}
-                        >
-                            {section.items.map((item) => (
-                                <NavigationButton
-                                    key={item.key}
-                                    href={item.href}
-                                    icon={item.icon}
-                                    label={item.label}
-                                    isActive={isActive(item.href)}
-                                    disabled={isItemDisabled(item)}
-                                    tooltipLabel={getTooltipLabel(item.requiresDataset, item.requiresEmbeddings)}
-                                    collapsed={collapsed}
-                                />
-                            ))}
-                        </CollapsibleSection>
-                    ))}
-
-                </Stack>
-            </Box> */}
-        </Box>
+        </div>
     )
 }
-
-export default Navbar
