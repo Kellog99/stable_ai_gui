@@ -1,60 +1,40 @@
+import { getModels } from "@/functionalities/NNTrustBackendUtils";
 import useStore from "@/store/nnTrustStore";
 import styles from "@/styles/ModelCard.module.css";
 import { Brain } from 'lucide-react';
-
-interface ModelCardProps
-{
-    name: string;
-    task: string;
-    numClasses: number;
-}
-
+import { useEffect, useState } from "react";
 
 export function ModelCard ()
 {
     const setModelName = useStore( ( state ) => state.setModelName )
     const modelName = useStore( ( state ) => state.modelName )
-    
-    const models = [ {
-        name: "resnet",
-        task: "classification",
-        numClasses: 1000,
-        pretrained: true,
-        mode: "timm"
-    }, {
-        name: "bert",
-        task: "text classification",
-        numClasses: 2,
-        pretrained: true,
-        mode: "transformers"
-    },
-    {
-        name: "custom_cnn",
-        task: "image classification",
-        numClasses: 10,
-        pretrained: false,
-        mode: "custom"
-    }, {
-        name: "gpt-3",
-        task: "text generation",
-        numClasses: 0,
-        pretrained: true,
-        mode: "transformers"
-    } ]
+    const setModels = useStore( ( state ) => state.setModels )
+    const models = useStore( ( state ) => state.models )
 
 
     const handleClick = ( clickedModelName: string ) =>
     {
         setModelName( clickedModelName );
-        if (clickedModelName === modelName){
-            setModelName(null);
+        if ( clickedModelName === modelName ) {
+            setModelName( null );
         }
     }
+
+    useEffect( () =>
+    {
+        getModels().then( ( fetchedModels ) =>
+        {
+            console.log( "Fetched models:", fetchedModels );
+            setModels( fetchedModels.models );
+        } )
+    }, [] )
+
+    console.log( "Models from store:", models );
 
     return (
         <>
             <div className={ styles.modelsContainer }>
-                { models.map( ( model, index ) => (
+                { models?.map( ( model, index ) => (
                     <div
                         className={ `${styles.card} ${modelName === model.name ? styles.cardSelected : ""
                             }` }

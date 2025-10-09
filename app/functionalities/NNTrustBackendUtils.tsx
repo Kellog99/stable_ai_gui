@@ -18,7 +18,6 @@ export async function getModels() {
   if (!response.ok) throw new Error('Failed to get model info from the backend');
 
   const modelsList = await response.json();
-  console.log("MODELS list", modelsList)
   return modelsList
 }
 

@@ -1,4 +1,4 @@
-import { Job } from "@/interfaces/NNInterfaces";
+import { Job, ModelSpecs } from "@/interfaces/NNInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -6,14 +6,14 @@ interface AppState
 {
   dataset: Object | null;
   datasets: string[] | null;
-  models: string[] | null;
+  models: ModelSpecs[] | null;
   allJobs: Job[];
   modelName: string | null;
   
 
   setDataset: ( dataset: Object | null ) => void;
   setDatasets: (datasets: string[] | null) => void;
-  setModels: (models: string[] | null) => void;
+  setModels: (models: ModelSpecs[] | null) => void;
   setAllJobs: (allJobs: Job[]) => void;
   setModelName: (modelName: string | null) => void;
   
