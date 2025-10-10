@@ -23,7 +23,7 @@ type Props = {
     infoModal: React.ReactNode
 };
 
-export function DragDrop({ config, infoModal }: Props) {
+export const DragDrop = ({ config, infoModal }: Props) => {
     const [file, setFile] = useState<File | null>(null);
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);

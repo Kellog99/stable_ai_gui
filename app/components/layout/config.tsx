@@ -20,7 +20,7 @@ export const DQsections: NavigationSection[] = [
             {
                 key: 'embeddings',
                 title: 'Embeddings',
-                href: '/pages/dataquality/embeddings',
+                href: '/pages/tasks/dataquality/embeddings',
                 icon: ChartScatter,
                 // requiresEmbeddings: true,
 
@@ -28,7 +28,7 @@ export const DQsections: NavigationSection[] = [
             {
                 key: 'prototypes',
                 title: 'Prototypes',
-                href: '/pages/dataquality/prototypes',
+                href: '/pages/tasks/dataquality/prototypes',
                 icon: Bot,
                 // requiresEmbeddings: true,
 
@@ -43,7 +43,7 @@ export const DQsections: NavigationSection[] = [
             {
                 key: 'duplicates',
                 title: 'Duplicates',
-                href: '/pages/dataquality/metrics/duplicates',
+                href: '/pages/tasks/dataquality/metrics/duplicates',
                 icon: BookCopy,
                 // requiresEmbeddings: true,
 
@@ -51,7 +51,7 @@ export const DQsections: NavigationSection[] = [
             {
                 key: 'outliers',
                 title: 'Outliers',
-                href: '/pages/dataquality/metrics/outliers',
+                href: '/pages/tasks/dataquality/metrics/outliers',
                 icon: ShieldX,
                 // requiresEmbeddings: true,
 
@@ -59,7 +59,7 @@ export const DQsections: NavigationSection[] = [
             {
                 key: 'completeness',
                 title: 'Completeness',
-                href: '/pages/dataquality/metrics/completeness',
+                href: '/pages/tasks/dataquality/metrics/completeness',
                 icon: CircleCheck,
                 // requiresEmbeddings: true,
 
@@ -74,20 +74,20 @@ export const DQsections: NavigationSection[] = [
             {
                 key: 'embedder',
                 title: 'Embedder',
-                href: '/pages/dataquality/actions/embeddings',
+                href: '/pages/tasks/dataquality/actions/embeddings',
                 icon: ChartScatter,
             },
             {
                 key: 'cleanDuplicates',
                 title: 'Clean Duplicates',
-                href: '/pages/dataquality/actions/cleanDuplicates',
+                href: '/pages/tasks/dataquality/actions/cleanDuplicates',
                 icon: Eraser
                 // requiresEmbeddings: true,
             },
             {
                 key: 'cropping',
                 title: 'Cropping',
-                href: '/pages/dataquality/actions/cropping',
+                href: '/pages/tasks/dataquality/actions/cropping',
                 icon: Crop
             },
         ],

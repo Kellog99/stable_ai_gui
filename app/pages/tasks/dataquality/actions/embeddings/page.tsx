@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCust } from '@/components/client/AlertCustom';
-import AsyncTaskTracker from '@/components/client/tracker_spinner_v2';
+import AsyncTaskTracker from '@/components/client/AsyncTracker'
 import { getModelInfo } from '@/functionalities/BackendUtils';
 import { ModelInfo } from '@/interfaces/genericInterface';
 import classes from "@/pages/tasks/dataquality/datasets/page.module.css";

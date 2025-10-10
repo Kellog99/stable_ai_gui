@@ -282,7 +282,7 @@ export default function Datasets() {
 
 
   return (
-    <div>
+    <div className={classes.pageContainer}>
       <div
         className={classes.title}
         style={{ display: "flex", flexDirection: "column", gap: "0px" }}
@@ -425,7 +425,7 @@ export default function Datasets() {
       </div>
 
 
-      <h2 style={{ color: "white" }}>Description</h2>
+      <h2 style={{ color: "white", marginBottom: "0px" }}>Description</h2>
       <div className={classes.datasetDividerDesc}></div>
 
       <div style={{ display: 'flex', marginBottom: '30px' }}>
@@ -448,7 +448,7 @@ export default function Datasets() {
 
       {datasetUsed?.samples_per_class ? (
         <>
-          <h2 style={{ color: "white" }}>Numerosity per class</h2>
+          <h2 style={{ color: "white", marginBottom: "0px" }}>Numerosity per class</h2>
           <div className={classes.datasetDividerNum}></div>
           <div style={{ margin: '20px' }}>
             <div style={{
@@ -464,7 +464,7 @@ export default function Datasets() {
                   marginRight: "30px",
                   overflowX: 'auto',
                   overflowY: 'hidden',
-                  maxWidth: '100%',
+                  maxWidth: '60vw',
                 }}
               >
                 <BarChartCustom

@@ -45,8 +45,9 @@ export default function Navbar() {
                 lineSize={4}
             />
 
-            {sections.map((item) => (
+            {sections.map((item, index) => (
                 <NavigationButton
+                    key={index}
                     section={item}
                     isActive={isActive}
                     collapsed={isClosed}

@@ -1,5 +1,6 @@
 .container {
   width: 100%;
+  margin-top: 2rem;
   max-width: 42rem; /* max-w-2xl */
   margin: 0 auto;
   padding: 1.5rem;

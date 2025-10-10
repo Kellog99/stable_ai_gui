@@ -1,3 +1,9 @@
+.pageContainer {
+  width: 100%;
+  overflow: hidden;
+}
+
+
 .title {
   display: flex;
   flex-direction: column;
@@ -72,6 +78,7 @@
   -webkit-background-clip: text;
   /* Safari support */
   color: transparent;
+  margin: 0
   /* same as text-transparent */
 }
 
@@ -88,6 +95,7 @@
   background: #3b82f6;  
   border-radius: 9999px; /* Tailwind rounded-full */
   margin-bottom: 15px;
+ 
 }
 
 .datasetDividerNum {
