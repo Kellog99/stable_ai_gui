@@ -13,7 +13,6 @@ import { MousePointerClick, Zap } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from "./page.module.css";
-// import AsyncTaskTracker from '@/components/client/AsyncTaskTracker';
 
 export default function Embedder ()
 {
@@ -21,10 +20,6 @@ export default function Embedder ()
   const [ featureName, setFeatureName ] = useState<string>( "" )
   const [ modelName, setModelName ] = useState<string | null>( "" )
   const [ features, setFeatures ] = useState<string[]>( [] )
-  const datasetName = useStore( ( state ) => state.datasetUsed )?.name
-  const [ progress, setProgress ] = useState( 0 );
-  const [ result, setResult ] = useState<string | null>( null );
-  const [ projecting, setProjecting ] = useState<boolean>( false );
   const [ computing, setComputing ] = useState<boolean>( false );
   const [ loadingInfo, setLoadingInfo ] = useState<boolean>( false );
   const [ modelInfo, setModelInfo ] = useState<ModelInfo | null>( null );
@@ -61,76 +56,6 @@ export default function Embedder ()
   }, [ showPrecompiled ] );
 
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
-  const setData = useStore( ( state ) => ( state.setData ) );
-
-  {/*
-  async function computeEmbeddings(model: string) {
-  
-    const baseUrl = embedder_get
-
-    const url = new URL(baseUrl);
-
-    // Option 1: Pass datasets as a single comma-separated list
-    url.searchParams.append('featureName', featureName);
-    url.searchParams.append('datasetName', datasetUsed?.name as string);
-    url.searchParams.append('modelUsed', model)
-    const response = await fetch(url);
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-
-    if (reader) {
-      try {
-        while (true) {
-          // Read a chunk from the stream
-
-          const { done, value } = await reader.read();
-
-          if (done) {
-            console.log("Stream complete");
-            break;
-          }
-
-          // Decode the bytes to string
-          const text = decoder.decode(value, { stream: true });
-          console.log(text)
-          // Process the SSE format (data: {...})
-          const lines = text.split('\n\n');
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const jsonData = JSON.parse(line.substring(6));
-                console.log('Received progress update:', jsonData);
-
-                // Handle the progress update
-                if (jsonData.status === "complete") {
-                  console.log("Process completed:", jsonData.result);
-                  if (jsonData.dataset) {
-                    const dataset = await GetDatasetAndSave(jsonData.dataset)
-                    setData(dataset)
-                  }
-                  setResult(jsonData.result)
-                } else if (jsonData.progress !== undefined) {
-                  // Update progress if available
-                  console.log(`Progress: ${jsonData.progress}%`);
-                  setProgress(jsonData.progress)
-                } else if (jsonData.status == "projecting") {
-                  setProjecting(true);
-                }
-              } catch (e) {
-                // Handle potential JSON parsing errors
-                console.error('Error parsing SSE data:', e);
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error reading stream:', error);
-      } finally {
-        reader.releaseLock(); // Always release the lock when done
-      }
-    }
-  }
-*/}
 
   const config = {
     datasetName: datasetUsed?.name,
@@ -186,7 +111,6 @@ export default function Embedder ()
   {
     setComputing( true )
     if ( modelName ) {
-      //computeEmbeddings(modelName)
       setCompute( true )  // this is going to trigger the tracker spinner 
     }
   }
@@ -363,7 +287,6 @@ export default function Embedder ()
 
       </Flex>
 
-
       { compute || activeTask ? (
         <AsyncTaskTracker
           startEndpoint={ 'http://localhost:8000/actions/embedder' }
@@ -373,76 +296,6 @@ export default function Embedder ()
           pollInterval={ 0 }
           progressDisplayMode={ true } />
       ) : null }
-
-      {/*
-
-      {computing && result == null ? (
-
-        <div>
-          <Center>
-            {projecting ?
-              <Text size="sm" style={{ marginTop: "60px" }}>Projecting embeddings...</Text>
-              : <Text size="sm" style={{ marginTop: "60px" }}>Computing embeddings...</Text>}
-
-          </Center>
-
-          <Box style={{ position: 'relative', marginTop: 60 }}>
-            <Progress
-              value={progress}
-              size="xl"
-              radius="xl"
-              color="red"
-              striped
-              animated
-              style={{
-                height: "30px"
-              }}
-            />
-            <Text
-              size="sm"
-              fw={700}
-              c="black"
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                pointerEvents: 'none',
-              }}
-            >
-              {progress}%
-            </Text>
-          </Box>
-
-
-        </div>
-      ) :
-        result == "Complete!" ? (<>
-          <AlertCust result={'success'} textToDisplay={`The ${featureName} feature has been correctly embedded and added to schema.`} />
-        </>
-        ) : result == "Feature is already embedded!" ? (
-          <>
-            <AlertCust
-              result={'warning'}
-              textToDisplay={<>
-                The {featureName} feature is already embedded. Check the dataset schema{" "}
-                <Link
-                  href={{
-                    pathname: "/pages/dataquality/datasets",
-                    query: { datasetName: datasetName }
-                  }}
-                  style={{ color: 'blue' }}
-                >
-                  here
-                </Link>.
-
-              </>} />
-          </>
-
-
-        ) : null
-      }
-        */}
     </div >
   );
 }

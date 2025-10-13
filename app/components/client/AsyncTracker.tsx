@@ -27,10 +27,8 @@ interface AsyncTaskTrackerProps {
   progressEndpoint: string;
   pollInterval: number;
   progressDisplayMode: boolean;
-  onComplete?: (result: any) => void;
-  onError?: (error: Error) => void;
 }
-export default function AsyncTaskTracker({ startEndpoint, startParams, startBody, progressEndpoint, pollInterval, progressDisplayMode = true, onComplete, onError }: AsyncTaskTrackerProps) {
+export default function AsyncTaskTracker({ startEndpoint, startParams, startBody, progressEndpoint, pollInterval, progressDisplayMode = true }: AsyncTaskTrackerProps) {
   const [status, setStatus] = useState('idle');
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState('');
@@ -78,7 +76,6 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
       setStatus('error');
       setError(err.message);
       setMessage('Failed to start task');
-      if (onError) onError(err);
     }
   };
 
@@ -124,7 +121,7 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
 
 
   useEffect(() => {
-    if (!activeTask || status === 'complete' || status === 'error') {
+    if (!activeTask || status === 'error') {
       return;
     }
 
@@ -137,6 +134,7 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
   }, [activeTask]);
 
 
+  console.log("STATUS:", status);
 
   return (
     <div className={styles.container}>
@@ -191,7 +189,7 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
           {result && (
             <div className={styles.resultBox}>
               <pre className={styles.resultText}>
-                {JSON.stringify(result, null, 2)}
+                {result}
               </pre>
             </div>
           )}
