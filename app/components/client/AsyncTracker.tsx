@@ -80,6 +80,7 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
   };
 
   const pollProgress = async () => {
+    
     try {
       const url = `${progressEndpoint}?task_id=${activeTask}`;
       const response = await fetch(url);

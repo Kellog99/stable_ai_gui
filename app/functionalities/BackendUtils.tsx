@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { completeness_post, completenessOK_get, data_get, duplicates_post, model_info_get, outliers_post, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
+import { completeness_start, completenessOK_get, data_get, duplicates_start, model_info_get, outliers_start, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -93,7 +93,7 @@ export async function getPrototypes(datasetName: string, featureName: string, la
 
 
 export async function getDuplicates(datasetName: string, featureName: string, internalConfig: Object) {
-  const response = await fetch(`${duplicates_post}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}`, {
+  const response = await fetch(`${duplicates_start}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }, // binary content type
     body: JSON.stringify(internalConfig),
@@ -109,7 +109,7 @@ export async function getDuplicates(datasetName: string, featureName: string, in
 
 export async function getOutliers(datasetName: string, featureName: string, internalConfig: Object, outliers_mode: string) {
 
-  const response = await fetch(`${outliers_post}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&outliersMode=${encodeURIComponent(outliers_mode)}`, {
+  const response = await fetch(`${outliers_start}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}&outliersMode=${encodeURIComponent(outliers_mode)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }, // binary content type
     body: JSON.stringify(internalConfig),
@@ -125,7 +125,7 @@ export async function getOutliers(datasetName: string, featureName: string, inte
 
 export async function getCompleteness(datasetName: string, featureName: string, internalConfig: Object) {
 
-  const response = await fetch(`${completeness_post}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}`, {
+  const response = await fetch(`${completeness_start}?datasetName=${encodeURIComponent(datasetName)}&featureName=${encodeURIComponent(featureName)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }, // binary content type
     body: JSON.stringify(internalConfig),
