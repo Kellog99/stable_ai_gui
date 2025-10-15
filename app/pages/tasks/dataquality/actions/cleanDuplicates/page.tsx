@@ -104,6 +104,7 @@ export default function CleanDuplicates ()
       ) : featureName !== "" && result === null && (compute || activeTask) ? (
 
         <AsyncTaskTracker
+          action={ "clean_duplicates" }
           startEndpoint={ cleaner_start }
           startParams={ config }
           startBody={ undefined }

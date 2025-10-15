@@ -12,8 +12,9 @@ import { useDisclosure } from "@mantine/hooks";
 import { Settings } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import useStore from '../../../store/dsStore';
-import classes from "../../../styles/Config.module.css";
+
+import useStore, { useActionStore } from "@/store/dsStore";
+import classes from "@/styles/Config.module.css";
 import { AlertCust } from "../AlertCustom";
 import AsyncTaskTracker from "../AsyncTracker";
 import CompletenessDisplayer from "./displayer/CompletenessDisplayer";
@@ -38,6 +39,12 @@ export default function Config ( props: ConfigsProps )
     const [ labelFeatures, setLabelFeatures ] = useState<string[]>( [] )
     const [ isLoading, setIsLoading ] = useState<boolean>( false )
     const [ computed, setComputed ] = useState<boolean>( false )
+
+    const waitForActionResult = useActionStore( ( s ) => s.waitForActionResult );
+    const actionResult = useActionStore( ( s ) => s.actionResult );
+    const setActionResult = useActionStore( ( state ) => state.setActionResult );
+
+
     const [ duplicates, setDuplicates ] = useState<DuplicatesDTO | null>( null )
     const [ outliers, setOutliers ] = useState<OutliersDTO | null>( null )
     const [ completeness, setCompleteness ] = useState<CompletenessDTO | null>( null )
@@ -125,18 +132,22 @@ export default function Config ( props: ConfigsProps )
 
     const setAddToReport = useStore( ( state ) => state.setAddToReport )
 
-    console.log( "REPORT", report )
-
     const endoPointMap: Record<string, string> = {
         duplicates: duplicates_start,
         outliers: outliers_start,
         completeness: completeness_start
     };
 
+    let adjustedOutliersMode = outliers_mode;
+
+    if ( outliers_mode === "isolation forest" ) {
+        adjustedOutliersMode = "iforest";
+    }
+
     const configTracker = {
         datasetName: datasetUsed?.name,
         featureName: featureName,
-        ...( props.metricName === "outliers" && { outliersMode: outliers_mode } ),
+        ...( props.metricName === "outliers" && { outliersMode: adjustedOutliersMode } ),
     };
 
     useEffect( () =>
@@ -211,22 +222,14 @@ export default function Config ( props: ConfigsProps )
             setIsLoading( true );
             setComputeNow( true );
 
-            {/*
             try {
-                const data = await metricsFetcher(
-                    props.metricName as MetricType,
-                    datasetName as string,
-                    featureName,
-                    internalConfigs,
-                    labelFeatureName,
-                    outliers_mode
-                );
+                const results = await waitForActionResult();
 
-                if ( props.metricName === "duplicates" ) setDuplicates( data );
-                if ( props.metricName === "outliers" ) setOutliers( data );
-                if ( props.metricName === "completeness" ) setCompleteness( data );
+                if ( props.metricName === "duplicates" ) setDuplicates( results.data as DuplicatesDTO );
+                if ( props.metricName === "outliers" ) setOutliers( results.data as OutliersDTO );
+                if ( props.metricName === "completeness" ) setCompleteness( results.data as CompletenessDTO );
 
-                newReportMetric.results = data;
+                newReportMetric.results = results.data;
                 newReportMetric.internalConfigs = internalConfigs;
 
             } catch ( error ) {
@@ -238,7 +241,7 @@ export default function Config ( props: ConfigsProps )
                 setIsDuplicate( false )
                 setReportMetric( newReportMetric )
             }
-                */}
+
         } else if ( isDuplicate ) {
             setIsDuplicate( true )
             setClicked( false )
@@ -334,6 +337,8 @@ export default function Config ( props: ConfigsProps )
                                 if ( showFeatureError ) setShowFeatureError( false );
                             } }
                             required
+                            clearable
+                            onClear={ () => setActionResult( { origin: "", data: {} } ) }
                             styles={ ( theme ) => ( {
                                 input: {
                                     borderColor: showFeatureError ? theme.colors.red[ 6 ] : undefined,
@@ -371,6 +376,8 @@ export default function Config ( props: ConfigsProps )
                                     if ( showLabelError ) setShowLabelError( false );
                                 } }
                                 required={ true }
+                                clearable
+                                onClear={ () => setActionResult( { origin: "", data: {} } ) }
                                 styles={ ( theme ) => ( {
                                     input: {
                                         borderColor: showLabelError ? theme.colors.red[ 6 ] : undefined,
@@ -415,6 +422,8 @@ export default function Config ( props: ConfigsProps )
                                 }
                             } }
                             required={ true }
+                            clearable
+                            onClear={ () => setActionResult( { origin: "", data: {} } ) }
                             styles={ ( theme ) => ( {
                                 input: {
                                     borderColor: showOutliersModeError ? theme.colors.red[ 6 ] : undefined,
@@ -568,6 +577,7 @@ export default function Config ( props: ConfigsProps )
                 isLoading ? (
                     <>
                         <AsyncTaskTracker
+                            action={ props.metricName }
                             startEndpoint={ endoPointMap[ props.metricName ] }
                             startParams={ configTracker }
                             startBody={ internalConfigs }

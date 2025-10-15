@@ -290,6 +290,7 @@ export default function Embedder ()
 
       { compute || activeTask ? (
         <AsyncTaskTracker
+          action={ "embedder" }
           startEndpoint={ embedder_start }
           startParams={ config }
           startBody={ undefined }

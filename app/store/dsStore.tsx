@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import Dataset, { Configs, datasetMock } from "../interfaces/genericInterface";
+import { ResultPoll } from "@/interfaces/metricsInterface";
 
 interface AppState
 {
@@ -157,4 +158,32 @@ const useStore = create<AppState>()(
   )
 );
 
+interface ActionStore {
+  actionResult: ResultPoll;
+  resolver: ((value: ResultPoll) => void) | null;
+  setActionResult: (result: ResultPoll) => void;
+  waitForActionResult: () => Promise<ResultPoll>;
+}
+
+export const useActionStore = create<ActionStore>((set, get) => ({
+  actionResult: { origin: "", data: {} },
+  resolver: null, // used to resolve waiting Promises
+
+  setActionResult: (result: ResultPoll) => {
+    set({ actionResult: result });
+    // Resolve any pending promise
+    const resolver = get().resolver;
+    if (resolver) {
+      resolver(result);
+      set({ resolver: null }); // clean up
+    }
+  },
+
+  waitForActionResult: () =>
+    new Promise((resolve) => set({ resolver: resolve })),
+}));
+
 export default useStore;
+
+
+

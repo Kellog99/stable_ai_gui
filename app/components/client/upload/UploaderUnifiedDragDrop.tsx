@@ -49,13 +49,11 @@ export const DragDrop = ({ config, infoModal }: Props) => {
                 body: formData,
             });
 
-
             if (response.ok) {
-                console.log("sono ok")
                 const data = await response.json();
                 setJsonUploaded(data)
             } else {
-                console.log("non sono ok")
+                
                 const data = await response.json();
                 console.log("DATA", data)
                 setMessage(data.detail || "An error occurred during load check");

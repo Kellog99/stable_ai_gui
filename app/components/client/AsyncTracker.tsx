@@ -1,5 +1,6 @@
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
-import useStore from '@/store/dsStore';
+import { dataset_upload } from '@/properties/urlsNNTrust';
+import useStore, { useActionStore } from '@/store/dsStore';
 import styles from '@/styles/AsyncTracker.module.css';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -9,6 +10,7 @@ import React, { useEffect, useRef, useState } from 'react';
  * AsyncTaskTracker - A reusable component for tracking Ray task progress
  * 
  * @param {Object} props
+ * @param {string} props.action - The type of action the component is applied to 
  * @param {string} props.startEndpoint - The endpoint to start the task (e.g., "/actions/embedder")
  * @param {Object} props.startParams - Query parameters for the start request
  * @param {Object} props.startBody - Request body for the start request (optional)
@@ -21,6 +23,7 @@ import React, { useEffect, useRef, useState } from 'react';
  */
 
 interface AsyncTaskTrackerProps {
+  action: string,
   startEndpoint: string;
   startParams: Record<string, any>;
   startBody: any;
@@ -28,18 +31,20 @@ interface AsyncTaskTrackerProps {
   pollInterval: number;
   progressDisplayMode: boolean;
 }
-export default function AsyncTaskTracker({ startEndpoint, startParams, startBody, progressEndpoint, pollInterval, progressDisplayMode = true }: AsyncTaskTrackerProps) {
+export default function AsyncTaskTracker({ action, startEndpoint, startParams, startBody, progressEndpoint, pollInterval, progressDisplayMode = true }: AsyncTaskTrackerProps) {
   const [status, setStatus] = useState('idle');
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState('');
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+
+  const setActionResult = useActionStore((state) => state.setActionResult);
+  
   const startedRef = useRef(false);
   const setDatasets = useStore((state) => state.setDatasets);
 
   const activeTask = useStore((state) => state.activeTask);
   const setActiveTask = useStore((state) => state.setActiveTask);
-
 
   const startTask = async () => {
 
@@ -88,13 +93,16 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
         throw new Error(`Failed to fetch progress: ${response.statusText}`);
       }
       const data = await response.json();
-
       setStatus(data.status);
       setProgress(data.progress || 0);
       setMessage(data.message || '');
 
       if (data.status === 'complete') {
-        setResult(data.result);
+        setActionResult({
+          origin: action,
+          data: data.result
+        })
+        //setResult(data.result);
         setActiveTask("");
         DatasetsLoader().then(fetchedData => {
           setDatasets(fetchedData);
@@ -107,7 +115,6 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
       setActiveTask("");
     }
   };
-
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -122,7 +129,9 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
 
 
   useEffect(() => {
-    if (!activeTask || status === 'error') {
+   
+    if (!activeTask || status == "error") {
+      setActiveTask("");
       return;
     }
 
@@ -132,10 +141,8 @@ export default function AsyncTaskTracker({ startEndpoint, startParams, startBody
 
 
     return () => clearInterval(intervalId);
-  }, [activeTask]);
+  }, [activeTask, status]);
 
-
-  console.log("STATUS:", status);
 
   return (
     <div className={styles.container}>
