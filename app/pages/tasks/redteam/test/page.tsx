@@ -1,27 +1,22 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Book, Bug, Camera, ChevronDown, ChevronUp, Glasses, Image, Pickaxe, Play, Settings2, Shield, TestTubeIcon, TrendingUp } from 'lucide-react';
+import { Book, Bug, Camera, ChevronDown, ChevronUp, Glasses, Play, Settings2, Shield, TestTubeIcon, TrendingUp } from 'lucide-react';
 import { AttackSelector } from '@/components/client/test/AttackSelector';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
 import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
-import { AttackResult, AttackStats } from '@/interfaces/testInterfaces';
+import { AdvanceResult, AttackResult, AttackStats } from '@/interfaces/testInterfaces';
 import styles from '@/styles/Test.module.css';
-import { AttackProps } from '@/interfaces/NNInterfaces';
+import { AttackProps, ParametersProps } from '@/interfaces/NNInterfaces';
 
 function Test() {
-    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-    const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
-
-    const [attackResult, setAttackResult] = useState<AttackResult | undefined>();
-    const [attackStats, setAttackStats] = useState<AttackStats | undefined>();
-
-
     // Initialize with default values, will be updated in useEffect
     const [attackList, setAttackList] = useState<AttackProps[]>([]);
     const [selectedAttack, setSelectedAttack] = useState<AttackProps | undefined>()
+    const [attackParameters, setAttackParameters] = useState<ParametersProps[]>([])
 
+    // since the attacks in the library are fixed, it is required just one fetch.
     useEffect(() => {
         async function fetchItem() {
             // fetching the attacks
@@ -32,39 +27,82 @@ function Test() {
                 }
                 const json = await response.json();
                 setAttackList(json);
+                // By default I set the first attack in the list and, therefore, use its information
+                if (json.length > 0) {
+                    setSelectedAttack(json[0])
+                }
 
             } catch (err) {
                 console.log(err instanceof Error ? err.message : "An error occurred");
             }
         }
         fetchItem();
-        if (attackList.length > 0) {
-            setSelectedAttack(attackList[0])
-        }
+
+
     }, []);
 
+    // This part is for defining the variables that will handle the loading of the image
+    const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+    const [advanceOption, setAdvanceOption] = useState<boolean>(false)
+    // this variable is for seeing the metrics of one attack
+    const [seeResults, setSeeResults] = useState<boolean>(false)
 
-    const handleImageUpload = (file: File, imageUrl: string) => {
-        setUploadedFile(file);
-        setUploadedImageUrl(imageUrl);
-        setAttackResult(undefined);
-        setAttackStats(undefined);
-    };
+    const [origImg, setOrigImg] = useState<string[] | null>(null)
+    const [advImg, setAdvImg] = useState<string[] | null>(null)
+    const [advPert, setAdvPert] = useState<string | null>(null)
 
+    const [atkResult, setAtkResult] = useState<AdvanceResult | undefined>();
     const [clicked, setClicked] = useState<Boolean>(false);
     const [loading, setLoading] = useState<Boolean>(false)
-    const handleClick = () => {
-        // The button has to execute an attack only if there is no attack already running in the background
-        if (!loading) {
-            if (clicked) {
-                //logic for executing the attacks following all the previous variables
-                // it must has 
+
+
+    const handleClick = async () => {
+        if (!loading && clicked) {
+            try {
+                setLoading(true);
+                console.log("data =", uploadedFile?.split(",")[1])
+                const response = await fetch('http://127.0.0.1:8000/attacks/executeAttack', {
+                    method: "POST",
+                    body: JSON.stringify({
+                        "image": uploadedFile?.split(",")[1],
+                        "attack": selectedAttack
+                    }),
+                    headers: {
+                        'Content-type': 'application/json'
+                    }
+                });
+
+                console.log('Status:', response.status);
+                const data: AttackResult = await response.json();
+                console.log('Response:', data);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // the attack has been done and it has to handle the results
+                setOrigImg([uploadedFile!, data.original_prediction])
+                setAdvImg([data.x_adv, data.adversarial_prediction])
+                setAdvPert(data.adv_perturbation)
+                console.log("pert=", data.adv_perturbation)
+
+                setAtkResult({
+                    "confidence": data.confidence,
+                    "ssim": data.ssim,
+                    "executionTime": data.executionTime,
+                })
+            } catch (error) {
+                console.error('ERROR:', error);
+            } finally {
+                setLoading(false);
+                setClicked(!clicked);
             }
-            setClicked(!clicked)
+        } else if (!loading && !clicked) {
+            setClicked(!clicked);
         }
-    }
-    const [advanceOption, setAdvanceOption] = useState<boolean>(false)
-    const [advanceResult, setAdvanceResult] = useState<boolean>(false)
+    };
+
+
     return (
         <div className={styles.test}>
             {/* Header */}
@@ -88,8 +126,8 @@ function Test() {
                     <ImageDisplay
                         placeholder='Load an PNG or a JPG file.'
                         footer='Here it is shown the selected image.'
-                        imageUrl={attackResult?.adversarialImage}
                         loader={true}
+                        handleUpload={(file: string | null) => setUploadedFile(file)}
                     />
 
                     <div className={styles.section}>
@@ -131,14 +169,15 @@ function Test() {
                     {
                         advanceOption && (
                             selectedAttack && selectedAttack.parameters.length > 0 ?
-                                <ParameterControls parameters={selectedAttack?.parameters} />
+                                <ParameterControls
+                                    parameters={selectedAttack?.parameters} />
                                 : <p style={{ color: 'gray' }}>No parameters available for custom settings.</p>
 
                         )
                     }
                     <button
                         disabled={!uploadedFile}
-                        className={styles.execute_button}
+                        className={`${styles.execute_button} ${uploadedFile ? styles.active : styles.inactive}`}
                         onClick={handleClick} // Added click handler
                     >
                         <Play size={'3vw'} />
@@ -158,14 +197,15 @@ function Test() {
                         <ImageDisplay
                             title="Original Image"
                             placeholder="No image loaded"
-                            imageUrl={uploadedImageUrl}
+                            imageUrl={origImg ? origImg[0] : undefined}
+                            footer={origImg ? origImg[1] : undefined}
                             loader={false}
                         />
 
                         <ImageDisplay
                             title="Adversarial Perturbation"
                             placeholder="No image loaded"
-                            imageUrl={attackResult?.perturbation}
+                            imageUrl={advPert ? advPert : undefined}
                             loader={false}
 
                         />
@@ -173,7 +213,8 @@ function Test() {
                         <ImageDisplay
                             title="Adversarial Example"
                             placeholder="No image loaded"
-                            imageUrl={attackResult?.adversarialImage}
+                            imageUrl={advImg ? advImg[0] : undefined}
+                            footer={advImg ? advImg[1] : undefined}
                             loader={false}
 
                         />
@@ -185,15 +226,17 @@ function Test() {
                         </p>
                         <button
                             className={styles.option_button}
-                            onClick={() => setAdvanceResult(!advanceResult)}>
+                            onClick={() => setSeeResults(!seeResults)}>
                             {
-                                advanceResult ? <ChevronUp /> : <ChevronDown />
+                                seeResults ? <ChevronUp /> : <ChevronDown />
                             }
                         </button>
                     </div>
                     {
-                        advanceResult && (<AttackVisualization
-                            result={attackResult} />)
+                        seeResults ?
+                            <AttackVisualization
+                                results={atkResult} />
+                            : null
                     }
 
 

@@ -2,8 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import Dataset, { Configs, datasetMock } from "../interfaces/genericInterface";
 
-interface AppState
-{
+interface AppState {
   datasets: Dataset[] | null;
   datasetUsed: Dataset | null;
   queryDataset: string | '';
@@ -23,7 +22,7 @@ interface AppState
 
   report: Object[];
   colorMap: Partial<Record<number, number[]>>;
-  uqColors: [ number, number, number ][] | null;
+  uqColors: [number, number, number][] | null;
 
   filteredLabels: string[];
   size: { width: number, height: number }
@@ -53,14 +52,14 @@ interface AppState
   setInternalConfigs: ( internalConfigs: Object ) => void;
   setLabelDict: (labelDict: { [key: number]: string } | null) => void;
 
-  setAddToReport: ( addToReport: boolean ) => void;
-  setIsLoadingEmbs: ( isLoadingEmbs: boolean ) => void;
-  setReport: ( report: Object[] | [] ) => void;
-  setColorMap: ( colorMap: Partial<Record<number, number[]>> ) => void;
-  setUqColors: ( uqColors: [ number, number, number ][] | null ) => void;
+  setAddToReport: (addToReport: boolean) => void;
+  setIsLoadingEmbs: (isLoadingEmbs: boolean) => void;
+  setReport: (report: Object[] | []) => void;
+  setColorMap: (colorMap: Partial<Record<number, number[]>>) => void;
+  setUqColors: (uqColors: [number, number, number][] | null) => void;
 
-  setFilteredLabels: ( filteredLabels: string[] | [] ) => void;
-  setSize: ( size: { width: number, height: number } ) => void;
+  setFilteredLabels: (filteredLabels: string[] | []) => void;
+  setSize: (size: { width: number, height: number }) => void;
   setPrototypesData: (prototypesData: string[] | null) => void;
   setLabelProtoData: (labelProtoData: number[] | null) => void;
   setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => void;
@@ -74,7 +73,7 @@ interface AppState
 
 const useStore = create<AppState>()(
   persist(
-    ( set ) => ( {
+    (set) => ({
       datasets: null,
       datasetUsed: null,
       queryDataset: "",
@@ -106,31 +105,31 @@ const useStore = create<AppState>()(
       activeTask: "",
 
 
-      setData: ( datasetUsed ) => set( { datasetUsed } ),
-      setDatasets: ( datasets: Dataset[] | null ) => set( { datasets } ),
-      setSelectedIndexes: ( selectedIndexes: number[] ) => set( { selectedIndexes } ),
-      setSelectedPoints: ( selectedPoints: number[] ) => set( { selectedPoints } ),
-      setHoverIndex: ( hoverIndex: number | null ) => set( { hoverIndex } ),
-      setSelectedFeature: ( selectedFeature: string ) => set( { selectedFeature } ),
-      setLazoMode: ( lazoMode: boolean ) => set( { lazoMode } ),
-      setQueryDataset: ( queryDataset: string ) => set( { queryDataset } ),
-      setFeatureToDisplay: ( featureToDisplay: string | null ) => set( { featureToDisplay } ),
-      setMetricsConfigs: ( metricsConfig: Configs[] | [] ) => set( { metricsConfig } ),
-      setInternalConfigs: ( internalConfigs: Object ) => set( { internalConfigs } ),
-      setLabelDict: (labelDict: { [key: number]: string } | null) => set({labelDict}),
+      setData: (datasetUsed) => set({ datasetUsed }),
+      setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
+      setSelectedIndexes: (selectedIndexes: number[]) => set({ selectedIndexes }),
+      setSelectedPoints: (selectedPoints: number[]) => set({ selectedPoints }),
+      setHoverIndex: (hoverIndex: number | null) => set({ hoverIndex }),
+      setSelectedFeature: (selectedFeature: string) => set({ selectedFeature }),
+      setLazoMode: (lazoMode: boolean) => set({ lazoMode }),
+      setQueryDataset: (queryDataset: string) => set({ queryDataset }),
+      setFeatureToDisplay: (featureToDisplay: string | null) => set({ featureToDisplay }),
+      setMetricsConfigs: (metricsConfig: Configs[] | []) => set({ metricsConfig }),
+      setInternalConfigs: (internalConfigs: Object) => set({ internalConfigs }),
+      setLabelDict: (labelDict: { [key: number]: string } | null) => set({ labelDict }),
 
-      setAddToReport: ( addToReport: boolean ) => set( { addToReport } ),
-      setIsLoadingEmbs: ( isLoadingEmbs: boolean ) => set( { isLoadingEmbs } ),
-      setReport: ( report: Object[] | [] ) => set( { report } ),
-      setColorMap: ( colorMap: Partial<Record<number, number[]>> ) => set( { colorMap } ),
-      setUqColors: ( uqColors: [ number, number, number ][] | null ) => set( { uqColors } ),
+      setAddToReport: (addToReport: boolean) => set({ addToReport }),
+      setIsLoadingEmbs: (isLoadingEmbs: boolean) => set({ isLoadingEmbs }),
+      setReport: (report: Object[] | []) => set({ report }),
+      setColorMap: (colorMap: Partial<Record<number, number[]>>) => set({ colorMap }),
+      setUqColors: (uqColors: [number, number, number][] | null) => set({ uqColors }),
 
-      setFilteredLabels: ( filteredLabels: string[] | [] ) => set( { filteredLabels } ),
-      setSize: ( size: { width: number, height: number } ) => set( { size } ),
+      setFilteredLabels: (filteredLabels: string[] | []) => set({ filteredLabels }),
+      setSize: (size: { width: number, height: number }) => set({ size }),
 
-      setPrototypesData: (prototypesData: string[] | null) => set( { prototypesData } ),
-      setLabelProtoData: (labelProtoData: number[] | null) => set( { labelProtoData } ),
-      setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set( { labelToSamples } ),
+      setPrototypesData: (prototypesData: string[] | null) => set({ prototypesData }),
+      setLabelProtoData: (labelProtoData: number[] | null) => set({ labelProtoData }),
+      setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set({ labelToSamples }),
 
       setShowOverview: ( showOverview: boolean ) => set( { showOverview } ),
       setCollapsed: ( collapsed: boolean ) => set( { collapsed } ),
@@ -140,19 +139,19 @@ const useStore = create<AppState>()(
 
     {
       name: "app-storage",
-      storage: createJSONStorage( () => sessionStorage ),
-      partialize: ( state ) => ( {
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({
         datasets: state.datasets,
         datasetUsed: state.datasetUsed,
         selectedFeature: state.selectedFeature,
         report: state.report,
         prototypesData: state.prototypesData,
-        labelProtoData:state.labelProtoData,
+        labelProtoData: state.labelProtoData,
         labelToSamples: state.labelToSamples,
         activeTask: state.activeTask,
         //featureToDisplay: state.featureToDisplay
         // queryDataset is NOT included, so it won't be persisted
-      } ),
+      }),
     }
   )
 );

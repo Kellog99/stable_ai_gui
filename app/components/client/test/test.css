@@ -25,13 +25,7 @@
     outline: none;
 }
 
-/* ################# Image display ################# */
-.container-parameters {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
+/* ################# Parameters ################# */
 .block-parameters {
     display: flex;
     flex-direction: column;
@@ -39,11 +33,11 @@
 }
 
 .parameter {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto;
     color: gray;
-    gap: 0.7vw;
-    padding-bottom: 1vw;
+    padding-bottom: 1.2vw;
+    row-gap: 0.7vw;
     border-bottom: 1px solid gray;
 }
 
@@ -61,7 +55,7 @@
 }
 
 .image-title {
-    font-size: 1.2vw;
+    font-size: 0.8rem;
     font-weight: 600;
     color: white;
     text-align: center;
@@ -127,4 +121,26 @@
     margin: 0;
 }
 
-/* ################# Post attack ################# */
+/* ################# Advance results ################# */
+.statistics-container {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    gap: 1vw;
+}
+
+h3 {
+    color: white;
+}
+
+.stat-title {
+    display: flex;
+    flex: row;
+    gap: 10px;
+}
+
+.statistic {
+    display: flex;
+    flex: row;
+    justify-content: space-between;
+}

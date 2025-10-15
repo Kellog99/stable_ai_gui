@@ -1,94 +1,62 @@
 import React from 'react';
-import { AttackResult, AttackStats } from '@/interfaces/testInterfaces';
-import { TrendingUp, Target, Zap, Clock } from 'lucide-react';
+import { AdvanceResult } from '@/interfaces/testInterfaces';
+import { LineChart } from '@mantine/charts';
+import { Clock, FileImage } from 'lucide-react';
+import './test.css';
 
 interface AttackVisualizationProps {
-  result?: AttackResult;
+  results?: AdvanceResult
 }
-
 export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
-  result
+  results
 }) => {
-  // Only create metrics if result exists
-  const metrics = result ? [
-    {
-      label: 'Attack Success',
-      value: result.success ? 'Success' : 'Failed',
-      icon: Target,
-      color: result.success ? 'text-green-400' : 'text-red-400'
-    },
-    {
-      label: 'Model Confidence',
-      value: `${(result.confidence * 100).toFixed(1)}%`,
-      icon: Zap,
-      color: 'text-blue-400'
-    },
-    {
-      label: 'L∞ Distance',
-      value: result.linfinityDistance.toFixed(4),
-      icon: TrendingUp,
-      color: 'text-yellow-400'
-    },
-    {
-      label: 'Execution Time',
-      value: `${result.executionTime || 0}ms`,
-      icon: Clock,
-      color: 'text-purple-400'
-    }
-  ] : [];
-
+  console.log("confid", results?.confidence)
   return (
     <>
-      {result ? (
-        <div className="bg-gray-800 rounded-lg border border-gray-600 p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Attack Analysis</h3>
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {metrics.map((metric, index) => (
-              <div key={index} className="bg-gray-700 rounded-lg p-4">
-                <div className="flex items-center mb-2">
-                  <metric.icon className={`w-4 h-4 ${metric.color} mr-2`} />
-                  <span className="text-sm text-gray-400">{metric.label}</span>
-                </div>
-                <div className={`text-lg font-semibold ${metric.color}`}>
-                  {metric.value}
-                </div>
+      {results ? (
+
+        <div>
+          <h3>
+            Statistics
+          </h3>
+          <div className='statistics-container'>
+            <div className='statistic'>
+              <div className='stat-title'>
+              <Clock size={30}/>
+              <span>Execution Time (s) </span>
               </div>
-            ))}
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                Perturbation Strength
-              </label>
-              <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-400 to-red-500 transition-all duration-500"
-                  style={{ width: `${Math.min(result.linfinityDistance * 1000, 100)}%` }}
-                />
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                L2: {result.l2Distance.toFixed(4)} | L∞: {result.linfinityDistance.toFixed(4)}
-              </div>
+              <b>{results.executionTime}</b>
             </div>
-            <div>
-              <label className="block text-sm text-gray-400 mb-2">
-                Attack Progress
-              </label>
-              <div className="bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div
-                  className="h-full bg-blue-500 transition-all duration-500"
-                  style={{ width: `${(result.iterations / 50) * 100}%` }}
-                />
+            <div className='statistic'>
+              <div className='stat-title'>
+              <FileImage size={30}/>
+              <span>Structural Similarity Index </span>
               </div>
-              <div className="text-xs text-gray-500 mt-1">
-                Iterations: {result.iterations}
-              </div>
+              <b>{results.ssim}</b>
             </div>
           </div>
+          <h3>
+            Confidence Chart
+          </h3>
+          <LineChart
+            h={300}
+            type="gradient"
+            data={results.confidence.map((conf, index) => ({
+              confidence: conf.toFixed(3),
+              step: index,
+            }))}
+            dataKey="step"
+            series={[{ name: 'confidence', color: 'blue' }]}
+            curveType="linear"
+          />
+
         </div>
       ) : (
-        <p style={{color:'gray'}}>Run an attack to see statistics and analysis</p>
+        <p style={{ color: 'gray' }}>
+          Run an attack to see statistics and analysis
+        </p>
       )}
     </>
   );
 };
+

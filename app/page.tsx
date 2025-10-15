@@ -6,7 +6,6 @@ import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
 import { FileDropZoneProps } from "./interfaces/NNInterfaces";
 import HomePageDrop from './pages/HomePage/HomePageDrop';
 
-
 // major information about the tasks
 const tasks: Task[] = [
   {
@@ -26,7 +25,7 @@ const tasks: Task[] = [
     href: "/pages/tasks/redteam/test"
   },
   {
-    title: "Data Quality Tool",
+    title: "Data Quality",
     Icon: FileText,
     description: 'View the analysis on the loaded dataset.',
     footer: "See Analysis",

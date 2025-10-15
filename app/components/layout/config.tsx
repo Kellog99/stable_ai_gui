@@ -1,94 +1,100 @@
-import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop } from "lucide-react";
+import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon } from "lucide-react";
 
 
 export interface NavigationSection {
-    key: string;
+    id: string;
     title: string;
-    icon: any;
+    Icon: LucideIcon;
     href?: string;
     items?: NavigationSection[];
+    requiresEmbeddings?: boolean
 }
-
 
 
 export const DQsections: NavigationSection[] = [
     {
-        key: 'visualization',
+        id: "dataset",
+        title: "Dataset",
+        Icon: Database,
+        href: "/pages/tasks/dataquality/datasets"
+    },
+    {
+        id: 'visualization',
         title: 'Visualization',
-        icon: Image,
+        Icon: Image,
         items: [
             {
-                key: 'embeddings',
+                id: 'embeddings',
                 title: 'Embeddings',
                 href: '/pages/tasks/dataquality/embeddings',
-                icon: ChartScatter,
-                // requiresEmbeddings: true,
+                Icon: ChartScatter,
+                requiresEmbeddings: true,
 
             },
             {
-                key: 'prototypes',
+                id: 'prototypes',
                 title: 'Prototypes',
                 href: '/pages/tasks/dataquality/prototypes',
-                icon: Bot,
-                // requiresEmbeddings: true,
+                Icon: Bot,
+                requiresEmbeddings: true,
 
             },
         ],
     },
     {
-        key: 'metrics',
+        id: 'metrics',
         title: 'Metrics',
-        icon: Ruler,
+        Icon: Ruler,
         items: [
             {
-                key: 'duplicates',
+                id: 'duplicates',
                 title: 'Duplicates',
                 href: '/pages/tasks/dataquality/metrics/duplicates',
-                icon: BookCopy,
-                // requiresEmbeddings: true,
+                Icon: BookCopy,
+                requiresEmbeddings: true,
 
             },
             {
-                key: 'outliers',
+                id: 'outliers',
                 title: 'Outliers',
                 href: '/pages/tasks/dataquality/metrics/outliers',
-                icon: ShieldX,
-                // requiresEmbeddings: true,
+                Icon: ShieldX,
+                requiresEmbeddings: true,
 
             },
             {
-                key: 'completeness',
+                id: 'completeness',
                 title: 'Completeness',
                 href: '/pages/tasks/dataquality/metrics/completeness',
-                icon: CircleCheck,
-                // requiresEmbeddings: true,
+                Icon: CircleCheck,
+                requiresEmbeddings: true,
 
             },
         ],
     },
     {
-        key: 'actions',
+        id: 'actions',
         title: 'Actions',
-        icon: SquareActivity,
+        Icon: SquareActivity,
         items: [
             {
-                key: 'embedder',
+                id: 'embedder',
                 title: 'Embedder',
                 href: '/pages/tasks/dataquality/actions/embeddings',
-                icon: ChartScatter,
+                Icon: ChartScatter,
             },
             {
-                key: 'cleanDuplicates',
+                id: 'cleanDuplicates',
                 title: 'Clean Duplicates',
                 href: '/pages/tasks/dataquality/actions/cleanDuplicates',
-                icon: Eraser
-                // requiresEmbeddings: true,
+                Icon: Eraser,
+                requiresEmbeddings: true,
             },
             {
-                key: 'cropping',
+                id: 'cropping',
                 title: 'Cropping',
                 href: '/pages/tasks/dataquality/actions/cropping',
-                icon: Crop
+                Icon: Crop
             },
         ],
     },
@@ -98,15 +104,15 @@ export const DQsections: NavigationSection[] = [
 
 export const TitannSections: NavigationSection[] = [
     {
-        key: 'home',
+        id: 'home',
         title: 'Benchmark',
         href: '/pages/tasks/redteam/benchmark',
-        icon: ChartLine,
+        Icon: ChartLine,
     },
     {
-        key: 'test',
+        id: 'test',
         title: 'Test',
         href: '/pages/tasks/redteam/test',
-        icon: TestTube,
+        Icon: TestTube,
     },
 ];
