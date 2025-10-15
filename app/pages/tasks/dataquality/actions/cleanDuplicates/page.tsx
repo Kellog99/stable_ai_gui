@@ -29,73 +29,6 @@ export default function CleanDuplicates ()
     featureName: featureName,
   };
 
-  {/*
-  async function Cleaning ( name: string )
-  {
-    const baseUrl = cleaner_get
-
-    const url = new URL( baseUrl );
-
-
-    url.searchParams.append( 'featureName', name );
-    url.searchParams.append( 'datasetName', datasetUsed?.name as string );
-
-    const response = await fetch( url );
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-
-    if ( reader ) {
-      try {
-        while ( true ) {
-
-          const { done, value } = await reader.read();
-
-          if ( done ) {
-            console.log( "Stream complete" );
-            break;
-          }
-
-          const text = decoder.decode( value, { stream: true } );
-          console.log( text )
-          // Process the SSE format (data: {...})
-          const lines = text.split( '\n\n' );
-          for ( const line of lines ) {
-            if ( line.startsWith( 'data: ' ) ) {
-              try {
-                const jsonData = JSON.parse( line.substring( 6 ) );
-                console.log( 'Received progress update:', jsonData );
-
-                // Handle the progress update
-                if ( jsonData.status === "complete" ) {
-                  console.log( "Process completed:", jsonData.result );
-                  if ( jsonData.dataset ) {
-                    const dataset = await GetDatasetAndSave( jsonData.dataset )
-                    setData( dataset )
-                  }
-                  setResult( jsonData.result )
-                } else if ( jsonData.progress !== undefined ) {
-                  // Update progress if available
-                  console.log( `Progress: ${jsonData.progress}%` );
-                  setProgress( jsonData.progress )
-                }
-              } catch ( e ) {
-                // Handle potential JSON parsing errors
-                console.error( 'Error parsing SSE data:', e );
-              }
-            }
-          }
-        }
-      } catch ( error ) {
-        console.error( 'Error reading stream:', error );
-      } finally {
-        reader.releaseLock();
-      }
-    }
-  }
-
-  */}
-
-
   useEffect( () =>
   {
     if ( Array.isArray( datasetUsed?.features ) ) {
@@ -112,7 +45,6 @@ export default function CleanDuplicates ()
   {
     setFeatureName( name )
     if ( name ) {
-      //Cleaning( name )
       setCompute(true)
     }
   }
@@ -178,68 +110,6 @@ export default function CleanDuplicates ()
           pollInterval={ 0 }
           progressDisplayMode={ true } />
       ) : null }
-      {/*
-
-        <>
-        
-          <Center>
-            <Text size="sm" style={{ marginTop: "60px" }}>Cleaning Duplicates...</Text>
-          </Center>
-
-          <Box style={{ position: 'relative', marginTop: 30 }}>
-            <Progress
-              value={progress}
-              size="xl"
-              radius="xl"
-              color="red"
-              striped
-              animated
-              style={{
-                height: "30px"
-              }}
-            />
-            <Text
-              size="sm"
-              fw={700}
-              c="black"
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                pointerEvents: 'none',
-              }}
-            >
-              {progress}%
-            </Text>
-          </Box>
-        </>
-      ) : result == "Complete!" ? (
-        <>
-          <AlertCust result={'success'} textToDisplay={`The ${featureName} feature has been correctly cleaned from duplicates.`} />
-
-        </>
-
-      ) : result == "Feature image is already embedded!" ? (
-        <>
-          <AlertCust
-            result={'success'}
-            textToDisplay={
-              <>
-                The {featureName} feature is already cleaned. Check the number of duplicates{" "}
-                <Link
-                  href={{
-                    pathname: "/pages/dataquality/metrics/duplicates",
-                    query: { datasetName: datasetUsed?.name },
-                  }}
-                  style={{ color: "blue" }}
-                >
-                  here
-                </Link>.
-              </>
-            } />
-        </> 
-      ) : null}*/}
 
     </div>
   )
