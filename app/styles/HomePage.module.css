@@ -1,8 +1,6 @@
 .homepage {
-  width: 90%;
-  height: 100vw;
   margin: auto;
-  padding-top: 1vw;
+  padding: 2vw 5vw 0 5vw;
 }
 
 .homecontainer {

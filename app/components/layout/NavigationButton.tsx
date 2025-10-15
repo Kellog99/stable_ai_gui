@@ -1,87 +1,81 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { useState } from 'react';
-import './NavigationButton.css';
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { NavigationSection } from "./config";
-import { Tooltip } from "@mantine/core";
+import { useState } from "react";
+import React from "react";
+import './Navbar.css'
+import { ChevronDown, ChevronUp } from "lucide-react";
+import Link from "next/link";
 
-interface NavigationButtonProps {
-  section: NavigationSection
-  isActive: (id: string) => boolean;
-  collapsed?: boolean;
-  level: number,
-  handlekey: (id: string) => void;
+
+// Move NavigationButton outside to prevent recreation on every render
+interface NavigationButtonProps extends NavigationSection {
+    isActive: boolean
+    activeLink: string;
+    setActiveLink: (id: string) => void;
+    isClosed: boolean;
 }
 
 const NavigationButton: React.FC<NavigationButtonProps> = ({
-  section,
-  isActive,
-  level,
-  collapsed = false,
-  handlekey
+    id,
+    title,
+    Icon,
+    href,
+    items,
+    isActive,
+    activeLink,
+    setActiveLink,
+    isClosed
 }) => {
-  const router = useRouter();
-  const [datasetName, setDatasetName] = useState<string | null>("");
-
-  const [seeAction, setSeeAction] = useState<boolean>(false);
-
-  const handleChevronClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent parent button click
-    setSeeAction(!seeAction);
-  };
-
-
-  const handleClick = () => {
-    // if the button is clicked it set the global key to its
-    handlekey(section.key)
-    if (section.href) {
-      router.push(section.href)
-    }
-  }
-  return (
-    <>
-      <Tooltip
-        label={section.title}
-        disabled={!collapsed}>
-        <button
-          onClick={handleClick}
-          className={`${isActive(section.key) ? "button active" : "button"}`}
-          style={{ gap: `${collapsed ? '0px' : '1vw'}` }}
-        >
-          <section.icon size={30*(10 - level) / 10} />
-          {
-            !collapsed ?
-              <p style={{ fontSize: `${(10 - level) / 10}rem` }}>{section.title}</p>
-              : null
-          }
-          {section.items ? (
-            <button
-              className='action-button'
-              onClick={handleChevronClick}
+    const [seeActions, setSeeActions] = useState<boolean>(false);
+    return (
+        <li>
+            <Link
+                onClick={(e) => {
+                    if (!isActive) {
+                        e.preventDefault();
+                        return;
+                    }
+                    if (items && items.length > 0) {
+                        e.preventDefault();
+                        setSeeActions(!seeActions);
+                        setActiveLink(id);
+                    }
+                }}
+                href={href && isActive ? href : "#"}
+                className={`${isActive ? activeLink === id ? 'nav-link active' : 'nav-link' : 'disabled'}`}
+                aria-current={activeLink === id ? 'page' : undefined}
+                aria-expanded={items && items.length > 0 ? seeActions : undefined}
             >
-              {!seeAction ? <ChevronDown /> : <ChevronUp />}
-            </button>
-          ) : null}
-        </button>
-      </Tooltip >
-      {
-        section.items && seeAction ? (
-          <div className="subbuttons">
-            {section.items.map((item, index) => (
-              <NavigationButton
-                section={item}
-                isActive={isActive}
-                collapsed={collapsed}
-                handlekey={handlekey}
-                level={level + 2}
-              />
-            ))}
-          </div>
-        ) : null
-      }
-    </>
-  );
-}
+                <div className="nav-text"
+                    style={{ gap: `${!isClosed ? '1vw' : '0px'}` }}>
+                    <Icon size={25} aria-hidden="true" />
+                    {!isClosed && (<span>{title}</span>)}
+                </div>
+                {items && items.length > 0 && (
+                    seeActions ?
+                        <ChevronUp aria-hidden="true" />
+                        : <ChevronDown aria-hidden="true" />
+                )}
+            </Link>
+            {items && items.length > 0 && seeActions && (
+                <ul role="menu"
+                    className="nav-links">
+                    {items.map((item) => (
+                        <NavigationButton
+                            id={item.id}
+                            title={item.title}
+                            Icon={item.Icon}
+                            href={item.href}
+                            items={item.items}
+                            activeLink={activeLink}
+                            setActiveLink={setActiveLink}
+                            isClosed={isClosed}
+                            isActive={item.requiresEmbeddings ? item.requiresEmbeddings : false}
+                        />
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
+};
 
 export default NavigationButton;

@@ -3,10 +3,8 @@ import Navbar from "@/components/layout/Navbar";
 import useStore from "@/store/dsStore";
 import {
   AppShell,
-  Container,
   MantineProvider,
 } from "@mantine/core";
-import "@mantine/core/styles.css";
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

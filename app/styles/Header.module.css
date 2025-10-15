@@ -65,21 +65,17 @@
   display: inline-flex;
   gap: 8px;
   width: auto;
-  /* let button size to its content */
   height: auto;
   font-size: 0.8vw;
-  /* smaller text */
   align-items: center;
   align-content: center;
   border-radius: 12px;
-  /* less rounded */
   font-weight: 500;
-  transition: all 0.2s;
+  transition: all 0.3s;
   --sidepadding: 1vw;
-  /* narrower */
   --toppadding: 0.3vw;
-  /* shorter */
   padding: var(--toppadding) var(--sidepadding);
+  border-color: transparent;
 }
 
 .button.active {
@@ -93,4 +89,5 @@
 
 .button.inactive:hover {
   color: white;
+  background-color: lightgray;
 }

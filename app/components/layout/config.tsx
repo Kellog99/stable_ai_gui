@@ -1,94 +1,100 @@
-import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop } from "lucide-react";
+import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon } from "lucide-react";
 
 
 export interface NavigationSection {
-    key: string;
+    id: string;
     title: string;
-    icon: any;
+    Icon: LucideIcon;
     href?: string;
     items?: NavigationSection[];
+    requiresEmbeddings?: boolean
 }
-
 
 
 export const DQsections: NavigationSection[] = [
     {
-        key: 'visualization',
+        id: "dataset",
+        title: "Dataset",
+        Icon: Database,
+        href: "/pages/tasks/dataquality/datasets"
+    },
+    {
+        id: 'visualization',
         title: 'Visualization',
-        icon: Image,
+        Icon: Image,
         items: [
             {
-                key: 'embeddings',
+                id: 'embeddings',
                 title: 'Embeddings',
-                href: '/pages/dataquality/embeddings',
-                icon: ChartScatter,
-                // requiresEmbeddings: true,
+                href: '/pages/tasks/dataquality/embeddings',
+                Icon: ChartScatter,
+                requiresEmbeddings: true,
 
             },
             {
-                key: 'prototypes',
+                id: 'prototypes',
                 title: 'Prototypes',
-                href: '/pages/dataquality/prototypes',
-                icon: Bot,
-                // requiresEmbeddings: true,
+                href: '/pages/tasks/dataquality/prototypes',
+                Icon: Bot,
+                requiresEmbeddings: true,
 
             },
         ],
     },
     {
-        key: 'metrics',
+        id: 'metrics',
         title: 'Metrics',
-        icon: Ruler,
+        Icon: Ruler,
         items: [
             {
-                key: 'duplicates',
+                id: 'duplicates',
                 title: 'Duplicates',
-                href: '/pages/dataquality/metrics/duplicates',
-                icon: BookCopy,
-                // requiresEmbeddings: true,
+                href: '/pages/tasks/dataquality/metrics/duplicates',
+                Icon: BookCopy,
+                requiresEmbeddings: true,
 
             },
             {
-                key: 'outliers',
+                id: 'outliers',
                 title: 'Outliers',
-                href: '/pages/dataquality/metrics/outliers',
-                icon: ShieldX,
-                // requiresEmbeddings: true,
+                href: '/pages/tasks/dataquality/metrics/outliers',
+                Icon: ShieldX,
+                requiresEmbeddings: true,
 
             },
             {
-                key: 'completeness',
+                id: 'completeness',
                 title: 'Completeness',
-                href: '/pages/dataquality/metrics/completeness',
-                icon: CircleCheck,
-                // requiresEmbeddings: true,
+                href: '/pages/tasks/dataquality/metrics/completeness',
+                Icon: CircleCheck,
+                requiresEmbeddings: true,
 
             },
         ],
     },
     {
-        key: 'actions',
+        id: 'actions',
         title: 'Actions',
-        icon: SquareActivity,
+        Icon: SquareActivity,
         items: [
             {
-                key: 'embedder',
+                id: 'embedder',
                 title: 'Embedder',
-                href: '/pages/dataquality/actions/embeddings',
-                icon: ChartScatter,
+                href: '/pages/tasks/dataquality/actions/embeddings',
+                Icon: ChartScatter,
             },
             {
-                key: 'cleanDuplicates',
+                id: 'cleanDuplicates',
                 title: 'Clean Duplicates',
-                href: '/pages/dataquality/actions/cleanDuplicates',
-                icon: Eraser
-                // requiresEmbeddings: true,
+                href: '/pages/tasks/dataquality/actions/cleanDuplicates',
+                Icon: Eraser,
+                requiresEmbeddings: true,
             },
             {
-                key: 'cropping',
+                id: 'cropping',
                 title: 'Cropping',
-                href: '/pages/dataquality/actions/cropping',
-                icon: Crop
+                href: '/pages/tasks/dataquality/actions/cropping',
+                Icon: Crop
             },
         ],
     },
@@ -98,15 +104,15 @@ export const DQsections: NavigationSection[] = [
 
 export const TitannSections: NavigationSection[] = [
     {
-        key: 'home',
+        id: 'home',
         title: 'Benchmark',
         href: '/pages/tasks/redteam/benchmark',
-        icon: ChartLine,
+        Icon: ChartLine,
     },
     {
-        key: 'test',
+        id: 'test',
         title: 'Test',
         href: '/pages/tasks/redteam/test',
-        icon: TestTube,
+        Icon: TestTube,
     },
 ];

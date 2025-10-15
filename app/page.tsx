@@ -43,7 +43,7 @@ const homePageDropZones: FileDropZoneProps[] = [
     title: "Dataset",
     Icon: Database,
     description: "Upload your dataset in ZIP format",
-    acceptedTypes: [ '.zip' ],
+    acceptedTypes: ['.zip'],
     isLoaded: false,
     loadedFileName: "dataset?.name",
   },
@@ -52,16 +52,15 @@ const homePageDropZones: FileDropZoneProps[] = [
     title: "Model",
     Icon: Brain,
     description: "Upload your model in a `.pth` format",
-    acceptedTypes: [ '.zip' ],
+    acceptedTypes: ['.zip'],
     isLoaded: false,
     loadedFileName: "dataset?.name",
-  } ]
+  }]
 
 
-const HomePage: React.FC = ( { } ) =>
-{
+const HomePage: React.FC = ({ }) => {
   return (
-    <div className={ styles.homecontainer }>
+    <div className={styles.homecontainer}>
 
       {/* This part has to deal with the drop zone Elements 
       <div className={styles.filegrid}>
@@ -75,23 +74,23 @@ const HomePage: React.FC = ( { } ) =>
       </div>*/}
 
       <HomePageDrop />
-      {/* This part has to deal with the Task part */ }
-      <div className={ styles.task }>
-        <div className={ styles.sectionheader }>
-          <h2 className={ styles.sectiontitle }>
+      {/* This part has to deal with the Task part */}
+      <div className={styles.task}>
+        <div className={styles.sectionheader}>
+          <h2 className={styles.sectiontitle}>
             Analysis Tasks
           </h2>
-          <p className={ styles.sectionsubtitle }>
+          <p className={styles.sectionsubtitle}>
             Select an analysis task to begin
           </p>
         </div>
 
-        <div className={ styles.taskgrid }>
+        <div className={styles.taskgrid}>
           {
-            tasks.map( ( task ) =>
+            tasks.map((task) =>
               <TaskButton
-                key={ task.title }
-                { ...task } /> )
+                key={task.title}
+                {...task} />)
           }
         </div>
       </div>

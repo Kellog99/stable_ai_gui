@@ -1,7 +1,7 @@
 .test {
-  height: 100%;
-  width: 100%;
-  display: inline
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .header {
@@ -9,7 +9,6 @@
   padding: 1.5rem;
   align-items: center;
   gap: 2vw;
-  width: 100%
 }
 
 .header_icon {

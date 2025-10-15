@@ -11,7 +11,6 @@ import { bbox_type, embedding_type, image_type, label_type, text_type } from "@/
 import useStore from '@/store/dsStore';
 import { motion } from 'framer-motion';
 import { Database, Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import classes from './page.module.css';
 
@@ -282,7 +281,7 @@ export default function Datasets() {
 
 
   return (
-    <div>
+    <div style={{minHeight:'100vh'}}>
       <div
         className={classes.title}
         style={{ display: "flex", flexDirection: "column", gap: "0px" }}
