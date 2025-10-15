@@ -6,29 +6,31 @@ export interface AttackConfig {
   confidence?: number;
 }
 
-export interface AttackResult {
-  originalImage: string;
-  perturbation: string;
-  adversarialImage: string;
-  success: boolean;
-  confidence: number;
-  l2Distance: number;
-  linfinityDistance: number;
-  iterations: number;
-  timestamp: number;
+
+export interface AdvanceResult {
+  confidence: number[];
+  ssim: number;
+  executionTime: number
+}
+
+export interface AttackResult extends AdvanceResult {
+  x: string;
+  adv_perturbation: string;
+  x_adv: string;
+  original_prediction: string;
+  adversarial_prediction: string;
+
 }
 
 export interface AttackStats {
-  successRate: number;
-  averageDistortion: number;
-  averageConfidence: number;
+  ssim: number;
   executionTime: number;
 }
 
-export type AttackType = 
-  | 'fgsm' 
-  | 'pgd' 
-  | 'cw' 
-  | 'deepfool' 
+export type AttackType =
+  | 'fgsm'
+  | 'pgd'
+  | 'cw'
+  | 'deepfool'
   | 'jsma';
 

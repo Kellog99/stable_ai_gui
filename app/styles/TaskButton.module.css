@@ -6,8 +6,7 @@
   border-radius: 1.5rem;
   transition: all 0.3s ease;
   padding: 2vw;
-  row-gap: 0.7vw;
-  grid-template-rows: 4vw 8vw 1.35rem;
+  grid-template-rows: auto 1fr auto;
   align-items: center;
   text-align: center;
 }
@@ -28,7 +27,7 @@
 }
 
 .card_header {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   align-content: center;
   gap: 15px;
@@ -43,8 +42,8 @@
 
 .card_icon {
   width: 4vw;
+  height: 4vw;
   color: white;
-  aspect-ratio: 1;
   border-radius: 1rem;
   position: relative;
   display: flex;
@@ -65,8 +64,7 @@
   color: #6b7280;
   padding: 6px;
   text-align: justify;
-  font-size: 0.7rem;
-
+  font-size: 0.8rem;
 }
 
 .card_link {

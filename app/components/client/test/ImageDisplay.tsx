@@ -1,12 +1,13 @@
 import React, { useRef, useState } from 'react';
 import { Image, X } from 'lucide-react';
+import './test.css';
 
 interface ImageDisplayProps {
   title?: string;
   placeholder: string;
   footer?: string;
   imageUrl?: string;
-  onDownload?: () => void;
+  handleUpload?: (file: string | null) => void;
   loader: boolean;
 }
 
@@ -14,7 +15,7 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   title,
   footer,
   imageUrl,
-  onDownload,
+  handleUpload,
   placeholder,
   loader = false
 }) => {
@@ -34,6 +35,9 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
       reader.onload = (e) => {
         const result = e.target?.result as string;
         setLoadedImage(result);
+        if (handleUpload) {
+          handleUpload(result)
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -42,6 +46,9 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   const handleDeleteImage = (e: React.MouseEvent) => {
     e.stopPropagation();
     setLoadedImage(null);
+    if (handleUpload) {
+      handleUpload(null)
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
