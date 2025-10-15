@@ -95,59 +95,43 @@ const Benchmark: React.FC = () => {
           </button>
         </div>
 
-        <Status attackList={Array.from(selectedAttacks)} />
 
-        <div className='attack-title'>
-          Advance options
-          <button className='btn-open'
-            onClick={() => setOpen((prev) => !prev)}>
-            {open ?
-              <ChevronUp className='icon' /> :
-              <ChevronDown className='icon' />
-            }
-          </button>
-
+        <div>
+          <div className='option-attacks'>
+            <h2>Vulnearbility selection</h2>
+            <p style={{ color: 'gray' }}> Here it is possible to choose the vulnerabilities to test on the selected target model.</p>
+          </div>
+          <div className="attacks-grid">
+            {attacks.map((attack) => (
+              <OptionCard
+                id={attack.id}
+                name={attack.name}
+                description={attack.description}
+                parameters={attack.parameters}
+                isSelected={selectedAttacks.has(attack.id)}
+                onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
+                Icon={Settings}
+              />
+            ))}
+          </div>
+          <div className='option-attacks'>
+            <h2>Metric Selection</h2>
+            <p style={{ color: 'gray' }}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
+          </div>
+          <div className="attacks-grid">
+            {metrics.map((metrics) => (
+              <OptionCard
+                id={metrics.id}
+                name={metrics.name}
+                description={metrics.description}
+                isSelected={selectedMetrics.has(metrics.id)}
+                onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
+                Icon={Ruler}
+              />
+            ))}
+          </div>
         </div>
 
-        {
-          open ?
-            <div>
-              <div className='option-attacks'>
-                <h2>Vulnearbility selection</h2>
-                <p style={{ color: 'gray' }}> Here it is possible to choose the vulnerabilities to test on the selected target model.</p>
-              </div>
-              <div className="attacks-grid">
-                {attacks.map((attack) => (
-                  <OptionCard
-                    id={attack.id}
-                    name={attack.name}
-                    description={attack.description}
-                    parameters={attack.parameters}
-                    isSelected={selectedAttacks.has(attack.id)}
-                    onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
-                    Icon={Settings}
-                  />
-                ))}
-              </div>
-              <div className='option-attacks'>
-                <h2>Metric Selection</h2>
-                <p style={{ color: 'gray' }}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
-              </div>
-              <div className="attacks-grid">
-                {metrics.map((metrics) => (
-                  <OptionCard
-                    id={metrics.id}
-                    name={metrics.name}
-                    description={metrics.description}
-                    isSelected={selectedMetrics.has(metrics.id)}
-                    onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
-                    Icon={Ruler}
-                  />
-                ))}
-              </div>
-            </div>
-            : null
-        }
       </div >);
   }
 

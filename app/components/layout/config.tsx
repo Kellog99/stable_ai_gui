@@ -1,4 +1,4 @@
-import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon } from "lucide-react";
+import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon, Info } from "lucide-react";
 
 
 export interface NavigationSection {
@@ -114,5 +114,11 @@ export const TitannSections: NavigationSection[] = [
         title: 'Test',
         href: '/pages/tasks/redteam/test',
         Icon: TestTube,
+    },
+    {
+        id: 'management',
+        title: 'Vulnerabilities Management',
+        href: '/pages/tasks/redteam/management',
+        Icon: Info,
     },
 ];
