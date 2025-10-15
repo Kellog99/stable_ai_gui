@@ -34,20 +34,22 @@ interface AppState {
   showOverview: boolean;
   collapsed: boolean;
 
+  activeTask: string;
+
+  
 
 
-
-  setSelectedIndexes: (selectedIndexes: number[]) => void;
-  setSelectedPoints: (selectedPoints: number[]) => void;
-  setHoverIndex: (hoverIndex: number | null) => void
-  setSelectedFeature: (selectedFeature: string) => void;
-  setData: (datasetUsed: Dataset | null) => void;
-  setDatasets: (datasets: Dataset[] | null) => void;
-  setLazoMode: (lazoMode: boolean) => void;
-  setQueryDataset: (queryDataset: string) => void;
-  setFeatureToDisplay: (featureToDisplay: string | null) => void;
-  setMetricsConfigs: (metricsConfig: Configs[] | []) => void;
-  setInternalConfigs: (internalConfigs: Object) => void;
+  setSelectedIndexes: ( selectedIndexes: number[] ) => void;
+  setSelectedPoints: ( selectedPoints: number[] ) => void;
+  setHoverIndex: ( hoverIndex: number | null ) => void
+  setSelectedFeature: ( selectedFeature: string ) => void;
+  setData: ( datasetUsed: Dataset | null ) => void;
+  setDatasets: ( datasets: Dataset[] | null ) => void;
+  setLazoMode: ( lazoMode: boolean ) => void;
+  setQueryDataset: ( queryDataset: string ) => void;
+  setFeatureToDisplay: ( featureToDisplay: string | null ) => void;
+  setMetricsConfigs: ( metricsConfig: Configs[] | [] ) => void;
+  setInternalConfigs: ( internalConfigs: Object ) => void;
   setLabelDict: (labelDict: { [key: number]: string } | null) => void;
 
   setAddToReport: (addToReport: boolean) => void;
@@ -64,6 +66,8 @@ interface AppState {
 
   setShowOverview: (showOverview: boolean) => void;
   setCollapsed: (collapsed: boolean) => void;
+
+  setActiveTask: ( activeTask: string ) => void;
 
 }
 
@@ -98,6 +102,8 @@ const useStore = create<AppState>()(
 
       collapsed: false,
 
+      activeTask: "",
+
 
       setData: (datasetUsed) => set({ datasetUsed }),
       setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
@@ -125,9 +131,11 @@ const useStore = create<AppState>()(
       setLabelProtoData: (labelProtoData: number[] | null) => set({ labelProtoData }),
       setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set({ labelToSamples }),
 
-      setShowOverview: (showOverview: boolean) => set({ showOverview }),
-      setCollapsed: (collapsed: boolean) => set({ collapsed }),
-    }),
+      setShowOverview: ( showOverview: boolean ) => set( { showOverview } ),
+      setCollapsed: ( collapsed: boolean ) => set( { collapsed } ),
+
+      setActiveTask: ( activeTask: string ) => set( { activeTask } ),
+    } ),
 
     {
       name: "app-storage",
@@ -140,6 +148,7 @@ const useStore = create<AppState>()(
         prototypesData: state.prototypesData,
         labelProtoData: state.labelProtoData,
         labelToSamples: state.labelToSamples,
+        activeTask: state.activeTask,
         //featureToDisplay: state.featureToDisplay
         // queryDataset is NOT included, so it won't be persisted
       }),

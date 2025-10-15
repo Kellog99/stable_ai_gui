@@ -17,6 +17,15 @@
   padding-top: 80px;
 }
 
+.mainContainer {
+  height: 100%;
+  width: 100%;
+}
+
+.mainContainer.collapsed {
+  padding-left: 130px;
+}
+
 
 /* Hide navbar on small screens */
 @media (max-width: 768px) {
