@@ -51,12 +51,15 @@
 
 .button {
     border-radius: 10px;
-    width: 8vw;
+    width: 9vw;
     font-size: 1.2vw;
     background-color: var(--navy-900);
     border: none;
     color: white;
     transition: 0.3s ease;
+    text-align: center;
+    align-items: center;
+    align-content: center;
 }
 
 .button:hover {
