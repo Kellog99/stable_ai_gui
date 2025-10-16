@@ -73,7 +73,7 @@ export default function Navbar() {
                 }
             </button>
             <ul className="nav-links"
-                style={{ padding: '0', marginTop:'0'}}>
+                style={{ padding: '0', marginTop: '0' }}>
                 {sections.length > 0 &&
                     (sections.map((item) => (
                         <NavigationButton

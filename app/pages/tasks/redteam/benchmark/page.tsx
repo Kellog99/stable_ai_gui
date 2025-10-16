@@ -1,17 +1,15 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { AttackProps, MetricsProps } from '@/interfaces/NNInterfaces';
-import OptionCard from '@/components/client/redtool/OptionCard';
+import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
-import { Play, ChevronDown, ChevronUp, Settings, Ruler } from 'lucide-react';
-import Status from '@/components/client/redtool/Status';
+import TableWrapper from "./TableWrapper"
+import { Play, Settings, Ruler, BrickWallFire, Bug, Gauge } from 'lucide-react';
 
 const Benchmark: React.FC = () => {
-  const [attacks, setAttacks] = useState<AttackProps[]>([]);
-  const [metrics, setMetrics] = useState<MetricsProps[]>([]);
+  const [attacks, setAttacks] = useState<RegisterObjectProps[]>([]);
+  const [metrics, setMetrics] = useState<RegisterObjectProps[]>([]);
 
-  const [open, setOpen] = useState<boolean>(false)
   const [selectedAttacks, setSelectedAttacks] = useState<Set<string>>(new Set());
   const [selectedMetrics, setSelectedMetrics] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +40,7 @@ const Benchmark: React.FC = () => {
         const json = await response.json();
         setMetrics(json);
         if (json.length > 0) {
-          const allIds = json.map((metric: MetricsProps) => metric.id);
+          const allIds = json.map((metric: RegisterObjectProps) => metric.id);
           setSelectedMetrics(new Set(allIds));
         }
       } catch (err) {
@@ -53,20 +51,7 @@ const Benchmark: React.FC = () => {
   }, []);
 
 
-  const handleSelection = (
-    id: string,
-    setFunction: React.Dispatch<React.SetStateAction<Set<string>>>
-  ) => {
-    setFunction(prev => {
-      const newSelected = new Set(prev);
-      if (newSelected.has(id)) {
-        newSelected.delete(id);
-      } else {
-        newSelected.add(id);
-      }
-      return newSelected;
-    });
-  };
+
 
 
   function errorPage() {
@@ -86,8 +71,11 @@ const Benchmark: React.FC = () => {
       < div className="attack-list" >
         <div className='attack-title'>
           <div className='attack-header'>
-            <h1>Red Teaming</h1>
-            <p>In this section it will be possible to test the model robustness under multiple vulnerabilities.</p>
+            <div className='attack-icon'>
+              <BrickWallFire size={'6vw'} color='red' />
+              <h1>Red Teaming</h1>
+            </div>
+            <p style={{ margin: '0' }}>This page provides a set of vulnerabilities that can be used to test the model's robustness and a set of metrics to register the performance of each attack.</p>
           </div>
           <button className='attack-button'>
             <Play className='icon' />
@@ -97,39 +85,46 @@ const Benchmark: React.FC = () => {
 
 
         <div>
+          {/* Attacks Selection */}
           <div className='option-attacks'>
-            <h2>Vulnearbility selection</h2>
-            <p style={{ color: 'gray' }}> Here it is possible to choose the vulnerabilities to test on the selected target model.</p>
+            <div className='attack-icon'>
+              <Bug size={'3vw'} color='red' />
+              <h2>Vulnearbility selection</h2>
+            </div>
+            <p style={{
+              fontSize: '1.3vw',
+              color: 'gray',
+              margin: 0
+            }}>
+              Here below, are listed all the possible vulnerabilities that can be tested on the selected model.
+              For customizing a vulnearbility click on the "Settings" icon on the right. A Panel will be shown on top where all the possible customizable parameters are shown.
+            </p>
           </div>
-          <div className="attacks-grid">
-            {attacks.map((attack) => (
-              <OptionCard
-                id={attack.id}
-                name={attack.name}
-                description={attack.description}
-                parameters={attack.parameters}
-                isSelected={selectedAttacks.has(attack.id)}
-                onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
-                Icon={Settings}
-              />
-            ))}
-          </div>
+          <TableWrapper
+            elements={attacks}
+            selectedElement={selectedAttacks}
+            setSelectedElements={setSelectedAttacks}
+            Icon={Settings}
+          />
+
+          {/* Metrics Selection */}
           <div className='option-attacks'>
-            <h2>Metric Selection</h2>
-            <p style={{ color: 'gray' }}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
+            <div className='attack-icon'>
+              <Gauge size={'3vw'} color='red' />
+              <h2>Metric Selection</h2>
+            </div>
+            <p style={{
+              fontSize: '1.3vw',
+              color: 'gray',
+              margin: 0
+            }}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
           </div>
-          <div className="attacks-grid">
-            {metrics.map((metrics) => (
-              <OptionCard
-                id={metrics.id}
-                name={metrics.name}
-                description={metrics.description}
-                isSelected={selectedMetrics.has(metrics.id)}
-                onSelect={(id: string) => handleSelection(id, setSelectedAttacks)}
-                Icon={Ruler}
-              />
-            ))}
-          </div>
+          <TableWrapper
+            elements={metrics}
+            selectedElement={selectedMetrics}
+            setSelectedElements={setSelectedMetrics}
+            Icon={Ruler}
+          />
         </div>
 
       </div >);

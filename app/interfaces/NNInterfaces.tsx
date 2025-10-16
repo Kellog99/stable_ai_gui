@@ -1,19 +1,11 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
 export interface ModelSpecs {
-    name: string;
-    task: string;
-    numClasses: number;
-    pretrained: boolean;
-    mode: string;
-}
-export interface Job {
-  last_attack_performed: string,
-  progress: number,
-  is_over: boolean,
-  model: string,
-  dataset: string,
-  id: number
+  name: string;
+  task: string;
+  numClasses: number;
+  pretrained: boolean;
+  mode: string;
 }
 
 export interface Task {
@@ -68,12 +60,13 @@ export interface ParametersProps {
   description: string
 }
 
-export interface AttackProps {
-  id: string
-  knowledge: string
-  name: string
+export interface RegisterObjectProps {
+  id: string,
+  name: string,
   description: string
-  parameters: ParametersProps[]
+  task?: string
+  knowledge?: string
+  parameters?: ParametersProps[]
 }
 
 // Settings Modal Component
@@ -83,9 +76,3 @@ export interface ParametersWindowProps {
   parameters: ParametersProps[],
 }
 
-
-export interface MetricsProps {
-  name: string,
-  id: string,
-  description: string
-}

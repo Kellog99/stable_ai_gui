@@ -4,47 +4,53 @@ import { ParametersProps } from '@/interfaces/NNInterfaces';
 import './AttackCard.css';
 import ParametersWindow from './Parameters';
 
-interface AttackCardProps {
+interface OptionCardProps {
   id: string,
   name: string,
   description?: string,
   parameters?: ParametersProps[],
   isSelected: boolean;
-  onSelect: (attackId: string) => void;
+  onSelect: () => void;
   Icon: LucideIcon
+  tags?: string[]
 }
 
-const OptionCard: React.FC<AttackCardProps> = ({
+export function OptionCard({
   id,
   name,
-  parameters,
   description,
+  parameters,
   isSelected,
   onSelect,
-  Icon
-}) => {
+  Icon,
+  tags
+}: OptionCardProps) {
   const [openSettings, setIsExpanded] = useState(false);
   return (
     <><div className="attack-card">
       <input
         className='checkbox'
         type="checkbox"
-        onClick={() => onSelect(id)}
-        defaultChecked={isSelected} />
+        onChange={onSelect}
+        checked={isSelected} />
       <div className='card-body'>
-        <div className="card-header" >
           <span className='title'>{name}</span>
-          <div
-            className='open'
-            onClick={() => setIsExpanded(true)} >
-            <Icon className='icon' />
-          </div>
-        </div>
-        {description ?
-          <div className='description'>
-            {description}
-          </div>
-          : null}
+          {
+            tags && tags.length > 0 ?
+              tags.map(tag => (
+                <div className='option-tag'>{tag}</div>
+              )) : null
+          }
+          {description ?
+            <div className='description'>
+              {description}
+            </div>
+            : null}
+      </div>
+      <div
+        className='open'
+        onClick={() => setIsExpanded(true)} >
+        <Icon className='icon' />
       </div>
     </div>
       {
