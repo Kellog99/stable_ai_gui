@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
-import { Play, Settings, Ruler, BrickWallFire, Bug, Gauge } from 'lucide-react';
+import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon } from 'lucide-react';
 import useNNTrustStore from '@/store/nnTrustStore';
 
 const Benchmark: React.FC = () => {
@@ -62,7 +62,7 @@ const Benchmark: React.FC = () => {
       <div className='attack-title'>
         <div className='attack-header'>
           <div className='attack-icon'>
-            <BrickWallFire size={'6vw'} color='red' />
+            <BrickWallFireIcon size={'6vw'} color='red' />
             <h1>Red Teaming</h1>
           </div>
           <p style={{ margin: '0' }}>This page provides a set of vulnerabilities that can be used to test the model's robustness and a set of metrics to register the performance of each attack.</p>

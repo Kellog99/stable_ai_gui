@@ -6,14 +6,14 @@ import { AttackSelector } from '@/components/client/test/AttackSelector';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
 import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
-import { AdvanceResult, AttackResult, AttackStats } from '@/interfaces/testInterfaces';
+import { AdvanceResult, AttackResult } from '@/interfaces/testInterfaces';
 import styles from '@/styles/Test.module.css';
-import { AttackProps, ParametersProps } from '@/interfaces/NNInterfaces';
+import { RegisterObjectProps, ParametersProps } from '@/interfaces/NNInterfaces';
 
 function Test() {
     // Initialize with default values, will be updated in useEffect
-    const [attackList, setAttackList] = useState<AttackProps[]>([]);
-    const [selectedAttack, setSelectedAttack] = useState<AttackProps | undefined>()
+    const [attackList, setAttackList] = useState<RegisterObjectProps[]>([]);
+    const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps | undefined>()
     const [attackParameters, setAttackParameters] = useState<ParametersProps[]>([])
 
     // since the attacks in the library are fixed, it is required just one fetch.
@@ -168,7 +168,7 @@ function Test() {
                     </div>
                     {
                         advanceOption && (
-                            selectedAttack && selectedAttack.parameters.length > 0 ?
+                            selectedAttack && selectedAttack.parameters!.length > 0 ?
                                 <ParameterControls
                                     parameters={selectedAttack?.parameters} />
                                 : <p style={{ color: 'gray' }}>No parameters available for custom settings.</p>

@@ -6,7 +6,6 @@
 .scroll-container {
     overflow-y: auto;
     height: 30rem;
-
     padding: 1rem;
     background-color: white;
     border-radius: 2vw;
