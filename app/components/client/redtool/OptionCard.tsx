@@ -23,7 +23,7 @@ export function OptionCard({
   isSelected,
   onSelect,
   Icon,
-  tags
+  tags,
 }: OptionCardProps) {
   const [openSettings, setIsExpanded] = useState(false);
   return (
@@ -34,18 +34,20 @@ export function OptionCard({
         onChange={onSelect}
         checked={isSelected} />
       <div className='card-body'>
-          <span className='title'>{name}</span>
-          {
-            tags && tags.length > 0 ?
-              tags.map(tag => (
-                <div className='option-tag'>{tag}</div>
-              )) : null
-          }
-          {description ?
+        <span className='title'>{name}</span>
+        {
+          tags && tags.length > 0 ?
+            tags.map(tag => (
+              <div className='option-tag'>{tag}</div>
+            )) : null
+        }
+        {
+          description ?
             <div className='description'>
               {description}
             </div>
-            : null}
+            : null
+        }
       </div>
       <div
         className='open'
@@ -55,6 +57,7 @@ export function OptionCard({
     </div>
       {
         parameters ? <ParametersWindow
+          id={id}  // Add this line
           isOpen={openSettings}
           parameters={parameters}
           onClose={() => setIsExpanded(false)}

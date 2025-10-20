@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
@@ -8,55 +8,71 @@ import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon } from 'lucide-rea
 import useNNTrustStore from '@/store/nnTrustStore';
 
 const Benchmark: React.FC = () => {
-  const [attacks, setAttacks] = useState<RegisterObjectProps[]>([]);
-  const [metrics, setMetrics] = useState<RegisterObjectProps[]>([]);
 
-  const [selectedAttacks, setSelectedAttacks] = useState<Set<string>>(new Set());
-  const [selectedMetrics, setSelectedMetrics] = useState<Set<string>>(new Set());
+  const { attacks, metrics, selectedAttacks, selectedMetrics, setSelectedAttacks, setSelectedMetrics, monitoring, setMonitoring, setExecutedAttacks } = useNNTrustStore()
 
-  useEffect(() => {
-    async function fetchItem() {
-      // fetching the attacks
-      try {
-        const response = await fetch('http://127.0.0.1:8000/attacks/getInfo');
-        if (!response.ok) {
-          throw new Error(`HTTP error for the attack List! Status: ${response.status}`);
-        }
-        const json = await response.json();
-        setAttacks(json);
-        if (json.length > 0) {
-          const allIds = json.map((attack: RegisterObjectProps) => attack.id);
-          setSelectedAttacks(new Set(allIds));
-        }
-      } catch (err) {
-        console.log(err instanceof Error ? err.message : "An error occurred");
-      }
-      // fetching the metrics
-      try {
-        const response = await fetch('http://127.0.0.1:8000/metrics/getInfo');
-        if (!response.ok) {
-          throw new Error(`HTTP error for the metric List! Status: ${response.status}`);
-        }
-        const json = await response.json();
-        setMetrics(json);
-        if (json.length > 0) {
-          const allIds = json.map((metric: RegisterObjectProps) => metric.id);
-          setSelectedMetrics(new Set(allIds));
-        }
-      } catch (err) {
-        console.log(err instanceof Error ? err.message : "An error occurred");
-      }
+  // Click Selection Handle
+  const handleSelectionClick = (
+    id: string,
+    map: Map<string, RegisterObjectProps>,
+    setMap: (map: Map<string, RegisterObjectProps>) => void,
+    completeList: Map<string, RegisterObjectProps>
+  ) => {
+    //with the first two cases I handle the selection button for selecting every attacks or deselecting everything
+    if (id === 'all') {
+      setMap(completeList)
     }
-    fetchItem();
-  }, []);
+    else if (id === 'none') {
+      setMap(new Map())
+    }
+    else {
+      const copiedMap = new Map(map);
+
+      if (copiedMap.has(id)) {
+        copiedMap.delete(id)
+      }
+      else {
+        copiedMap.set(id, completeList.get(id)!)
+      }
+      setMap(copiedMap)
+    }
+  };
 
   // variables for executing the benchmarking
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
-  const setStoredAttacks = useNNTrustStore((state) => state.setAttacks)
-  const ableMonitoring = useNNTrustStore((state) => state.setEnableMonitoring)
 
-  const storedAttacks = useNNTrustStore((state) => state.attacks)
-  // True display of the page when everything goes as planned.
+
+  // Click Execution Attack Handle
+  const handleClick = async () => {
+    try {
+      // Block any new click on the button
+      setExecuteBenchmark(false);
+      // Allows to see the Monitoring
+      setMonitoring(true)
+      const response = await fetch('http://127.0.0.1:8000/attacks/executeBenchmark', {
+        method: "POST",
+        body: JSON.stringify(selectedAttacks),
+        headers: {
+          'Content-type': 'application/json'
+        }
+      });
+
+      console.log('Status:', response.status);
+      const results = await response.json();
+      console.log('Response:', results);
+      setExecutedAttacks(results)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('ERROR:', error);
+    } finally {
+      setExecuteBenchmark(true);
+    }
+
+  };
+
   return (
     < div className="attack-list" >
       <div className='attack-title'>
@@ -70,15 +86,7 @@ const Benchmark: React.FC = () => {
         <button
           className='attack-button'
           disabled={!executeBenchmark}
-          onClick={() => {
-            //Since there must be only one benchmark at the time I have to disable the button at the beginning
-            setExecuteBenchmark(false);
-            setStoredAttacks(selectedAttacks)
-            ableMonitoring(true)
-            console.log(storedAttacks)
-
-            setExecuteBenchmark(true)
-          }}>
+          onClick={handleClick}>
           <Play className='icon' />
           <div className='btn-desc'> Execute benchmark</div>
         </button>
@@ -104,7 +112,12 @@ const Benchmark: React.FC = () => {
         <TableWrapper
           elements={attacks}
           selectedElement={selectedAttacks}
-          setSelectedElements={setSelectedAttacks}
+          handleSelection={(id: string) => handleSelectionClick(
+            id,
+            selectedAttacks,
+            setSelectedAttacks,
+            attacks
+          )}
           Icon={Settings}
         />
 
@@ -123,7 +136,12 @@ const Benchmark: React.FC = () => {
         <TableWrapper
           elements={metrics}
           selectedElement={selectedMetrics}
-          setSelectedElements={setSelectedMetrics}
+          handleSelection={(id: string) => handleSelectionClick(
+            id,
+            selectedMetrics,
+            setSelectedMetrics,
+            metrics
+          )}
           Icon={Ruler}
         />
       </div>

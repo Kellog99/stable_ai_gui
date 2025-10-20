@@ -74,5 +74,6 @@ export interface ParametersWindowProps {
   isOpen: boolean,
   onClose: () => void,
   parameters: ParametersProps[],
+  handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
 }
 

@@ -5,35 +5,18 @@ import { LucideIcon } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 
 interface TableWrapperProps {
-    elements: RegisterObjectProps[];
-    selectedElement: Set<string>;
+    elements: Map<string, RegisterObjectProps>;
+    selectedElement: Map<string, RegisterObjectProps>;
     Icon: LucideIcon
-    setSelectedElements: (ids: Set<string>) => void;
+    handleSelection: (id: string) => void;
 }
 
 const TableWrapper: React.FC<TableWrapperProps> = ({
     elements,
     selectedElement,
-    setSelectedElements,
+    handleSelection,
     Icon
 }) => {
-
-    const handleSelection = (
-        id: string,
-    ) => {
-        let newSelected = new Set(selectedElement)
-        if (newSelected.has(id)) {
-            newSelected.delete(id)
-        }
-        else {
-            newSelected.add(id)
-        }
-        setSelectedElements(newSelected);
-    };
-
-    // Count of selected elements
-    const selectedCount = selectedElement.size;
-
     // Type guard to check if element is AttackProps
     const getTags = (element: RegisterObjectProps) => {
         const tags = []
@@ -52,44 +35,31 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 <div>
                     <h2 className="table-title">Elements</h2>
                     <p className="subtitle">
-                        Selected: {selectedCount} / {elements.length}
+                        Selected: {Object.keys(selectedElement).length} / {Object.keys(elements).length}
                     </p>
                 </div>
                 <div className='buttons-container'>
                     <button
                         className="button"
-                        onClick={() => {
-                            // adding every element to the list
-                            const newSelected = new Set<string>()
-                            elements.forEach((element: RegisterObjectProps) => {
-                                newSelected.add(element.id)
-                            })
-                            setSelectedElements(newSelected)
-                            console.log(newSelected)
-                        }}
+                        onClick={() => { handleSelection("all") }}
                     > Select All </button>
                     <button
                         className="button"
-                        onClick={() => {
-                            // adding every element to the list
-                            const newSelected = new Set<string>()
-                            setSelectedElements(newSelected)
-                            console.log(newSelected)
-                        }}> Deselect All </button>
+                        onClick={() => { handleSelection("none") }}> Deselect All </button>
                 </div>
             </div>
 
             <div className="scroll-container">
                 <ul className='list'>
-                    {elements.map((element) => (
-                        <li key={element.id} className='list-item'>
+                    {Object.entries(elements).map(([id, element]) => (
+                        <li key={id} className='list-item'>
                             <OptionCard
-                                id={element.id}
+                                id={id}
                                 name={element.name}
                                 tags={getTags(element)}
                                 description={element.description}
                                 parameters={element.parameters}
-                                isSelected={selectedElement.has(element.id)}
+                                isSelected={id in selectedElement}
                                 onSelect={() => handleSelection(element.id)}
                                 Icon={Icon}
                             />

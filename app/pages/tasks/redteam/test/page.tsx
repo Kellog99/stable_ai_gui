@@ -60,7 +60,6 @@ function Test() {
         if (!loading && clicked) {
             try {
                 setLoading(true);
-                console.log("data =", uploadedFile?.split(",")[1])
                 const response = await fetch('http://127.0.0.1:8000/attacks/executeAttack', {
                     method: "POST",
                     body: JSON.stringify({
