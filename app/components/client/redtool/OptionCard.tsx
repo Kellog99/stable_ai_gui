@@ -5,23 +5,23 @@ import './AttackCard.css';
 import ParametersWindow from './Parameters';
 
 interface OptionCardProps {
-  id: string,
   name: string,
   description?: string,
   parameters?: ParametersProps[],
   isSelected: boolean;
-  onSelect: () => void;
   Icon: LucideIcon
   tags?: string[]
+  onSelect: () => void;
+  handleParametersChange: (parameters: number[]) => void;
 }
 
 export function OptionCard({
-  id,
   name,
   description,
   parameters,
   isSelected,
   onSelect,
+  handleParametersChange,
   Icon,
   tags,
 }: OptionCardProps) {
@@ -36,10 +36,11 @@ export function OptionCard({
       <div className='card-body'>
         <span className='title'>{name}</span>
         {
-          tags && tags.length > 0 ?
-            tags.map(tag => (
-              <div className='option-tag'>{tag}</div>
-            )) : null
+          tags && tags.length > 0 && (
+            tags.map((tag, index) => (
+              <div key={`${tag}-${index}`}
+                className='option-tag'>{tag}</div>
+            )))
         }
         {
           description ?
@@ -49,19 +50,19 @@ export function OptionCard({
             : null
         }
       </div>
-      <div
-        className='open'
-        onClick={() => setIsExpanded(true)} >
-        <Icon className='icon' />
-      </div>
+
+      <Icon
+        onClick={() => setIsExpanded(true)}
+        className='icon' />
     </div>
       {
-        parameters ? <ParametersWindow
-          id={id}  // Add this line
-          isOpen={openSettings}
-          parameters={parameters}
-          onClose={() => setIsExpanded(false)}
-        /> : null
+        parameters ?
+          <ParametersWindow
+            isOpen={openSettings}
+            parameters={parameters}
+            onClose={() => setIsExpanded(false)}
+            handleParametersChange={handleParametersChange} />
+          : null
       }
     </>
   );

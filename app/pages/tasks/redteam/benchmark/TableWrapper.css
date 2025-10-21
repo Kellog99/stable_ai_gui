@@ -4,23 +4,16 @@
 }
 
 .scroll-container {
+    display: grid;
+    grid-auto-rows: clamp(60px, 9vw, 180px);
+    row-gap: 10px;
     overflow-y: auto;
-    height: 30rem;
+    height: 50rem;
     padding: 1rem;
     background-color: white;
     border-radius: 2vw;
 }
 
-.list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.list-item {
-    margin-bottom: 0.5rem;
-    cursor: pointer;
-}
 
 .header {
     display: flex;

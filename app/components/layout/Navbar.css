@@ -1,5 +1,6 @@
 .navbar-container {
-    height: 100vw;
+    height: auto-fill;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     transition: width 0.3s ease;

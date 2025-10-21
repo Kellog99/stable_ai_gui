@@ -11,28 +11,28 @@ export interface AttackManagementProps {
 interface AppState {
   models: ModelSpecs[] | null;
   modelName: string | null;
-  attacks: Map<string, RegisterObjectProps>;
-  metrics: Map<string, RegisterObjectProps>;
+  attacks: { [key: string]: RegisterObjectProps };
+  metrics: { [key: string]: RegisterObjectProps };
 
-  selectedAttacks: Map<string, RegisterObjectProps>;
-  selectedMetrics: Map<string, RegisterObjectProps>;
+  selectedAttacks: { [key: string]: RegisterObjectProps };
+  selectedMetrics: { [key: string]: RegisterObjectProps };
 
+
+  testAttack: RegisterObjectProps | null; // this variable saves the attack to test on the Test Page
   executedAttacks: AttackManagementProps[];
-  monitoring: boolean;
   loading: boolean;
   error: string | null;
 
   setModels: (models: ModelSpecs[] | null) => void;
   setModelName: (modelName: string | null) => void;
-  setAttacks: (attaks: Map<string, RegisterObjectProps>) => void;
-  setMetrics: (metrics: Map<string, RegisterObjectProps>) => void;
-  setSelectedAttacks: (selectedAttack: Map<string, RegisterObjectProps>) => void;
-  setSelectedMetrics: (selectedMetrics: Map<string, RegisterObjectProps>) => void;
+  setAttacks: (attaks: { [key: string]: RegisterObjectProps }) => void;
+  setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
+  setSelectedAttacks: (selectedAttack: { [key: string]: RegisterObjectProps }) => void;
+  setSelectedMetrics: (selectedMetrics: { [key: string]: RegisterObjectProps }) => void;
   setMap: (
-    map: Map<string, RegisterObjectProps>,
+    map: { [key: string]: RegisterObjectProps },
     name: 'attacks' | 'metrics' | 'selectedAttacks' | 'selectedMetrics'
   ) => void;
-  setMonitoring: (monitoring: boolean) => void;
   setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => void;
 }
 
@@ -42,14 +42,15 @@ const useNNTrustStore = create<AppState>()(
       models: null,
       modelName: null,
 
-      attacks: new Map(),
-      metrics: new Map(),
-      selectedAttacks: new Map(),
-      selectedMetrics: new Map(),
+      attacks: {},
+      metrics: {},
+      selectedAttacks: {},
+      selectedMetrics: {},
 
       executedAttacks: [],
 
-      monitoring: false,
+      testAttack: null,
+
       loading: false,
       error: null,
 
@@ -62,9 +63,7 @@ const useNNTrustStore = create<AppState>()(
       setSelectedMetrics: (selectedMetrics) => set({ selectedMetrics }),
 
       setMap: (map, name) => set({ [name]: map }),
-      setMonitoring: (monitoring: boolean) => set({ monitoring }),
       setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => set({ executedAttacks })
-
     }),
 
     {
@@ -75,7 +74,7 @@ const useNNTrustStore = create<AppState>()(
         modelName: state.modelName,
         attacks: state.attacks,
         metrics: state.metrics,
-        monitoring: state.monitoring,
+        selectedAttacks: state.selectedAttacks
         // Don't persist loading and error states
       }),
     }

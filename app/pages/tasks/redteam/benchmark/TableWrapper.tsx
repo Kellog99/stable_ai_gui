@@ -5,16 +5,18 @@ import { LucideIcon } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 
 interface TableWrapperProps {
-    elements: Map<string, RegisterObjectProps>;
-    selectedElement: Map<string, RegisterObjectProps>;
+    elements: { [key: string]: RegisterObjectProps };
+    selectedElement: { [key: string]: RegisterObjectProps };
     Icon: LucideIcon
     handleSelection: (id: string) => void;
+    handleParametersChange: (id: string, parameters: number[]) => void;
 }
 
 const TableWrapper: React.FC<TableWrapperProps> = ({
     elements,
     selectedElement,
     handleSelection,
+    handleParametersChange,
     Icon
 }) => {
     // Type guard to check if element is AttackProps
@@ -50,22 +52,19 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
             </div>
 
             <div className="scroll-container">
-                <ul className='list'>
-                    {Object.entries(elements).map(([id, element]) => (
-                        <li key={id} className='list-item'>
-                            <OptionCard
-                                id={id}
-                                name={element.name}
-                                tags={getTags(element)}
-                                description={element.description}
-                                parameters={element.parameters}
-                                isSelected={id in selectedElement}
-                                onSelect={() => handleSelection(element.id)}
-                                Icon={Icon}
-                            />
-                        </li>
-                    ))}
-                </ul>
+                {Object.entries(elements).map(([id, element]) => (
+                    <OptionCard
+                        key={id}
+                        name={element.name}
+                        tags={getTags(element)}
+                        description={element.description}
+                        parameters={element.parameters}
+                        isSelected={id in selectedElement}
+                        onSelect={() => handleSelection(element.id)}
+                        Icon={Icon}
+                        handleParametersChange={(parameters: number[]) => { handleParametersChange(id, parameters) }} />
+                ))}
+
             </div>
         </div>
     );

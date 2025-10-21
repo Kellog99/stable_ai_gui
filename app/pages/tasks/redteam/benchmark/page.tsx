@@ -9,34 +9,57 @@ import useNNTrustStore from '@/store/nnTrustStore';
 
 const Benchmark: React.FC = () => {
 
-  const { attacks, metrics, selectedAttacks, selectedMetrics, setSelectedAttacks, setSelectedMetrics, monitoring, setMonitoring, setExecutedAttacks } = useNNTrustStore()
+  const { attacks, metrics, selectedAttacks, selectedMetrics, setSelectedAttacks, setSelectedMetrics, setExecutedAttacks } = useNNTrustStore()
 
-  // Click Selection Handle
+  // Handle the selection of an attack
   const handleSelectionClick = (
     id: string,
-    map: Map<string, RegisterObjectProps>,
-    setMap: (map: Map<string, RegisterObjectProps>) => void,
-    completeList: Map<string, RegisterObjectProps>
+    map: { [key: string]: RegisterObjectProps },
+    setMap: (map: { [key: string]: RegisterObjectProps }) => void,
+    completeList: { [key: string]: RegisterObjectProps }
   ) => {
     //with the first two cases I handle the selection button for selecting every attacks or deselecting everything
     if (id === 'all') {
       setMap(completeList)
     }
     else if (id === 'none') {
-      setMap(new Map())
+      setMap({})
     }
     else {
-      const copiedMap = new Map(map);
+      const copiedMap = { ...map };
 
-      if (copiedMap.has(id)) {
-        copiedMap.delete(id)
+      if (id in copiedMap) {
+        delete copiedMap[id]
       }
       else {
-        copiedMap.set(id, completeList.get(id)!)
+        copiedMap[id] = completeList[id]
       }
       setMap(copiedMap)
     }
   };
+
+  // Handle the saving of a new set of parameters
+  const handleParametersChange = (
+    id: string,
+    parameters: number[],
+    setMap: (map: { [key: string]: RegisterObjectProps }) => void,
+    registeredObject: { [key: string]: RegisterObjectProps },
+  ) => {
+    // Get the appropriate map based on type
+    const currentMap: { [key: string]: RegisterObjectProps } = { ...registeredObject };
+    const currentObject = currentMap[id];
+    if (currentObject && currentObject.parameters) {
+      // updating the new parameters that wants to be set
+      currentObject.parameters.map((param, index) => {
+        param.default = parameters[index]
+      })
+      // Update the map
+      currentMap[id] = currentObject;
+      // Save to store
+      setMap(currentMap);
+    }
+  }
+
 
   // variables for executing the benchmarking
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
@@ -47,8 +70,6 @@ const Benchmark: React.FC = () => {
     try {
       // Block any new click on the button
       setExecuteBenchmark(false);
-      // Allows to see the Monitoring
-      setMonitoring(true)
       const response = await fetch('http://127.0.0.1:8000/attacks/executeBenchmark', {
         method: "POST",
         body: JSON.stringify(selectedAttacks),
@@ -100,11 +121,7 @@ const Benchmark: React.FC = () => {
             <Bug size={'3vw'} color='red' />
             <h2>Vulnearbility selection</h2>
           </div>
-          <p style={{
-            fontSize: '1.3vw',
-            color: 'gray',
-            margin: 0
-          }}>
+          <p style={{ margin: 0 }}>
             Here below, are listed all the possible vulnerabilities that can be tested on the selected model.
             For customizing a vulnearbility click on the "Settings" icon on the right. A Panel will be shown on top where all the possible customizable parameters are shown.
           </p>
@@ -118,6 +135,14 @@ const Benchmark: React.FC = () => {
             setSelectedAttacks,
             attacks
           )}
+          handleParametersChange={(id: string, parameters: number[]) => {
+            handleParametersChange(
+              id,
+              parameters,
+              setSelectedAttacks,
+              selectedAttacks
+            )
+          }}
           Icon={Settings}
         />
 
@@ -127,11 +152,7 @@ const Benchmark: React.FC = () => {
             <Gauge size={'3vw'} color='red' />
             <h2>Metric Selection</h2>
           </div>
-          <p style={{
-            fontSize: '1.3vw',
-            color: 'gray',
-            margin: 0
-          }}> Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
+          <p > Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
         </div>
         <TableWrapper
           elements={metrics}
@@ -143,7 +164,12 @@ const Benchmark: React.FC = () => {
             metrics
           )}
           Icon={Ruler}
-        />
+          handleParametersChange={(id: string, parameters: number[]) => {
+            handleParametersChange(id,
+              parameters,
+              setSelectedMetrics,
+              selectedMetrics)
+          }} />
       </div>
 
     </div >);

@@ -4,20 +4,20 @@ import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
 
 interface ParametersWindowProps {
-    id: string;  // Add the ID of the option being configured
     isOpen: boolean;
-    onClose: () => void;
     parameters: ParametersProps[];
+    onClose: () => void;
+    handleParametersChange: (parameters: number[]) => void;
 }
 
 const ParametersWindow: React.FC<ParametersWindowProps> = ({
-    id,
     isOpen,
-    onClose,
     parameters,
+    onClose,
+    handleParametersChange
 }) => {
-    // Initialize state with parameter defaults
-    const [values, setValues] = useState<number[]>([]);
+    const [values, setValues] = useState<number[]>(parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []);
+    const defaultParameters = parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []
 
     // Update values when parameters change or modal opens
     useEffect(() => {
@@ -35,16 +35,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
     };
 
     const handleReset = () => {
-        setValues(parameters.map(p => p.default));
-    };
-
-    const handleSave = () => {
-        // Create updated parameters with new values
-        const updatedParams = parameters.map((param, index) => ({
-            ...param,
-            default: values[index]
-        }));
-        onClose();
+        setValues(defaultParameters);
     };
 
     return (
@@ -104,10 +95,14 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                         Reset to Default
                     </button>
                     <div className="button-group">
-                        <button onClick={onClose} className="cancel-button">
+                        <button
+                            onClick={onClose}
+                            className="cancel-button">
                             Cancel
                         </button>
-                        <button onClick={handleSave} className="save-button">
+                        <button
+                            onClick={() => handleParametersChange(values)}
+                            className="save-button">
                             Save Changes
                         </button>
                     </div>

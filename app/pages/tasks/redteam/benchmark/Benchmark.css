@@ -67,3 +67,8 @@
   margin-bottom: 2vw;
   margin-top: 2vw;
 }
+
+.option-attacks p {
+  margin: 0;
+  color: rgb(187, 184, 184);
+}

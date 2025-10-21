@@ -63,7 +63,6 @@ export default function Navbar() {
             const fetchData = async () => {
                 const fetchattack = await fetchItem('http://127.0.0.1:8000/attacks/getInfo');
                 const fetchmetrics = await fetchItem('http://127.0.0.1:8000/metrics/getInfo');
-
                 if (fetchattack) {
                     setAttacks(fetchattack);
                     setSelectedAttacks(fetchattack);
@@ -115,6 +114,7 @@ export default function Navbar() {
                 {sections.length > 0 &&
                     (sections.map((item) => (
                         <NavigationButton
+                            key={item.id}
                             id={item.id}
                             title={item.title}
                             Icon={item.Icon}
