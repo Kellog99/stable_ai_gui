@@ -1,6 +1,6 @@
 "use client";
 
-import FeatureDisplayer from '@/components/client/FeatureDisplayer';
+import FeatureDisplayer from '@/components/client/FeatureDisplayerFINAL';
 import MovableWindow from '@/components/client/MovableWindow';
 import { IsFeatureBond, IsFeatureSameLength } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/genericInterface';

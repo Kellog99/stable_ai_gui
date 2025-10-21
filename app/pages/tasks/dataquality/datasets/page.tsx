@@ -1,7 +1,7 @@
 "use client";
 
 import { BarChartCustom } from "@/components/client/BarChart";
-import FeatureDisplayer from "@/components/client/FeatureDisplayer";
+import FeatureDisplayer from "@/components/client/FeatureDisplayerFINAL";
 import SchemaShower from "@/components/client/SchemaShower";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { IsFeatureBond, IsFeaturePresent } from "@/functionalities/Utils";
@@ -278,10 +278,9 @@ export default function Datasets() {
     setLabelFeature(null)
   }
 
-
-
-
   return (
+    <>
+      
     <div className={classes.pageContainer}>
       <div
         className={classes.title}
@@ -598,5 +597,7 @@ export default function Datasets() {
       </div>
 
     </div >
+ 
+    </>
   );
 }
