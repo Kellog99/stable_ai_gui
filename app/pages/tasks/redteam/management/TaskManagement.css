@@ -8,6 +8,44 @@
     padding: 1.5rem;
 }
 
+.management-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-button {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    height: 4vw;
+    min-width: 100px;
+    aspect-ratio: calc(3.14);
+    font-size: 1rem;
+    justify-content: space-between;
+    padding: 1.5vw;
+    border-radius: 1vw;
+    background-color: #222;
+    color: white;
+}
+
+.header-button svg {
+    transition: all 0.4s ease;
+}
+
+.header-button:hover:not(.disabled) {
+    background-color: #333;
+}
+
+.header-button:hover:not(.disabled) svg {
+    transform: translateX(5px);
+}
+
+.header-button.disabled {
+    opacity: 0.6;
+}
+
 h1 {
     font-size: 1.875rem;
     font-weight: bold;
@@ -70,7 +108,7 @@ select:focus {
 }
 
 .table-wrapper {
-    max-height: 1000px;
+    max-height: 80vh;
     /* Set vertical scroll limit */
     overflow-y: auto;
     /* Enable vertical scrolling */

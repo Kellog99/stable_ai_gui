@@ -1,4 +1,4 @@
-import { ModelSpecs, ParametersProps, RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -22,6 +22,8 @@ interface AppState {
   executedAttacks: AttackManagementProps[];
   loading: boolean;
   error: string | null;
+
+  // report
 
   setModels: (models: ModelSpecs[] | null) => void;
   setModelName: (modelName: string | null) => void;

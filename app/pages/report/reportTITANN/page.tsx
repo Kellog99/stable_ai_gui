@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './Report.css'
 import { mockData, benchmarkData } from './examples';
 import { ReportProps, BenchmarkDataProps } from '@/interfaces/reportInterfaces';
-import AttackTable from '../../../../components/client/nntrustReport/AttackTable';
-import BenchmarkTable from '../../../../components/client/nntrustReport/BenchmarkTable';
+import AttackTable from '@/components/client/nntrustReport/AttackTable';
+import BenchmarkTable from '@/components/client/nntrustReport/BenchmarkTable';
 
 
 
