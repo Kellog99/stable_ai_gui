@@ -1,6 +1,6 @@
 "use client";
 
-import FeatureDisplayer from "@/components/client/FeatureDisplayer";
+import FeatureDisplayer from "@/components/client/FeatureDisplayerFINAL";
 import { getPrototypes } from "@/functionalities/BackendUtils";
 import { IsFeatureSameLength } from "@/functionalities/Utils";
 import Dataset, { PrototypesInt } from "@/interfaces/genericInterface";

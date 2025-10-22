@@ -1,13 +1,21 @@
 "use client";
 import TaskButton from '@/components/client/buttons/TaskButton';
 import { Task } from '@/interfaces/NNInterfaces';
+import useStoreDQ from '@/store/dsStore';
+import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/HomePage.module.css';
-import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
-import { FileDropZoneProps } from "./interfaces/NNInterfaces";
-import HomePageDrop from './pages/HomePage/HomePageDrop';
+import { BarChart3, Database, FileText, TestTube, Upload } from 'lucide-react';
+import { DatasetRepository } from './components/client/DatasetsRepoLoad';
+import FileDropZone2 from './components/client/FileDropZone2';
+import { ModelRepository } from './components/client/ModelDisplayer';
+import { ModalUploadDataset } from './components/client/upload/ModalUploadDataset';
+import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
+import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
+import DatasetsLoader from './functionalities/DatasetsLoader';
+import { getModels } from './functionalities/NNTrustBackendUtils';
+import { uploadDataset_check, uploaderDataset, uploadModel, uploadModel_check } from './properties/urls';
 
 
-// major information about the tasks
 const tasks: Task[] = [
   {
     title: "Benchmark",
@@ -35,47 +43,95 @@ const tasks: Task[] = [
   }
 ]
 
-
-// information about the Drop components.
-const homePageDropZones: FileDropZoneProps[] = [
-  {
-    id: "drop1",
-    title: "Dataset",
-    Icon: Database,
-    description: "Upload your dataset in ZIP format",
-    acceptedTypes: [ '.zip' ],
-    isLoaded: false,
-    loadedFileName: "dataset?.name",
-  },
-  {
-    id: "drop2",
-    title: "Model",
-    Icon: Brain,
-    description: "Upload your model in a `.pth` format",
-    acceptedTypes: [ '.zip' ],
-    isLoaded: false,
-    loadedFileName: "dataset?.name",
-  } ]
-
-
 const HomePage: React.FC = ( { } ) =>
 {
+  const setModels = useStore( ( state ) => state.setModels )
+  const setDatasets = useStoreDQ( ( state ) => state.setDatasets )
+
+  const ZipDragDrop = () =>
+  {
+    return (
+      <DragDrop
+        config={ {
+          name: "dataset",
+          fileType: 'zip',
+          accept: 'application/zip',
+          formFieldName: "folder_zip",
+          description: 'Make sure your zip contains raw data and a json config file.',
+          uploadUrlCheck: uploadDataset_check,
+          uploadUrl: uploaderDataset,
+          refreshFunction: DatasetsLoader,
+          setRefreshData: setDatasets
+        } }
+        infoModal={ <ModalUploadDataset /> } /> )
+  }
+
+  const ZipModelDragDrop = () =>
+  {
+    return (
+      <DragDrop
+        config={ {
+          name: "model",
+          fileType: 'zip',
+          accept: 'application/zip',
+          formFieldName: "file",
+          description: 'Make sure your zip contains raw data and a json config file.',
+          uploadUrlCheck: uploadModel_check,
+          uploadUrl: uploadModel,
+          refreshFunction: getModels,
+          setRefreshData: setModels
+
+        } }
+        infoModal={ <ModalUploadModel /> } /> )
+  }
+
+  const datasetSections = [
+    {
+      id: "selection",
+      title: "Upload Dataset",
+      Icon: Upload,
+      child: ZipDragDrop
+    },
+    {
+      id: "repository",
+      title: "Dataset Repository",
+      Icon: Database,
+      child: DatasetRepository
+    }
+  ];
+
+  const modelSections = [
+    {
+      id: "model",
+      title: "Upload Model",
+      Icon: Upload,
+      child: ZipModelDragDrop
+    },
+    {
+      id: "modrepository",
+      title: "Model Repository",
+      Icon: Database,
+      child: ModelRepository
+    }
+  ];
+
+  const listOfSections = [ datasetSections, modelSections ];
   return (
     <div className={ styles.homecontainer }>
 
-      {/* This part has to deal with the drop zone Elements 
-      <div className={styles.filegrid}>
-        {
-          homePageDropZones.map((dropElement: FileDropZoneProps) => (
-            <FileDropZone
-              key={dropElement.id}
-              {...dropElement} />
-          ))
-        }
-      </div>*/}
 
-      <HomePageDrop />
-      {/* This part has to deal with the Task part */ }
+
+      <div className={ styles.filegrid }>
+        { listOfSections.map( ( dropElement, index ) => (
+          <FileDropZone2
+            key={ index }
+            sections={ dropElement }
+            defaultActiveSection={ dropElement[ 0 ].id }
+          />
+        ) ) }
+
+      </div>
+
       <div className={ styles.task }>
         <div className={ styles.sectionheader }>
           <h2 className={ styles.sectiontitle }>

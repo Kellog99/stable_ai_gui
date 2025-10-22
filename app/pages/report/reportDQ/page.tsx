@@ -1,6 +1,6 @@
 "use client"
 
-import FeatureDisplayer from "@/components/client/FeatureDisplayer";
+import FeatureDisplayer from "@/components/client/FeatureDisplayerFINAL";
 import PDFPreviewModal from "@/components/client/ReportModal";
 import SchemaShower from "@/components/client/SchemaShower";
 import { FeatureSchema } from "@/interfaces/genericInterface";

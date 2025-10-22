@@ -13,16 +13,17 @@ import
     PointElement,
     Tooltip,
 } from 'chart.js';
-import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 
-import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
+import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayerFINAL';
 import featureLoader from "@/functionalities/FeatureLoader";
+import { useThumbnailWS } from "@/functionalities/useThumbnailWS";
 import { getScoreColor } from '@/functionalities/Utils';
 import { FeatureDTO } from "@/interfaces/genericInterface";
 import { OutliersDTO } from "@/interfaces/metricsInterface";
 import { image_type, text_type } from "@/properties/types";
+import useStore from "@/store/dsStore";
 
 
 ChartJS.register( LinearScale, PointElement, LineElement, Tooltip, Legend );
@@ -44,13 +45,13 @@ interface ChartJsPoint
 
 function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO } )
 {
-    const searchParams = useSearchParams();
+
     const { featureName, mode, score, indexes, score_per_sample } = outliersProp;
 
     const scoreRound = ( score * 100 ).toFixed( 1 );
     const [ feature, setFeature ] = useState<FeatureDTO | null>( null );
     const [ type, setType ] = useState( "" );
-    const [ datasetName, setDatasetName ] = useState<string | null>( "" );
+    const datasetName = useStore( ( state ) => state.datasetUsed?.name )
 
     const [ clickedOutlierData, setClickedOutlierData ] = useState<DataPoint | null>( null );
     const [ clicked, setClicked ] = useState<boolean>( false )
@@ -72,13 +73,6 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
         return score_per_sample ? score_per_sample.length - 1 : 0;
     }, [ score_per_sample ] );
 
-    useEffect( () =>
-    {
-        if ( searchParams.get( "datasetName" ) ) {
-            setDatasetName( searchParams.get( "datasetName" ) );
-        }
-    }, [ searchParams ] );
-
 
     useEffect( () =>
     {
@@ -87,8 +81,9 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
             {
                 try {
                     const featureLoaded = await featureLoader( datasetName, featureName );
-                    console.log( "FEATURE LOADED:", featureLoaded );
+
                     if ( featureLoaded.type === image_type || featureLoaded.type === text_type ) {
+
                         setFeature( featureLoaded );
                         setType( featureLoaded.type );
                     }
@@ -100,15 +95,31 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
         }
     }, [ datasetName, featureName ] );
 
+    const currentData =
+        feature?.datas && clickedOutlierData?.index !== undefined
+            ? feature.datas[ clickedOutlierData.index ]
+            : undefined;
+
+    // 🧠 Step 2: call the hook unconditionally (can accept undefined/null)
+    const { thumbnails, connectionStatus, requestThumbnail } = useThumbnailWS(
+        image_type,
+        currentData // 👈 this can be undefined — the hook should handle it
+    );
+
+    // 🧠 Step 3: react to changes
     useEffect( () =>
     {
-        if ( feature?.datas && clickedOutlierData?.index !== undefined ) {
-            const index = clickedOutlierData.index;
-            if ( index >= 0 && index < feature.datas.length ) {
-                setOutlierSel( feature.datas[ index ] );
+        if ( currentData ) {
+            const thumb = thumbnails.get( currentData );
+            if ( thumb ) {
+                setOutlierSel( thumb as string );
+            } else {
+                // Optionally trigger the thumbnail request if not loaded
+                requestThumbnail( currentData );
             }
         }
-    }, [ feature, clickedOutlierData ] );
+    }, [ currentData, thumbnails, requestThumbnail ] );
+
 
     const chartData = useMemo<ChartData<'scatter', ChartJsPoint[]>>( () =>
     {
@@ -357,7 +368,7 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
 
     return (
         <Flex direction="column" align="center" style={ { width: '100%', maxWidth: '100%' } }>
-            <Title order={3}>Score computed on { featureName } with { mode } mode</Title>
+            <Title order={ 3 }>Score computed on { featureName } with { mode } mode</Title>
             <RingProgress
                 size={ 180 }
                 roundCaps
@@ -419,7 +430,7 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                                 featureType={ type }
                                 outlier={ clickedOutlierData?.group }
                                 score={ clickedOutlierData?.score }
-                            />
+                                thumbnailUrl={ outlierSel } />
                         </Box>
                     </> ) : null }
 

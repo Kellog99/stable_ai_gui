@@ -1,6 +1,6 @@
 "use client"
 
-import FeatureDisplayer from "@/components/client/FeatureDisplayer";
+import FeatureDisplayer from "@/components/client/FeatureDisplayerFINAL";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { getScoreColor } from "@/functionalities/Utils";
 import { FeatureDTO } from "@/interfaces/genericInterface";

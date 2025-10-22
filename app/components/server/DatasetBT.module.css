@@ -1,11 +1,10 @@
 .dataset_buttons {
-  width:100vh;
   margin-bottom: 30px;
 }
 
 .card.card {
   
-  height: 280px;
+  height: auto;
   width: 100%;
   background: white;
   border: 1px solid #e5e7eb;
@@ -45,14 +44,14 @@
   border-radius: 4px;
   padding: 1rem;
   box-sizing: border-box;
-  overflow-y: auto;       /* Makes text scrollable */
-  display: block;         /* No need to center content with flex */
+  overflow-y: auto;       
+  display: block;         
 }
 
 .TextDisplayer .mantine-Text-root {
-  margin-top: 0;         /* Reset the margin you had */
+  margin-top: 0;        
   width: 100%;
   text-align: left;
-  overflow-wrap: break-word; /* Optional: break long words */
-  white-space: pre-wrap;     /* Preserve line breaks if your text has them */
+  overflow-wrap: break-word; 
+  white-space: pre-wrap;     
 }

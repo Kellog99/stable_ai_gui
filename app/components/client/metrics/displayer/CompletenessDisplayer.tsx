@@ -8,7 +8,7 @@ import { BarChart } from '@mantine/charts';
 import '@mantine/charts/styles.css';
 import { Flex, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import FeatureDisplayer from '../../FeatureDisplayer';
+import FeatureDisplayer from '../../FeatureDisplayerFINAL';
 
 export default function CompletenessDisplayer ( props: { completeness: CompletenessDTO, requirements: string[] } )
 {
