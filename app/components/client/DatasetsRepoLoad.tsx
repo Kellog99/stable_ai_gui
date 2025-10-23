@@ -27,7 +27,7 @@ export const DatasetRepository: React.FC = () =>
     const query = useStore( ( state ) => ( state.queryDataset ) );
 
     return (
-        <div style={ { position: 'relative', width: '100%' } }>
+        <div style={ { position: 'relative', width: '100%', height:"340px", overflowY: "auto", overflowX: 'hidden',  } }>
             { isLoading && (
                 <div style={ {
                     position: 'absolute',

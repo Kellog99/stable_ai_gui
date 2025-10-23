@@ -1,44 +1,66 @@
 "use client"
 import { useState } from "react";
-import { FileText } from 'lucide-react';
 
-import styles from '@/styles/HomePage.module.css'
+import FileDropZone2 from "@/components/client/FileDropZone2";
 import { LoadedFile } from "@/interfaces/NNInterfaces";
-import FileDropZone from "@/components/client/FileDropZone";
+import styles from '@/styles/HomePage.module.css';
+import { Database, Upload } from "lucide-react";
+import { DragDrop } from "@/components/client/upload/UploaderUnifiedDragDrop";
+import { uploadModel, uploadModel_check } from "@/properties/urls";
+import { getModels } from "@/functionalities/NNTrustBackendUtils";
+import { ModalUploadModel } from "@/components/client/upload/ModalUploadModel";
+import { ModelRepository } from "@/components/client/ModelDisplayer";
 
-
-interface ReportPageProps {
+interface ReportPageProps
+{
   reportFiles: LoadedFile[];
-  onFileSelect: (file: File) => void;
-  onFileDelete: (index: number) => void;
+  onFileSelect: ( file: File ) => void;
+  onFileDelete: ( index: number ) => void;
 }
 
-export default function ReportPage({ reportFiles, onFileSelect, onFileDelete }: ReportPageProps) {
-  const [selectedFileIndex, setSelectedFileIndex] = useState<number | null>(null);
-  const [jsonData, setJsonData] = useState<any>(null);
+export default function ReportPage ( { reportFiles, onFileSelect, onFileDelete }: ReportPageProps )
+{
 
-  const handleShowData = async (index: number) => {
-    const file = reportFiles[index];
-    try {
-      const text = await file.file.text();
-      const data = JSON.parse(text);
-      setJsonData(data);
-      setSelectedFileIndex(index);
-    } catch (error) {
-      console.error('Error parsing JSON:', error);
-      alert('Invalid JSON file');
+  const ReportDragDrop = () =>
+    {
+      return (
+        <DragDrop
+          config={ {
+            name: "report",
+            fileType: 'json',
+            accept: 'application/json',
+            formFieldName: "file",
+            description: 'Make sure your json contains a file.',
+            uploadUrlCheck: uploadModel_check, // DA MODIFICARE
+            uploadUrl: uploadModel, // DA MODIFICARE
+            refreshFunction: getModels, // DA MODIFICARE
+            setRefreshData: getModels // DA MODIFICARE
+  
+          } }
+          infoModal={ <ModalUploadModel /> } /> ) // DA MODIFICARE
     }
-  };
+
+  const dropElement = [
+    {
+      id: "json",
+      title: "Upload Json",
+      Icon: Upload,
+      child: ReportDragDrop
+    },
+    {
+      id: "reportRepo",
+      title: "Report Repository",
+      Icon: Database,
+      child: ModelRepository
+    }
+  ];
 
 
   return (
-    <div className={styles.reportContainer}>
-      <FileDropZone
-        id="drop3"
-        title="Report"
-        Icon={FileText}
-        description="Upload the JSON file for seeing the report."
-        acceptedTypes={['json']}
+    <div className={ styles.reportContainer }>
+      <FileDropZone2
+        sections={ dropElement }
+        defaultActiveSection={ dropElement[ 0 ].id }
       />
     </div>
 

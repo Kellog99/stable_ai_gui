@@ -40,8 +40,7 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
   const horizontalSpacing = 160; // Fixed horizontal spacing between nodes
   const verticalSpacing = 120;
 
-  console.log( "features:", features )
-  console.log( "EDGES:", connections )
+ 
   const depthGroups: Record<number, string[]> = {};
   features.forEach( ( feature ) =>
   {

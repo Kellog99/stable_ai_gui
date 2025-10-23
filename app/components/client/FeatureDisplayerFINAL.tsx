@@ -23,7 +23,6 @@ interface FeatureCardProps
     uncertainty?: boolean,
     outlier?: string,
     score?: number
-    thumbnailUrl: string
 }
 
 interface FeatureDisplayerProps
@@ -42,7 +41,7 @@ interface FeatureDisplayerProps
 
 export function FeatureCard ( props: FeatureCardProps )
 {
-    const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty, thumbnailUrl } = props
+    const { index, data, featureType, label, labelString, labelColor, outlier, score, uncertainty } = props
     const [ showSection, setShowSection ] = useState( false )
 
     return (
@@ -51,9 +50,9 @@ export function FeatureCard ( props: FeatureCardProps )
                 <div onClick={ () => setShowSection( true ) } style={ { cursor: "pointer" } }>
                     <CardSection className={ classes.cardsection }>
                         { featureType === image_type ? (
-                            thumbnailUrl ? (
+                            data ? (
                                 <img
-                                    src={ thumbnailUrl }
+                                    src={ data }
                                     alt=""
                                     className={ classes.ImageDisplayer }
                                     style={ {
@@ -81,10 +80,13 @@ export function FeatureCard ( props: FeatureCardProps )
                             )
                         ) : featureType === text_type ? (
                             <div className={ classes.TextDisplayer }>
-                                <Text size="sm">{ data }</Text>
+                                <Text size="sm" c="black">
+                                    { data }
+                                </Text>
                             </div>
                         ) : null }
                     </CardSection>
+
                 </div>
                 { index || index == 0 || label || label == 0 || labelString ? (
                     <>
@@ -164,7 +166,7 @@ export function FeatureCard ( props: FeatureCardProps )
                         } }
                     >
                         <img
-                            src={ thumbnailUrl }
+                            src={ data }
                             alt="preview"
 
                         />
@@ -181,7 +183,7 @@ export function FeatureCard ( props: FeatureCardProps )
                     </div>
                 ) : props.featureType === text_type ? (
                     <>
-                        <Text fw={ 500 } size="lg"
+                        <Text fw={ 500 } size="lg" c="dark"
                             style={ {
                                 maxWidth: "60vw",
                                 overflow: "auto",
@@ -220,14 +222,18 @@ export default function FeatureDisplayer ( {
 
     const { thumbnails, connectionStatus, requestThumbnails } = useThumbnailWS( featureType, featureData );
 
-
     /* ---------------- Grid size & layout calculation ---------------- */
     const { columnCount, rowCount } = useMemo( () =>
     {
         if ( !columns && dimensions ) {
             const maxPossibleColumns = Math.floor( dimensions.width / itemSize );
-            const targetRows = Math.ceil( Math.sqrt( totalItems ) );
-            let computedRows = Math.max( 1, targetRows );
+            const maxPossibleRows = Math.floor( dimensions.height / itemSize );
+
+            const targetRows = Math.ceil( Math.sqrt( totalItems ) ); // key change: target row count
+
+            let computedRows = Math.min( maxPossibleRows, targetRows );
+            computedRows = Math.max( 1, computedRows );
+
             let computedColumns = Math.ceil( totalItems / computedRows );
 
             if ( computedColumns * itemSize > dimensions.width ) {
@@ -236,38 +242,51 @@ export default function FeatureDisplayer ( {
             }
 
             return { columnCount: computedColumns, rowCount: computedRows };
-        } else if ( columns ) {
-            return { columnCount: columns, rowCount: Math.ceil( totalItems / columns ) };
+        } else if ( columns && !dimensions ) {
+            return {
+                columnCount: columns,
+                rowCount: Math.ceil( totalItems / columns )
+            };
         }
+
         return { columnCount: 1, rowCount: totalItems };
     }, [ columns, dimensions, itemSize, totalItems ] );
 
 
-    /// DA CONTROLLARE PERCHÈ NON FA QUELLO CHE VORREI 
     useEffect( () =>
-    {
-        if ( !dimensions ) return; // Wait for dimensions to be available
+    {   
+        console.log("featurelnght", connectionStatus === 'connected')
+        if (
+            connectionStatus === 'connected' &&
+            featureData.length > 0 &&
+            columnCount > 0 &&
+            rowCount > 0
+        ) {
 
-        const initialIndices: number[] = [];
-        const visibleRows = Math.ceil( dimensions.height / itemSize );
-        const visibleCols = columnCount;
+            const gridHeight = dimensions ? dimensions.height : 600;
+            const gridWidth = dimensions
+                ? dimensions.width - dimensions.width * 0.08
+                : columnCount * itemSize;
 
-        for ( let row = 0; row < visibleRows; row++ ) {
-            for ( let col = 0; col < visibleCols; col++ ) {
-                const index = row * columnCount + col;
-                if ( index < featureData.length ) {
-                    initialIndices.push( index );
+            const visibleRows = Math.ceil( gridHeight / itemSize );
+            const visibleCols = Math.ceil( gridWidth / itemSize );
+
+            const initialIndices: number[] = [];
+
+            for ( let row = 0; row < Math.min( visibleRows, rowCount ); row++ ) {
+                for ( let col = 0; col < Math.min( visibleCols, columnCount ); col++ ) {
+                    const index = row * columnCount + col;
+                    if ( index < featureData.length ) {
+                        initialIndices.push( index );
+                    }
                 }
             }
+            if ( initialIndices.length > 0 ) {
+                console.log("initials,", initialIndices)
+                requestThumbnails( initialIndices );
+            }
         }
-
-        console.log( 'initial indexes', initialIndices );
-        console.log( 'dimensions:', dimensions );
-        console.log( 'itemSize:', itemSize );
-        console.log( 'visibleRows:', visibleRows, 'visibleCols:', visibleCols );
-
-        requestThumbnails( initialIndices );
-    }, [ dimensions, columnCount, itemSize, featureData.length ] );
+    }, [ connectionStatus, featureData.length, dimensions, itemSize, columnCount, rowCount ] );
 
     /* ------------------------- Render the grid ------------------------- */
     return (
@@ -281,7 +300,6 @@ export default function FeatureDisplayer ( {
             width={ dimensions ? dimensions.width - dimensions.width * 0.08 : columnCount * itemSize }
             onItemsRendered={ ( { visibleRowStartIndex, visibleRowStopIndex, visibleColumnStartIndex, visibleColumnStopIndex } ) =>
             {
-                console.log( 'onItemsRendered fired' ); // Add this to debug
                 const visibleIndices: number[] = [];
                 for ( let row = visibleRowStartIndex; row <= visibleRowStopIndex; row++ ) {
                     for ( let col = visibleColumnStartIndex; col <= visibleColumnStopIndex; col++ ) {
@@ -289,7 +307,6 @@ export default function FeatureDisplayer ( {
                         if ( index < featureData.length ) visibleIndices.push( index );
                     }
                 }
-                console.log( 'visible indices from scroll:', visibleIndices );
                 requestThumbnails( visibleIndices );
             } }
         >
@@ -300,7 +317,7 @@ export default function FeatureDisplayer ( {
                     if ( index >= featureData.length ) return null;
 
                     const imagePath = featureData[ index ];
-                    const thumbnailUrl = featureType === image_type ? thumbnails.get( imagePath ) : undefined;
+                    const thumbnailUrl = featureType === image_type ? thumbnails.get( imagePath ) : imagePath;
 
                     return (
                         <div style={ { ...style, padding: "8px" } }>
@@ -310,9 +327,9 @@ export default function FeatureDisplayer ( {
                                     onMouseLeave={ () => setHoverIndex( null ) }
                                 >
                                     <FeatureCard
-                                        data={ imagePath }
+                                        data={ thumbnailUrl }
                                         featureType={ featureType }
-                                        thumbnailUrl={ thumbnailUrl as string }
+
                                         { ...( indexes ? { index: indexes[ index ] } : {} ) }
                                         { ...( labelData ? { label: labelData[ index ] } : {} ) }
                                         { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }
@@ -325,9 +342,9 @@ export default function FeatureDisplayer ( {
                                 </div> ) : (
 
                                 <FeatureCard
-                                    data={ imagePath }
+                                    data={ thumbnailUrl }
                                     featureType={ featureType }
-                                    thumbnailUrl={ thumbnailUrl as string }
+
                                     { ...( indexes ? { index: indexes[ index ] } : {} ) }
                                     { ...( labelData ? { label: labelData[ index ] } : {} ) }
                                     { ...( labelData && label_dict ? { labelString: label_dict[ labelData[ index ] ] } : {} ) }

@@ -118,9 +118,6 @@ const HomePage: React.FC = ( { } ) =>
   const listOfSections = [ datasetSections, modelSections ];
   return (
     <div className={ styles.homecontainer }>
-
-
-
       <div className={ styles.filegrid }>
         { listOfSections.map( ( dropElement, index ) => (
           <FileDropZone2

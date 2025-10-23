@@ -430,7 +430,7 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                                 featureType={ type }
                                 outlier={ clickedOutlierData?.group }
                                 score={ clickedOutlierData?.score }
-                                thumbnailUrl={ outlierSel } />
+                                />
                         </Box>
                     </> ) : null }
 

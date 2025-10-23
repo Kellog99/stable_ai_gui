@@ -1,7 +1,6 @@
 "use client";
 
 import AsyncTaskTracker from '@/components/client/AsyncTracker';
-import { GetDatasetAndSave } from '@/functionalities/DatasetsLoader';
 import classes from "@/pages/tasks/dataquality/datasets/page.module.css";
 import { image_type, text_type } from '@/properties/types';
 import { cleaner_progress, cleaner_start } from '@/properties/urls';
@@ -16,11 +15,7 @@ export default function CleanDuplicates ()
   const [ features, setFeatures ] = useState<string[]>( [] )
   const [ featureName, setFeatureName ] = useState<any>( "" )
 
-  const [ progress, setProgress ] = useState( 0 );
-  const [ result, setResult ] = useState<string | null>( null );
-
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
-  const setData = useStore( ( state ) => ( state.setData ) );
   const [compute, setCompute] = useState<boolean>(false);
   const activeTask = useStore( ( state ) => state.activeTask );
 
@@ -45,12 +40,9 @@ export default function CleanDuplicates ()
   {
     setFeatureName( name )
     if ( name ) {
-      //Cleaning( name )
       setCompute(true)
     }
   }
-
-
 
   return (
     <div>
@@ -101,7 +93,7 @@ export default function CleanDuplicates ()
             </Text>
           </span>
         </Center>
-      ) : featureName !== "" && result === null && (compute || activeTask) ? (
+      ) : featureName !== ""  && (compute || activeTask) ? (
 
         <AsyncTaskTracker
           action={ "clean_duplicates" }
