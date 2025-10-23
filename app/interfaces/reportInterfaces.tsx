@@ -26,7 +26,7 @@ export interface attacksProps {
     misclassification?: number,
     power?: number,
     num_queries?: number,
-    robustness?: number[],
+    robustness?: number,
     confusion_matrix?: number[][]
 }
 
@@ -42,5 +42,6 @@ export interface BenchmarkDataProps {
     f1score?: number[];
     robustness?: number[];
     wobbliness?: number[];
-    params: number[]
+    params: number[];
+    names: string[]
 }

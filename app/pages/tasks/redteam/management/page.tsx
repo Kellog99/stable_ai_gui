@@ -4,9 +4,11 @@ import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { ArrowDownUp, CircleArrowRight, Search } from 'lucide-react';
 import { HoverCard } from '@mantine/core';
+import { useRouter } from 'next/navigation';
+import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
 
 const TaskManagement: React.FC = () => {
-    const { executedAttacks, } = useNNTrustStore()
+    const { executedAttacks, setReport, setBenchmark, benchmark } = useNNTrustStore()
     const [attackArray, setAttackArray] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
@@ -89,25 +91,36 @@ const TaskManagement: React.FC = () => {
         // return executedAttacks.length === 0 || (atkFinished !== executedAttacks.length)
     }
 
+    const router = useRouter()
     // handle click for going to the Report page
-    const handleClickReport = () => {
+    const handleClickReport = async () => {
         // If the button is clickable then all the attacks are done and the JSON has been produced
-        async function fetchItem() {
+        async function fetchResult<T>(url: string): Promise<T | undefined> {
             try {
-                const response = await fetch('');
+                const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error(`HTTP error for the attack List! Status: ${response.status}`);
+                    throw new Error(`HTTP error for the report JSON! Status: ${response.status}`);
                 }
-                const json = await response.json();
+                const json: T = await response.json();
                 return json;
             } catch (err) {
                 console.log(err instanceof Error ? err.message : "An error occurred");
-                return undefined; // Ex
-                // plicitly return undefined on error
+                return undefined; // Explicitly return undefined on error
             }
         }
-        fetchItem()
+
+        const reportFetch = await fetchResult<ReportProps>('http://127.0.0.1:8000/report/getReport');
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>('http://127.0.0.1:8000/report/getBenchmark');
+        if (reportFetch) {
+            setReport(reportFetch);
+        }
+        if (benchmarkFetch) {
+            console.log("saving = ", benchmarkFetch)
+            setBenchmark(benchmarkFetch);
+        }
+        router.push("/pages/report/reportTITANN")
     }
+
     return (
         <div className="container">
             <div className='management-header'>
@@ -124,6 +137,7 @@ const TaskManagement: React.FC = () => {
                         <div>
                             <button
                                 disabled={isDisabled()}
+                                onClick={handleClickReport}
                                 className={`header-button ${isDisabled() ? 'disabled' : ''}`}>
                                 Report <CircleArrowRight />
                             </button>

@@ -1,4 +1,5 @@
 import { ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { BenchmarkDataProps, ReportProps } from "@/interfaces/reportInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -24,6 +25,9 @@ interface AppState {
   error: string | null;
 
   // report
+  report: ReportProps | null;
+  benchmark: BenchmarkDataProps | null;
+  vulnerabilitySelected: string | null;
 
   setModels: (models: ModelSpecs[] | null) => void;
   setModelName: (modelName: string | null) => void;
@@ -36,6 +40,9 @@ interface AppState {
     name: 'attacks' | 'metrics' | 'selectedAttacks' | 'selectedMetrics'
   ) => void;
   setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => void;
+  setReport: (report: ReportProps) => void;
+  setBenchmark: (benchmark: BenchmarkDataProps) => void;
+  setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
 }
 
 const useNNTrustStore = create<AppState>()(
@@ -56,6 +63,10 @@ const useNNTrustStore = create<AppState>()(
       loading: false,
       error: null,
 
+      report: null,
+      benchmark: null,
+      vulnerabilitySelected: null,
+
       setModels: (models) => set({ models }),
       setModelName: (modelName) => set({ modelName }),
 
@@ -65,7 +76,11 @@ const useNNTrustStore = create<AppState>()(
       setSelectedMetrics: (selectedMetrics) => set({ selectedMetrics }),
 
       setMap: (map, name) => set({ [name]: map }),
-      setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => set({ executedAttacks })
+      setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => set({ executedAttacks }),
+
+      setReport: (report: ReportProps) => set({ report }),
+      setBenchmark: (benchmark: BenchmarkDataProps) => set({ benchmark }),
+      setVulnerabilitySelected: (vulnerabilitySelected: string) => set({ vulnerabilitySelected })
     }),
 
     {
@@ -76,7 +91,10 @@ const useNNTrustStore = create<AppState>()(
         modelName: state.modelName,
         attacks: state.attacks,
         metrics: state.metrics,
-        selectedAttacks: state.selectedAttacks
+        selectedAttacks: state.selectedAttacks,
+        report: state.report,
+        benchmark: state.benchmark,
+        vulnerabilitySelected: state.vulnerabilitySelected
         // Don't persist loading and error states
       }),
     }

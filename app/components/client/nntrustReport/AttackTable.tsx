@@ -1,10 +1,11 @@
 import React from 'react'
-import { RingProgress, Text } from "@mantine/core";
+import { SemiCircleProgress, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import './AttackTable.css';
 import { attacksProps } from '@/interfaces/reportInterfaces';
+import useNNTrustStore from '@/store/nnTrustStore';
+
 // Color scheme for different risk levels
-const COLORS = ['#4caf50', '#03a9f4', '#ff9800', '#ef5350'];
 function getRiskColor(value: number) {
     // Clamp the value between 0 and 100
     value = Math.max(0, Math.min(100, value));
@@ -27,48 +28,51 @@ function getRiskColor(value: number) {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
+interface AttackTableProps {
+    data: { [key: string]: attacksProps }
+}
 
-const AttackTable: React.FC<{ [key: string]: attacksProps }> = ({
+const AttackTable: React.FC<AttackTableProps> = ({
     data
 }) => {
+    const { setVulnerabilitySelected } = useNNTrustStore()
     const router = useRouter();
 
     return (
         <table className="vulnerability-grid">
-            <thead className="bg-gray-100 border-b border-gray-200">
+            <thead>
                 <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                        Vulnerabilities tested
-                    </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                        Risk
-                    </th>
+                    <th>Vulnerabilities tested</th>
+                    <th>Risk</th>
                 </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
-                {Object.entries(data).map(([key, value], index) => (
-                    <tr>
-                        <td className="px-6 py-4">
+            <tbody>
+                {Object.entries(data).map(([key, value]) => (
+                    <tr key={key}>
+                        <td>
                             <button
-                                onClick={() => router.push(`/${key}`)}
+                                onClick={() => {
+                                    setVulnerabilitySelected(key)
+                                    router.push(`/pages/report/reportTITANN/AttackPage`)
+                                }}
                                 className="btn-table"
                             >
                                 {value.name}
                             </button>
                         </td>
                         <td className="place-content-center">
-                            <RingProgress
-                                size={125}
-                                roundCaps
+                            <SemiCircleProgress
+                                fillDirection="left-to-right"
+                                orientation="up"
+                                size={130}
+                                value={value.risk * 100}
+                                filledSegmentColor={getRiskColor(value.risk * 100)}
                                 label={
-                                    <Text size="xs" ta="center">
-                                        {value.risk}%
+                                    <Text size="s" ta="center">
+                                        {(value.risk * 100).toFixed(1)}%
                                     </Text>
                                 }
-                                sections={[{
-                                    value: value.risk,
-                                    color: getRiskColor(value.risk)
-                                }]} />
+                            />
                         </td>
                     </tr>
                 ))}
@@ -77,4 +81,4 @@ const AttackTable: React.FC<{ [key: string]: attacksProps }> = ({
     )
 }
 
-export default AttackTable
+export default AttackTable;

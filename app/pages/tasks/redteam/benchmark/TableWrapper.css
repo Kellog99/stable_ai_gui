@@ -5,8 +5,8 @@
 
 .scroll-container {
     display: grid;
-    grid-auto-rows: clamp(60px, 9vw, 180px);
-    row-gap: 10px;
+    grid-auto-rows: clamp(100px, 4vh, 120px);
+    row-gap: 8px;
     overflow-y: auto;
     height: 50rem;
     padding: 1rem;
