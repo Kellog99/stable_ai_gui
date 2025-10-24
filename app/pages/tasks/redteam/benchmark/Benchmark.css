@@ -72,3 +72,45 @@
   margin: 0;
   color: rgb(187, 184, 184);
 }
+
+.alert-message {
+  position: fixed;
+  pointer-events: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.allert-button {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  height: 3vw;
+  min-width: 100px;
+  font-size: 1rem;
+  justify-content: space-between;
+  padding: 1.5vw;
+  border-radius: 1vw;
+  background-color: black;
+  color: white;
+  gap: 20px;
+}
+
+.allert-button svg {
+  transition: all 0.4s ease;
+}
+
+.allert-button:hover:not(.disabled) {
+  background-color: #333;
+}
+
+.allert-button:hover:not(.disabled) svg {
+  transform: translateX(5px);
+}

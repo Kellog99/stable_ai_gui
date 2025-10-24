@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
-import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon } from 'lucide-react';
+import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
 import useNNTrustStore from '@/store/nnTrustStore';
+import { Alert } from '@mantine/core';
 
 const Benchmark: React.FC = () => {
 
@@ -66,6 +67,8 @@ const Benchmark: React.FC = () => {
 
 
   // Click Execution Attack Handle
+  const [isClicked, setIsCLicked] = useState<boolean>(false)
+
   const handleClick = async () => {
     try {
       // Block any new click on the button
@@ -79,13 +82,7 @@ const Benchmark: React.FC = () => {
       });
 
       console.log('Status:', response.status);
-      const results = await response.json();
-      console.log('Response:', results);
-      setExecutedAttacks(results)
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      setIsCLicked(true)
     } catch (error) {
       console.error('ERROR:', error);
     } finally {
@@ -94,85 +91,117 @@ const Benchmark: React.FC = () => {
 
   };
 
+
   return (
-    < div className="attack-list" >
-      <div className='attack-title'>
-        <div className='attack-header'>
-          <div className='attack-icon'>
-            <BrickWallFireIcon size={'6vw'} color='red' />
-            <h1>Red Teaming</h1>
+    <>
+      < div className="attack-list" >
+        <div className='attack-title'>
+          <div className='attack-header'>
+            <div className='attack-icon'>
+              <BrickWallFireIcon size={'6vw'} color='red' />
+              <h1>Red Teaming</h1>
+            </div>
+            <p style={{ margin: '0' }}>This page provides a set of vulnerabilities that can be used to test the model's robustness and a set of metrics to register the performance of each attack.</p>
           </div>
-          <p style={{ margin: '0' }}>This page provides a set of vulnerabilities that can be used to test the model's robustness and a set of metrics to register the performance of each attack.</p>
+          <button
+            className='attack-button'
+            disabled={!executeBenchmark}
+            onClick={handleClick}>
+            <Play className='icon' />
+            <div className='btn-desc'> Execute benchmark</div>
+          </button>
         </div>
-        <button
-          className='attack-button'
-          disabled={!executeBenchmark}
-          onClick={handleClick}>
-          <Play className='icon' />
-          <div className='btn-desc'> Execute benchmark</div>
-        </button>
-      </div>
 
 
-      <div>
-        {/* Attacks Selection */}
-        <div className='option-attacks'>
-          <div className='attack-icon'>
-            <Bug size={'3vw'} color='red' />
-            <h2>Vulnearbility selection</h2>
+        <div>
+          {/* Attacks Selection */}
+          <div className='option-attacks'>
+            <div className='attack-icon'>
+              <Bug size={'3vw'} color='red' />
+              <h2>Vulnearbility selection</h2>
+            </div>
+            <p style={{ margin: 0 }}>
+              Here below, are listed all the possible vulnerabilities that can be tested on the selected model.
+              For customizing a vulnearbility click on the "Settings" icon on the right. A Panel will be shown on top where all the possible customizable parameters are shown.
+            </p>
           </div>
-          <p style={{ margin: 0 }}>
-            Here below, are listed all the possible vulnerabilities that can be tested on the selected model.
-            For customizing a vulnearbility click on the "Settings" icon on the right. A Panel will be shown on top where all the possible customizable parameters are shown.
-          </p>
-        </div>
-        <TableWrapper
-          elements={attacks}
-          selectedElement={selectedAttacks}
-          handleSelection={(id: string) => handleSelectionClick(
-            id,
-            selectedAttacks,
-            setSelectedAttacks,
-            attacks
-          )}
-          handleParametersChange={(id: string, parameters: number[]) => {
-            handleParametersChange(
+          <TableWrapper
+            elements={attacks}
+            selectedElement={selectedAttacks}
+            handleSelection={(id: string) => handleSelectionClick(
               id,
-              parameters,
+              selectedAttacks,
               setSelectedAttacks,
-              selectedAttacks
-            )
-          }}
-          Icon={Settings}
-        />
+              attacks
+            )}
+            handleParametersChange={(id: string, parameters: number[]) => {
+              handleParametersChange(
+                id,
+                parameters,
+                setSelectedAttacks,
+                selectedAttacks
+              )
+            }}
+            Icon={Settings}
+          />
 
-        {/* Metrics Selection */}
-        <div className='option-attacks'>
-          <div className='attack-icon'>
-            <Gauge size={'3vw'} color='red' />
-            <h2>Metric Selection</h2>
+          {/* Metrics Selection */}
+          <div className='option-attacks'>
+            <div className='attack-icon'>
+              <Gauge size={'3vw'} color='red' />
+              <h2>Metric Selection</h2>
+            </div>
+            <p > Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
           </div>
-          <p > Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
-        </div>
-        <TableWrapper
-          elements={metrics}
-          selectedElement={selectedMetrics}
-          handleSelection={(id: string) => handleSelectionClick(
-            id,
-            selectedMetrics,
-            setSelectedMetrics,
-            metrics
-          )}
-          Icon={Ruler}
-          handleParametersChange={(id: string, parameters: number[]) => {
-            handleParametersChange(id,
-              parameters,
+          <TableWrapper
+            elements={metrics}
+            selectedElement={selectedMetrics}
+            handleSelection={(id: string) => handleSelectionClick(
+              id,
+              selectedMetrics,
               setSelectedMetrics,
-              selectedMetrics)
-          }} />
-      </div>
+              metrics
+            )}
+            Icon={Ruler}
+            handleParametersChange={(id: string, parameters: number[]) => {
+              handleParametersChange(id,
+                parameters,
+                setSelectedMetrics,
+                selectedMetrics)
+            }} />
+        </div>
 
-    </div >);
+      </div >
+      {
+        isClicked && (
+          <div className="alert-message">
+            <Alert
+              icon={<Info size={20} />}
+              title="Alert Message"
+              variant="filled"
+              color="blue"
+              radius="lg"
+              withCloseButton
+              style={{ width: "30vw", height: "25vh" }}
+              onClose={() => setIsCLicked(false)}
+              className="shadow-lg"
+            >
+              <div >
+                <p style={{ fontSize: "1vw" }}>
+                  A Benchmark containing {Object.keys(selectedAttacks).length} vulnearbilities has been scheduled.
+                  Visit the management page for checking the advancement of the experiments.
+                </p>
+                <button
+                  onClick={() => window.location.href = "/pages/tasks/redteam/management"}
+                  className="allert-button"
+                >
+                  Go to Management Table <ChevronRight size={"2vw"} />
+                </button>
+              </div>
+            </Alert>
+          </div>
+        )}
+    </>)
 };
 
 export default Benchmark;

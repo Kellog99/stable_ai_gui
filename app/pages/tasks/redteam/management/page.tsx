@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { ArrowDownUp, CircleArrowRight, Search } from 'lucide-react';
-import { HoverCard } from '@mantine/core';
+import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
 
@@ -172,7 +172,6 @@ const TaskManagement: React.FC = () => {
                     <option value="Pending">Pending</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>
-                    <option value="Blocked">Blocked</option>
                 </select>
             </div>
             <div className="table-wrapper">
@@ -218,9 +217,10 @@ const TaskManagement: React.FC = () => {
                                             {jobName}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100">
-                                                {jobStatus}
-                                            </span>
+                                            <div>
+                                            <p>{jobStatus}</p>
+                                            <Progress value={30} color='blue' animated/>
+                                            </div>
                                         </td>
                                     </tr>
                                 );
