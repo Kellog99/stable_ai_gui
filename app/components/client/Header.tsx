@@ -49,13 +49,13 @@ const Header = () => {
         {btns.map((btnprops) =>
           <button
             key={btnprops.id}
-            className={`${styles.button} ${page === btnprops.id ? styles.active : styles.inactive}`}
+            className={`${styles.button} ${page === btnprops.id ? styles.active : ''}`}
             onClick={() => {
               setPage(btnprops.id);
               router.push(btnprops.href);
             }}>
             <btnprops.Icon />
-            <p>{btnprops.name.charAt(0).toUpperCase() + btnprops.name.slice(1)}</p>
+            {btnprops.name.charAt(0).toUpperCase() + btnprops.name.slice(1)}
           </button>)}
       </div>
 
@@ -73,13 +73,13 @@ const Header = () => {
       <div className={styles.indicators}>
         <div className={`${styles.item} ${modelName ? styles.loaded : ''}`}>
           <Brain />
-          <span className={styles.text}>
+          <span>
             {modelName || 'No model'}
           </span>
         </div>
         <div className={`${styles.item} ${datasetName ? styles.loaded : ''}`}>
           <Database />
-          <span className={styles.text}>
+          <span>
             {datasetName || 'No dataset'}
           </span>
         </div >

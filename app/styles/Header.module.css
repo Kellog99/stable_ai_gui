@@ -1,8 +1,9 @@
 .container {
   display: flex;
-  height: 5.5vw;
+  height: 12vh;
+  max-height: 120px;
   width: 100%;
-  background-color: rgb(62, 129, 236, 0.2);
+  background-color: var(--navy-700);
   padding: 40px;
   margin: 0 auto;
   align-items: center;
@@ -13,8 +14,40 @@
 
 .buttons {
   display: flex;
+  width: 20vw;
+  height: 8vh;
+  max-height: 80px;
+  margin: 1vh;
   align-items: center;
-  gap: 1rem;
+  border-radius: calc(2*var(--border-radius));
+  background-color: var(--navy-500);
+  border: 2px solid var(--navy-900);
+}
+
+.button {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  font-size: 0.8vw;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: calc(2*var(--border-radius));
+  font-weight: 900;
+  border-color: transparent;
+  background-color: transparent;
+  transition: all 0.4s ease;
+  color: var(--text-secondary);
+
+}
+
+.button.active {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  background-color: var(--coral-600);
+  color: var(--text-primary);
+  font-weight: bolder;
 }
 
 .title {
@@ -31,21 +64,31 @@
 }
 
 .logo {
-  height:1.4vw;
+  height: 1.4vw;
   margin: 0 1vw 0 1vw;
 }
 
 .indicators {
   display: flex;
+  width: 17vw;
   align-items: center;
   gap: 1.5rem;
+  border-radius: calc(2*var(--border-radius));
 }
 
 .item {
   display: flex;
   align-items: center;
+  text-align: center;
+  font-size: 0.7vw;
+  font-weight: bold;
   gap: 0.5rem;
-  color: #6B7280;
+  background-color: var(--warning);
+  width: 9vw;
+  padding: 0.7vw;
+  border-radius: var(--border-radius);
+  color: black;
+  border: 2px solid black;
 }
 
 .item.loaded {
@@ -54,40 +97,4 @@
 
 .item.model_loaded {
   color: #10B981;
-}
-
-.text {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.button {
-  display: inline-flex;
-  gap: 8px;
-  width: auto;
-  height: auto;
-  font-size: 0.8vw;
-  align-items: center;
-  align-content: center;
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s;
-  --sidepadding: 1vw;
-  --toppadding: 0.3vw;
-  padding: var(--toppadding) var(--sidepadding);
-  border-color: transparent;
-}
-
-.button.active {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.button.inactive {
-  color: #6B7280;
-  background: transparent;
-}
-
-.button.inactive:hover {
-  color: white;
-  background-color: lightgray;
 }

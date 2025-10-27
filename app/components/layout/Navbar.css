@@ -5,13 +5,13 @@
     flex-direction: column;
     transition: width 0.3s ease;
     border-radius: 1vw;
-    background-color: #0f172a;
+    background-color: var(--navy-700);
     padding: 1vw;
     gap: 1vw;
 }
 
 .burger-button {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--navy-600);
     border: none;
     color: white;
     padding: 12px;
@@ -55,6 +55,7 @@
     position: relative;
     overflow: hidden;
     justify-content: space-between;
+    background-color: var(--navy-600);
 
 }
 
@@ -65,7 +66,7 @@
     left: 0;
     width: 4px;
     height: 100%;
-    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    background: linear-gradient(180deg, #3b82f6 );
     transform: scaleY(0);
     transition: transform 0.3s ease;
 }
@@ -97,7 +98,7 @@
 
 .nav-link.active {
     width: 100%;
-    background: rgba(59, 130, 246, 0.2);
+    background: var(--navy-300);
 }
 
 .nav-link.active::before {

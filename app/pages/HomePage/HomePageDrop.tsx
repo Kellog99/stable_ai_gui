@@ -16,17 +16,15 @@ import { ModelCard } from '@/components/client/ModelDisplayer';
 
 
 
-const HomePageDrop: React.FC = ( {
-} ) =>
-{
-    const setModels = useStore( ( state ) => state.setModels )
-    const setDatasets = useStoreDQ( ( state ) => state.setDatasets )
+const HomePageDrop: React.FC = ({
+}) => {
+    const setModels = useStore((state) => state.setModels)
+    const setDatasets = useStoreDQ((state) => state.setDatasets)
 
-    const ZipDragDrop = () =>
-    {
+    const ZipDragDrop = () => {
         return (
             <DragDrop
-                config={ {
+                config={{
                     name: "dataset",
                     fileType: 'zip',
                     accept: 'application/zip',
@@ -36,38 +34,34 @@ const HomePageDrop: React.FC = ( {
                     uploadUrl: "http://localhost:8000/upload_folder",
                     refreshFunction: DatasetsLoader,
                     setRefreshData: setDatasets
-                } }
-                infoModal={ <ModalUploadDataset /> } /> )
+                }}
+                infoModal={<ModalUploadDataset />} />)
     }
 
-    const ZipModelDragDrop = () =>
-    {
+    const ZipModelDragDrop = () => {
         return (
             <DragDrop
-                config={ {
+                config={{
                     name: "model",
                     fileType: 'zip',
                     accept: 'application/zip',
                     formFieldName: "file",
                     description: 'Make sure your zip contains raw data and a json config file.',
                     uploadUrlCheck: "http://localhost:8082/model/upload/check",
-                    uploadUrl:"http://localhost:8082/model/upload",
+                    uploadUrl: "http://localhost:8082/model/upload",
                     refreshFunction: getModels,
                     setRefreshData: setModels
 
-                } }
-                infoModal={ <ModalUploadModel /> } /> )
+                }}
+                infoModal={<ModalUploadModel />} />)
     }
 
-    const ModelRepo = () =>
-    {
+    const ModelRepo = () => {
         return (
-        <><ModelCard /></>
-            
+            <><ModelCard /></>
+
         )
     }
-
-
 
 
     const datasetSections = [
@@ -100,18 +94,18 @@ const HomePageDrop: React.FC = ( {
         }
     ];
 
-    const listOfSections = [ datasetSections, modelSections ];
+    const listOfSections = [datasetSections, modelSections];
 
     return (
 
-        <div className={ styles.filegrid }>
-            { listOfSections.map( ( dropElement, index ) => (
+        <div className={styles.filegrid}>
+            {listOfSections.map((dropElement, index) => (
                 <FileDropZone2
-                    key={ index }
-                    sections={ dropElement }
-                    defaultActiveSection={ dropElement[ 0 ].id }
+                    key={index}
+                    sections={dropElement}
+                    defaultActiveSection={dropElement[0].id}
                 />
-            ) ) }
+            ))}
 
         </div>
     )
