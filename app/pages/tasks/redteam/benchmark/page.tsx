@@ -5,7 +5,7 @@ import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
 import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
-import useNNTrustStore from '@/store/nnTrustStore';
+import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 
 const Benchmark: React.FC = () => {
@@ -82,6 +82,9 @@ const Benchmark: React.FC = () => {
       });
 
       console.log('Status:', response.status);
+      const status: AttackManagementProps[] = await response.json();
+      setExecutedAttacks(status)
+      console.log(status)
       setIsCLicked(true)
     } catch (error) {
       console.error('ERROR:', error);
@@ -182,11 +185,10 @@ const Benchmark: React.FC = () => {
               color="blue"
               radius="lg"
               withCloseButton
-              style={{ width: "30vw", height: "25vh" }}
+              style={{ width: "32vw", aspectRatio: "1.6", background: "var(--navy-400)" }}
               onClose={() => setIsCLicked(false)}
-              className="shadow-lg"
             >
-              <div >
+              <div className='message-body'>
                 <p style={{ fontSize: "1vw" }}>
                   A Benchmark containing {Object.keys(selectedAttacks).length} vulnearbilities has been scheduled.
                   Visit the management page for checking the advancement of the experiments.

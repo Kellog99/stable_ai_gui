@@ -97,11 +97,12 @@
   align-content: center;
   height: 3vw;
   min-width: 100px;
+  width: 17vw;
   font-size: 1rem;
   justify-content: space-between;
   padding: 1.5vw;
   border-radius: 1vw;
-  background-color: black;
+  background-color: var(--navy-700);
   color: white;
   gap: 20px;
 }
@@ -111,9 +112,16 @@
 }
 
 .allert-button:hover:not(.disabled) {
-  background-color: #333;
+  background-color: var(--navy-100);
 }
 
 .allert-button:hover:not(.disabled) svg {
   transform: translateX(5px);
+}
+
+.message-body{
+  height: 15vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }

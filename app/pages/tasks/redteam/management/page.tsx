@@ -2,13 +2,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { ArrowDownUp, CircleArrowRight, Search } from 'lucide-react';
+import { ArrowDownUp, CircleArrowRight, RotateCw, Search } from 'lucide-react';
 import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
 
 const TaskManagement: React.FC = () => {
-    const { executedAttacks, setReport, setBenchmark, benchmark } = useNNTrustStore()
+    const { setReport, setBenchmark, executedAttacks, setExecutedAttacks } = useNNTrustStore()
     const [attackArray, setAttackArray] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
@@ -16,6 +16,8 @@ const TaskManagement: React.FC = () => {
         key: null,
         direction: 'asc'
     });
+    console.log("in benchmark ", executedAttacks)
+
 
     // Convert Set to Array whenever executedAttacks changes
     useEffect(() => {
@@ -120,13 +122,32 @@ const TaskManagement: React.FC = () => {
         }
         router.push("/pages/report/reportTITANN")
     }
+    const [isRotating, setIsRotating] = useState(false);
+
+    const handleRefresh = async () => {
+        setIsRotating(true);
+        setTimeout(() => setIsRotating(false), 600); // Match animation duration
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/attacks/benchmarkStatus');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`); // Fixed: parentheses, not backtick
+            }
+            const data = await response.json(); // Parse the response
+            console.log("management ==", data)
+            setExecutedAttacks(data)
+        } catch (error) {
+            console.error('ERROR:', error);
+            return []; // Return empty array on error
+        }
+    }
 
     return (
         <div className="container">
             <div className='management-header'>
                 <div>
                     <h1>Job Status Management</h1>
-                    <p>Number of finished tested vulnearbilities {atkFinished}/{executedAttacks.length}</p>
+                    <p style={{ color: "lightgray" }}>Number of finished tested vulnearbilities {atkFinished}/{executedAttacks.length}</p>
                 </div>
 
                 <HoverCard
@@ -139,7 +160,7 @@ const TaskManagement: React.FC = () => {
                                 disabled={isDisabled()}
                                 onClick={handleClickReport}
                                 className={`header-button ${isDisabled() ? 'disabled' : ''}`}>
-                                Report <CircleArrowRight />
+                                See Report <CircleArrowRight size={"3vw"} />
                             </button>
                         </div>
                     </HoverCard.Target>
@@ -173,6 +194,12 @@ const TaskManagement: React.FC = () => {
                     <option value="In Progress">In Progress</option>
                     <option value="Completed">Completed</option>
                 </select>
+                <button
+                    className={`updateButton ${isRotating ? 'rotating' : ''}`}
+                    onClick={handleRefresh}
+                >
+                    <RotateCw color='red' size={"2.3vw"} />
+                </button>
             </div>
             <div className="table-wrapper">
                 <table>
@@ -185,7 +212,7 @@ const TaskManagement: React.FC = () => {
                             </th>
                             <th>
                                 <button onClick={() => handleSort('name')}>
-                                    Job Name <ArrowDownUp />
+                                    Attack Name <ArrowDownUp />
                                 </button>
                             </th>
                             <th>
@@ -193,9 +220,12 @@ const TaskManagement: React.FC = () => {
                                     Status <ArrowDownUp />
                                 </button>
                             </th>
+                            <th>
+                                Progress
+                            </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody>
                         {filteredAndSortedJobs.length === 0 ? (
                             <tr>
                                 <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
@@ -209,19 +239,22 @@ const TaskManagement: React.FC = () => {
                                 const jobStatus = typeof job === 'string' ? 'N/A' : (job?.status || 'N/A');
 
                                 return (
-                                    <tr key={`${jobId}-${index}`} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    <tr key={`${jobId}-${index}`}>
+                                        <td>
                                             {jobId}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <td style={{ fontWeight: "bold" }}>
                                             {jobName}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div>
+                                        <td>
                                             <p>{jobStatus}</p>
-                                            <Progress value={30} color='blue' animated/>
-                                            </div>
                                         </td>
+                                        <td>
+                                            {job.progress === 100 ?
+                                                <Progress value={job.progress} color='green' />
+                                                : <Progress value={job.progress} color='blue' animated />}
+                                        </td>
+
                                     </tr>
                                 );
                             })

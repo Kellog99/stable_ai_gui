@@ -1,6 +1,6 @@
 .container {
   display: flex;
-  height: 12vh;
+  height: 10vh;
   max-height: 120px;
   width: 100%;
   background-color: var(--navy-700);
@@ -16,7 +16,8 @@
   display: flex;
   position: relative;
   width: 15vw;
-  height: 6vh;
+  height: 4vh;
+  min-height: 50px;
   max-height: 80px;
   margin: 1vh;
   align-items: center;

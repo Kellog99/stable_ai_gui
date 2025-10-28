@@ -7,6 +7,7 @@ export interface AttackManagementProps {
   id: number;
   name: string;
   status: string;
+  progress: number
 }
 
 interface AppState {
@@ -94,7 +95,8 @@ const useNNTrustStore = create<AppState>()(
         selectedAttacks: state.selectedAttacks,
         report: state.report,
         benchmark: state.benchmark,
-        vulnerabilitySelected: state.vulnerabilitySelected
+        vulnerabilitySelected: state.vulnerabilitySelected, 
+        executedAttacks: state.executedAttacks,
         // Don't persist loading and error states
       }),
     }
