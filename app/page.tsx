@@ -6,7 +6,7 @@ import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/HomePage.module.css';
 import { BarChart3, Database, FileText, TestTube, Upload } from 'lucide-react';
 import { DatasetRepository } from './components/client/DatasetsRepoLoad';
-import FileDropZone2 from './components/client/FileDropZone2';
+import FileDropZone from './components/client/FileDropZone';
 import { ModelRepository } from './components/client/ModelDisplayer';
 import { ModalUploadDataset } from './components/client/upload/ModalUploadDataset';
 import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
@@ -43,16 +43,14 @@ const tasks: Task[] = [
   }
 ]
 
-const HomePage: React.FC = ( { } ) =>
-{
-  const setModels = useStore( ( state ) => state.setModels )
-  const setDatasets = useStoreDQ( ( state ) => state.setDatasets )
+const HomePage: React.FC = ({ }) => {
+  const setModels = useStore((state) => state.setModels)
+  const setDatasets = useStoreDQ((state) => state.setDatasets)
 
-  const ZipDragDrop = () =>
-  {
+  const ZipDragDrop = () => {
     return (
       <DragDrop
-        config={ {
+        config={{
           name: "dataset",
           fileType: 'zip',
           accept: 'application/zip',
@@ -62,15 +60,14 @@ const HomePage: React.FC = ( { } ) =>
           uploadUrl: uploaderDataset,
           refreshFunction: DatasetsLoader,
           setRefreshData: setDatasets
-        } }
-        infoModal={ <ModalUploadDataset /> } /> )
+        }}
+        infoModal={<ModalUploadDataset />} />)
   }
 
-  const ZipModelDragDrop = () =>
-  {
+  const ZipModelDragDrop = () => {
     return (
       <DragDrop
-        config={ {
+        config={{
           name: "model",
           fileType: 'zip',
           accept: 'application/zip',
@@ -81,8 +78,8 @@ const HomePage: React.FC = ( { } ) =>
           refreshFunction: getModels,
           setRefreshData: setModels
 
-        } }
-        infoModal={ <ModalUploadModel /> } /> )
+        }}
+        infoModal={<ModalUploadModel />} />)
   }
 
   const datasetSections = [
@@ -115,36 +112,36 @@ const HomePage: React.FC = ( { } ) =>
     }
   ];
 
-  const listOfSections = [ datasetSections, modelSections ];
+  const listOfSections = [datasetSections, modelSections];
   return (
-    <div className={ styles.homecontainer }>
-      <div className={ styles.filegrid }>
-        { listOfSections.map( ( dropElement, index ) => (
-          <FileDropZone2
-            key={ index }
-            sections={ dropElement }
-            defaultActiveSection={ dropElement[ 0 ].id }
+    <div className={styles.homecontainer}>
+      <div className={styles.filegrid}>
+        {listOfSections.map((dropElement, index) => (
+          <FileDropZone
+            key={index}
+            sections={dropElement}
+            defaultActiveSection={dropElement[0].id}
           />
-        ) ) }
+        ))}
 
       </div>
 
-      <div className={ styles.task }>
-        <div className={ styles.sectionheader }>
-          <h2 className={ styles.sectiontitle }>
+      <div className={styles.task}>
+        <div className={styles.sectionheader}>
+          <h2 className={styles.sectiontitle}>
             Analysis Tasks
           </h2>
-          <p className={ styles.sectionsubtitle }>
+          <p className={styles.sectionsubtitle}>
             Select an analysis task to begin
           </p>
         </div>
 
-        <div className={ styles.taskgrid }>
+        <div className={styles.taskgrid}>
           {
-            tasks.map( ( task ) =>
+            tasks.map((task) =>
               <TaskButton
-                key={ task.title }
-                { ...task } /> )
+                key={task.title}
+                {...task} />)
           }
         </div>
       </div>

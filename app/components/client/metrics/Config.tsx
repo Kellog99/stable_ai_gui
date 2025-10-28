@@ -262,6 +262,7 @@ export default function Config ( props: ConfigsProps )
             }, 3000 );
             setIsDuplicate( false )
             setReport( [ ...report, reportMetric ] );
+            //qua bisogna fare la chiamata a backend che salva/aggiorna il report da mostrare 
         }
 
     }
