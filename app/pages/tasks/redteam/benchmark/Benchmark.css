@@ -33,6 +33,9 @@
   align-items: center;
   align-content: space-between;
   border-radius: 2vw;
+  background-color: var(--navy-700);
+  color: var(--primary-text);
+  font-weight: bold;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -42,7 +45,7 @@
 }
 
 .attack-button:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
 }
 
 .icon {

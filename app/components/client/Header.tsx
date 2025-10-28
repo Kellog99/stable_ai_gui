@@ -46,17 +46,26 @@ const Header = () => {
   return (
     <div className={styles.container}>
       <div className={styles.buttons}>
-        {btns.map((btnprops) =>
+        <div
+          className={styles.slider}
+          style={{
+            transform: `translateX(${btns.findIndex(b => b.id === page) * 100}%)`,
+            width: `${100 / btns.length}%`
+          }}
+        />
+        {btns.map((btnprops) => (
           <button
             key={btnprops.id}
             className={`${styles.button} ${page === btnprops.id ? styles.active : ''}`}
             onClick={() => {
               setPage(btnprops.id);
               router.push(btnprops.href);
-            }}>
+            }}
+          >
             <btnprops.Icon />
             {btnprops.name.charAt(0).toUpperCase() + btnprops.name.slice(1)}
-          </button>)}
+          </button>
+        ))}
       </div>
 
       {/* Title */}

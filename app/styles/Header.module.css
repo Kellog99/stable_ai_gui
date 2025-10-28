@@ -14,14 +14,26 @@
 
 .buttons {
   display: flex;
-  width: 20vw;
-  height: 8vh;
+  position: relative;
+  width: 15vw;
+  height: 6vh;
   max-height: 80px;
   margin: 1vh;
   align-items: center;
   border-radius: calc(2*var(--border-radius));
   background-color: var(--navy-500);
   border: 2px solid var(--navy-900);
+  overflow: hidden;
+}
+
+.slider {
+  position: absolute;
+  height: 100%;
+  background-color: var(--coral-600);
+  border-radius: calc(2*var(--border-radius));
+  transition: transform 0.4s ease;
+  z-index: 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .button {
@@ -36,16 +48,16 @@
   text-align: center;
   border-radius: calc(2*var(--border-radius));
   font-weight: 900;
-  border-color: transparent;
+  border: none;
   background-color: transparent;
   transition: all 0.4s ease;
   color: var(--text-secondary);
-
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
 }
 
 .button.active {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  background-color: var(--coral-600);
   color: var(--text-primary);
   font-weight: bolder;
 }
@@ -72,7 +84,7 @@
   display: flex;
   width: 17vw;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   border-radius: calc(2*var(--border-radius));
 }
 
@@ -83,12 +95,10 @@
   font-size: 0.7vw;
   font-weight: bold;
   gap: 0.5rem;
-  background-color: var(--warning);
   width: 9vw;
   padding: 0.7vw;
-  border-radius: var(--border-radius);
-  color: black;
-  border: 2px solid black;
+  color: var(--warning);
+  border: transparent;
 }
 
 .item.loaded {

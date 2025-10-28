@@ -2,8 +2,7 @@
 import TaskButton from '@/components/client/buttons/TaskButton';
 import { Task } from '@/interfaces/NNInterfaces';
 import styles from '@/styles/HomePage.module.css';
-import { BarChart3, Brain, Database, FileText, TestTube } from 'lucide-react';
-import { FileDropZoneProps } from "./interfaces/NNInterfaces";
+import { BarChart3, FileText, TestTube } from 'lucide-react';
 import HomePageDrop from './pages/HomePage/HomePageDrop';
 
 // major information about the tasks

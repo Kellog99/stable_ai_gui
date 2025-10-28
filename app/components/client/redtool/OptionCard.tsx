@@ -28,13 +28,8 @@ export function OptionCard({
   const [openSettings, setIsExpanded] = useState(false);
   return (
     <><div className="attack-card">
-      <input
-        className='checkbox'
-        type="checkbox"
-        onChange={onSelect}
-        checked={isSelected} />
       <div className='card-body'>
-        <span className='title'>{name}</span>
+        <h3 style={{ marginBottom: '3px' }}>{name}</h3>
         {
           tags && tags.length > 0 && (
             tags.map((tag, index) => (
@@ -50,10 +45,20 @@ export function OptionCard({
             : null
         }
       </div>
-
-      <Icon
-        onClick={() => setIsExpanded(true)}
-        className='icon' />
+      <div className='card-footer'>
+        <Icon
+          className='card-icon'
+          style={{ pointerEvents: parameters ? "auto" : "none" }}
+          size={30}
+          onClick={() => setIsExpanded(true)} />
+        <label className="circle-checkbox">
+          <input
+            type="checkbox"
+            onChange={onSelect}
+            checked={isSelected} />
+          <span className="checkmark"></span>
+        </label>
+      </div>
     </div>
       {
         parameters ?
