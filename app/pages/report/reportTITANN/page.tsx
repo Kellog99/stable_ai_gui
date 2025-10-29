@@ -11,7 +11,11 @@ import { ChartNoAxesCombined, IdCardLanyard, Info, Radar, Trophy } from 'lucide-
 const SecurityReport = () => {
 
     const { report, benchmark } = useNNTrustStore()
-    console.log("benchark fetch = ", report?.attacks)
+
+    // Bisogna pensare ad una logica in cui il benchmark viene anche caricato qua se e è nullo 
+
+    
+    console.log("benchark fetch = ", benchmark)
     if (report && benchmark) {
         return (
             <div>
@@ -36,8 +40,8 @@ const SecurityReport = () => {
                         {Object.entries(report.info).map(([key, value]) => (
                             key !== 'confusion_matrix' ?
                                 <div className="info-item">
-                                    <div className="label">{key}:</div>
-                                    <div className="value">{value}</div>
+                                    <div className="label" key={key}>{key}:</div>
+                                    <div className="value" key={`value-${key}`}>{value}</div>
                                 </div> : null)
                         )}
                     </div>

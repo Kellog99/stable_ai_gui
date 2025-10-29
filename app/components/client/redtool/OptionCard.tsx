@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LucideIcon } from 'lucide-react';
+import { Check, LucideIcon } from 'lucide-react';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import './AttackCard.css';
 import ParametersWindow from './Parameters';
@@ -27,39 +27,45 @@ export function OptionCard({
 }: OptionCardProps) {
   const [openSettings, setIsExpanded] = useState(false);
   return (
-    <><div className="attack-card">
-      <div className='card-body'>
-        <h3 style={{ marginBottom: '3px' }}>{name}</h3>
-        {
-          tags && tags.length > 0 && (
-            tags.map((tag, index) => (
-              <div key={`${tag}-${index}`}
-                className='option-tag'>{tag}</div>
-            )))
-        }
+    <>
+      <div className="attack-card">
+        <div className="card-header">
+          <h3>{name}</h3>
+          {
+            tags && tags.length > 0 && (
+              <div>
+                {tags.map((tag, index) => (
+                  <div key={`${tag}-${index}`}
+                    className='option-tag'>{tag}</div>
+                ))}
+              </div>)
+          }
+        </div>
+
         {
           description ?
-            <div className='description'>
+            <div className='card-body'>
               {description}
             </div>
             : null
         }
+        <div className='card-footer'>
+          <Icon
+            className='card-icon'
+            style={{ pointerEvents: parameters ? "auto" : "none" }}
+            size={30}
+            onClick={() => setIsExpanded(true)} />
+          <label className="circle-checkbox">
+            <input
+              type="checkbox"
+              onChange={onSelect}
+              checked={isSelected} />
+            <span className="checkmark">
+              <Check className="check-icon" size={18} strokeWidth={3} />
+            </span>
+          </label>
+        </div>
       </div>
-      <div className='card-footer'>
-        <Icon
-          className='card-icon'
-          style={{ pointerEvents: parameters ? "auto" : "none" }}
-          size={30}
-          onClick={() => setIsExpanded(true)} />
-        <label className="circle-checkbox">
-          <input
-            type="checkbox"
-            onChange={onSelect}
-            checked={isSelected} />
-          <span className="checkmark"></span>
-        </label>
-      </div>
-    </div>
       {
         parameters ?
           <ParametersWindow

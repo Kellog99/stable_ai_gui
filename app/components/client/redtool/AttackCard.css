@@ -3,13 +3,13 @@
   flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 0 2vw 0 2vw;
+  padding: 1vw 2vw 0 2vw;
   gap: 1.5vw;
   background: rgb(231, 229, 229);
   border-radius: var(--border-radius);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   align-items: center;
-
+  align-self: end;
   /* Ensure the card’s internal layout stretches properly */
   position: relative;
 }
@@ -20,13 +20,34 @@
   border-color: #667eea;
 }
 
+.card-header {
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  width: 100%;
+  padding: 20px;
+  align-content: center;
+  align-items: center;
+  background-color: rgb(202, 200, 200);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.attack-header h3 {
+  color: black;
+}
 
 .card-body {
   width: 100%;
   flex: 1;
-  /* <-- Take all available vertical space */
+  /* Takes all available vertical space */
+  display: flex;
+  /* Add this */
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-bottom: 20px;
   align-items: center;
-  align-content: center;
+  font-size: 0.8rem;
 }
 
 .card-footer {
@@ -57,20 +78,37 @@
   margin-right: 8px;
   position: relative;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .circle-checkbox input:checked+.checkmark {
-  background-color: var(--affermative);
-  /* blue */
+  background-color: var(--affermative, #4CAF50);
   border: none;
 }
-.card-icon{
+
+.check-icon {
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.circle-checkbox input:checked+.checkmark .check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.card-icon {
   transition: all 0.2s ease;
 }
+
 .card-icon:hover {
   fill: lightgray;
   scale: 1.1;
-transform: translateY(-2px);}
+  transform: translateY(-2px);
+}
 
 .option-tag {
   width: fit-content;
@@ -82,13 +120,6 @@ transform: translateY(-2px);}
   align-content: center;
   text-align: center;
   margin-bottom: 1.5vw;
-}
-
-.description {
-  width: 100%;
-  height: 100%;
-  font-size: 0.7rem;
-  text-align: justify;
 }
 
 
@@ -187,9 +218,6 @@ transform: translateY(-2px);}
 }
 
 @media (max-width: 768px) {
-  .card-header h3 {
-    font-size: 1.1rem;
-  }
 
   .parameter-header {
     flex-direction: column;

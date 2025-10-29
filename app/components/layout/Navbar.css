@@ -98,7 +98,7 @@
 
 .nav-link.active {
     width: 100%;
-    background: var(--navy-300);
+    background: var(--navy-800);
 }
 
 .nav-link.active::before {

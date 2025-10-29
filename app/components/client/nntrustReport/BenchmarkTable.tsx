@@ -5,9 +5,9 @@ import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
 
 interface BenchmarkTableProps {
-    modelName?: string                  // name of the tested model
-    benchmark: BenchmarkDataProps;      // stored benchmarks from previous models
-    data: metricsProps;                 // metrics result from the benchmark
+    modelName?: string;                                    // name of the tested model
+    benchmark: { [key: string]: BenchmarkDataProps };     // stored benchmarks from previous models
+    data: metricsProps;                                   // metrics result from the benchmark
 }
 
 const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
@@ -15,18 +15,44 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     benchmark,
     data
 }) => {
-    console.log("data keys = ", Object.keys(data))
-    const availableBenchmarks = useMemo(() =>
-        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix"].includes(key))
-        , [data]);
+    // These are the metrics that were used during the evaluation of this model.
+    const availableBenchmarkingMetrics = useMemo(() =>
+        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix"].includes(key)),
+        [data]
+    );
+
+    const [benchmarkData, setBenchmarkData] = useState<Array<{
+        name: string;
+        param: number;
+        task: string;
+        metrics: { [key: string]: number };
+    }>>([]);
+
+    useEffect(() => {
+        const out = Object.entries(benchmark).map(([id, benchmarkProps]) => ({
+            name: benchmarkProps.name,
+            param: benchmarkProps.param,
+            task: benchmarkProps.task,
+            metrics: availableBenchmarkingMetrics.reduce((acc, metricKey) => {
+                if (benchmarkProps.metrics[metricKey] !== undefined) {
+                    acc[metricKey] = benchmarkProps.metrics[metricKey];
+                }
+                return acc;
+            }, {} as { [key: string]: number })
+        }));
+
+        setBenchmarkData(out);
+    }, [benchmark, availableBenchmarkingMetrics]);
+
+    console.log("benchmarkData = ", benchmarkData);
 
     const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
 
     useEffect(() => {
-        if (availableBenchmarks.length > 0) {
-            setSelectedBenchmark(availableBenchmarks[0]);
+        if (availableBenchmarkingMetrics.length > 0) {
+            setSelectedBenchmark(availableBenchmarkingMetrics[0]);
         }
-    }, [availableBenchmarks]);
+    }, [availableBenchmarkingMetrics]);
 
     // Sort data by value, descending
     const [sortedData, setSortedData] = useState<[string, number][]>([]);
@@ -46,49 +72,53 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             return [];
         };
 
-        const benchmarkValue = flattenValue(benchmark[selectedBenchmark as keyof BenchmarkDataProps]);
+        // Extract benchmark values for the selected metric
+        const benchmarkEntries = Object.entries(benchmark);
+        const benchmarkValues = benchmarkEntries.map(([id, benchmarkProp]) =>
+            benchmarkProp.metrics[selectedBenchmark] ?? 0
+        );
+
         const dataValue = flattenValue(data[selectedBenchmark as keyof metricsProps]);
 
         // Create chart data for benchmark points
-        if (benchmarkValue.length > 0) {
-            // Check if params exists and is an array            
-            const benchmarkChartData = benchmark.params.map((param, index) => ({
-                "params": param,
-                [selectedBenchmark]: benchmarkValue[index],
+        if (benchmarkValues.length > 0) {
+            const benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
+                "params": benchmarkProp.param,
+                [selectedBenchmark]: benchmarkValues[index],
             }));
-            console.log("Setting benchmarkChartData:", benchmarkChartData);
 
             setChartBenchmarkData(benchmarkChartData);
         } else {
-            console.log("benchmarkValue is empty, setting empty array");
-            setChartBenchmarkData([{}]);
+            setChartBenchmarkData([]);
         }
 
         // Create chart data for the tested model value
-        setChartValueData([{
-            "params": data.params,
-            [selectedBenchmark]: dataValue[0],
-        }]);
-
+        if (dataValue.length > 0 && data.params !== undefined) {
+            setChartValueData([{
+                "params": data.params,
+                [selectedBenchmark]: dataValue[0],
+            }]);
+        } else {
+            setChartValueData([]);
+        }
 
         // Combine into [name, value] tuples and sort by value descending
         const combined: [string, number][] = [];
 
         // Add benchmark values with their names
-        benchmarkValue.forEach((val, index) => {
-            combined.push([benchmark.names[index], val]);
+        benchmarkEntries.forEach(([id, benchmarkProp], index) => {
+            combined.push([benchmarkProp.name, benchmarkValues[index]]);
         });
 
         // Add the tested model value
-        combined.push([modelName || 'Target Model', dataValue[0]]);
+        if (dataValue.length > 0) {
+            combined.push([modelName || 'Target Model', dataValue[0]]);
+        }
 
         // Sort by value (descending)
         combined.sort((a, b) => b[1] - a[1]);
-        console.log("combined = ", combined)
-        setSortedData(combined)
-    }, [selectedBenchmark, benchmark, data]);
-
-
+        setSortedData(combined);
+    }, [selectedBenchmark, benchmark, data, modelName]);
 
     // Chart data
     const chartData = [
@@ -106,10 +136,13 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
     const isHighlighted = (value: number) => {
         const testedValue = data[selectedBenchmark as keyof metricsProps];
-        return value === testedValue ? "row highlighted" : "row";
+        const flatValue = typeof testedValue === 'number' ? testedValue :
+            Array.isArray(testedValue) ? testedValue[0] : null;
+        return value === flatValue ? "row highlighted" : "row";
     };
 
-    console.log("sorted elements", sortedData )
+    console.log("sorted elements", sortedData);
+
     return (
         <div className="benchmark-controls">
             {/* Benchmark selector */}
@@ -118,7 +151,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                 onChange={(e) => setSelectedBenchmark(e.target.value)}
                 className="benchmark-select"
             >
-                {availableBenchmarks.map((key) => (
+                {availableBenchmarkingMetrics.map((key) => (
                     <option key={key} value={key}>
                         {key}
                     </option>

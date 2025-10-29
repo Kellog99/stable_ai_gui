@@ -27,7 +27,7 @@ interface AppState {
 
   // report
   report: ReportProps | null;
-  benchmark: BenchmarkDataProps | null;
+  benchmark: { [key: string]: BenchmarkDataProps } | null;
   vulnerabilitySelected: string | null;
 
   setModels: (models: ModelSpecs[] | null) => void;
@@ -95,7 +95,7 @@ const useNNTrustStore = create<AppState>()(
         selectedAttacks: state.selectedAttacks,
         report: state.report,
         benchmark: state.benchmark,
-        vulnerabilitySelected: state.vulnerabilitySelected, 
+        vulnerabilitySelected: state.vulnerabilitySelected,
         executedAttacks: state.executedAttacks,
         // Don't persist loading and error states
       }),

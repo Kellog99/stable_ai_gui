@@ -67,11 +67,7 @@ const AttackTable: React.FC<AttackTableProps> = ({
                                 size={130}
                                 value={value.risk * 100}
                                 filledSegmentColor={getRiskColor(value.risk * 100)}
-                                label={
-                                    <Text size="s" ta="center">
-                                        {(value.risk * 100).toFixed(1)}%
-                                    </Text>
-                                }
+                                label={`${(value.risk * 100).toFixed(1)}%`}
                             />
                         </td>
                     </tr>

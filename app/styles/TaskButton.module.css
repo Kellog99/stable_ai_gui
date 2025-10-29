@@ -8,7 +8,7 @@
   padding: 2vw;
   grid-template-rows: auto 1fr auto;
   align-items: center;
-  text-align: center;
+  text-align: justify;
 }
 
 .card:hover {

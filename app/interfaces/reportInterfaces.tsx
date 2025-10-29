@@ -2,6 +2,8 @@
 interface infoProps {
     name: string;
     parameters: number;
+    task: string
+    dataset: string
     classes: number;
     dimensionality: number[];
 
@@ -37,11 +39,8 @@ export interface ReportProps {
 }
 
 export interface BenchmarkDataProps {
-    accuracy?: number[];
-    precision?: number[];
-    f1score?: number[];
-    robustness?: number[];
-    wobbliness?: number[];
-    params: number[];
-    names: string[]
+    name: string
+    param: number
+    task: string
+    metrics: { [key: string | number]: number }
 }

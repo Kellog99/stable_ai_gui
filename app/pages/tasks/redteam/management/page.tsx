@@ -125,6 +125,8 @@ const TaskManagement: React.FC = () => {
     const [isRotating, setIsRotating] = useState(false);
 
     const handleRefresh = async () => {
+        // This handle is for getting, every time the user clicke the Circle Arrow Icon, 
+        // the updates from the jobs that are running throught the backend
         setIsRotating(true);
         setTimeout(() => setIsRotating(false), 600); // Match animation duration
 
@@ -184,22 +186,27 @@ const TaskManagement: React.FC = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <select
-                    id="statusFilter"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                    <option value="All">All Statuses</option>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                </select>
+
                 <button
                     className={`updateButton ${isRotating ? 'rotating' : ''}`}
                     onClick={handleRefresh}
                 >
                     <RotateCw color='red' size={"2.3vw"} />
                 </button>
+                <div className='filter'>
+                    <div>Filter by:</div>
+                    <select
+                        className='selectionButton'
+                        id="statusFilter"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                    >
+                        <option value="All">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
             </div>
             <div className="table-wrapper">
                 <table>
