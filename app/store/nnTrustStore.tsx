@@ -42,7 +42,7 @@ interface AppState {
   ) => void;
   setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => void;
   setReport: (report: ReportProps) => void;
-  setBenchmark: (benchmark: BenchmarkDataProps) => void;
+  setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => void;
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
 }
 
@@ -80,7 +80,7 @@ const useNNTrustStore = create<AppState>()(
       setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => set({ executedAttacks }),
 
       setReport: (report: ReportProps) => set({ report }),
-      setBenchmark: (benchmark: BenchmarkDataProps) => set({ benchmark }),
+      setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => set({ benchmark }),
       setVulnerabilitySelected: (vulnerabilitySelected: string) => set({ vulnerabilitySelected })
     }),
 
