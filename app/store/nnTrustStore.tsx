@@ -1,52 +1,82 @@
-import { Job, ModelSpecs } from "@/interfaces/NNInterfaces";
+import { ModelSpecs, ParametersProps, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface AppState
-{
-  dataset: Object | null;
-  datasets: string[] | null;
-  models: ModelSpecs[] | null;
-  allJobs: Job[];
-  modelName: string | null;
-  
+export interface AttackManagementProps {
+  id: number;
+  name: string;
+  status: string;
+}
 
-  setDataset: ( dataset: Object | null ) => void;
-  setDatasets: (datasets: string[] | null) => void;
+interface AppState {
+  models: ModelSpecs[] | null;
+  modelName: string | null;
+  attacks: { [key: string]: RegisterObjectProps };
+  metrics: { [key: string]: RegisterObjectProps };
+
+  selectedAttacks: { [key: string]: RegisterObjectProps };
+  selectedMetrics: { [key: string]: RegisterObjectProps };
+
+
+  testAttack: RegisterObjectProps | null; // this variable saves the attack to test on the Test Page
+  executedAttacks: AttackManagementProps[];
+  loading: boolean;
+  error: string | null;
+
   setModels: (models: ModelSpecs[] | null) => void;
-  setAllJobs: (allJobs: Job[]) => void;
   setModelName: (modelName: string | null) => void;
-  
- 
+  setAttacks: (attaks: { [key: string]: RegisterObjectProps }) => void;
+  setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
+  setSelectedAttacks: (selectedAttack: { [key: string]: RegisterObjectProps }) => void;
+  setSelectedMetrics: (selectedMetrics: { [key: string]: RegisterObjectProps }) => void;
+  setMap: (
+    map: { [key: string]: RegisterObjectProps },
+    name: 'attacks' | 'metrics' | 'selectedAttacks' | 'selectedMetrics'
+  ) => void;
+  setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => void;
 }
 
 const useNNTrustStore = create<AppState>()(
   persist(
-    ( set ) => ( {
-      dataset: null,
-      datasets: null,
+    (set) => ({
       models: null,
-      allJobs: [],
       modelName: null,
-      
-     
-      setDataset: ( dataset ) => set( { dataset } ),
-      setDatasets: (datasets) => set({datasets}),
-      setModels: (models) => set({models}),
-      setAllJobs: (allJobs) => set({allJobs}),
-      setModelName: (modelName) => set({modelName}),
-      
-      
-    } ),
+
+      attacks: {},
+      metrics: {},
+      selectedAttacks: {},
+      selectedMetrics: {},
+
+      executedAttacks: [],
+
+      testAttack: null,
+
+      loading: false,
+      error: null,
+
+      setModels: (models) => set({ models }),
+      setModelName: (modelName) => set({ modelName }),
+
+      setAttacks: (attacks) => set({ attacks }),
+      setMetrics: (metrics) => set({ metrics }),
+      setSelectedAttacks: (selectedAttacks) => set({ selectedAttacks }),
+      setSelectedMetrics: (selectedMetrics) => set({ selectedMetrics }),
+
+      setMap: (map, name) => set({ [name]: map }),
+      setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => set({ executedAttacks })
+    }),
 
     {
       name: "app-storage",
-      storage: createJSONStorage( () => sessionStorage ),
-      partialize: ( state ) => ( {
-        datasets: state.dataset,
-       
-
-      } ),
+      storage: createJSONStorage(() => sessionStorage),
+      partialize: (state) => ({
+        models: state.models,
+        modelName: state.modelName,
+        attacks: state.attacks,
+        metrics: state.metrics,
+        selectedAttacks: state.selectedAttacks
+        // Don't persist loading and error states
+      }),
     }
   )
 );

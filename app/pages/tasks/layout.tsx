@@ -1,6 +1,5 @@
 "use client";
 import Navbar from "@/components/layout/Navbar";
-import useStore from "@/store/dsStore";
 import {
   AppShell,
   MantineProvider,
@@ -10,7 +9,6 @@ import classes from "@/layout.module.css";
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const collapsed = useStore((state) => state.collapsed);
 
   return (
     <MantineProvider >

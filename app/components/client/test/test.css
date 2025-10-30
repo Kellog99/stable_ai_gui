@@ -29,7 +29,28 @@
 .block-parameters {
     display: flex;
     flex-direction: column;
-    gap: 0.7vw;
+    gap: 0.5vw;
+    margin-top: 10px;
+}
+
+.hyperparameters {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+    align-items: center;
+}
+
+.reset-button {
+    width: fit-content;
+    height: fit-content;
+    background-color: transparent;
+    color: white;
+    animation: 0.4s;
+    border-radius: 10px;
+}
+
+.reset-button:hover {
+    text-decoration: underline;
 }
 
 .parameter {

@@ -4,55 +4,65 @@ import { ParametersProps } from '@/interfaces/NNInterfaces';
 import './AttackCard.css';
 import ParametersWindow from './Parameters';
 
-interface AttackCardProps {
-  id: string,
+interface OptionCardProps {
   name: string,
   description?: string,
   parameters?: ParametersProps[],
   isSelected: boolean;
-  onSelect: (attackId: string) => void;
   Icon: LucideIcon
+  tags?: string[]
+  onSelect: () => void;
+  handleParametersChange: (parameters: number[]) => void;
 }
 
-const OptionCard: React.FC<AttackCardProps> = ({
-  id,
+export function OptionCard({
   name,
-  parameters,
   description,
+  parameters,
   isSelected,
   onSelect,
-  Icon
-}) => {
+  handleParametersChange,
+  Icon,
+  tags,
+}: OptionCardProps) {
   const [openSettings, setIsExpanded] = useState(false);
   return (
     <><div className="attack-card">
       <input
         className='checkbox'
         type="checkbox"
-        onClick={() => onSelect(id)}
-        defaultChecked={isSelected} />
+        onChange={onSelect}
+        checked={isSelected} />
       <div className='card-body'>
-        <div className="card-header" >
-          <span className='title'>{name}</span>
-          <div
-            className='open'
-            onClick={() => setIsExpanded(true)} >
-            <Icon className='icon' />
-          </div>
-        </div>
-        {description ?
-          <div className='description'>
-            {description}
-          </div>
-          : null}
+        <span className='title'>{name}</span>
+        {
+          tags && tags.length > 0 && (
+            tags.map((tag, index) => (
+              <div key={`${tag}-${index}`}
+                className='option-tag'>{tag}</div>
+            )))
+        }
+        {
+          description ?
+            <div className='description'>
+              {description}
+            </div>
+            : null
+        }
       </div>
+
+      <Icon
+        onClick={() => setIsExpanded(true)}
+        className='icon' />
     </div>
       {
-        parameters ? <ParametersWindow
-          isOpen={openSettings}
-          parameters={parameters}
-          onClose={() => setIsExpanded(false)}
-        /> : null
+        parameters ?
+          <ParametersWindow
+            isOpen={openSettings}
+            parameters={parameters}
+            onClose={() => setIsExpanded(false)}
+            handleParametersChange={handleParametersChange} />
+          : null
       }
     </>
   );

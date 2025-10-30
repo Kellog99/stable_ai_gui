@@ -1,69 +1,107 @@
 import { Settings, X } from 'lucide-react';
 import './Parameters.css';
-import { ParametersWindowProps } from '@/interfaces/NNInterfaces';
+import { ParametersProps } from '@/interfaces/NNInterfaces';
+import { useState, useEffect } from 'react';
+
+interface ParametersWindowProps {
+    isOpen: boolean;
+    parameters: ParametersProps[];
+    onClose: () => void;
+    handleParametersChange: (parameters: number[]) => void;
+}
 
 const ParametersWindow: React.FC<ParametersWindowProps> = ({
     isOpen,
-    onClose,
     parameters,
+    onClose,
+    handleParametersChange
 }) => {
+    const [values, setValues] = useState<number[]>(parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []);
+    const defaultParameters = parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []
+
+    // Update values when parameters change or modal opens
+    useEffect(() => {
+        if (isOpen) {
+            setValues(parameters.map(p => p.default));
+        }
+    }, [isOpen, parameters]);
 
     if (!isOpen) return null;
 
+    const handleChange = (index: number, newValue: number) => {
+        const newValues = [...values];
+        newValues[index] = newValue;
+        setValues(newValues);
+    };
+
+    const handleReset = () => {
+        setValues(defaultParameters);
+    };
+
     return (
-        <div className="modal-overlay">
-            <div className="modal-window">
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-window" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="modal-header">
                     <h2 className="modal-title">
                         <Settings size={24} />
                         Settings
                     </h2>
-                    <button
-                        onClick={onClose}
-                        className="close-button">
+                    <button onClick={onClose} className="close-button">
                         <X size={24} />
                     </button>
                 </div>
 
                 {/* Settings Content */}
                 <div className="modal-content">
-                    {
-                        parameters.map((param) => (
-                            <div className="form-group">
-                                <p>{param.label}</p>
-                                <label className="form-label">{param.description}</label>
-                                <input
-                                    type="range"
-                                    min={param.min}
-                                    max={param.max}
-                                    value={param.default ? param.default : 2}
-                                    className="form-slider"
-                                />
-                            </div>
-                        ))
-                    }
+                    {parameters.map((param, index) => (
+                        <div key={`${param.label}-${index}`} className="form-group">
+                            <label className="form-label">
+                                {param.label}
+                                <span style={{
+                                    float: 'right',
+                                    fontWeight: 'bold',
+                                    color: '#3b82f6'
+                                }}>
+                                    {values[index]?.toFixed(2) ?? param.default}
+                                </span>
+                            </label>
+                            {param.description && (
+                                <p style={{
+                                    fontSize: '0.8rem',
+                                    color: '#6b7280',
+                                    marginTop: '0.25rem',
+                                    marginBottom: '0.75rem'
+                                }}>
+                                    {param.description}
+                                </p>
+                            )}
+                            <input
+                                type="range"
+                                min={param.min}
+                                max={param.max}
+                                step={(param.max - param.min) / 100}
+                                value={values[index] ?? param.default}
+                                onChange={(e) => handleChange(index, parseFloat(e.target.value))}
+                                className="form-slider"
+                            />
+                        </div>
+                    ))}
                 </div>
-
-
 
                 {/* Footer */}
                 <div className="modal-footer">
-                    <button
-                        // onClick={handleReset}
-                        className="reset-button"
-                    >
+                    <button onClick={handleReset} className="reset-button">
                         Reset to Default
                     </button>
                     <div className="button-group">
                         <button
                             onClick={onClose}
-                            className="cancel-button"
-                        >
+                            className="cancel-button">
                             Cancel
                         </button>
                         <button
-                            // onClick={handleSave}
+                            onClick={() => handleParametersChange(values)}
                             className="save-button">
                             Save Changes
                         </button>
@@ -73,4 +111,5 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
         </div>
     );
 };
-export default ParametersWindow
+
+export default ParametersWindow;

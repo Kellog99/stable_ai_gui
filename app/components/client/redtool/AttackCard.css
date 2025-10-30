@@ -1,15 +1,13 @@
 .attack-card {
   display: flex;
-  align-content: space-between;
   width: 100%;
   height: 100%;
-  gap: 1vw;
+  padding: 1vw;
+  gap: 1.5vw;
   background: lightgray;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 2vw;
+  align-items: center;
 }
 
 .attack-card:hover {
@@ -19,18 +17,10 @@
 }
 
 .checkbox {
-  width: clamp(16px, 7%, 25px);
+  width: clamp(8px, 7%, 12px);
   aspect-ratio: 1;
 }
 
-.card-header {
-  width: 100%;
-  display: flex;
-  grid-template-columns: 80% 20%;
-  transition: background-color 0.2s ease;
-  align-items: center;
-  align-content: space-between;
-}
 
 .card-body {
   width: 100%;
@@ -40,13 +30,24 @@
 
 .title {
   font-weight: bold;
-  width: 100%;
+  font-size: 1.1rem;
+}
+
+.option-tag {
+  width: fit-content;
+  min-width: 3vw;
+  font-size: 0.7rem;
+  border-radius: 7px;
+  background-color: #2a9d8f;
+  color: white;
+  align-content: center;
+  text-align: center;
 }
 
 .description {
   width: 100%;
   height: 100%;
-  font-size: 0.6rem;
+  font-size: 0.8rem;
   text-align: justify;
 }
 
@@ -61,12 +62,12 @@
   height: 100%;
   padding: 0;
   margin: 0 auto;
-  transition: background-color 0.4s ease;
-
+  transition: 0.3s ease;
 }
 
 .icon:hover {
   transform: translateY(-5px);
+  fill: gray;
 }
 
 .card-content {
@@ -167,7 +168,13 @@
   transition: opacity 0.3s ease;
 }
 
-
+.value {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+}
 @media (max-width: 768px) {
   .card-header h3 {
     font-size: 1.1rem;

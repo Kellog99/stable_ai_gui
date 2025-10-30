@@ -37,8 +37,8 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
                     if (items && items.length > 0) {
                         e.preventDefault();
                         setSeeActions(!seeActions);
-                        setActiveLink(id);
                     }
+                    setActiveLink(id);
                 }}
                 href={href && isActive ? href : "#"}
                 className={`${isActive ? activeLink === id ? 'nav-link active' : 'nav-link' : 'disabled'}`}
