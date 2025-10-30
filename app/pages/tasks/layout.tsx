@@ -5,6 +5,8 @@ import {
   MantineProvider,
 } from "@mantine/core";
 
+import classes from "@/layout.module.css";
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 
@@ -18,10 +20,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           height: '100%',
           paddingTop: '20px'
         }}>
-        <Navbar />
-        {children}
-      </div>
-    </AppShell>
+          <Navbar />
+          <Container
+            size="100%"
+            className={classes.mainContainer}
+          >
+            {children}
+          </Container>
+        </div>
+      </AppShell>
     </MantineProvider >
   );
 }

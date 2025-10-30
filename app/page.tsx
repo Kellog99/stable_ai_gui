@@ -11,23 +11,23 @@ const HomePage: React.FC = ({ }) => {
     <div className={styles.homecontainer}>
 
       <HomePageDrop />
-      {/* This part has to deal with the Task part */}
-      <div className={styles.task}>
-        <div className={styles.sectionheader}>
-          <h2 className={styles.sectiontitle}>
+      {/* This part has to deal with the Task part */ }
+      <div className={ styles.task }>
+        <div className={ styles.sectionheader }>
+          <h2 className={ styles.sectiontitle }>
             Analysis Tasks
           </h2>
-          <p className={styles.sectionsubtitle}>
+          <p className={ styles.sectionsubtitle }>
             Select an analysis task to begin
           </p>
         </div>
 
-        <div className={styles.taskgrid}>
+        <div className={ styles.taskgrid }>
           {
             AvailableTasks.map((task) =>
               <TaskButton
-                key={task.title}
-                {...task} />)
+                key={ task.title }
+                { ...task } /> )
           }
         </div>
       </div>

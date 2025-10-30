@@ -2,9 +2,9 @@ import { getModels } from "@/functionalities/NNTrustBackendUtils";
 import useStore from "@/store/nnTrustStore";
 import styles from "@/styles/ModelCard.module.css";
 import { Brain } from 'lucide-react';
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-export function ModelCard ()
+export const ModelRepository: React.FC = () =>
 {
     const setModelName = useStore( ( state ) => state.setModelName )
     const modelName = useStore( ( state ) => state.modelName )

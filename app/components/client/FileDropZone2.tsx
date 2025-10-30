@@ -49,17 +49,7 @@ export function FileDropZone ( { sections, defaultActiveSection }: FileDropZoneP
                 ) ) }
             </div>
 
-            <div style={ {
-                width:"30vw",
-                height:"45vh",
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-                background: "rgba(255, 255, 255, 0.4)",
-                padding: "16px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-            } }>
+            <div className={styles.containerChild}>
                 { currentSection && <currentSection.child /> }
             </div>
         </div>

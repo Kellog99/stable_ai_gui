@@ -11,7 +11,7 @@ import useStore from '@/store/nnTrustStore';
 import { Database, Upload } from 'lucide-react';
 import React from 'react';
 import styles from '@/styles/HomePage.module.css';
-import { ModelCard } from '@/components/client/ModelDisplayer';
+import { ModelRepository } from '@/components/client/ModelDisplayer';
 
 
 
@@ -56,13 +56,6 @@ const HomePageDrop: React.FC = ({
                 infoModal={<ModalUploadModel />} />)
     }
 
-    const ModelRepo = () => {
-        return (
-            <><ModelCard /></>
-
-        )
-    }
-
 
     const datasetSections = [
         {
@@ -90,7 +83,7 @@ const HomePageDrop: React.FC = ({
             id: "modrepository",
             title: "Model Repository",
             Icon: Database,
-            child: ModelRepo
+            child: ModelRepository
         }
     ];
 

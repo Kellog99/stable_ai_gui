@@ -52,6 +52,7 @@
   /* Safari support */
   color: transparent;
   /* same as text-transparent */
+  margin: 0
 }
 
 .datasetDivider {
