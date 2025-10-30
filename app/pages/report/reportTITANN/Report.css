@@ -1,12 +1,9 @@
-.header {
+.report-title{
+    display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 20px;
+    gap: 2vw;
 }
-
-.header h1 {
-    color: white;
-}
-
 
 .section {
     color: white;

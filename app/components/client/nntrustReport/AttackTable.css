@@ -1,18 +1,61 @@
 .vulnerability-grid {
     width: 100%;
+    padding: 5vw;
     margin-top: 20px;
     text-align: left;
     align-content: center;
     align-items: center;
+    color: black;
 }
 
+/* Table header */
+.vulnerability-grid thead {
+    border-bottom: 1px solid #e5e7eb;
+    color: white;
+}
+
+/* Header cells */
+.vulnerability-grid th {
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.vulnerability-grid th:first-child {
+    text-align: left;
+}
+
+.vulnerability-grid th:last-child {
+    text-align: center;
+}
+
+/* Table cells */
+.vulnerability-grid td {
+    padding: 1rem 1.5rem;
+}
+
+/* Button styling */
 .btn-table {
-    background-color: transparent;
-    border: transparent;
-    color: gray;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: left;
+    padding: 0;
+    text-decoration: underline;
+    transition: color 0.2s;
 }
 
 .btn-table:hover {
-    color: white;
-    text-decoration: underline;
+    color: #1d4ed8;
+}
+
+/* Center content cell */
+.place-content-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

@@ -4,18 +4,6 @@
   row-gap: 20vw;
 }
 
-.containerChild {
-  width: 30vw;
-  min-height: 45vh;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.4);
-  padding: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .dropzone {
   width: 28vw;
   aspect-ratio: 4;

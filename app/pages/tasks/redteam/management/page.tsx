@@ -2,10 +2,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { ArrowDownUp, Search } from 'lucide-react';
+import { ArrowDownUp, CircleArrowRight, Search } from 'lucide-react';
+import { HoverCard } from '@mantine/core';
+import { useRouter } from 'next/navigation';
+import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
 
 const TaskManagement: React.FC = () => {
-    const { executedAttacks } = useNNTrustStore()
+    const { executedAttacks, setReport, setBenchmark, benchmark } = useNNTrustStore()
     const [attackArray, setAttackArray] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
@@ -80,9 +83,75 @@ const TaskManagement: React.FC = () => {
         return filtered;
     }, [attackArray, searchTerm, statusFilter, sortConfig]);
 
+    const [atkFinished, setAtkFinished] = useState<number>(0)
+    useEffect(() => { setAtkFinished(executedAttacks.filter(job => job.status === "Completed").length) }, [executedAttacks])
+    const isDisabled = () => {
+        console.log(executedAttacks.length > 0 && (atkFinished === executedAttacks.length))
+        return false
+        // return executedAttacks.length === 0 || (atkFinished !== executedAttacks.length)
+    }
+
+    const router = useRouter()
+    // handle click for going to the Report page
+    const handleClickReport = async () => {
+        // If the button is clickable then all the attacks are done and the JSON has been produced
+        async function fetchResult<T>(url: string): Promise<T | undefined> {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error for the report JSON! Status: ${response.status}`);
+                }
+                const json: T = await response.json();
+                return json;
+            } catch (err) {
+                console.log(err instanceof Error ? err.message : "An error occurred");
+                return undefined; // Explicitly return undefined on error
+            }
+        }
+
+        const reportFetch = await fetchResult<ReportProps>('http://127.0.0.1:8000/report/getReport');
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>('http://127.0.0.1:8000/report/getBenchmark');
+        if (reportFetch) {
+            setReport(reportFetch);
+        }
+        if (benchmarkFetch) {
+            console.log("saving = ", benchmarkFetch)
+            setBenchmark(benchmarkFetch);
+        }
+        router.push("/pages/report/reportTITANN")
+    }
+
     return (
         <div className="container">
-            <h1>Job Status Management</h1>
+            <div className='management-header'>
+                <div>
+                    <h1>Job Status Management</h1>
+                    <p>Number of finished tested vulnearbilities {atkFinished}/{executedAttacks.length}</p>
+                </div>
+
+                <HoverCard
+                    width={170}
+                    shadow="md"
+                    disabled={!isDisabled()}>
+                    <HoverCard.Target>
+                        <div>
+                            <button
+                                disabled={isDisabled()}
+                                onClick={handleClickReport}
+                                className={`header-button ${isDisabled() ? 'disabled' : ''}`}>
+                                Report <CircleArrowRight />
+                            </button>
+                        </div>
+                    </HoverCard.Target>
+                    <HoverCard.Dropdown>
+                        <p style={{ fontSize: "0.7rem" }}>
+                            This button is currently disabled. Because {executedAttacks.length === 0 ? "there are no vulnearbilities scheduled." : `${executedAttacks.length - atkFinished} vulnearbily(s) remains to be finished.`}
+                        </p>
+                    </HoverCard.Dropdown>
+                </HoverCard>
+
+
+            </div>
             <div className="filters">
                 <div className="search-wrapper">
                     <Search className="search-icon" />
