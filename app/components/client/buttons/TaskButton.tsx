@@ -7,45 +7,45 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 
 
-const TaskButton: React.FC<Task> = ( {
+const TaskButton: React.FC<Task> = ({
   Icon,
   title,
   description,
   footer,
   color,
   href
-} ) =>
-{
+}) => {
   const router = useRouter();
 
-  const isModel = useStore( ( state ) => state.modelName ) !== null
-  const isDataset = useStoreDQ( ( state ) => state.datasetUsed ) !== null
+  const isModel = useStore((state) => state.modelName) !== null
+  const isDataset = useStoreDQ((state) => state.datasetUsed) !== null
 
-  const handleClick = ( e: React.MouseEvent<HTMLElement> ) =>
-  {
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
-    router.push( href )
+    router.push(href)
   }
 
 
   return (
     <button
-      className={ styles.card }
-      onClick={ handleClick }
-      disabled={
-        ( ( title === "Test" || title === "Benchmark" ) && ( !isModel || !isDataset ) ) ||
-        ( title === "Data Quality Tool" && !isDataset )
-      }>
-      <div className={ styles.card_header }>
-        <div className={ styles.card_icon } style={ { background: color } }>
-          <Icon style={ { width: "2vw" } } />
+      className={styles.card}
+      onClick={handleClick}
+    // disabled={
+    //   ( ( title === "Test" || title === "Benchmark" ) && ( !isModel || !isDataset ) ) ||
+    //   ( title === "Data Quality Tool" && !isDataset )}
+    >
+      <div className={styles.card_header}>
+        <div
+          className={styles.card_icon}
+          style={{ background: color }}>
+          <Icon style={{ width: "2vw" }} />
         </div>
-        <p className={ styles.card_title }>{ title }</p>
+        <p className={styles.card_title}>{title}</p>
       </div>
-      <p className={ styles.card_description }>{ description }</p>
-      <div className={ styles.card_link } >
-        { footer }
-        <ChevronRight />
+      <p className={styles.card_description}>{description}</p>
+      <div className={styles.card_link} >
+        {footer}
+        <ChevronRight size={"2vw"} />
       </div>
     </button>
   );

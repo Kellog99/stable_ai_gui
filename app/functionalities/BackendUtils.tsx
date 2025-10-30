@@ -99,7 +99,7 @@ export async function getDuplicates(datasetName: string, featureName: string, in
     body: JSON.stringify(internalConfig),
   });
 
- 
+
   if (!response.ok) throw new Error('Failed to get duplicates from the backend');
 
   const duplicates = await response.json();
@@ -114,12 +114,12 @@ export async function getOutliers(datasetName: string, featureName: string, inte
     headers: { 'Content-Type': 'application/json' }, // binary content type
     body: JSON.stringify(internalConfig),
   });
-  
-  
+
+
   if (!response.ok) throw new Error('Failed to get outliers from the backend');
 
   const outliers = await response.json();
-  
+
   return outliers
 }
 

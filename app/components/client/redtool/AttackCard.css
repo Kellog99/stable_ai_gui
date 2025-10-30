@@ -1,13 +1,17 @@
 .attack-card {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  padding: 1vw;
+  padding: 1vw 2vw 0 2vw;
   gap: 1.5vw;
-  background: lightgray;
-  border-radius: 12px;
+  background: rgb(231, 229, 229);
+  border-radius: var(--border-radius);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   align-items: center;
+  align-self: end;
+  /* Ensure the card’s internal layout stretches properly */
+  position: relative;
 }
 
 .attack-card:hover {
@@ -16,20 +20,94 @@
   border-color: #667eea;
 }
 
-.checkbox {
-  width: clamp(8px, 7%, 12px);
-  aspect-ratio: 1;
+.card-header {
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  width: 100%;
+  padding: 20px;
+  align-content: center;
+  align-items: center;
+  background-color: rgb(202, 200, 200);
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
+.attack-header h3 {
+  color: black;
+}
 
 .card-body {
   width: 100%;
+  flex: 1;
+  /* Takes all available vertical space */
+  display: flex;
+  /* Add this */
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-bottom: 20px;
   align-items: center;
-  align-content: center;
+  font-size: 0.8rem;
 }
 
-.title {
-  font-weight: bold;
+.card-footer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px 1.5vw 15px;
+}
+
+.circle-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: sans-serif;
+}
+
+.circle-checkbox input {
+  display: none;
+}
+
+.circle-checkbox .checkmark {
+  width: 30px;
+  aspect-ratio: 1;
+  border: 2px solid #888;
+  border-radius: 50%;
+  margin-right: 8px;
+  position: relative;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-checkbox input:checked+.checkmark {
+  background-color: var(--affermative, #4CAF50);
+  border: none;
+}
+
+.check-icon {
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.2s ease;
+  color: white;
+}
+
+.circle-checkbox input:checked+.checkmark .check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.card-icon {
+  transition: all 0.2s ease;
+}
+
+.card-icon:hover {
+  fill: lightgray;
+  scale: 1.1;
+  transform: translateY(-2px);
 }
 
 .option-tag {
@@ -41,45 +119,9 @@
   color: white;
   align-content: center;
   text-align: center;
+  margin-bottom: 1.5vw;
 }
 
-.description {
-  width: 100%;
-  height: 100%;
-  font-size: min(1.2vw, 1.2vh);
-  text-align: justify;
-}
-
-.open {
-  aspect-ratio: 1;
-  align-items: center;
-  align-content: center;
-}
-
-.icon {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0 auto;
-  transition: 0.3s ease;
-}
-
-.icon:hover {
-  transform: translateY(-5px);
-  fill: gray;
-}
-
-.card-content {
-  max-height: 0;
-  overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #fafafa;
-}
-
-.card-content.expanded {
-  max-height: 1000px;
-  border-top: 1px solid #e5e7eb;
-}
 
 .parameters-section {
   padding: 1.5rem;
@@ -176,9 +218,6 @@
 }
 
 @media (max-width: 768px) {
-  .card-header h3 {
-    font-size: 1.1rem;
-  }
 
   .parameter-header {
     flex-direction: column;

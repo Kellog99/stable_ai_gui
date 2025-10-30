@@ -1,5 +1,34 @@
-import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon, Info } from "lucide-react";
+import { Task } from "@/interfaces/NNInterfaces";
+import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon, Info, FileText, BarChart3 } from "lucide-react";
 
+
+// These are the major buttons to show on the homepage
+export const AvailableTasks: Task[] = [
+    {
+        title: "Data Quality",
+        Icon: FileText,
+        description: 'View the analysis on the loaded dataset.',
+        footer: "See Analysis",
+        color: "linear-gradient(to bottom right, #059669, #533A71)",
+        href: "/pages/tasks/dataquality/datasets",
+    },
+    {
+        title: "RedTeaming Tool",
+        Icon: BarChart3,
+        footer: "Start Benchmark",
+        color: "linear-gradient(to bottom right, #3b82f6, red)",
+        description: 'Allows a vulnerability assesment on the selected model and generates a detailed performance reports across multiple attack vectors.',
+        href: "/pages/tasks/redteam/benchmark"
+    },
+    {
+        title: "Custom Attack",
+        Icon: TestTube,
+        description: 'Test individual adversarial attacks with custom parameters and visualize the results.',
+        footer: "Execute Test",
+        color: "linear-gradient(to bottom right, #9333ea, #7c3aed)",
+        href: "/pages/tasks/redteam/test"
+    }
+]
 
 export interface NavigationSection {
     id: string;

@@ -8,7 +8,7 @@
   padding: 2vw;
   grid-template-rows: auto 1fr auto;
   align-items: center;
-  text-align: center;
+  text-align: justify;
 }
 
 .card:hover {
@@ -31,11 +31,11 @@
   align-items: center;
   align-content: center;
   gap: 15px;
-  padding-bottom: 4%;
+  padding: 0;
 }
 
 .card_title {
-  font-size: 1.1rem;
+  font-size: 1.5vw;
   font-weight: 700;
   color: #1f2937;
 }
@@ -62,17 +62,20 @@
 
 .card_description {
   color: #6b7280;
-  padding: 6px;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 3vh;
   text-align: justify;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 0.8vw, 1rem);
 }
 
 .card_link {
-  display: inline-flex;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  font-weight: 600;
-  font-size: 1.3vw;
+  align-content: center;
+  font-weight: bold;
+  font-size: 1.2vw;
   color: black;
   transition: color 0.3s ease;
 }
-

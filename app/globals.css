@@ -4,17 +4,32 @@
 
 
 :root {
-  --navy-900: #0f172a;
-  --navy-800: #1e293b;
-  --navy-700: #334155;
-  --navy-600: #475569;
-  --navy-500: #64748b;
-  --navy-400: #94a3b8;
-  --navy-300: #cbd5e1;
-  --navy-200: #e2e8f0;
-  --navy-100: #f1f5f9;
-  --navy-50: #f8fafc;
-
+  --navy-900: hsl(217, 33%, 11%);
+  --navy-800: hsl(210, 80%, 13%);
+  --navy-700: hsl(202, 100%, 15%);
+  --navy-600: hsl(202, 100%, 19%);
+  --navy-500: hsl(202, 100%, 24%);
+  --navy-400: hsl(202, 100%, 26%);
+  --navy-300: hsl(200, 57%, 38%);
+  --navy-200: hsl(199, 57%, 40%);
+  --navy-100: hsl(199, 44%, 49%);
+  --coral-600: #c22e38;
+  --coral-500: #FF6B6B;
+  --coral-400: #FF8A8A;
+  --coral-300: #FFB3B3;
+  --text-primary: hsl(210, 40%, 98%);
+  /* Brightest - main content */
+  --text-secondary: hsl(215, 30%, 88%);
+  /* Medium - secondary content */
+  --text-tertiary: hsl(215, 20%, 60%);
+  /* Dimmer - tertiary/muted content */
+  --text-disabled: hsl(215, 14%, 34%);
+  /* Dimmest - disabled state */
+  --text-inverse: hsl(217, 33%, 11%);
+  /* Dark text for light backgrounds */
+  --border-radius: 1vw;
+  --warning: #FFD800;
+  --affermative: green;
 }
 
 html,
@@ -23,17 +38,20 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--navy-700) !important;
+  background-color: var(--navy-900) !important;
 }
 
 body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* background: linear-gradient(135deg,
-      var(--navy-900) 0%,
-      var(--navy-800) 25%,
-      var(--navy-700) 50%,
-      var(--navy-600) 75%,
-      var(--navy-500) 100%); */
+
+}
+
+h1 {
+  color: var(--text-primary);
+}
+
+h2 {
+  color: var(--text-secondary);
 }

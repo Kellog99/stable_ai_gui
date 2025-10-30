@@ -46,17 +46,26 @@ const Header = () => {
   return (
     <div className={styles.container}>
       <div className={styles.buttons}>
-        {btns.map((btnprops) =>
+        <div
+          className={styles.slider}
+          style={{
+            transform: `translateX(${btns.findIndex(b => b.id === page) * 100}%)`,
+            width: `${100 / btns.length}%`
+          }}
+        />
+        {btns.map((btnprops) => (
           <button
             key={btnprops.id}
-            className={`${styles.button} ${page === btnprops.id ? styles.active : styles.inactive}`}
+            className={`${styles.button} ${page === btnprops.id ? styles.active : ''}`}
             onClick={() => {
               setPage(btnprops.id);
               router.push(btnprops.href);
-            }}>
+            }}
+          >
             <btnprops.Icon />
-            <p>{btnprops.name.charAt(0).toUpperCase() + btnprops.name.slice(1)}</p>
-          </button>)}
+            {btnprops.name.charAt(0).toUpperCase() + btnprops.name.slice(1)}
+          </button>
+        ))}
       </div>
 
       {/* Title */}
@@ -73,13 +82,13 @@ const Header = () => {
       <div className={styles.indicators}>
         <div className={`${styles.item} ${modelName ? styles.loaded : ''}`}>
           <Brain />
-          <span className={styles.text}>
+          <span>
             {modelName || 'No model'}
           </span>
         </div>
         <div className={`${styles.item} ${datasetName ? styles.loaded : ''}`}>
           <Database />
-          <span className={styles.text}>
+          <span>
             {datasetName || 'No dataset'}
           </span>
         </div >

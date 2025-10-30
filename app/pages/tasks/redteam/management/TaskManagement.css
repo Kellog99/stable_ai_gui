@@ -2,7 +2,6 @@
     width: 100%;
     height: fit-content;
     margin: 0 auto;
-    background: white;
     border-radius: 0.5rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     padding: 1.5rem;
@@ -20,13 +19,14 @@
     align-items: center;
     align-content: center;
     height: 4vw;
+    width: 17vw;
     min-width: 100px;
-    aspect-ratio: calc(3.14);
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
     justify-content: space-between;
     padding: 1.5vw;
     border-radius: 1vw;
-    background-color: #222;
+    background-color: var(--navy-600);
     color: white;
 }
 
@@ -35,7 +35,7 @@
 }
 
 .header-button:hover:not(.disabled) {
-    background-color: #333;
+    background-color: var(--navy-400);
 }
 
 .header-button:hover:not(.disabled) svg {
@@ -46,18 +46,54 @@
     opacity: 0.6;
 }
 
-h1 {
-    font-size: 1.875rem;
-    font-weight: bold;
-    color: #1f2937;
-    margin-bottom: 1.5rem;
+.updateButton {
+    height: auto;
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    transition: all 0.4s ease;
+}
+
+.updateButton:hover {
+    transform: translateY(-3px);
+}
+
+.updateButton.rotating svg {
+    animation: rotate 0.6s ease-in-out;
+}
+
+.selectionButton {
+    background-color: var(--navy-800);
+    border: 2px solid var(--navy-600);
+    color: white;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 2rem;
     margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.filter {
+    display: flex;
+    color: white;
+    gap: 20px;
+    align-items: center;
+    font-weight: bold;
 }
 
 .search-wrapper {
@@ -109,58 +145,43 @@ select:focus {
 
 .table-wrapper {
     max-height: 80vh;
-    /* Set vertical scroll limit */
-    overflow-y: auto;
-    /* Enable vertical scrolling */
-    overflow-x: auto;
-    /* Allow horizontal scroll if needed */
+    overflow: auto;
     border: 1px solid #e5e7eb;
-    /* Light border (gray-200) */
     border-radius: 8px;
-    /* Rounded corners */
+    background-color: lightgray;
 }
 
-/* Table basics */
 .table-wrapper table {
-    height: 100%;
     width: 100%;
     border-collapse: collapse;
-    font-family: inherit;
     font-size: 14px;
 }
 
-/* Header styling and stickiness */
 .table-wrapper thead th {
     position: sticky;
     top: 0;
     background-color: #f9fafb;
-    /* gray-50 */
     color: #374151;
-    /* gray-700 */
     font-weight: 600;
     text-align: left;
-    padding: 12px 16px;
+    padding: 8px 12px;
+    /* Reduced padding */
     border-bottom: 1px solid #e5e7eb;
     z-index: 2;
-    /* ensures it stays above body rows */
 }
 
-/* Table body cells */
 .table-wrapper tbody td {
-    padding: 12px 16px;
+    padding: 6px 12px;
+    /* Reduced padding for smaller rows */
     border-bottom: 1px solid #e5e7eb;
-    color: #111827;
-    /* gray-900 */
+    color: black;
 }
 
-/* Hover effect on rows */
 .table-wrapper tbody tr:hover {
     background-color: #f3f4f6;
-    /* gray-100 */
-    transition: background-color 0.15s ease-in-out;
+    transition: background-color 0.15s;
 }
 
-/* Optional: make buttons in header look clean */
 .table-wrapper th button {
     background: none;
     border: none;
@@ -170,11 +191,4 @@ select:focus {
     display: flex;
     align-items: center;
     gap: 4px;
-}
-
-td {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    font-size: 0.875rem;
-    color: #111827;
 }
