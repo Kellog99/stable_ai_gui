@@ -111,8 +111,10 @@ const TaskManagement: React.FC = () => {
             }
         }
 
-        const reportFetch = await fetchResult<ReportProps>('http://127.0.0.1:8000/report/getReport');
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>('http://127.0.0.1:8000/report/getBenchmark');
+        const reportFetch = await fetchResult<ReportProps>('http://localhost:8082/report/getReport');
+        console.log("REPORT PROPS", reportFetch)
+
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>('http://localhost:8082/report/getBenchmark');
         if (reportFetch) {
             setReport(reportFetch);
         }
@@ -131,7 +133,7 @@ const TaskManagement: React.FC = () => {
         setTimeout(() => setIsRotating(false), 600); // Match animation duration
 
         try {
-            const response = await fetch('http://127.0.0.1:8000/attacks/benchmarkStatus');
+            const response = await fetch('http://localhost:8082/attacks/benchmarkStatus');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`); // Fixed: parentheses, not backtick
             }

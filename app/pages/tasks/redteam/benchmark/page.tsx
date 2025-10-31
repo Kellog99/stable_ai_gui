@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
-import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
+import { Play, Settings, Ruler, Bug, Gauge, BrickWallIcon, Info, ChevronRight } from 'lucide-react';
 import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 
@@ -58,10 +58,16 @@ const Benchmark: React.FC = () => {
       currentMap[id] = currentObject;
       // Save to store
       setMap(currentMap);
+
+      console.log("current map", currentMap)
     }
   }
 
 
+setExecutedAttacks
+
+console.log("SELECTED ATTACKS", selectedAttacks)
+console.log("SELECTED METRICS", selectedMetrics)
   // variables for executing the benchmarking
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
 
@@ -73,7 +79,7 @@ const Benchmark: React.FC = () => {
     try {
       // Block any new click on the button
       setExecuteBenchmark(false);
-      const response = await fetch('http://127.0.0.1:8000/attacks/executeBenchmark', {
+      const response = await fetch('http://localhost:8082/attacks/executeBenchmark', {
         method: "POST",
         body: JSON.stringify(selectedAttacks),
         headers: {
@@ -101,7 +107,7 @@ const Benchmark: React.FC = () => {
         <div className='attack-title'>
           <div className='attack-header'>
             <div className='attack-icon'>
-              <BrickWallFireIcon size={'6vw'} color='red' />
+              <BrickWallIcon size={'6vw'} color='red' />
               <h1>Red Teaming</h1>
             </div>
             <p style={{ margin: '0' }}>This page provides a set of vulnerabilities that can be used to test the model's robustness and a set of metrics to register the performance of each attack.</p>
