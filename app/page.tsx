@@ -1,10 +1,9 @@
 "use client";
 import TaskButton from '@/components/client/buttons/TaskButton';
-import { Task } from '@/interfaces/NNInterfaces';
 import useStoreDQ from '@/store/dsStore';
 import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/HomePage.module.css';
-import { BarChart3, Database, FileText, TestTube, Upload } from 'lucide-react';
+import { Database, Upload } from 'lucide-react';
 import { DatasetRepository } from './components/client/DatasetsRepoLoad';
 import FileDropZone from './components/client/FileDropZone';
 import { ModelRepository } from './components/client/ModelDisplayer';
@@ -14,34 +13,7 @@ import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
 import DatasetsLoader from './functionalities/DatasetsLoader';
 import { getModels } from './functionalities/NNTrustBackendUtils';
 import { uploadDataset_check, uploaderDataset, uploadModel, uploadModel_check } from './properties/urls';
-
-
-const tasks: Task[] = [
-  {
-    title: "Benchmark",
-    Icon: BarChart3,
-    footer: "Start Benchmark",
-    color: "linear-gradient(to bottom right, #3b82f6, red)",
-    description: 'Test all the possible vulnerabilities and generate a detailed performance reports across multiple attack vectors.',
-    href: "/pages/tasks/redteam/benchmark"
-  },
-  {
-    title: "Test",
-    Icon: TestTube,
-    description: 'Test individual adversarial attacks with custom parameters and visualize the results.',
-    footer: "Execute Test",
-    color: "linear-gradient(to bottom right, #9333ea, #7c3aed)",
-    href: "/pages/tasks/redteam/test"
-  },
-  {
-    title: "Data Quality Tool",
-    Icon: FileText,
-    description: 'View the analysis on the loaded dataset.',
-    footer: "See Analysis",
-    color: "linear-gradient(to bottom right, #059669, #533A71)",
-    href: "/pages/tasks/dataquality/datasets",
-  }
-]
+import { AvailableTasks } from './components/layout/config';
 
 const HomePage: React.FC = ({ }) => {
   const setModels = useStore((state) => state.setModels)
@@ -138,10 +110,10 @@ const HomePage: React.FC = ({ }) => {
 
         <div className={styles.taskgrid}>
           {
-            tasks.map((task) =>
+            AvailableTasks.map((task) =>
               <TaskButton
-                key={task.title}
-                {...task} />)
+                key={ task.title }
+                { ...task } /> )
           }
         </div>
       </div>
