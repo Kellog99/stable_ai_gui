@@ -27,7 +27,7 @@ export const uploadModel_check = `http://${host}:8082/model/upload/check`
 export const uploadModel = `http://${host}:8082/model/upload`
 
 
-/// POLLING NEW ////
+/// POLLING ////
 export const metrics_progress = `http://${host}:8000/metrics/progress`
 
 export const embedder_start = `http://${host}:8000/actions/embedder`

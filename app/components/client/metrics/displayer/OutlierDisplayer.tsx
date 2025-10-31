@@ -1,22 +1,21 @@
 "use client";
 
 import { Box, Button, CloseButton, Flex, RingProgress, Text, Title } from "@mantine/core";
-import
-{
-    ChartData,
-    Chart as ChartJS,
-    ChartOptions,
-    InteractionItem,
-    Legend,
-    LineElement,
-    LinearScale,
-    PointElement,
-    Tooltip,
+import {
+ChartData,
+Chart as ChartJS,
+ChartOptions,
+InteractionItem,
+Legend,
+LineElement,
+LinearScale,
+PointElement,
+Tooltip,
 } from 'chart.js';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Scatter, getElementAtEvent } from 'react-chartjs-2';
 
-import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayerFINAL';
+import FeatureDisplayer, { FeatureCard } from '@/components/client/FeatureDisplayer';
 import featureLoader from "@/functionalities/FeatureLoader";
 import { useThumbnailWS } from "@/functionalities/useThumbnailWS";
 import { getScoreColor } from '@/functionalities/Utils';
@@ -26,78 +25,72 @@ import { image_type, text_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
 
 
-ChartJS.register( LinearScale, PointElement, LineElement, Tooltip, Legend );
+ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend);
 
 
-interface DataPoint
-{
+interface DataPoint {
     index: number;
     score: number;
     group: string;
 }
 
-interface ChartJsPoint
-{
+interface ChartJsPoint {
     x: number;
     y: number;
     originalData: DataPoint;
 }
 
-function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO } )
-{
+function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO }) {
 
     const { featureName, mode, score, indexes, score_per_sample } = outliersProp;
 
-    const scoreRound = ( score * 100 ).toFixed( 1 );
-    const [ feature, setFeature ] = useState<FeatureDTO | null>( null );
-    const [ type, setType ] = useState( "" );
-    const datasetName = useStore( ( state ) => state.datasetUsed?.name )
+    const scoreRound = (score * 100).toFixed(1);
+    const [feature, setFeature] = useState<FeatureDTO | null>(null);
+    const [type, setType] = useState("");
+    const datasetName = useStore((state) => state.datasetUsed?.name)
 
-    const [ clickedOutlierData, setClickedOutlierData ] = useState<DataPoint | null>( null );
-    const [ clicked, setClicked ] = useState<boolean>( false )
-    const [ showAll, setShowAll ] = useState<boolean>( false )
-    const [ outlierSel, setOutlierSel ] = useState<string>( "" )
+    const [clickedOutlierData, setClickedOutlierData] = useState<DataPoint | null>(null);
+    const [clicked, setClicked] = useState<boolean>(false)
+    const [showAll, setShowAll] = useState<boolean>(false)
+    const [outlierSel, setOutlierSel] = useState<string>("")
 
-    const [ allOutliers, setAllOutliers ] = useState<string[]>( [] )
-    const [ allScores, setAllScores ] = useState<number[]>( [] )
-    const [ allGroups, setAllGroups ] = useState<string[]>( [] )
-
-
-
-    const chartRef = React.useRef<ChartJS<'scatter'>>( null );
-    const containerRef = React.useRef<HTMLDivElement>( null );
+    const [allOutliers, setAllOutliers] = useState<string[]>([])
+    const [allScores, setAllScores] = useState<number[]>([])
+    const [allGroups, setAllGroups] = useState<string[]>([])
 
 
-    const maxIndex = useMemo( () =>
-    {
+
+    const chartRef = React.useRef<ChartJS<'scatter'>>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
+
+    const maxIndex = useMemo(() => {
         return score_per_sample ? score_per_sample.length - 1 : 0;
-    }, [ score_per_sample ] );
+    }, [score_per_sample]);
 
 
-    useEffect( () =>
-    {
-        if ( datasetName && featureName ) {
-            const loadFeature = async () =>
-            {
+    useEffect(() => {
+        if (datasetName && featureName) {
+            const loadFeature = async () => {
                 try {
-                    const featureLoaded = await featureLoader( datasetName, featureName );
+                    const featureLoaded = await featureLoader(datasetName, featureName);
 
-                    if ( featureLoaded.type === image_type || featureLoaded.type === text_type ) {
+                    if (featureLoaded.type === image_type || featureLoaded.type === text_type) {
 
-                        setFeature( featureLoaded );
-                        setType( featureLoaded.type );
+                        setFeature(featureLoaded);
+                        setType(featureLoaded.type);
                     }
-                } catch ( error ) {
-                    console.error( 'Error loading feature:', error );
+                } catch (error) {
+                    console.error('Error loading feature:', error);
                 }
             };
             loadFeature();
         }
-    }, [ datasetName, featureName ] );
+    }, [datasetName, featureName]);
 
     const currentData =
         feature?.datas && clickedOutlierData?.index !== undefined
-            ? feature.datas[ clickedOutlierData.index ]
+            ? feature.datas[clickedOutlierData.index]
             : undefined;
 
     // 🧠 Step 2: call the hook unconditionally (can accept undefined/null)
@@ -107,29 +100,26 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
     );
 
     // 🧠 Step 3: react to changes
-    useEffect( () =>
-    {
-        if ( currentData ) {
-            const thumb = thumbnails.get( currentData );
-            if ( thumb ) {
-                setOutlierSel( thumb as string );
+    useEffect(() => {
+        if (currentData) {
+            const thumb = thumbnails.get(currentData);
+            if (thumb) {
+                setOutlierSel(thumb as string);
             } else {
                 // Optionally trigger the thumbnail request if not loaded
-                requestThumbnail( currentData );
+                requestThumbnail(currentData);
             }
         }
-    }, [ currentData, thumbnails, requestThumbnail ] );
+    }, [currentData, thumbnails, requestThumbnail]);
 
 
-    const chartData = useMemo<ChartData<'scatter', ChartJsPoint[]>>( () =>
-    {
-        const outlierSet = new Set( indexes );
+    const chartData = useMemo<ChartData<'scatter', ChartJsPoint[]>>(() => {
+        const outlierSet = new Set(indexes);
         const inliersPoints: ChartJsPoint[] = [];
         const outliersPoints: ChartJsPoint[] = [];
 
-        score_per_sample.forEach( ( sampleScore, i ) =>
-        {
-            const isOutlier = outlierSet.has( i );
+        score_per_sample.forEach((sampleScore, i) => {
+            const isOutlier = outlierSet.has(i);
             const originalData: DataPoint = {
                 index: i,
                 score: sampleScore,
@@ -141,20 +131,20 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                 originalData: originalData,
             };
 
-            if ( isOutlier ) {
-                outliersPoints.push( point );
+            if (isOutlier) {
+                outliersPoints.push(point);
 
 
             } else {
-                inliersPoints.push( point );
+                inliersPoints.push(point);
             }
-        } );
+        });
 
 
-        const allScoresOut: number[] = outliersPoints.map( point => point.originalData.score );
-        setAllScores( allScoresOut )
-        const allGroupsOut: string[] = outliersPoints.map( point => point.originalData.group );
-        setAllGroups( allGroupsOut )
+        const allScoresOut: number[] = outliersPoints.map(point => point.originalData.score);
+        setAllScores(allScoresOut)
+        const allGroupsOut: string[] = outliersPoints.map(point => point.originalData.group);
+        setAllGroups(allGroupsOut)
 
 
 
@@ -176,68 +166,62 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                 },
             ],
         };
-    }, [ score_per_sample, indexes ] );
+    }, [score_per_sample, indexes]);
 
 
-    const handlePointClick = ( event: React.MouseEvent<HTMLCanvasElement> ) =>
-    {
+    const handlePointClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
         const chart = chartRef.current;
-        if ( !chart ) {
+        if (!chart) {
             return;
         }
 
-        const elements: InteractionItem[] = getElementAtEvent( chart, event );
+        const elements: InteractionItem[] = getElementAtEvent(chart, event);
 
-        if ( elements.length > 0 ) {
-            const firstElement = elements[ 0 ];
+        if (elements.length > 0) {
+            const firstElement = elements[0];
             const datasetIndex = firstElement.datasetIndex;
             const index = firstElement.index;
-            const clickedPointData = chart.data.datasets[ datasetIndex ].data[ index ] as ChartJsPoint;
-            setTimeout( () =>
-            {
-                if ( clickedPointData && clickedPointData.originalData ) {
-                    setClicked( true )
-                    console.log( 'Clicked point (Chart.js):', clickedPointData.originalData );
-                    setClickedOutlierData( clickedPointData.originalData );
+            const clickedPointData = chart.data.datasets[datasetIndex].data[index] as ChartJsPoint;
+            setTimeout(() => {
+                if (clickedPointData && clickedPointData.originalData) {
+                    setClicked(true)
+                    console.log('Clicked point (Chart.js):', clickedPointData.originalData);
+                    setClickedOutlierData(clickedPointData.originalData);
 
                 } else {
-                    setClickedOutlierData( null );
+                    setClickedOutlierData(null);
                 }
-            }, 10 );
+            }, 10);
         }
     };
 
-    const handleShowAll = () =>
-    {
+    const handleShowAll = () => {
 
         const indicesFlat = indexes.flat()
-        const allOutliersList: string[] = indicesFlat.map( i => feature?.datas[ i ] ).filter( Boolean );
-        setAllOutliers( allOutliersList )
-        setShowAll( !showAll )
-        setClicked( false )
+        const allOutliersList: string[] = indicesFlat.map(i => feature?.datas[i]).filter(Boolean);
+        setAllOutliers(allOutliersList)
+        setShowAll(!showAll)
+        setClicked(false)
     }
 
-    const maxScore = useMemo( () =>
-    {
-        if ( !score_per_sample || score_per_sample.length === 0 ) return 1;
-        return Math.max( ...score_per_sample ) * 1.05; // Add 5% padding at the top
-    }, [ score_per_sample ] );
+    const maxScore = useMemo(() => {
+        if (!score_per_sample || score_per_sample.length === 0) return 1;
+        return Math.max(...score_per_sample) * 1.05; // Add 5% padding at the top
+    }, [score_per_sample]);
 
-    const minScore = useMemo( () =>
-    {
-        if ( !score_per_sample || score_per_sample.length === 0 ) return 1;
-        return Math.min( ...score_per_sample ) * 1.05; // Add 5% padding at the bottom
-    }, [ score_per_sample ] );
+    const minScore = useMemo(() => {
+        if (!score_per_sample || score_per_sample.length === 0) return 1;
+        return Math.min(...score_per_sample) * 1.05; // Add 5% padding at the bottom
+    }, [score_per_sample]);
 
 
-    const options = useMemo<ChartOptions<'scatter'>>( () => ( {
+    const options = useMemo<ChartOptions<'scatter'>>(() => ({
         responsive: true,
         maintainAspectRatio: false,
         responsiveAnimationDuration: 0,
-        onHover: ( event: any, chartElement: any[] ) =>
-        {
+        onHover: (event: any, chartElement: any[]) => {
             const canvas = event?.native?.target as HTMLCanvasElement | null;
-            if ( canvas ) {
+            if (canvas) {
                 canvas.style.cursor = chartElement.length ? 'pointer' : 'default';
             }
         },
@@ -256,18 +240,17 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
             tooltip: {
                 enabled: true,
                 callbacks: {
-                    label: function ( context )
-                    {
+                    label: function (context) {
                         const pointData = context.raw as ChartJsPoint;
-                        if ( pointData && pointData.originalData ) {
+                        if (pointData && pointData.originalData) {
                             const orig = pointData.originalData;
                             return [
                                 `Group: ${orig.group}`,
                                 `Index: ${orig.index}`,
-                                `Score: ${orig.score.toFixed( 3 )}`
+                                `Score: ${orig.score.toFixed(3)}`
                             ];
                         }
-                        return `Index: ${context.parsed.x}, Score: ${context.parsed.y.toFixed( 3 )}`;
+                        return `Index: ${context.parsed.x}, Score: ${context.parsed.y.toFixed(3)}`;
                     },
                 },
             },
@@ -284,11 +267,11 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                 },
                 grid: {
                     color: '#dee2e6',
-                    borderDash: [ 2, 4 ], // Dotted line pattern for grid
+                    borderDash: [2, 4], // Dotted line pattern for grid
                     lineWidth: 1
                 },
                 border: {
-                    dash: [ 2, 4 ],
+                    dash: [2, 4],
                     width: 1,
                     color: '#868e96'
                 },
@@ -301,8 +284,7 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                 },
                 min: 0,
                 max: maxIndex,
-                afterDataLimits: ( scale ) =>
-                {
+                afterDataLimits: (scale) => {
                     scale.max = maxIndex;
                     scale.min = 0;
                 }
@@ -317,11 +299,11 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                 },
                 grid: {
                     color: '#dee2e6',
-                    borderDash: [ 2, 4 ],
+                    borderDash: [2, 4],
                     lineWidth: 1
                 },
                 border: {
-                    dash: [ 2, 4 ],
+                    dash: [2, 4],
                     width: 1,
                     color: '#868e96'
                 },
@@ -333,8 +315,7 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
                 },
                 min: minScore,
                 max: maxScore,
-                afterDataLimits: ( scale ) =>
-                {
+                afterDataLimits: (scale) => {
                     scale.max = maxScore;
                     scale.min = minScore;
                 }
@@ -348,95 +329,92 @@ function OutlierDisplayer ( { outliers: outliersProp }: { outliers: OutliersDTO 
             axis: 'xy' as const,
             intersect: true,
         },
-    } ), [ maxIndex, maxScore ] );
+    }), [maxIndex, maxScore]);
 
-    useEffect( () =>
-    {
-        const handleResize = () =>
-        {
-            if ( chartRef.current ) {
+    useEffect(() => {
+        const handleResize = () => {
+            if (chartRef.current) {
                 chartRef.current.resize();
             }
         };
 
-        window.addEventListener( 'resize', handleResize );
-        return () =>
-        {
-            window.removeEventListener( 'resize', handleResize );
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
         };
-    }, [] );
+    }, []);
 
     return (
-        <Flex direction="column" align="center" style={ { width: '100%', maxWidth: '100%' } }>
-            <Title order={ 3 }>Score computed on { featureName } with { mode } mode</Title>
+        <Flex direction="column" align="center" style={{ width: '100%', maxWidth: '100%' }}>
+            <Title order={3}>Score computed on {featureName} with {mode} mode</Title>
             <RingProgress
-                size={ 180 }
+                size={180}
                 roundCaps
-                sections={ [ { value: score * 100, color: getScoreColor( score ) } ] }
+                sections={[{ value: score * 100, color: getScoreColor(score) }]}
                 rootColor="transparent"
-                transitionDuration={ 1000 }
-                label={ <Text ta="center" fw={ 700 } size="lg">{ scoreRound }%</Text> }
+                transitionDuration={1000}
+                label={<Text ta="center" fw={700} size="lg">{scoreRound}%</Text>}
             />
 
             <Box
-                ref={ containerRef }
-                style={ {
+                ref={containerRef}
+                style={{
                     width: '100%',
                     maxWidth: '100%',
                     height: '400px',
                     marginTop: '20px',
                     position: 'relative',
                     overflow: 'hidden'
-                } }
+                }}
             >
                 <Scatter
-                    ref={ chartRef }
-                    options={ options }
-                    data={ chartData }
-                    onClick={ handlePointClick }
-                    style={ { maxWidth: '100%', maxHeight: '100%' } }
+                    ref={chartRef}
+                    options={options}
+                    data={chartData}
+                    onClick={handlePointClick}
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                 />
 
             </Box>
 
-            <Button onClick={ handleShowAll }>
-                { showAll ? "Hide outliers" : "Show all outliers" }
+            <Button onClick={handleShowAll}>
+                {showAll ? "Hide outliers" : "Show all outliers"}
             </Button>
 
             <Box
-                ref={ containerRef }
-                style={ {
+                ref={containerRef}
+                style={{
                     maxWidth: '100%',
                     marginTop: '20px',
                     position: 'relative',
                     overflow: 'hidden'
-                } }
+                }}
             >
 
-                { clicked && outlierSel !== "" ? (
+                {clicked && outlierSel !== "" ? (
                     <>
-                        <Box style={ { width: "260px", position: "relative" } }>
+                        <Box style={{ width: "260px", position: "relative" }}>
                             <CloseButton
-                                style={ {
+                                style={{
                                     position: 'absolute',
                                     top: 8,
                                     right: 8,
                                     zIndex: 1,
-                                } }
-                                onClick={ () => setClicked( false ) }
+                                }}
+                                onClick={() => setClicked(false)}
                             />
                             <FeatureCard
-                                data={ outlierSel }
-                                featureType={ type }
-                                outlier={ clickedOutlierData?.group }
-                                score={ clickedOutlierData?.score }
-                                />
+                                data={outlierSel}
+                                featureType={type}
+                                outlier={clickedOutlierData?.group}
+                                score={clickedOutlierData?.score}
+                            />
                         </Box>
-                    </> ) : null }
+                    </>) : null}
 
-                { showAll ? (
-                    <FeatureDisplayer featureData={ allOutliers } featureType={ type } outliers={ allGroups } scores={ allScores } columns={ 4 } />
-                ) : null }
+                {showAll ? (
+                    <FeatureDisplayer featureData={allOutliers} featureType={type} outliers={allGroups} scores={allScores} columns={4} />
+                ) : null}
             </Box>
         </Flex>
     );
