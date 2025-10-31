@@ -45,7 +45,7 @@ function EmbeddingsPage() {
 
   const [features, setFeatures] = useState<string[]>([])
   const [labelFeatures, setLabelFeatures] = useState<string[]>([])
-  
+
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +81,7 @@ function EmbeddingsPage() {
     }
   }, [datasetUsed, featureName, feature])
 
-  
+
 
   const datasetName = useStore((state) => state.datasetUsed)?.name
 
@@ -282,7 +282,7 @@ function EmbeddingsPage() {
                     <div className={classes.tooltipBox}>
                       <Text>{indexes.length} point{indexes.length !== 1 ? 's' : ''} selected</Text>
                     </div>
-                  
+
                   ) : null}
                 </Flex>
 
@@ -341,7 +341,7 @@ function EmbeddingsPage() {
         <div className={classes.datasetDivider}></div>
 
       </Box>
-      <div className={classes.featureBox} style={{marginTop:"30px"}}>
+      <div className={classes.featureBox} style={{ marginTop: "30px" }}>
         <Flex direction="row" justify="space-between">
           <Group>
             <Flex
@@ -557,7 +557,7 @@ function EmbeddingsPage() {
           : featureName && embFeatures && embFeatures.length == 1
             ? renderedComponent()
             : featureName && embFeatures && embFeatures.length == 0 ? (
-              <AlertCust result={ 'warning' } textToDisplay={ `The ${featureName} feature is not embedded. You can embed it in the Action menù. `}/>
+              <AlertCust result={'warning'} textToDisplay={`The ${featureName} feature is not embedded. You can embed it in the Action menù. `} />
             )
               : (
                 <>

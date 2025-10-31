@@ -21,10 +21,16 @@ export interface OutliersDTO
 export interface CompletenessDTO 
 {
     name: string,
-    featureName : string, 
-    score: number, 
+    featureName: string,
+    score: number,
     giniScore: number,
     score_per_requirement: number[],
     combinedScore: number,
-    indexes_per_requirement : number[][]
+    indexes_per_requirement: number[][]
+}
+
+export interface ResultPoll
+{
+    origin: string,
+    data: any
 }

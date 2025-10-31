@@ -6,7 +6,6 @@ import { IsFeatureSameLength } from "@/functionalities/Utils";
 import Dataset, { PrototypesInt } from "@/interfaces/genericInterface";
 import { image_type, label_type, text_type } from "@/properties/types";
 import { Button, Center, Flex, Loader, Select, Text, Box } from "@mantine/core";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import featureLoader from "@/functionalities/FeatureLoader";
 import classes from './page.module.css';

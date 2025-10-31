@@ -8,22 +8,22 @@ import { useState } from 'react';
 import { AlertCust } from '../AlertCustom';
 
 type Props = {
-    config: {
-        name: string;
-        fileType: string;
-        accept: string;  // for a zip file in linux the MIME type is "application/zip" while for windows is "application/x-zip-compressed"
-        description?: string;
-        uploadUrlCheck: string;
-        uploadUrl: string;
-        formFieldName: string;
-        refreshFunction: () => Promise<any>; //ex: "DatasetsLoader" is the function the reloads the data with the new upload
-        setRefreshData: (data: any) => void;
-
-    };
-    infoModal: React.ReactNode
+  config: {
+    name: string;
+    fileType: string;
+    accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
+    description?: string;
+    uploadUrlCheck: string;
+    uploadUrl: string;
+    formFieldName: string;
+    refreshFunction: () => Promise<any>; // e.g., "DatasetsLoader" reloads the data with the new upload
+    setRefreshData: (data: any) => void;
+  };
+  infoModal: React.ReactNode;
 };
 
-export const DragDrop = ({ config, infoModal }: Props) => {
+export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
+  
     const [file, setFile] = useState<File | null>(null);
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -49,13 +49,11 @@ export const DragDrop = ({ config, infoModal }: Props) => {
                 body: formData,
             });
 
-
             if (response.ok) {
-                console.log("sono ok")
                 const data = await response.json();
                 setJsonUploaded(data)
             } else {
-                console.log("non sono ok")
+                
                 const data = await response.json();
                 console.log("DATA", data)
                 setMessage(data.detail || "An error occurred during load check");
@@ -138,8 +136,6 @@ export const DragDrop = ({ config, infoModal }: Props) => {
             setLoading(false);
         }
     };
-
-
 
     return (
         <>

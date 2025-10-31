@@ -1,33 +1,147 @@
 "use client";
 import TaskButton from '@/components/client/buttons/TaskButton';
+import { Task } from '@/interfaces/NNInterfaces';
+import useStoreDQ from '@/store/dsStore';
+import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/HomePage.module.css';
-import HomePageDrop from './pages/HomePage/HomePageDrop';
-import { AvailableTasks } from '@/components/layout/config';
-// major information about the tasks
+import { BarChart3, Database, FileText, TestTube, Upload } from 'lucide-react';
+import { DatasetRepository } from './components/client/DatasetsRepoLoad';
+import FileDropZone from './components/client/FileDropZone';
+import { ModelRepository } from './components/client/ModelDisplayer';
+import { ModalUploadDataset } from './components/client/upload/ModalUploadDataset';
+import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
+import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
+import DatasetsLoader from './functionalities/DatasetsLoader';
+import { getModels } from './functionalities/NNTrustBackendUtils';
+import { uploadDataset_check, uploaderDataset, uploadModel, uploadModel_check } from './properties/urls';
 
+
+const tasks: Task[] = [
+  {
+    title: "Benchmark",
+    Icon: BarChart3,
+    footer: "Start Benchmark",
+    color: "linear-gradient(to bottom right, #3b82f6, red)",
+    description: 'Test all the possible vulnerabilities and generate a detailed performance reports across multiple attack vectors.',
+    href: "/pages/tasks/redteam/benchmark"
+  },
+  {
+    title: "Test",
+    Icon: TestTube,
+    description: 'Test individual adversarial attacks with custom parameters and visualize the results.',
+    footer: "Execute Test",
+    color: "linear-gradient(to bottom right, #9333ea, #7c3aed)",
+    href: "/pages/tasks/redteam/test"
+  },
+  {
+    title: "Data Quality Tool",
+    Icon: FileText,
+    description: 'View the analysis on the loaded dataset.',
+    footer: "See Analysis",
+    color: "linear-gradient(to bottom right, #059669, #533A71)",
+    href: "/pages/tasks/dataquality/datasets",
+  }
+]
 
 const HomePage: React.FC = ({ }) => {
+  const setModels = useStore((state) => state.setModels)
+  const setDatasets = useStoreDQ((state) => state.setDatasets)
+
+  const ZipDragDrop = () => {
+    return (
+      <DragDrop
+        config={{
+          name: "dataset",
+          fileType: 'zip',
+          accept: 'application/zip',
+          formFieldName: "folder_zip",
+          description: 'Make sure your zip contains raw data and a json config file.',
+          uploadUrlCheck: uploadDataset_check,
+          uploadUrl: uploaderDataset,
+          refreshFunction: DatasetsLoader,
+          setRefreshData: setDatasets
+        }}
+        infoModal={<ModalUploadDataset />} />)
+  }
+
+  const ZipModelDragDrop = () => {
+    return (
+      <DragDrop
+        config={{
+          name: "model",
+          fileType: 'zip',
+          accept: 'application/zip',
+          formFieldName: "file",
+          description: 'Make sure your zip contains raw data and a json config file.',
+          uploadUrlCheck: uploadModel_check,
+          uploadUrl: uploadModel,
+          refreshFunction: getModels,
+          setRefreshData: setModels
+
+        }}
+        infoModal={<ModalUploadModel />} />)
+  }
+
+  const datasetSections = [
+    {
+      id: "selection",
+      title: "Upload Dataset",
+      Icon: Upload,
+      child: ZipDragDrop
+    },
+    {
+      id: "repository",
+      title: "Dataset Repository",
+      Icon: Database,
+      child: DatasetRepository
+    }
+  ];
+
+  const modelSections = [
+    {
+      id: "model",
+      title: "Upload Model",
+      Icon: Upload,
+      child: ZipModelDragDrop
+    },
+    {
+      id: "modrepository",
+      title: "Model Repository",
+      Icon: Database,
+      child: ModelRepository
+    }
+  ];
+
+  const listOfSections = [datasetSections, modelSections];
   return (
     <div className={styles.homecontainer}>
+      <div className={styles.filegrid}>
+        {listOfSections.map((dropElement, index) => (
+          <FileDropZone
+            key={index}
+            sections={dropElement}
+            defaultActiveSection={dropElement[0].id}
+          />
+        ))}
 
-      <HomePageDrop />
-      {/* This part has to deal with the Task part */ }
-      <div className={ styles.task }>
-        <div className={ styles.sectionheader }>
-          <h2 className={ styles.sectiontitle }>
+      </div>
+
+      <div className={styles.task}>
+        <div className={styles.sectionheader}>
+          <h2 className={styles.sectiontitle}>
             Analysis Tasks
           </h2>
-          <p className={ styles.sectionsubtitle }>
+          <p className={styles.sectionsubtitle}>
             Select an analysis task to begin
           </p>
         </div>
 
-        <div className={ styles.taskgrid }>
+        <div className={styles.taskgrid}>
           {
-            AvailableTasks.map((task) =>
+            tasks.map((task) =>
               <TaskButton
-                key={ task.title }
-                { ...task } /> )
+                key={task.title}
+                {...task} />)
           }
         </div>
       </div>

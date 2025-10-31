@@ -1,10 +1,9 @@
 "use client";
 
 import AsyncTaskTracker from '@/components/client/AsyncTracker';
-import { GetDatasetAndSave } from '@/functionalities/DatasetsLoader';
 import classes from "@/pages/tasks/dataquality/datasets/page.module.css";
 import { image_type, text_type } from '@/properties/types';
-import { cleaner_get } from '@/properties/urls';
+import { cleaner_progress, cleaner_start } from '@/properties/urls';
 import useStore from '@/store/dsStore';
 import { Box, Center, Flex, Select, Text } from '@mantine/core';
 import { MagicWandSparkles } from '@vectopus/atlas-icons-react';
@@ -16,11 +15,7 @@ export default function CleanDuplicates ()
   const [ features, setFeatures ] = useState<string[]>( [] )
   const [ featureName, setFeatureName ] = useState<any>( "" )
 
-  const [ progress, setProgress ] = useState( 0 );
-  const [ result, setResult ] = useState<string | null>( null );
-
   const datasetUsed = useStore( ( state ) => state.datasetUsed )
-  const setData = useStore( ( state ) => ( state.setData ) );
   const [compute, setCompute] = useState<boolean>(false);
   const activeTask = useStore( ( state ) => state.activeTask );
 
@@ -48,8 +43,6 @@ export default function CleanDuplicates ()
       setCompute(true)
     }
   }
-
-
 
   return (
     <div>
@@ -100,13 +93,14 @@ export default function CleanDuplicates ()
             </Text>
           </span>
         </Center>
-      ) : featureName !== "" && result === null && (compute || activeTask) ? (
+      ) : featureName !== ""  && (compute || activeTask) ? (
 
         <AsyncTaskTracker
-          startEndpoint={ 'http://localhost:8000/actions/cleaner' }
+          action={ "clean_duplicates" }
+          startEndpoint={ cleaner_start }
           startParams={ config }
           startBody={ undefined }
-          progressEndpoint={ 'http://localhost:8000/cleaner/progress' }
+          progressEndpoint={ cleaner_progress }
           pollInterval={ 0 }
           progressDisplayMode={ true } />
       ) : null }

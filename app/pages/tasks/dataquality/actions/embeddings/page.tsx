@@ -13,6 +13,7 @@ import { MousePointerClick, Zap } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from "./page.module.css";
+import { embedder_progress, embedder_start } from '@/properties/urls';
 
 export default function Embedder ()
 {
@@ -289,10 +290,11 @@ export default function Embedder ()
 
       { compute || activeTask ? (
         <AsyncTaskTracker
-          startEndpoint={ 'http://localhost:8000/actions/embedder' }
+          action={ "embedder" }
+          startEndpoint={ embedder_start }
           startParams={ config }
           startBody={ undefined }
-          progressEndpoint={ 'http://localhost:8000/embedder/progress' }
+          progressEndpoint={embedder_progress}
           pollInterval={ 0 }
           progressDisplayMode={ true } />
       ) : null }
