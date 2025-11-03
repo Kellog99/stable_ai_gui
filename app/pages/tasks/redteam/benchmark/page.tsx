@@ -73,7 +73,7 @@ const Benchmark: React.FC = () => {
   const attacksCleaned = Object.fromEntries(
     Object.entries(selectedAttacks).map(([key, value]) => [
       key,
-      Object.fromEntries(Object.entries(value).filter(([k]) => k !== "parameters"))
+      { name: value.id }
     ])
   );
 
