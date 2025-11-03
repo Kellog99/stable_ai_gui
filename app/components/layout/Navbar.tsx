@@ -61,8 +61,8 @@ export default function Navbar() {
         if (isNNTrust) {
             // Make the useEffect async by creating an async function inside
             const fetchData = async () => {
-                const fetchattack = await fetchItem('http://localhost:8082/attacks/getInfo');
-                const fetchmetrics = await fetchItem('http://localhost:8082/metrics/getInfo');
+                const fetchattack = await fetchItem('http://localhost:8082/info/attacks/getInfo');
+                const fetchmetrics = await fetchItem('http://localhost:8082/info/metrics/getInfo');
                 if (fetchattack) {
                     setAttacks(fetchattack);
                     setSelectedAttacks(fetchattack);

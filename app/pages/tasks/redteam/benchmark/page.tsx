@@ -7,12 +7,18 @@ import TableWrapper from "./TableWrapper"
 import { Play, Settings, Ruler, Bug, Gauge, BrickWallIcon, Info, ChevronRight } from 'lucide-react';
 import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
+import useStore from '@/store/dsStore';
 
 const Benchmark: React.FC = () => {
 
   const { attacks, metrics, selectedAttacks, selectedMetrics, setSelectedAttacks, setSelectedMetrics, setExecutedAttacks } = useNNTrustStore()
 
-  // Handle the selection of an attack
+  const datasetName = useStore((state) => state.datasetUsed)?.name
+  const modelName = useNNTrustStore((state) => state.modelName)
+  const setBenchmarkID = useNNTrustStore((state) => state.setBenchmarkID)
+  const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
+
+
   const handleSelectionClick = (
     id: string,
     map: { [key: string]: RegisterObjectProps },
@@ -63,11 +69,23 @@ const Benchmark: React.FC = () => {
     }
   }
 
+  //preparing data to send to backend
+  const attacksCleaned = Object.fromEntries(
+    Object.entries(selectedAttacks).map(([key, value]) => [
+      key,
+      Object.fromEntries(Object.entries(value).filter(([k]) => k !== "parameters"))
+    ])
+  );
 
-setExecutedAttacks
+  const benchmarkDatas = {
+    attacks: Object.values(attacksCleaned),
+    metrics: Object.values(selectedMetrics),
+    dataset: datasetName,
+    model: modelName
+  };
 
-console.log("SELECTED ATTACKS", selectedAttacks)
-console.log("SELECTED METRICS", selectedMetrics)
+  console.log("benchmark to send", benchmarkDatas)
+
   // variables for executing the benchmarking
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
 
@@ -79,18 +97,34 @@ console.log("SELECTED METRICS", selectedMetrics)
     try {
       // Block any new click on the button
       setExecuteBenchmark(false);
-      const response = await fetch('http://localhost:8082/attacks/executeBenchmark', {
+
+      const response = await fetch('http://localhost:8082/job/start', {
         method: "POST",
-        body: JSON.stringify(selectedAttacks),
+        body: JSON.stringify(benchmarkDatas),
         headers: {
           'Content-type': 'application/json'
         }
       });
 
+      //const response = await fetch('http://localhost:8082/attacks/executeBenchmark', {
+      //  method: "POST",
+      //  body: JSON.stringify(selectedAttacks),
+      //  headers: {
+      //    'Content-type': 'application/json'
+      //  }
+      //});
+
+
       console.log('Status:', response.status);
-      const status: AttackManagementProps[] = await response.json();
-      setExecutedAttacks(status)
-      console.log(status)
+      //const status: AttackManagementProps[] = await response.json();
+      //setExecutedAttacks(status)
+      //console.log(status)
+
+
+      const id = await response.json();
+      console.log("id:", id)
+      setBenchmarkID(id)
+
       setIsCLicked(true)
     } catch (error) {
       console.error('ERROR:', error);
@@ -99,6 +133,8 @@ console.log("SELECTED METRICS", selectedMetrics)
     }
 
   };
+
+  console.log("benchmarkID from store", benchmarkID)
 
 
   return (

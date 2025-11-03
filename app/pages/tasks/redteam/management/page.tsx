@@ -16,6 +16,11 @@ const TaskManagement: React.FC = () => {
         key: null,
         direction: 'asc'
     });
+
+    const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
+    console.log("id from management", benchmarkID)
+    
+    
     console.log("in benchmark ", executedAttacks)
 
 
@@ -133,7 +138,8 @@ const TaskManagement: React.FC = () => {
         setTimeout(() => setIsRotating(false), 600); // Match animation duration
 
         try {
-            const response = await fetch('http://localhost:8082/attacks/benchmarkStatus');
+            const response = await fetch(`http://localhost:8082/job/getJobs?id=${encodeURIComponent(benchmarkID)}`); 
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`); // Fixed: parentheses, not backtick
             }

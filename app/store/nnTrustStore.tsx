@@ -1,10 +1,11 @@
 import { ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 import { BenchmarkDataProps, ReportProps } from "@/interfaces/reportInterfaces";
+import Benchmark from "@/pages/tasks/redteam/benchmark/page";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 export interface AttackManagementProps {
-  id: number;
+  id: string;
   name: string;
   status: string;
   progress: number
@@ -20,6 +21,7 @@ interface AppState {
   selectedMetrics: { [key: string]: RegisterObjectProps };
 
 
+
   testAttack: RegisterObjectProps | null; // this variable saves the attack to test on the Test Page
   executedAttacks: AttackManagementProps[];
   loading: boolean;
@@ -29,6 +31,8 @@ interface AppState {
   report: ReportProps | null;
   benchmark: { [key: string]: BenchmarkDataProps } | null;
   vulnerabilitySelected: string | null;
+
+  benchmarkID: string;
 
   setModels: (models: ModelSpecs[] | null) => void;
   setModelName: (modelName: string | null) => void;
@@ -44,6 +48,8 @@ interface AppState {
   setReport: (report: ReportProps) => void;
   setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => void;
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
+
+  setBenchmarkID: (benchmarkID: string) => void;
 }
 
 const useNNTrustStore = create<AppState>()(
@@ -57,7 +63,12 @@ const useNNTrustStore = create<AppState>()(
       selectedAttacks: {},
       selectedMetrics: {},
 
-      executedAttacks: [],
+      executedAttacks: [{
+        id: "",
+        name: "",
+        status: "",
+        progress: 0
+      }],
 
       testAttack: null,
 
@@ -67,6 +78,8 @@ const useNNTrustStore = create<AppState>()(
       report: null,
       benchmark: null,
       vulnerabilitySelected: null,
+
+      benchmarkID: "",
 
       setModels: (models) => set({ models }),
       setModelName: (modelName) => set({ modelName }),
@@ -81,7 +94,8 @@ const useNNTrustStore = create<AppState>()(
 
       setReport: (report: ReportProps) => set({ report }),
       setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => set({ benchmark }),
-      setVulnerabilitySelected: (vulnerabilitySelected: string) => set({ vulnerabilitySelected })
+      setVulnerabilitySelected: (vulnerabilitySelected: string) => set({ vulnerabilitySelected }),
+      setBenchmarkID: (benchmarkID: string) => set({ benchmarkID }),
     }),
 
     {
@@ -97,6 +111,7 @@ const useNNTrustStore = create<AppState>()(
         benchmark: state.benchmark,
         vulnerabilitySelected: state.vulnerabilitySelected,
         executedAttacks: state.executedAttacks,
+        benchmarkID: state.benchmarkID
         // Don't persist loading and error states
       }),
     }
