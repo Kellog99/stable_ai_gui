@@ -52,7 +52,7 @@ export function OptionCard({
         <div className='card-footer'>
           <Icon
             className='card-icon'
-            style={{ pointerEvents: parameters ? "auto" : "none" }}
+            style={{ pointerEvents: parameters ? "auto" : "none", visibility: 'hidden'}} //TO MAKE CONFIG VISIBILE WHEN THE THEY CAN ACTUALLY BE SET
             size={30}
             onClick={() => setIsExpanded(true)} />
           <label className="circle-checkbox">

@@ -4,7 +4,7 @@ import { Task } from '@/interfaces/NNInterfaces';
 import useStoreDQ from '@/store/dsStore';
 import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/HomePage.module.css';
-import { BarChart3, Database, FileText, TestTube, Upload } from 'lucide-react';
+import { Database, Upload } from 'lucide-react';
 import { DatasetRepository } from './components/client/DatasetsRepoLoad';
 import FileDropZone from './components/client/FileDropZone';
 import { ModelRepository } from './components/client/ModelDisplayer';

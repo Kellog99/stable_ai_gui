@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
-import { Play, Settings, Ruler, Bug, Gauge, BrickWallIcon, Info, ChevronRight } from 'lucide-react';
+import { Play, Settings, Ruler, Bug, Gauge, Info, ChevronRight, BrickWallFire } from 'lucide-react';
 import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 import useStore from '@/store/dsStore';
@@ -17,6 +17,11 @@ const Benchmark: React.FC = () => {
   const modelName = useNNTrustStore((state) => state.modelName)
   const setBenchmarkID = useNNTrustStore((state) => state.setBenchmarkID)
   const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
+  // variables for executing the benchmarking
+  const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
+
+  const isBenchmarkAvailable = !!(datasetName && modelName && selectedAttacks && selectedMetrics) //the !! makes sure this variable is a proper boolean
+  console.log("isBenchmark???", isBenchmarkAvailable)
 
 
   const handleSelectionClick = (
@@ -86,8 +91,7 @@ const Benchmark: React.FC = () => {
 
   console.log("benchmark to send", benchmarkDatas)
 
-  // variables for executing the benchmarking
-  const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
+
 
 
   // Click Execution Attack Handle
@@ -105,15 +109,6 @@ const Benchmark: React.FC = () => {
           'Content-type': 'application/json'
         }
       });
-
-      //const response = await fetch('http://localhost:8082/attacks/executeBenchmark', {
-      //  method: "POST",
-      //  body: JSON.stringify(selectedAttacks),
-      //  headers: {
-      //    'Content-type': 'application/json'
-      //  }
-      //});
-
 
       console.log('Status:', response.status);
       //const status: AttackManagementProps[] = await response.json();
@@ -143,18 +138,24 @@ const Benchmark: React.FC = () => {
         <div className='attack-title'>
           <div className='attack-header'>
             <div className='attack-icon'>
-              <BrickWallIcon size={'6vw'} color='red' />
+              <BrickWallFire size={'6vw'} color='red' />
               <h1>Red Teaming</h1>
             </div>
             <p style={{ margin: '0' }}>This page provides a set of vulnerabilities that can be used to test the model's robustness and a set of metrics to register the performance of each attack.</p>
           </div>
-          <button
-            className='attack-button'
-            disabled={!executeBenchmark}
-            onClick={handleClick}>
-            <Play className='icon' />
-            <div className='btn-desc'> Execute benchmark</div>
-          </button>
+          <div className="tooltip-container">
+            <button
+              className="attack-button"
+              disabled={!isBenchmarkAvailable && !executeBenchmark}
+              onClick={handleClick}
+            >
+              <Play className="icon" />
+              <div className="btn-desc">Execute benchmark</div>
+            </button>
+            {!isBenchmarkAvailable && (
+              <span className="tooltip">Before executing the benchmark, make sure you have selected at least one attack and one metric.</span>
+            )}
+          </div>
         </div>
 
 

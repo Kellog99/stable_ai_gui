@@ -91,7 +91,7 @@ const TaskManagement: React.FC = () => {
     }, [attackArray, searchTerm, statusFilter, sortConfig]);
 
     const [atkFinished, setAtkFinished] = useState<number>(0)
-    useEffect(() => { setAtkFinished(executedAttacks.filter(job => job.status === "Completed").length) }, [executedAttacks])
+    useEffect(() => { setAtkFinished(executedAttacks.filter(job => job.status === "completed").length) }, [executedAttacks])
     const isDisabled = () => {
         console.log(executedAttacks.length > 0 && (atkFinished === executedAttacks.length))
         return false
@@ -118,11 +118,11 @@ const TaskManagement: React.FC = () => {
 
         const reportFetch = await fetchResult<ReportProps>('http://localhost:8082/report/getReport');
         console.log("REPORT PROPS", reportFetch)
-
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>('http://localhost:8082/report/getBenchmark');
         if (reportFetch) {
             setReport(reportFetch);
         }
+
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>('http://localhost:8082/report/getBenchmark');
         if (benchmarkFetch) {
             console.log("saving = ", benchmarkFetch)
             setBenchmark(benchmarkFetch);

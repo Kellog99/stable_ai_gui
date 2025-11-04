@@ -139,7 +139,7 @@ const useStore = create<AppState>()(
     } ),
 
     {
-      name: "app-storage",
+      name: "app-storage-dq",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         datasets: state.datasets,

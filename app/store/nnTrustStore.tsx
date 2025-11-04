@@ -99,7 +99,7 @@ const useNNTrustStore = create<AppState>()(
     }),
 
     {
-      name: "app-storage",
+      name: "app-storage-models",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         models: state.models,
