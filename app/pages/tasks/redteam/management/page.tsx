@@ -6,9 +6,11 @@ import { ArrowDownUp, CircleArrowRight, RotateCw, Search } from 'lucide-react';
 import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
+import useStore from '@/store/dsStore';
 
 const TaskManagement: React.FC = () => {
     const { setReport, setBenchmark, executedAttacks, setExecutedAttacks } = useNNTrustStore()
+    const datasetName = useStore((state) => state.datasetUsed)?.name
     const [attackArray, setAttackArray] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
@@ -116,13 +118,13 @@ const TaskManagement: React.FC = () => {
             }
         }
 
-        const reportFetch = await fetchResult<ReportProps>('http://localhost:8082/report/getReport');
+        const reportFetch = await fetchResult<ReportProps>(`http://localhost:8082/job/report/getResult?id=${encodeURIComponent(benchmarkID)}`);
         console.log("REPORT PROPS", reportFetch)
         if (reportFetch) {
             setReport(reportFetch);
         }
 
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>('http://localhost:8082/report/getBenchmark');
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`http://localhost:8082/job/benchmark/getResult?dataset=${datasetName}`);
         if (benchmarkFetch) {
             console.log("saving = ", benchmarkFetch)
             setBenchmark(benchmarkFetch);
