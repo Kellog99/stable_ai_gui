@@ -78,6 +78,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             benchmarkProp.metrics[selectedBenchmark] ?? 0
         );
 
+
         const dataValue = flattenValue(data[selectedBenchmark as keyof metricsProps]);
 
         // Create chart data for benchmark points
@@ -109,14 +110,16 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         benchmarkEntries.forEach(([id, benchmarkProp], index) => {
             combined.push([benchmarkProp.name, benchmarkValues[index]]);
         });
-
+        
         // Add the tested model value
-        if (dataValue.length > 0) {
-            combined.push([modelName || 'Target Model', dataValue[0]]);
-        }
+        
+        //if (dataValue.length > 0) {
+        //    combined.push([modelName || 'Target Model', dataValue[0]]); //no need to add anything
+        //}
 
         // Sort by value (descending)
         combined.sort((a, b) => b[1] - a[1]);
+        
         setSortedData(combined);
     }, [selectedBenchmark, benchmark, data, modelName]);
 

@@ -70,7 +70,6 @@
     padding: 0.75rem;
     border-radius: 0.5rem;
     background-color: #2f3640;
-    /* custom gray-750 */
     transition: all 0.2s;
 }
 
@@ -81,7 +80,7 @@
 
 .row.highlighted {
     background-color: gray;
-    height: 100vw;    
+    border: 2px solid #60a5fa;  
 }
 
 .row-left {

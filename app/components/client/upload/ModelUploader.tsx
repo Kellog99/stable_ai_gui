@@ -87,7 +87,7 @@ const ModelUploadComponent = () => {
       setUploadStatus('error');
     } finally {
       getModels().then(fetchedData => {
-        setModels(fetchedData.names);
+        setModels(fetchedData.models);
       })
       setLoading(false);
     }

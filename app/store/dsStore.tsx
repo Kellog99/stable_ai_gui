@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import Dataset, { Configs, datasetMock } from "../interfaces/genericInterface";
+import Dataset, { Configs} from "../interfaces/genericInterface";
 import { ResultPoll } from "@/interfaces/metricsInterface";
 
 interface AppState {

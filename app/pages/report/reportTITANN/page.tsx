@@ -20,7 +20,7 @@ const SecurityReport = () => {
         return (
             <div>
                 <div className='report-title'>
-                    <IdCardLanyard size={"8vw"} color='#1B9AAA' />
+                    {/*<IdCardLanyard size={"8vw"} color='#1B9AAA' />*/}
                     <div>
                         <h1 style={{ color: "white" }}>Security Report</h1>
                         <p style={{ color: "gray" }}>

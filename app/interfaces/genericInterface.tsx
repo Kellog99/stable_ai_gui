@@ -36,39 +36,6 @@ export default interface Dataset
   default_embedding_model?:string
 }
 
-export const datasetMock: Dataset = {
-  name: "animals",
-  n_samples: 1000,
-  task: "classification",
-  features: [
-    {
-      type: "image",
-      name: "image",
-      depth: 0,
-      datas: [],
-      is_logic: false,
-      description: "Image of the animal",
-    },
-    {
-      type: "text",
-      name: "text",
-      depth: 1,
-      datas: [],
-      is_logic: false,
-      description: "Textual description of the animal"}],
-  prototype: {
-    type: "image",
-    name: "image",
-    depth: 0,
-    datas: ["/datasets/animals/data/antelope/0a37838e99.jpg"],
-    is_logic: true,
-    description: "Image of the animal",
-  },
-  edges: [["image", "text"]],
-  n_classes: 5,
-  samples_per_class: { 0: 200, 1: 200, 2: 200, 3: 200, 4: 200 }
-}
-
 
 export interface FeatureSchema
 {

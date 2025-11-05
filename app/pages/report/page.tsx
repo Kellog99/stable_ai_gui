@@ -7,7 +7,7 @@ import { DragDrop } from "@/components/client/upload/UploaderUnifiedDragDrop";
 import { uploadModel, uploadModel_check } from "@/properties/urls";
 import { getModels } from "@/functionalities/NNTrustBackendUtils";
 import { ModalUploadModel } from "@/components/client/upload/ModalUploadModel";
-import { JsonRepository } from "@/components/client/ReportCard";
+import { JsonRepository } from "@/components/client/JsonRepository";
 
 
 export default function ReportPage() {
@@ -38,11 +38,18 @@ export default function ReportPage() {
       child: ReportDragDrop
     },
     {
-      id: "reportRepo",
-      title: "Report Repository",
+      id: "NNreportRepo",
+      title: "NNTrust Reports",
       Icon: Database,
-      child: JsonRepository   //questo deve diventare jsonRepository 
-    }
+      child: () => <JsonRepository tool="nntrust" />
+    },
+    {
+      id: "DQreportRepo",
+      title: "DQ Reports",
+      Icon: Database,
+      child: () => <JsonRepository tool="dq" />,
+    },
+
   ];
 
 

@@ -1,6 +1,5 @@
 "use client";
 import TaskButton from '@/components/client/buttons/TaskButton';
-import { Task } from '@/interfaces/NNInterfaces';
 import useStoreDQ from '@/store/dsStore';
 import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/HomePage.module.css';

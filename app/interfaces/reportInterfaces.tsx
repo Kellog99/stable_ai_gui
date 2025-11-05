@@ -1,3 +1,5 @@
+import Dataset from "./genericInterface";
+
 // Report information
 interface infoProps {
     name: string;
@@ -45,4 +47,12 @@ export interface BenchmarkDataProps {
     param: number
     task: string
     metrics: { [key: string | number]: number }
+}
+
+export interface DQReportProps{
+    tool: string
+    dataset: Dataset;
+    metrics: Object[];
+
+    
 }
