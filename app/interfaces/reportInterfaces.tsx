@@ -52,7 +52,5 @@ export interface BenchmarkDataProps {
 export interface DQReportProps{
     tool: string
     dataset: Dataset;
-    metrics: Object[];
-
-    
+    metrics: Object[]; 
 }

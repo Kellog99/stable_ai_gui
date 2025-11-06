@@ -19,11 +19,17 @@ import { AlertCust } from "@/components/client/AlertCustom";
 import { BarChartCustom } from "@/components/client/BarChart";
 import { MetricResume } from "@/components/client/metrics/displayer/MetricResume";
 import { labelColorMapType } from "@/properties/static";
+import { DQReportProps } from "@/interfaces/reportInterfaces";
 
 export default function Report() {
 
-    const report = useStore((state) => state.report)
-    const setReport = useStore((state) => state.setReport)
+    //const report = useStore((state) => state.report)
+    //const setReport = useStore((state) => state.setReport)
+
+    const report = useStore((state) => state.reportFromBE) as DQReportProps
+    const setReport = useStore((state) => state.setReportFromBE)
+
+    console.log("REPORT IN PAGE", report)
 
     const [features, setFeatures] = useState<FeatureSchema[]>([])
     const [connections, setConnections] = useState<[string, string][]>([])
@@ -48,17 +54,17 @@ export default function Report() {
     const [showAccuracyCard, setShowAccuracyCard] = useState<boolean>(true)
 
     useEffect(() => {
-        if (datasetUsed) {
-            setConnections(datasetUsed.edges);
+        if (report.dataset) {
+            setConnections(report.dataset.edges);
 
             const allDescriptions: string[] = [];
 
-            if (datasetUsed.description) {
-                allDescriptions.push(datasetUsed.description);
+            if (report.dataset.description) {
+                allDescriptions.push(report.dataset.description);
             }
 
-            if (Array.isArray(datasetUsed?.features)) {
-                const extractedFeatures = datasetUsed.features.map(({ type, name, depth }) => ({
+            if (Array.isArray(report.dataset.features)) {
+                const extractedFeatures = report.dataset.features.map(({ type, name, depth }) => ({
                     type,
                     name,
                     depth,
@@ -66,7 +72,7 @@ export default function Report() {
 
                 setFeatures(extractedFeatures);
 
-                const featuresDescriptions = datasetUsed.features.map(({ description }) => ({
+                const featuresDescriptions = report.dataset.features.map(({ description }) => ({
                     description
                 }));
 
@@ -85,19 +91,24 @@ export default function Report() {
 
     useEffect(() => {
         // Save items that were originally at positions where name === "accuracy"
-        const accuracyItems = report.filter(item => item.results.name === "accuracy");
+        const accuracyItems = report.metrics.filter(item => item.results.name === "accuracy");
         originalAccuracyItems.current = accuracyItems;
 
         // Reorder the list
         const reordered = [
             ...accuracyItems,
-            ...report.filter(item => item.results.name !== "accuracy"),
+            ...report.metrics.filter(item => item.results.name !== "accuracy"),
         ];
-        setReport(reordered);
+
+        const updatedReport = {
+            ...report,
+            metrics: reordered
+        };
+        setReport(updatedReport);
     }, []);
 
     useEffect(() => {
-        const currentIndexes = report.map((item, index) => {
+        const currentIndexes = report.metrics.map((item, index) => {
             return originalAccuracyItems.current.includes(item) ? index : -1;
         }).filter(index => index !== -1);
 
@@ -115,9 +126,9 @@ export default function Report() {
 
         const insertBefore = Math.max(sortedIndexes[0] - 1, 0);
 
-        const block = sortedIndexes.map(i => report[i]);
+        const block = sortedIndexes.map(i => report.metrics[i]);
 
-        const remaining = report.filter((_, idx) => !sortedIndexes.includes(idx));
+        const remaining = report.metrics.filter((_, idx) => !sortedIndexes.includes(idx));
 
         const newReport = [
             ...remaining.slice(0, insertBefore),
@@ -125,7 +136,12 @@ export default function Report() {
             ...remaining.slice(insertBefore),
         ];
 
-        setReport(newReport);
+        const updatedReport = {
+            ...report,
+            metrics: newReport
+        };
+        setReport(updatedReport);
+
     };
 
     const handleMoveOutDown = (indexes: number[]) => {
@@ -133,12 +149,12 @@ export default function Report() {
 
         const sortedIndexes = [...indexes].sort((a, b) => a - b);
 
-        const lastIndex = report.length - 1;
+        const lastIndex = report.metrics.length - 1;
         if (sortedIndexes[sortedIndexes.length - 1] === lastIndex) return;
 
-        const block = sortedIndexes.map(i => report[i]);
+        const block = sortedIndexes.map(i => report.metrics[i]);
 
-        const remaining = report.filter((_, idx) => !sortedIndexes.includes(idx));
+        const remaining = report.metrics.filter((_, idx) => !sortedIndexes.includes(idx));
 
         const insertPos = sortedIndexes[sortedIndexes.length - 1] + 1;
 
@@ -148,12 +164,23 @@ export default function Report() {
             ...remaining.slice(insertPos),
         ];
 
-        setReport(newReport);
+        const updatedReport = {
+            ...report,
+            metrics: newReport
+        };
+        setReport(updatedReport);
+        
     };
 
     const handleCancelOut = (indexes: number[]) => {
-        const newReport = report.filter((_, index) => !indexes.includes(index));
-        setReport(newReport);
+        const newReport = report.metrics.filter((_, index) => !indexes.includes(index));
+        
+        const updatedReport = {
+            ...report,
+            metrics: newReport
+        };
+        
+        setReport(updatedReport);
         setShowAccuracyCard(false)
     };
 
@@ -175,7 +202,7 @@ export default function Report() {
                     <Button
                         radius="lg"
                         onClick={open}
-                        disabled={report.length === 0}
+                        disabled={report.metrics.length === 0}
                     >
                         Show PDF Preview
                     </Button>
@@ -234,6 +261,7 @@ export default function Report() {
                                 </Text>
                             </Box>
                             <Title order={4} mb="sm">Prototypes Preview</Title>
+                            {/*
                             <ScrollArea >
                                 {prototypesData ? (<Flex
                                     mih={150}
@@ -250,6 +278,7 @@ export default function Report() {
                                     <AlertCust result={"warning"} textToDisplay={"In order to see the preview of the prototypes you need to first compute them on the dedicated page. Otherwise you can see them on the PDF preview."} />
                                 )}
                             </ScrollArea>
+                            */}
 
                             {labelToSamples.length > 0 ? (
                                 <>
@@ -286,18 +315,18 @@ export default function Report() {
                         <Title order={3}>Metrics</Title>
                     </span>
                     <>
-                        {report.map((metric, index) => {
+                        {report.metrics.map((metric, index) => {
                             if (metric.results.name === "accuracy") {
 
-                                const firstAccuracyIndex = report.findIndex(m => m.results.name === "accuracy");
+                                const firstAccuracyIndex = report.metrics.findIndex(m => m.results.name === "accuracy");
                                 if (index !== firstAccuracyIndex) {
                                     return null;
                                 }
 
                                 if (!showAccuracyCard) return null;
 
-                                const accuracyMetrics = report.filter(m => m.results.name === "accuracy");
-                                const accuracyIndexes = report
+                                const accuracyMetrics = report.metrics.filter(m => m.results.name === "accuracy");
+                                const accuracyIndexes = report.metrics
                                     .map((m, i) => ({ metric: m, index: i }))
                                     .filter(({ metric }) => metric.results.name === "accuracy")
                                     .map(({ index }) => index);
@@ -330,7 +359,7 @@ export default function Report() {
                                                 <MetricResume
                                                     key={`accuracy-metric-${accuracyIndex}`}
                                                     metric={accuracyMetric as any}
-                                                    index={report.findIndex(m => m === accuracyMetric)}
+                                                    index={report.metrics.findIndex(m => m === accuracyMetric)}
                                                     outIndexes={outIndexes}
                                                 />
                                             ))}
@@ -358,7 +387,7 @@ export default function Report() {
                                             </Tooltip>
                                         )}
 
-                                        {accuracyIndexes[accuracyIndexes.length - 1] < report.length - 1 && (
+                                        {accuracyIndexes[accuracyIndexes.length - 1] < report.metrics.length - 1 && (
                                             <Tooltip
                                                 multiline
                                                 withArrow
@@ -393,7 +422,7 @@ export default function Report() {
                                                 style={{
                                                     transition: "background-color 0.2s ease",
                                                 }}
-                                                disabled={report.length === accuracyIndexes.length}
+                                                disabled={report.metrics.length === accuracyIndexes.length}
                                                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                                             >
                                                 <FontAwesomeIcon icon={faTrashCan} />

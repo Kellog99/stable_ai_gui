@@ -62,7 +62,6 @@ export default function Config ( props: ConfigsProps )
     const datasetName = datasetUsed?.name
 
     const configs = useStore( ( state ) => state.metricsConfig )
-    const setConfigs = useStore( ( state ) => state.setMetricsConfigs )
     const internalConfigs = useStore.getState().internalConfigs;
     const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
 
@@ -268,9 +267,8 @@ export default function Config ( props: ConfigsProps )
 
             setReport( [ ...report, reportMetric ] );  ///deve diventare una variabile di useState e non dello store!! 
             
-            
             setReportToSave([...reportToSave, reportMetric.results]);
-            saveMetricToReport( datasetName as string, [...reportToSave, reportMetric.results] );
+            saveMetricToReport( datasetName as string, [ ...report, reportMetric ] );
             setReportToSave( [] )
              
         }

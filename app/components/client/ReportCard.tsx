@@ -1,6 +1,7 @@
 import { useThumbnailWS } from "@/functionalities/useThumbnailWS";
 import { DQReportProps, ReportProps } from "@/interfaces/reportInterfaces";
 import { image_type } from "@/properties/types";
+import useStore from "@/store/dsStore";
 import useNNTrustStore from "@/store/nnTrustStore";
 import styles from "@/styles/JsonRepository.module.css"
 import { Bug, Cpu, Database } from "lucide-react";
@@ -16,7 +17,8 @@ interface ReportCardProps {
 export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
 
-
+    const setReportFromBE = useStore((state) => state.setReportFromBE)
+    
     const setReport = useNNTrustStore((state) => state.setReport)
     const router = useRouter()
 
@@ -37,9 +39,12 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
             setReport(reportNN as ReportProps)
             router.push("/pages/report/reportTITANN")
         } else if (reportDQ) {
+            console.log("REPORTDQ CLICK", reportDQ)
+            setReportFromBE(reportDQ as DQReportProps)
             router.push("/pages/report/reportDQ")
         }
     }
+
 
     return (
         <>
@@ -127,7 +132,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                                 reportDQ &&
                                 reportDQ.metrics.map((metric, index) => (
                                     <div key={index}>
-                                        <span className={styles.subtitlePanel}>{metric.name}:</span> {metric.score.toFixed(2)}
+                                        <span className={styles.subtitlePanel}>{metric.results.name}:</span> {metric.results.score.toFixed(2)}
                                     </div>
                                 ))
                             )

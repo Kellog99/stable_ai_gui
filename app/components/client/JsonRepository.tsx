@@ -4,7 +4,7 @@ import useNNTrustStore from "@/store/nnTrustStore";
 import styles from "@/styles/JsonRepository.module.css"
 
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReportCard from "./ReportCard";
 import { getAllDQReports, getDQReport } from "@/functionalities/BackendUtils";
 
@@ -18,7 +18,8 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
     const datasetUsed = useStore((state) => state.datasetUsed)
     const reportDQ = useStore((state) => state.report)
 
-    const [DQReports, setDQReports] = React.useState<DQReportProps[]>([]);
+    const [DQReports, setDQReports] = useState<DQReportProps[]>([]);
+    
     //const report = useNNTrustStore((state) => state.report)
 
     const modelProva = [{
@@ -104,14 +105,6 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
     ]
 
 
-    const datasetProva = [{
-        "tool": "dq",
-        "dataset": datasetUsed,
-        "metrics": reportDQ
-
-    },
-    ]
-
     useEffect(() => {
         if (tool === "dq") {
             const fetchDQReport = async () => {
@@ -129,10 +122,6 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
             fetchDQReport();
         }
     }, [tool, datasetUsed]);
-
-
-
-    console.log("datasetPROVA", datasetProva)
     
 
     return (
