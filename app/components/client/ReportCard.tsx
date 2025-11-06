@@ -127,7 +127,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                                 reportDQ &&
                                 reportDQ.metrics.map((metric, index) => (
                                     <div key={index}>
-                                        <span className={styles.subtitlePanel}>{metric.results.name}:</span> {metric.results.score.toFixed(2)}
+                                        <span className={styles.subtitlePanel}>{metric.name}:</span> {metric.score.toFixed(2)}
                                     </div>
                                 ))
                             )

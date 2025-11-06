@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { completeness_start, completenessOK_get, data_get, duplicates_start, model_info_get, outliers_start, prototypes_get, retrieve_get, root_folder, upload_post } from '../properties/urls';
+import { completeness_start, completenessOK_get, data_get, duplicates_start, getAllReports_get, getDQReportByName, model_info_get, outliers_start, prototypes_get, retrieve_get, root_folder, saveMetric, upload_post } from '../properties/urls';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -228,6 +228,59 @@ export async function getCompletenessOK(datasetName: string, featureName: string
     const errorText = await response.text(); // optional: log/debug response body
     throw new Error(`Failed to get completeness check: ${response.status} ${errorText}`);
   }
+}
+
+
+export async function saveMetricToReport(datasetName: string, metrics: Object[]) {
+
+  const url = new URL(`${saveMetric}`);
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, // binary content type
+    body: JSON.stringify(
+      {
+        datasetName: datasetName,
+        metrics: metrics
+      }),
+  });
+
+  if (response.status === 200) {
+    return true;
+  } else if (response.status === 404) {
+    return false;
+  } else {
+    const errorText = await response.text(); // optional: log/debug response body
+    throw new Error(`Failed to save metric to report`);
+  }
+
+}
+
+
+export async function getDQReport(datasetName: string){
+
+  const url = new URL(`${getDQReportByName}?datasetName=${encodeURIComponent(datasetName)}`);
+
+  const response = await fetch(url);
+  
+  if (!response.ok) throw new Error('Failed to get model info from the backend');
+
+  const DQReport = await response.json();
+  return DQReport
+
+}
+
+
+export async function getAllDQReports(){
+
+  const url = new URL(`${getAllReports_get}`);
+
+  const response = await fetch(url);
+  
+  if (!response.ok) throw new Error('Failed to get all the reports from the backend');
+
+  const DQReports = await response.json();
+  return DQReports
+
 }
 
 

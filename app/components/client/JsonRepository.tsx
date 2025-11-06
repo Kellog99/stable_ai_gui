@@ -1,11 +1,12 @@
-import { DQReportProps} from "@/interfaces/reportInterfaces";
+import { DQReportProps } from "@/interfaces/reportInterfaces";
 import useStore from "@/store/dsStore";
 import useNNTrustStore from "@/store/nnTrustStore";
 import styles from "@/styles/JsonRepository.module.css"
 
 
-import React from "react";
+import React, { useEffect } from "react";
 import ReportCard from "./ReportCard";
+import { getAllDQReports, getDQReport } from "@/functionalities/BackendUtils";
 
 
 type JsonRepositoryProps = {
@@ -16,8 +17,10 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
 
     const datasetUsed = useStore((state) => state.datasetUsed)
     const reportDQ = useStore((state) => state.report)
-    const report = useNNTrustStore((state) => state.report)
-    
+
+    const [DQReports, setDQReports] = React.useState<DQReportProps[]>([]);
+    //const report = useNNTrustStore((state) => state.report)
+
     const modelProva = [{
         "tool": "nntrust",
         "image": "/home/roberta-stellino/Desktop/datasetRepo/animals/data/antelope/02f4b3be2d.jpg",
@@ -99,6 +102,8 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
         }
     },
     ]
+
+
     const datasetProva = [{
         "tool": "dq",
         "dataset": datasetUsed,
@@ -107,11 +112,28 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
     },
     ]
 
-    /////////QUA BISOGNA FARE LA CHIAMATA GETREPORT DAL BE E SETTARE I REPORT 
+    useEffect(() => {
+        if (tool === "dq") {
+            const fetchDQReport = async () => {
+                try {
+                    const DQreports = await getAllDQReports(); 
+                    console.log("reports from the backend", DQreports);
+                    setDQReports(DQreports);
+                    // optionally set state here
+                    // setReport(DQreport);
+                } catch (error) {
+                    console.error("Failed to fetch DQ report:", error);
+                }
+            };
+
+            fetchDQReport();
+        }
+    }, [tool, datasetUsed]);
+
 
 
     console.log("datasetPROVA", datasetProva)
-    console.log("REPORT FROM STORE", report)
+    
 
     return (
         <>
@@ -125,7 +147,7 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
                     </>
                 ) : (
                     <>
-                        {datasetProva.map((dataset, key) => (
+                        {DQReports.map((dataset, key) => (
                             <ReportCard key={key} reportDQ={dataset as DQReportProps} />
                         ))}
                     </>

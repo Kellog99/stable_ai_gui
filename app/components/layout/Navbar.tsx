@@ -112,7 +112,7 @@ export default function Navbar() {
             <ul className="nav-links"
                 style={{ padding: '0', marginTop: '0' }}>
                 {sections.length > 0 &&
-                    (sections.map((item) => (
+                    (sections.map((item, key) => (
                         <NavigationButton
                             key={item.id}
                             id={item.id}

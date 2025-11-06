@@ -12,30 +12,26 @@ import { JsonRepository } from "@/components/client/JsonRepository";
 
 export default function ReportPage() {
 
-  const ReportDragDrop = () => {
-    return (
-      <DragDrop
-        config={{
-          name: "report",
-          fileType: 'json',
-          accept: 'application/json',
-          formFieldName: "file",
-          description: 'Make sure your json contains a file.',
-          uploadUrlCheck: uploadModel_check, // DA MODIFICARE
-          uploadUrl: uploadModel, // DA MODIFICARE
-          refreshFunction: getModels, // DA MODIFICARE
-          setRefreshData: getModels // DA MODIFICARE
-
-        }}
-        infoModal={<ModalUploadModel />} />) // DA MODIFICARE
-  }
-
   const dropElement = [
     {
       id: "json",
       title: "Upload Json",
       Icon: Upload,
-      child: ReportDragDrop
+      child: () =>
+        <DragDrop
+          config={{
+            name: "report",
+            fileType: 'json',
+            accept: 'application/json',
+            formFieldName: "file",
+            description: 'Make sure your json contains a file.',
+            uploadUrlCheck: uploadModel_check, // DA MODIFICARE
+            uploadUrl: uploadModel, // DA MODIFICARE
+            refreshFunction: getModels, // DA MODIFICARE
+            setRefreshData: getModels // DA MODIFICARE
+
+          }}
+          infoModal={<ModalUploadModel />} />
     },
     {
       id: "NNreportRepo",

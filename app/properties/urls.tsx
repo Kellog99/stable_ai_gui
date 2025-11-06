@@ -26,6 +26,10 @@ export const uploaderDataset = `http://${host}:8000/upload_folder`
 export const uploadModel_check = `http://${host}:8082/model/upload/check`
 export const uploadModel = `http://${host}:8082/model/upload`
 
+export const saveMetric = `http://${host}:8000/report/saveMetric`
+export const getDQReportByName = `http://${host}:8000/report/getJson`
+export const getAllReports_get = `http://${host}:8000/report/getAllReports`
+
 
 /// POLLING ////
 export const metrics_progress = `http://${host}:8000/metrics/progress`
