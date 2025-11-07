@@ -1,6 +1,6 @@
 // Wrap the function with cache so that repeated calls return the cached result
 "use server";
-import { completeness_start, completenessOK_get, data_get, duplicates_start, getAllReports_get, getDQReportByName, model_info_get, outliers_start, prototypes_get, retrieve_get, root_folder, saveMetric, upload_post } from '../properties/urls';
+import { completeness_start, completenessOK_get, data_get, duplicates_start, getAllReports_get, getDQReportByName, model_info_get, outliers_start, prototypes_get, retrieve_get, root_folder, saveMetric, upload_post, uploadJsonReport_post } from '../properties/urls';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 

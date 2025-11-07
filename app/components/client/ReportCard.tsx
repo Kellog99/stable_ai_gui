@@ -22,7 +22,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
     const setReport = useNNTrustStore((state) => state.setReport)
     const router = useRouter()
 
-    const imageDatas = reportNN?.image || reportDQ?.dataset.prototype.datas[0];
+    const imageDatas = reportNN?.prototype || reportDQ?.dataset.prototype.datas[0];
 
     console.log("imagedata", imageDatas)
 
@@ -126,7 +126,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                                     .filter(([key]) => key !== "params" && key !== "confusion_matrix")
                                     .map(([key, value]) => (
                                         <div key={key}>
-                                            <span className={styles.subtitlePanel}>{key}:</span> {value}
+                                            <span className={styles.subtitlePanel}>{key}:</span> {value.toFixed(2)}
                                         </div>
                                     ))) : (
                                 reportDQ &&

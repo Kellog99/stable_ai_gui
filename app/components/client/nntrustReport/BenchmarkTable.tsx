@@ -3,6 +3,7 @@ import { BenchmarkDataProps, metricsProps } from '@/interfaces/reportInterfaces'
 import { ScatterChart } from '@mantine/charts';
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
+import '@mantine/charts/styles.css';
 
 interface BenchmarkTableProps {
     modelName?: string;                                    // name of the tested model
@@ -79,29 +80,42 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         );
 
 
+        console.log("DATA BHO= ", data);
         const dataValue = flattenValue(data[selectedBenchmark as keyof metricsProps]);
+        console.log("dataValue= ", dataValue);
 
         // Create chart data for benchmark points
         if (benchmarkValues.length > 0) {
-            const benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
-                "params": benchmarkProp.param,
+            let benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
+                params: benchmarkProp.param,
                 [selectedBenchmark]: benchmarkValues[index],
             }));
 
+            // Create chart data for the tested model value
+            let chartValueData: any[] = [];
+            if (dataValue.length > 0 && data.params !== undefined) {
+                chartValueData = [{
+                    params: data.params,
+                    [selectedBenchmark]: dataValue[0],
+                }];
+
+                console.log("before filter benchmarkChartData= ", benchmarkChartData);
+                console.log("chartValueData BEFORE= ", chartValueData);
+
+                // Filter out duplicates: remove benchmark entries with the same params or value
+                benchmarkChartData = benchmarkChartData.filter(
+                    (entry) =>
+                        !(entry.params === data.params && entry[selectedBenchmark] === dataValue[0])
+                )
+            }
+
             setChartBenchmarkData(benchmarkChartData);
+            setChartValueData(chartValueData);
         } else {
             setChartBenchmarkData([]);
-        }
-
-        // Create chart data for the tested model value
-        if (dataValue.length > 0 && data.params !== undefined) {
-            setChartValueData([{
-                "params": data.params,
-                [selectedBenchmark]: dataValue[0],
-            }]);
-        } else {
             setChartValueData([]);
         }
+
 
         // Combine into [name, value] tuples and sort by value descending
         const combined: [string, number][] = [];
@@ -110,24 +124,26 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         benchmarkEntries.forEach(([id, benchmarkProp], index) => {
             combined.push([benchmarkProp.name, benchmarkValues[index]]);
         });
-        
+
         // Add the tested model value
-        
+
         //if (dataValue.length > 0) {
         //    combined.push([modelName || 'Target Model', dataValue[0]]); //no need to add anything
         //}
 
         // Sort by value (descending)
+
         combined.sort((a, b) => b[1] - a[1]);
-        
+
         setSortedData(combined);
     }, [selectedBenchmark, benchmark, data, modelName]);
+
 
     // Chart data
     const chartData = [
         {
             color: 'blue.5',
-            name: 'Benchmark Elements',
+            name: 'Benchmark Element',
             data: chartBenchmarkData
         },
         {
@@ -176,7 +192,9 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                             color: 'red.7',
                         },
                     ]}
+
                 />
+              
 
                 {/* Leaderboard */}
                 <div className="leaderboard">

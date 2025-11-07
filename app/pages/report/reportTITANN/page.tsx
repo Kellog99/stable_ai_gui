@@ -11,7 +11,8 @@ import { ChartNoAxesCombined, IdCardLanyard, Info, Radar, Trophy } from 'lucide-
 const SecurityReport = () => {
 
     const { report, benchmark } = useNNTrustStore()
-
+    console.log("report fetch = ", report)
+    
     // Bisogna pensare ad una logica in cui il benchmark viene anche caricato qua se e è nullo 
 
     
@@ -39,7 +40,7 @@ const SecurityReport = () => {
                     <div className="info-grid">
                         {Object.entries(report.info).map(([key, value]) => (
                             key !== 'confusion_matrix' ?
-                                <div className="info-item">
+                                <div className="info-item" key={key}>
                                     <div className="label" key={key}>{key}:</div>
                                     <div className="value" key={`value-${key}`}>{value}</div>
                                 </div> : null)
@@ -53,7 +54,7 @@ const SecurityReport = () => {
                     <div className="info-grid">
                         {Object.entries(report.metrics).map(([key, value]) => (
                             key !== 'confusion_matrix' ?
-                                <div className="info-item">
+                                <div className="info-item" key={key}>
                                     <span className="label">{key}: </span>
                                     <span className="value">{value}</span>
                                 </div> : null)

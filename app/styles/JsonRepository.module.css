@@ -29,8 +29,8 @@
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
- 
   max-height: 50vh;
+  overflow: auto;
 }
 
 

@@ -12,16 +12,20 @@ import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
 import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
 import DatasetsLoader from './functionalities/DatasetsLoader';
 import { getModels } from './functionalities/NNTrustBackendUtils';
-import { uploadDataset_check, uploaderDataset, uploadModel, uploadModel_check } from './properties/urls';
+import { uploadDataset_check, uploaderDataset } from './properties/urls';
 import { AvailableTasks } from './components/layout/config';
+import { uploadModel, uploadModel_check } from './properties/urlsNNTrust';
 
 const HomePage: React.FC = ({ }) => {
   const setModels = useStore((state) => state.setModels)
   const setDatasets = useStoreDQ((state) => state.setDatasets)
 
-  const ZipDragDrop = () => {
-    return (
-      <DragDrop
+  const datasetSections = [
+    {
+      id: "selection",
+      title: "Upload Dataset",
+      Icon: Upload,
+      child: () => <DragDrop
         config={{
           name: "dataset",
           fileType: 'zip',
@@ -33,34 +37,9 @@ const HomePage: React.FC = ({ }) => {
           refreshFunction: DatasetsLoader,
           setRefreshData: setDatasets
         }}
-        infoModal={<ModalUploadDataset />} />)
-  }
-
-  const ZipModelDragDrop = () => {
-    return (
-      <DragDrop
-        config={{
-          name: "model",
-          fileType: 'zip',
-          accept: 'application/zip',
-          formFieldName: "file",
-          description: 'Make sure your zip contains raw data and a json config file.',
-          uploadUrlCheck: uploadModel_check,
-          uploadUrl: uploadModel,
-          refreshFunction: getModels,
-          setRefreshData: setModels
-
-        }}
-        infoModal={<ModalUploadModel />} />)
-  }
-
-  const datasetSections = [
-    {
-      id: "selection",
-      title: "Upload Dataset",
-      Icon: Upload,
-      child: ZipDragDrop
+        infoModal={<ModalUploadDataset />} />
     },
+
     {
       id: "repository",
       title: "Dataset Repository",
@@ -74,7 +53,20 @@ const HomePage: React.FC = ({ }) => {
       id: "model",
       title: "Upload Model",
       Icon: Upload,
-      child: ZipModelDragDrop
+      child: () => <DragDrop
+        config={{
+          name: "model",
+          fileType: 'zip',
+          accept: 'application/zip',
+          formFieldName: "file",
+          description: 'Make sure your zip contains raw data and a json config file.',
+          uploadUrlCheck: uploadModel_check,
+          uploadUrl: uploadModel,
+          refreshFunction: getModels,
+          setRefreshData: setModels
+
+        }}
+        infoModal={<ModalUploadModel />} />
     },
     {
       id: "modrepository",
@@ -85,6 +77,7 @@ const HomePage: React.FC = ({ }) => {
   ];
 
   const listOfSections = [datasetSections, modelSections];
+  
   return (
     <div className={styles.homecontainer}>
       <div className={styles.filegrid}>

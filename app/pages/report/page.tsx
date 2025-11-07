@@ -4,10 +4,10 @@ import FileDropZone from "@/components/client/FileDropZone";
 import styles from '@/styles/HomePage.module.css';
 import { Database, Upload } from "lucide-react";
 import { DragDrop } from "@/components/client/upload/UploaderUnifiedDragDrop";
-import { uploadModel, uploadModel_check } from "@/properties/urls";
-import { getModels } from "@/functionalities/NNTrustBackendUtils";
 import { ModalUploadModel } from "@/components/client/upload/ModalUploadModel";
 import { JsonRepository } from "@/components/client/JsonRepository";
+import { uploadModel, uploadModel_check } from "@/properties/urlsNNTrust";
+import { uploadJsonReport_post } from "@/properties/urls";
 
 
 export default function ReportPage() {
@@ -23,13 +23,10 @@ export default function ReportPage() {
             name: "report",
             fileType: 'json',
             accept: 'application/json',
-            formFieldName: "file",
+            formFieldName: "request",
             description: 'Make sure your json contains a file.',
-            uploadUrlCheck: uploadModel_check, // DA MODIFICARE
-            uploadUrl: uploadModel, // DA MODIFICARE
-            refreshFunction: getModels, // DA MODIFICARE
-            setRefreshData: getModels // DA MODIFICARE
-
+            uploadUrlCheck: uploadJsonReport_post, 
+            uploadUrl: "",
           }}
           infoModal={<ModalUploadModel />} />
     },

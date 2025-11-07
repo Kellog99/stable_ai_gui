@@ -21,8 +21,10 @@ const Benchmark: React.FC = () => {
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
 
   const isBenchmarkAvailable = !!(datasetName && modelName && selectedAttacks && selectedMetrics) //the !! makes sure this variable is a proper boolean
-  console.log("isBenchmark???", isBenchmarkAvailable)
-
+  
+  console.log("SELECTED ATTACKS:", selectedAttacks)
+  console.log("SELECTED METRICS:", selectedMetrics)
+  
 
   const handleSelectionClick = (
     id: string,

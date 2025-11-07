@@ -23,13 +23,11 @@ export const completenessOK_get =`http://${host}:8000/checkModelCompleteness`
 export const uploadDataset_check = `http://${host}:8000/upload_folder/check`
 export const uploaderDataset = `http://${host}:8000/upload_folder`
 
-export const uploadModel_check = `http://${host}:8082/model/upload/check`
-export const uploadModel = `http://${host}:8082/model/upload`
-
 export const saveMetric = `http://${host}:8000/report/saveMetric`
 export const getDQReportByName = `http://${host}:8000/report/getJson`
 export const getAllReports_get = `http://${host}:8000/report/getAllReports`
 
+export const uploadJsonReport_post = `http://${host}:8000/upload/report` 
 
 /// POLLING ////
 export const metrics_progress = `http://${host}:8000/metrics/progress`
