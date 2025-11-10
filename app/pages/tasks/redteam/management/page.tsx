@@ -7,6 +7,7 @@ import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
 import useStore from '@/store/dsStore';
+import { benchmarkFetch_get, getJobsProgress, reportFetch, reportFetch_get } from '@/properties/urlsNNTrust';
 
 const TaskManagement: React.FC = () => {
     const { setReport, setBenchmark, executedAttacks, setExecutedAttacks } = useNNTrustStore()
@@ -94,10 +95,11 @@ const TaskManagement: React.FC = () => {
 
     const [atkFinished, setAtkFinished] = useState<number>(0)
     useEffect(() => { setAtkFinished(executedAttacks.filter(job => job.status === "completed").length) }, [executedAttacks])
+    
+    console.log("atk finished =", atkFinished)
+   
     const isDisabled = () => {
-        console.log(executedAttacks.length > 0 && (atkFinished === executedAttacks.length))
-        return false
-        // return executedAttacks.length === 0 || (atkFinished !== executedAttacks.length)
+        return !(executedAttacks.length > 0 && (atkFinished === executedAttacks.length))
     }
 
     const router = useRouter()
@@ -118,13 +120,13 @@ const TaskManagement: React.FC = () => {
             }
         }
 
-        const reportFetch = await fetchResult<ReportProps>(`http://localhost:8082/job/report/getResult?id=${encodeURIComponent(benchmarkID)}`);
+        const reportFetch = await fetchResult<ReportProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkID)}`);
         console.log("REPORT PROPS", reportFetch)
         if (reportFetch) {
             setReport(reportFetch);
         }
 
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`http://localhost:8082/job/benchmark/getResult?dataset=${datasetName}`);
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
         if (benchmarkFetch) {
             console.log("saving = ", benchmarkFetch)
             setBenchmark(benchmarkFetch);
@@ -140,7 +142,7 @@ const TaskManagement: React.FC = () => {
         setTimeout(() => setIsRotating(false), 600); // Match animation duration
 
         try {
-            const response = await fetch(`http://localhost:8082/job/getJobs?id=${encodeURIComponent(benchmarkID)}`); 
+            const response = await fetch(`${getJobsProgress}?id=${encodeURIComponent(benchmarkID)}`); 
             
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`); // Fixed: parentheses, not backtick

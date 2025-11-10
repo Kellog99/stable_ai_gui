@@ -1,9 +1,33 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { BenchmarkDataProps, metricsProps } from '@/interfaces/reportInterfaces';
-import { ScatterChart } from '@mantine/charts';
+import {
+    Chart as ChartJS,
+    ScatterController,
+    PointElement,
+    LinearScale,
+    Title,
+    Tooltip,
+    Legend,
+    LineElement,
+} from 'chart.js';
+
+import annotationPlugin from 'chartjs-plugin-annotation';
+
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
-import '@mantine/charts/styles.css';
+import { Scatter } from 'react-chartjs-2';
+
+
+ChartJS.register(annotationPlugin);
+ChartJS.register(
+    ScatterController,
+    PointElement,
+    LineElement,
+    LinearScale,
+    Title,
+    Tooltip,
+    Legend
+);
 
 interface BenchmarkTableProps {
     modelName?: string;                                    // name of the tested model
@@ -16,9 +40,11 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     benchmark,
     data
 }) => {
+
     // These are the metrics that were used during the evaluation of this model.
     const availableBenchmarkingMetrics = useMemo(() =>
-        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix"].includes(key)),
+        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
+            !key.endsWith("_rank")),
         [data]
     );
 
@@ -79,19 +105,15 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             benchmarkProp.metrics[selectedBenchmark] ?? 0
         );
 
-
-        console.log("DATA BHO= ", data);
         const dataValue = flattenValue(data[selectedBenchmark as keyof metricsProps]);
-        console.log("dataValue= ", dataValue);
 
-        // Create chart data for benchmark points
+
         if (benchmarkValues.length > 0) {
             let benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
                 params: benchmarkProp.param,
                 [selectedBenchmark]: benchmarkValues[index],
             }));
 
-            // Create chart data for the tested model value
             let chartValueData: any[] = [];
             if (dataValue.length > 0 && data.params !== undefined) {
                 chartValueData = [{
@@ -102,7 +124,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                 console.log("before filter benchmarkChartData= ", benchmarkChartData);
                 console.log("chartValueData BEFORE= ", chartValueData);
 
-                // Filter out duplicates: remove benchmark entries with the same params or value
                 benchmarkChartData = benchmarkChartData.filter(
                     (entry) =>
                         !(entry.params === data.params && entry[selectedBenchmark] === dataValue[0])
@@ -116,42 +137,39 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             setChartValueData([]);
         }
 
-
-        // Combine into [name, value] tuples and sort by value descending
         const combined: [string, number][] = [];
 
-        // Add benchmark values with their names
         benchmarkEntries.forEach(([id, benchmarkProp], index) => {
             combined.push([benchmarkProp.name, benchmarkValues[index]]);
         });
-
-        // Add the tested model value
-
-        //if (dataValue.length > 0) {
-        //    combined.push([modelName || 'Target Model', dataValue[0]]); //no need to add anything
-        //}
-
-        // Sort by value (descending)
 
         combined.sort((a, b) => b[1] - a[1]);
 
         setSortedData(combined);
     }, [selectedBenchmark, benchmark, data, modelName]);
 
+    const chartData2 = {
+        datasets: [
+            {
+                label: 'Benchmark Element',
+                data: chartBenchmarkData.map((d) => ({
+                    x: d.params,
+                    y: d[selectedBenchmark],
+                })),
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            },
+            {
+                label: 'Tested Model',
+                data: chartValueData.map((d) => ({
+                    x: d.params,
+                    y: d[selectedBenchmark],
+                })),
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+            },
+        ],
+    };
 
-    // Chart data
-    const chartData = [
-        {
-            color: 'blue.5',
-            name: 'Benchmark Element',
-            data: chartBenchmarkData
-        },
-        {
-            color: 'red.5',
-            name: 'Tested Model',
-            data: chartValueData
-        },
-    ];
+    console.log("chartData2 = ", chartData2);
 
     const isHighlighted = (value: number) => {
         const testedValue = data[selectedBenchmark as keyof metricsProps];
@@ -161,6 +179,67 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     };
 
     console.log("sorted elements", sortedData);
+
+    const referenceY = data[selectedBenchmark];
+    const referenceLabel = modelName || 'Tested Model';
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' as const },
+            annotation: {
+                annotations: {
+                    referenceLine: {
+                        type: 'line',
+                        yMin: referenceY,
+                        yMax: referenceY,
+                        borderColor: 'rgba(239, 68, 68, 0.8)', // red.7
+                        borderWidth: 1,
+                        label: {
+                            display: true,
+                            content: referenceLabel,
+                            position: 'start',
+                            color: 'rgba(239, 68, 68, 0.8)', // red.7
+                            backgroundColor: 'transparent',
+                            yAdjust: -10,
+                        },
+                    },
+                },
+            },
+            tooltip: {
+                callbacks: {
+                    title: () => '', // Remove title to eliminate the color box there
+                    label: (context: any) => {
+                        const point = context.raw;
+                        const params = point.x;
+                        const value = point.y;
+                        const modelName = context.dataset.label || '';
+
+                        return [
+                            `Group: ${modelName}`,
+                            `Params: ${params}`,
+                            `Value: ${value.toFixed(2)}`
+                        ];
+                    },
+                },
+            },
+        },
+        scales: {
+            x: {
+                title: { display: true, text: 'params' },
+                type: 'linear' as const,
+                position: 'bottom' as const,
+            },
+            y: {
+                title: { display: true, text: selectedBenchmark },
+            },
+        },
+    };
+
+    console.log("selectedBenchmark = ", availableBenchmarkingMetrics);
+
+
 
     return (
         <div className="benchmark-controls">
@@ -178,23 +257,11 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             </select>
 
             <div className='results-grid'>
-                {/* Scatter plot */}
-                <ScatterChart
-                    h={350}
-                    data={chartData}
-                    dataKey={{ x: 'params', y: selectedBenchmark }}
-                    xAxisLabel="params"
-                    yAxisLabel={selectedBenchmark}
-                    referenceLines={[
-                        {
-                            y: data[selectedBenchmark as keyof metricsProps] as number,
-                            label: modelName ? modelName : 'Tested Model',
-                            color: 'red.7',
-                        },
-                    ]}
+            
+                <div style={{ width: '100%', height: 400 }}>
+                    <Scatter data={chartData2} options={options as any} />
+                </div>
 
-                />
-              
 
                 {/* Leaderboard */}
                 <div className="leaderboard">

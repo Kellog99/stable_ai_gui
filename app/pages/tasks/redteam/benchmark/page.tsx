@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
@@ -8,6 +8,7 @@ import { Play, Settings, Ruler, Bug, Gauge, Info, ChevronRight, BrickWallFire } 
 import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 import useStore from '@/store/dsStore';
+import { setKeyboardInteraction } from 'recharts/types/state/tooltipSlice';
 
 const Benchmark: React.FC = () => {
 
@@ -19,12 +20,18 @@ const Benchmark: React.FC = () => {
   const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
   // variables for executing the benchmarking
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
+  const [isBenchmarkAvailable, setIsBenchmarkAvailable] = useState<boolean>(false)
 
-  const isBenchmarkAvailable = !!(datasetName && modelName && selectedAttacks && selectedMetrics) //the !! makes sure this variable is a proper boolean
-  
+ useEffect(() => {
+  const isAttacksEmpty = !selectedAttacks || Object.keys(selectedAttacks).length === 0;
+  const isMetricsEmpty = !selectedMetrics || Object.keys(selectedMetrics).length === 0;
+
+  setIsBenchmarkAvailable(!(isAttacksEmpty || isMetricsEmpty));
+}, [selectedAttacks, selectedMetrics]);
+
   console.log("SELECTED ATTACKS:", selectedAttacks)
   console.log("SELECTED METRICS:", selectedMetrics)
-  
+
 
   const handleSelectionClick = (
     id: string,

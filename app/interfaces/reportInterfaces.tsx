@@ -36,6 +36,7 @@ export interface attacksProps {
 
 export interface ReportProps {
     prototype: string;
+    dataset: string;
     tool: string;
     info: infoProps;
     metrics: metricsProps;

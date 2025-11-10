@@ -51,7 +51,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
             <div className={styles.card} onClick={handleClick}>
                 {reportNN ? (
                     <div className={styles.networkName}>
-                        <h3>{reportNN.info.name} on {reportNN.info.dataset}</h3>
+                        <h3>{reportNN.info.name} on {reportNN.dataset}</h3>
                     </div>
                 ) : (reportDQ && (
                     <div className={styles.networkName}>
@@ -123,7 +123,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
                             {(reportNN?.metrics) ? (
                                 Object.entries(reportNN?.metrics)
-                                    .filter(([key]) => key !== "params" && key !== "confusion_matrix")
+                                    .filter(([key]) => key !== "params" && key !== "confusion_matrix" && key !== "total benchmarks")
                                     .map(([key, value]) => (
                                         <div key={key}>
                                             <span className={styles.subtitlePanel}>{key}:</span> {value.toFixed(2)}

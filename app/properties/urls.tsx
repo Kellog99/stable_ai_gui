@@ -27,7 +27,8 @@ export const saveMetric = `http://${host}:8000/report/saveMetric`
 export const getDQReportByName = `http://${host}:8000/report/getJson`
 export const getAllReports_get = `http://${host}:8000/report/getAllReports`
 
-export const uploadJsonReport_post = `http://${host}:8000/upload/report` 
+export const uploadJsonReport_DQ = `http://${host}:8000/upload/report` 
+
 
 /// POLLING ////
 export const metrics_progress = `http://${host}:8000/metrics/progress`

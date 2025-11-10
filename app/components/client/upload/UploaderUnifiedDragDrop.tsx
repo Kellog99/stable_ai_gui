@@ -7,6 +7,9 @@ import { Brain, CheckIcon, Database, FileText, FolderIcon } from 'lucide-react';
 import { useState } from 'react';
 import { AlertCust } from '../AlertCustom';
 import { fetchExternalImage } from 'next/dist/server/image-optimizer';
+import { json } from 'stream/consumers';
+import { uploadJsonReport_DQ } from '@/properties/urls';
+import { uploadJsonReport_NN } from '@/properties/urlsNNTrust';
 
 type Props = {
     config: {
@@ -17,10 +20,15 @@ type Props = {
         uploadUrlCheck: string;
         uploadUrl: string;
         formFieldName: string;
-        refreshFunction: () => Promise<any>; // e.g., "DatasetsLoader" reloads the data with the new upload
-        setRefreshData: (data: any) => void;
+        refreshFunction?: () => Promise<any>; // e.g., "DatasetsLoader" reloads the data with the new upload
+        setRefreshData?: (data: any) => void;
     };
     infoModal: React.ReactNode;
+};
+
+type UploadedJson = {
+  tool: string; // mandatory field
+  [key: string]: any; // any other optional fields
 };
 
 export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
@@ -29,7 +37,7 @@ export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [uploadStatus, setUploadStatus] = useState<string | null>(null);
-    const [jsonUploaded, setJsonUploaded] = useState<Object>({})
+    const [jsonUploaded, setJsonUploaded] = useState<UploadedJson>({tool: ''});
     const [loadingHC, setLoadingHC] = useState<boolean>(false)
 
     const [openedJs, { toggle: toggleJs }] = useDisclosure(false);
@@ -41,101 +49,170 @@ export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append(config.formFieldName, selectedFile);
-        setLoadingHC(true)
-        try {
-            const response = await fetch(config.uploadUrlCheck, {
-                method: 'POST',
-                body: formData,
-            });
+        console.log("Selected file:", selectedFile);
 
-            if (response.ok) {
-                const data = await response.json();
-                setJsonUploaded(data)
-            } else {
+        let body: BodyInit;
+        let headers: HeadersInit = {};
+
+        if (config.name !== "report") {
+
+            try {
+
+                const formData = new FormData();
+                formData.append(config.formFieldName, selectedFile);
+                body = formData;
+                setLoadingHC(true);
+
+                const response = await fetch(config.uploadUrlCheck, {
+                    method: 'POST',
+                    headers,
+                    body,
+                });
 
                 const data = await response.json();
-                console.log("DATA", data)
-                setMessage(data.detail || "An error occurred during load check");
+                console.log("DATA", data);
+
+                if (response.ok) {
+                    setJsonUploaded(data);
+                    setUploadStatus('success');
+                } else {
+                    setMessage(data.detail || "An error occurred during load check");
+                    setUploadStatus('error');
+                }
+
+            } catch (error) {
+                console.error('Error uploading:', error);
+                setMessage(`An error occurred: ${error}`);
                 setUploadStatus('error');
 
-            }
+            } finally {
 
-        } catch (error) {
-
-            console.error('Error uploading:', error);
-            setMessage(`An error occurred: ${error}`);
-            setUploadStatus('error');
-
-        } finally {
-            if (config.refreshFunction && config.setRefreshData) {
-                config.refreshFunction().then(fetchedData => {
-                    if (config.name === 'model') {
-                        console.log("fetched data:", fetchedData.models)
-                        config.setRefreshData?.(fetchedData.models);
-                    } else {
-                        console.log("FETCHED DATA", fetchedData);
-                        config.setRefreshData?.(fetchedData);
+                if (config.refreshFunction && config.setRefreshData) {
+                    try {
+                        const fetchedData = await config.refreshFunction();
+                        if (config.name === 'model') {
+                            console.log("Fetched data:", fetchedData.models);
+                            config.setRefreshData?.(fetchedData.models);
+                        } else {
+                            console.log("FETCHED DATA", fetchedData);
+                            config.setRefreshData?.(fetchedData);
+                        }
+                    } catch (e) {
+                        console.error("Error refreshing data:", e);
                     }
-                });
+                }
+
+                setLoadingHC(false);
+                setFile(selectedFile);
             }
 
-            setLoadingHC(false);
-            setFile(selectedFile);
-        }
+        } else {
 
+            try {
+                setLoadingHC(true);
+                const fileContent = await selectedFile.text();
+                const jsonData = JSON.parse(fileContent);
+                console.log("JSON DATA", jsonData);
+                setJsonUploaded(jsonData);
+                
+        
+            } catch (error) {
+                console.error('Error reading JSON file:', error);
+                setMessage(`An error occurred while reading the JSON file: ${error}`);
+                setUploadStatus('error');
+                return;
+            } finally {
+                setLoadingHC(false);
+                setFile(selectedFile);
+            }
+        }
     };
 
-    console.log("message", message, "uploadStatus", uploadStatus);
+
+    console.log("JSON UPLOADED STATE", jsonUploaded);
+
+
     const handleUpload = async () => {
-        if (!file) {
-            setMessage(`Please select a ${config.fileType} file first.`);
-            setUploadStatus('error');
-            return;
-        }
+       
+        if (config.name !== "report") {
+            if (!file) {
+                setMessage(`Please select a ${config.fileType} file first.`);
+                setUploadStatus('error');
+                return;
+            }
 
-        setMessage(`Uploading ${file.name}...`);
-        setLoading(true);
-        setUploadStatus(null);
-        const fileName = file.name.split('.').slice(0, -1).join('.')
+            setMessage(`Uploading ${file.name}...`);
+            setLoading(true);
+            setUploadStatus(null);
+            const fileName = file.name.split('.').slice(0, -1).join('.')
 
-        const url = new URL(config.uploadUrl);
-        if (config.name == "dataset") {
-            url.searchParams.append("dataset_name", fileName);
-        } else if (config.name == "model") {
-            url.searchParams.append("model_name", fileName);
-        }
+            const url = new URL(config.uploadUrl);
+            if (config.name == "dataset") {
+                url.searchParams.append("dataset_name", fileName);
+            } else if (config.name == "model") {
+                url.searchParams.append("model_name", fileName);
+            }
 
-        try {
-            const response = await fetch(url);
-            console.log("RESPONSE", response)
+            try {
+                const response = await fetch(url);
+                console.log("RESPONSE", response)
 
-            if (response.ok) {
-                setMessage(`Upload successful! Check the Dataset Repository.`);
-                setUploadStatus('success');
-            } else {
-                const data = await response.json(); // 👈 parse JSON body
-                setMessage(data.message || "An error occurred");
+                if (response.ok) {
+                    setMessage(`Upload successful! Check the Dataset Repository.`);
+                    setUploadStatus('success');
+                } else {
+                    const data = await response.json(); // 👈 parse JSON body
+                    setMessage(data.message || "An error occurred");
+                    setUploadStatus('error');
+                }
+
+            } catch (error) {
+                console.error('Error uploading:', error);
+                setMessage(`An error occurred: ${error}`);
+                setUploadStatus('error');
+
+            } finally {
+                if (config.refreshFunction && config.setRefreshData) {
+                    config.refreshFunction().then(fetchedData => {
+                        if (config.name === 'model') {
+                            config.setRefreshData?.(fetchedData.models);
+                        } else {
+                            config.setRefreshData?.(fetchedData);
+                        }
+                    });
+                }
+                setLoading(false);
+            }
+        } else {
+           
+            try {
+                const body = JSON.stringify(jsonUploaded);
+                const headers = { "Content-Type": "application/json" };
+                
+                const tool = jsonUploaded.tool
+
+                const url = tool === "dq"? uploadJsonReport_DQ : uploadJsonReport_NN
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers,
+                    body,
+                });
+
+                if (response.ok) {
+                    setMessage('Report uploaded successfully!');
+                    setUploadStatus('success');
+                } else {
+                    const data = await response.json();
+                    setMessage(data.message || 'An error occurred uploading the report.');
+                    setUploadStatus('error');
+                }
+
+            } catch (error) {
+                console.error('Error uploading report:', error);
+                setMessage(`An error occurred: ${error}`);
                 setUploadStatus('error');
             }
-
-        } catch (error) {
-            console.error('Error uploading:', error);
-            setMessage(`An error occurred: ${error}`);
-            setUploadStatus('error');
-
-        } finally {
-            if (config.refreshFunction && config.setRefreshData) {
-                config.refreshFunction().then(fetchedData => {
-                    if (config.name === 'model') {
-                        config.setRefreshData?.(fetchedData.models);
-                    } else {
-                        config.setRefreshData?.(fetchedData);
-                    }
-                });
-            }
-            setLoading(false);
         }
     };
 
@@ -257,102 +334,109 @@ export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
 
                     </div>
 
-                    <Box style={{
-                        padding: '10px',
-                        backgroundColor: 'rgba(53, 216, 61, 0.2)',
-                        borderRadius: '8px',
-                        width: '100%',
+                    {jsonUploaded && (
+                        <>
+                            <Box style={{
+                                padding: '10px',
+                                backgroundColor: 'rgba(53, 216, 61, 0.2)',
+                                borderRadius: '8px',
+                                width: '100%',
 
-                        visibility: file && uploadStatus !== "error" ? "visible" : "hidden"
-                    }}
+                                visibility: file && uploadStatus !== "error" ? "visible" : "hidden"
+                            }}
 
 
-                    >
-                        <Group justify='space-between' onClick={toggleJs} style={{ cursor: 'pointer' }}  >
-                            <Group justify='flex-start'>
-                                <CheckIcon size={12} />
-                                <Text size="sm" c="var(--mantine-color-gray-7)">Data you loaded:</Text>
-                            </Group>
-                            <IconChevronDown size={16} style={{ color: "var(--mantine-color-gray-7)", marginLeft: 10, transform: openedJs ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
-                        </Group>
-
-                        <Collapse in={openedJs}>
-                            <Divider my="xs" color="rgba(30, 120, 40, 0.9)" />
-
-                            <Box
-                                p="md"
-                                style={{
-                                    backgroundColor: 'rgba(30, 120, 40, 0.05)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(30, 120, 40, 0.2)'
-                                }}
                             >
-                                <List
-                                    spacing="sm"
-                                    size="sm"
-                                    icon={
-                                        <ThemeIcon
-                                            color="rgba(30, 120, 40, 0.9)"
-                                            size={8}
-                                            radius="xl"
-                                        />
-                                    }
-                                >
-                                    <List.Item>
-                                        <Group gap="xs">
-                                            <FolderIcon size={16} style={{ color: 'rgba(30, 120, 40, 0.9)' }} />
-                                            <Text c="var(--mantine-color-gray-7)" size="sm" fw={600}>Data Folder Name:</Text>
-                                            <Text c="var(--mantine-color-gray-7)" size="sm" style={{ fontFamily: 'monospace' }}>{file?.name?.split('.').slice(0, -1).join('.')}</Text>
-                                        </Group>
-                                    </List.Item>
 
-                                    <List.Item>
-                                        <Group gap="xs">
-                                            <FolderIcon size={16} style={{ color: 'rgba(30, 120, 40, 0.9)' }} />
-                                            <Text c="var(--mantine-color-gray-7)" size="sm" fw={600}>JSON Content:</Text>
-                                        </Group>
-                                    </List.Item>
-                                </List>
-                                <div
-                                    style={{
-                                        width: '24vw',
-                                        height: '200px',
-                                        overflow: 'auto',
-                                    }}
-                                >
-                                    <Box ml="xl" mt="sm">
+                                <Group justify='space-between' onClick={toggleJs} style={{ cursor: 'pointer' }}  >
+                                    <Group justify='flex-start'>
+                                        <CheckIcon size={12} />
+                                        <Text size="sm" c="var(--mantine-color-gray-7)">Data you loaded:</Text>
+                                    </Group>
+                                    <IconChevronDown size={16} style={{ color: "var(--mantine-color-gray-7)", marginLeft: 10, transform: openedJs ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                                </Group>
 
-                                        <Code
-                                            block
+                                <Collapse in={openedJs}>
+                                    <Divider my="xs" color="rgba(30, 120, 40, 0.9)" />
+
+                                    <Box
+                                        p="md"
+                                        style={{
+                                            backgroundColor: 'rgba(30, 120, 40, 0.05)',
+                                            borderRadius: '8px',
+                                            border: '1px solid rgba(30, 120, 40, 0.2)'
+                                        }}
+                                    >
+                                        <List
+                                            spacing="sm"
+                                            size="sm"
+                                            icon={
+                                                <ThemeIcon
+                                                    color="rgba(30, 120, 40, 0.9)"
+                                                    size={8}
+                                                    radius="xl"
+                                                />
+                                            }
+                                        >
+                                            <List.Item>
+                                                <Group gap="xs">
+                                                    <FolderIcon size={16} style={{ color: 'rgba(30, 120, 40, 0.9)' }} />
+                                                    <Text c="var(--mantine-color-gray-7)" size="sm" fw={600}>Data Folder Name:</Text>
+                                                    <Text c="var(--mantine-color-gray-7)" size="sm" style={{ fontFamily: 'monospace' }}>{file?.name?.split('.').slice(0, -1).join('.')}</Text>
+                                                </Group>
+                                            </List.Item>
+
+                                            <List.Item>
+                                                <Group gap="xs">
+                                                    <FolderIcon size={16} style={{ color: 'rgba(30, 120, 40, 0.9)' }} />
+                                                    <Text c="var(--mantine-color-gray-7)" size="sm" fw={600}>JSON Content:</Text>
+                                                </Group>
+                                            </List.Item>
+                                        </List>
+
+                                        <div
                                             style={{
-                                                fontSize: '0.75rem',
-                                                backgroundColor: 'rgba(30, 120, 40, 0.3)',
-
+                                                width: '24vw',
+                                                height: '200px',
+                                                overflow: 'auto',
                                             }}
                                         >
-                                            {JSON.stringify(jsonUploaded, null, 2)}
-                                        </Code>
+                                            <Box ml="xl" mt="sm">
 
+                                                <Code
+                                                    block
+                                                    style={{
+                                                        fontSize: '0.75rem',
+                                                        backgroundColor: 'rgba(30, 120, 40, 0.3)',
+
+                                                    }}
+                                                >
+                                                    {JSON.stringify(jsonUploaded, null, 2)}
+                                                </Code>
+
+                                            </Box>
+                                        </div>
                                     </Box>
-                                </div>
-                            </Box>
-                        </Collapse>
+                                </Collapse>
 
-                    </Box >
+                            </Box >
 
-                    <Group justify="center" mt="md">
-                        <Button
-                            leftSection={<IconCloudUpload size={16} />}
-                            onClick={handleUpload}
-                            loading={loading}
-                            disabled={!file || loading}
-                            size="md"
-                            variant="gradient"
-                            gradient={{ from: "#1e293b", to: "red", deg: 90 }}
-                        >
-                            {loading ? 'Uploading...' : 'Upload'}
-                        </Button>
-                    </Group>
+                            <Group justify="center" mt="md">
+                                <Button
+                                    leftSection={<IconCloudUpload size={16} />}
+                                    onClick={handleUpload}
+                                    loading={loading}
+                                    disabled={!file || loading}
+                                    size="md"
+                                    variant="gradient"
+                                    gradient={{ from: "#1e293b", to: "red", deg: 90 }}
+                                >
+                                    {loading ? 'Uploading...' : 'Upload'}
+                                </Button>
+                            </Group>
+                        </>
+                    )}
+
                     {uploadStatus == "success" ? (
                         <AlertCust result={'success'} textToDisplay={message} />
                     ) : (

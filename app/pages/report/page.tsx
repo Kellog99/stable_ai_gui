@@ -7,7 +7,7 @@ import { DragDrop } from "@/components/client/upload/UploaderUnifiedDragDrop";
 import { ModalUploadModel } from "@/components/client/upload/ModalUploadModel";
 import { JsonRepository } from "@/components/client/JsonRepository";
 import { uploadModel, uploadModel_check } from "@/properties/urlsNNTrust";
-import { uploadJsonReport_post } from "@/properties/urls";
+
 
 
 export default function ReportPage() {
@@ -25,7 +25,7 @@ export default function ReportPage() {
             accept: 'application/json',
             formFieldName: "request",
             description: 'Make sure your json contains a file.',
-            uploadUrlCheck: uploadJsonReport_post, 
+            uploadUrlCheck: "", 
             uploadUrl: "",
           }}
           infoModal={<ModalUploadModel />} />

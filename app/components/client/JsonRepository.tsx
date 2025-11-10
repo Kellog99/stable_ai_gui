@@ -30,8 +30,7 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
                     const DQreports = await getAllDQReports();
                     console.log("reports from the backend", DQreports);
                     setDQReports(DQreports);
-                    // optionally set state here
-                    // setReport(DQreport);
+                    
                 } catch (error) {
                     console.error("Failed to fetch DQ reports:", error);
                 }
@@ -44,8 +43,7 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
                     const NNreports = await getReports();
                     console.log("reports from the backend", NNreports);
                     setNNReports(NNreports);
-                    // optionally set state here
-                    // setReport(DQreport);
+                    
                 } catch (error) {
                     console.error("Failed to fetch NN reports:", error);
                 }
