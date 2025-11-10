@@ -92,7 +92,7 @@ const Benchmark: React.FC = () => {
   );
 
   const benchmarkDatas = {
-    attacks: Object.values(attacksCleaned),
+    attacks: Object.values(selectedAttacks),
     metrics: Object.values(selectedMetrics),
     dataset: datasetName,
     model: modelName

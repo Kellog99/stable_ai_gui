@@ -34,6 +34,8 @@ function Test() {
     const [clicked, setClicked] = useState<Boolean>(false);
     const [loading, setLoading] = useState<Boolean>(false)
 
+    const modelName = useNNTrustStore((state) => state.modelName)
+
     const handleChange = (index: number, value: number) => {
         setSelectedAttack(prev => {
             if (!prev || !prev.parameters) return prev
@@ -49,11 +51,13 @@ function Test() {
         if (!loading && clicked) {
             try {
                 setLoading(true);
-                const response = await fetch('http://127.0.0.1:8000/attacks/executeAttack', {
+                console.log(selectedAttack)
+                const response = await fetch('http://localhost:8082/job/attack', {
                     method: "POST",
                     body: JSON.stringify({
                         "image": uploadedFile?.split(",")[1],
-                        "attack": selectedAttack
+                        "attack":selectedAttack,
+                        "model_name": modelName
                     }),
                     headers: {
                         'Content-type': 'application/json'
@@ -67,17 +71,17 @@ function Test() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+                
                 // the attack has been done and it has to handle the results
                 setOrigImg([uploadedFile!, data.original_prediction])
                 setAdvImg([data.x_adv, data.adversarial_prediction])
                 setAdvPert(data.adv_perturbation)
-                console.log("pert=", data.adv_perturbation)
-
+                console.log(data.executionTime)
+                console.log(data.ssim)
                 setAtkResult({
                     "confidence": data.confidence,
-                    "ssim": data.ssim,
-                    "executionTime": data.executionTime,
+                    "ssim": data.advance_metrics.ssim,
+                    "executionTime": data.advance_metrics.executionTime,
                 })
             } catch (error) {
                 console.error('ERROR:', error);
@@ -213,7 +217,7 @@ function Test() {
                         <ImageDisplay
                             title="Adversarial Perturbation"
                             placeholder="No image loaded"
-                            imageUrl={advPert ? advPert : undefined}
+                            imageUrl={advPert ? "data:image/jpeg;base64,"+advPert : undefined}
                             loader={false}
 
                         />
@@ -221,7 +225,7 @@ function Test() {
                         <ImageDisplay
                             title="Adversarial Example"
                             placeholder="No image loaded"
-                            imageUrl={advImg ? advImg[0] : undefined}
+                            imageUrl={advImg ? "data:image/jpeg;base64,"+ advImg[0] : undefined}
                             footer={advImg ? advImg[1] : undefined}
                             loader={false}
 
