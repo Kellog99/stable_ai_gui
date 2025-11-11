@@ -18,7 +18,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
 
     const setReportFromBE = useStore((state) => state.setReportFromBE)
-    
+
     const setReport = useNNTrustStore((state) => state.setReport)
     const router = useRouter()
 
@@ -51,7 +51,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
             <div className={styles.card} onClick={handleClick}>
                 {reportNN ? (
                     <div className={styles.networkName}>
-                        <h3>{reportNN.info.name} on {reportNN.dataset}</h3>
+                        <h3>{reportNN.info.name}</h3>
                     </div>
                 ) : (reportDQ && (
                     <div className={styles.networkName}>
@@ -82,16 +82,24 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                                 <h4>General</h4>
                             </div>
                             <div className={styles.panelBody}>
+                                {/*
                                 <div>
                                     <span className={styles.subtitlePanel}>Task:</span>
                                     {reportNN ? reportNN.info.task : reportDQ?.dataset.task}
                                 </div>
-
+                                */}
                                 {reportNN ? (
-                                    <div>
-                                        <span className={styles.subtitlePanel}>Classes:</span>
-                                        {reportNN.info.classes}
-                                    </div>
+                                    <>
+                                        <div>
+                                            <span className={styles.subtitlePanel}>Dataset:</span>
+                                            {reportNN.dataset}
+                                        </div>
+                                        <div>
+                                            <span className={styles.subtitlePanel}>Classes:</span>
+                                            {reportNN.info.classes}
+                                        </div>
+                                    </>
+
                                 ) : reportDQ && reportDQ.dataset.task === "classification" ? (
                                     <div>
                                         <span className={styles.subtitlePanel}>Classes:</span>
@@ -140,20 +148,20 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                         </div>
                     </div>
 
-                    {reportNN && 
-                    <div className={styles.panel}>
-                        <div className={styles.panelHeader}>
-                            <Bug />
-                            <h4>Attacks</h4>
+                    {reportNN &&
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <Bug />
+                                <h4>Attacks</h4>
+                            </div>
+                            <div className={styles.panelBody}>
+                                {reportNN.attacks && Object.keys(reportNN.attacks).map((attackKey) => (
+                                    <div key={attackKey}>
+                                        <span className={styles.subtitlePanel}>{attackKey}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div className={styles.panelBody}>
-                            {reportNN.attacks && Object.keys(reportNN.attacks).map((attackKey) => (
-                                <div key={attackKey}>
-                                    <span className={styles.subtitlePanel}>{attackKey}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
                     }
 
                 </div>

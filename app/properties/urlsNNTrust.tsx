@@ -10,6 +10,12 @@ export const uploadJsonReport_NN = `http://${host}:8082/job/report/upload`
 export const reportFetch_get = `http://${host}:8082/job/report/getResult`
 export const benchmarkFetch_get = `http://${host}:8082/job/benchmark/getResult`
 export const getJobsProgress = `http://${host}:8082/job/getJobs`
+export const getInfoAttacks = `http://${host}:8082/info/attacks/getInfo`
+export const getInfoMetrics = `http://${host}:8082/info/metrics/getInfo`
+
+export const startJob = `http://${host}:8082/job/start`
+export const startAttack = `http://${host}:8082/job/attack`
+
 
 
 /////////////////////////////////////////////////////////////

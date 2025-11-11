@@ -68,17 +68,16 @@
   justify-content: center;
   gap: 1rem;
   transition: background-color 0.2s;
-  cursor: pointer;
   border: none;
 }
 
-.execute_button .inactive {
-  background-color: red;
+.execute_button.inactive {
+  cursor: not-allowed;
 }
 
-.execute_button .active {
+.execute_button.active {
   color: black;
-
+  cursor: pointer;
 }
 
 .active:hover {

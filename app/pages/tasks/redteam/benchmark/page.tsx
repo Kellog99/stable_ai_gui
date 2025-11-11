@@ -9,6 +9,7 @@ import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 import useStore from '@/store/dsStore';
 import { setKeyboardInteraction } from 'recharts/types/state/tooltipSlice';
+import { startJob } from '@/properties/urlsNNTrust';
 
 const Benchmark: React.FC = () => {
 
@@ -111,7 +112,7 @@ const Benchmark: React.FC = () => {
       // Block any new click on the button
       setExecuteBenchmark(false);
 
-      const response = await fetch('http://localhost:8082/job/start', {
+      const response = await fetch(startJob, {
         method: "POST",
         body: JSON.stringify(benchmarkDatas),
         headers: {

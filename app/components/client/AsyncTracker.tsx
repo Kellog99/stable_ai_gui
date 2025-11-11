@@ -1,4 +1,5 @@
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
+import Dataset from '@/interfaces/genericInterface';
 import { dataset_upload } from '@/properties/urlsNNTrust';
 import useStore, { useActionStore } from '@/store/dsStore';
 import styles from '@/styles/AsyncTracker.module.css';
@@ -37,6 +38,8 @@ export default function AsyncTaskTracker({ action, startEndpoint, startParams, s
   const [message, setMessage] = useState('');
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const datasetUsed = useStore((state) => state.datasetUsed);
+  const setData = useStore((state) => state.setData);
 
   const setActionResult = useActionStore((state) => state.setActionResult);
   
@@ -84,6 +87,8 @@ export default function AsyncTaskTracker({ action, startEndpoint, startParams, s
     }
   };
 
+  console.log("MESSAGE", message);
+
   const pollProgress = async () => {
     
     try {
@@ -105,7 +110,10 @@ export default function AsyncTaskTracker({ action, startEndpoint, startParams, s
         //setResult(data.result);
         setActiveTask("");
         DatasetsLoader().then(fetchedData => {
+          const result = fetchedData.find((obj : Dataset) => obj.name === datasetUsed?.name);
           setDatasets(fetchedData);
+          setData(result)
+
         })
 
       }

@@ -17,6 +17,7 @@ const SecurityReport = () => {
 
     
     console.log("benchark fetch = ", benchmark)
+    
     if (report && benchmark) {
         return (
             <div>

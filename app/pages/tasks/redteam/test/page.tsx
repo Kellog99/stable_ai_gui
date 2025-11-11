@@ -9,6 +9,7 @@ import { AdvanceResult, AttackResult } from '@/interfaces/testInterfaces';
 import styles from '@/styles/Test.module.css';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
+import { startAttack } from '@/properties/urlsNNTrust';
 
 function Test() {
 
@@ -48,15 +49,16 @@ function Test() {
     }
 
     const handleClick = async () => {
-        if (!loading && clicked) {
+        if (!loading) {
+            setClicked(true);
             try {
                 setLoading(true);
                 console.log(selectedAttack)
-                const response = await fetch('http://localhost:8082/job/attack', {
+                const response = await fetch(startAttack, {
                     method: "POST",
                     body: JSON.stringify({
                         "image": uploadedFile?.split(",")[1],
-                        "attack":selectedAttack,
+                        "attack": selectedAttack,
                         "model_name": modelName
                     }),
                     headers: {
@@ -71,7 +73,7 @@ function Test() {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 // the attack has been done and it has to handle the results
                 setOrigImg([uploadedFile!, data.original_prediction])
                 setAdvImg([data.x_adv, data.adversarial_prediction])
@@ -87,10 +89,8 @@ function Test() {
                 console.error('ERROR:', error);
             } finally {
                 setLoading(false);
-                setClicked(!clicked);
+                setClicked(false);
             }
-        } else if (!loading && !clicked) {
-            setClicked(!clicked);
         }
     };
 
@@ -190,10 +190,14 @@ function Test() {
                     <button
                         disabled={!uploadedFile}
                         className={`${styles.execute_button} ${uploadedFile ? styles.active : styles.inactive}`}
-                        onClick={handleClick} // Added click handler
+                        onClick={handleClick}
                     >
-                        <Play size={'3vw'} />
-                        <p>Execute attack</p>
+                        {clicked ? (<p>Executing...</p>) :
+                            (<>
+                                <Play size={'3vw'} />
+                                <p>Execute attack</p>
+                            </>
+                            )}
                     </button>
                 </div>
 
@@ -217,7 +221,7 @@ function Test() {
                         <ImageDisplay
                             title="Adversarial Perturbation"
                             placeholder="No image loaded"
-                            imageUrl={advPert ? "data:image/jpeg;base64,"+advPert : undefined}
+                            imageUrl={advPert ? "data:image/jpeg;base64," + advPert : undefined}
                             loader={false}
 
                         />
@@ -225,7 +229,7 @@ function Test() {
                         <ImageDisplay
                             title="Adversarial Example"
                             placeholder="No image loaded"
-                            imageUrl={advImg ? "data:image/jpeg;base64,"+ advImg[0] : undefined}
+                            imageUrl={advImg ? "data:image/jpeg;base64," + advImg[0] : undefined}
                             footer={advImg ? advImg[1] : undefined}
                             loader={false}
 

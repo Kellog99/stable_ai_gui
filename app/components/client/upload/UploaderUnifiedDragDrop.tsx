@@ -129,9 +129,6 @@ export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
     };
 
 
-    console.log("JSON UPLOADED STATE", jsonUploaded);
-
-
     const handleUpload = async () => {
        
         if (config.name !== "report") {

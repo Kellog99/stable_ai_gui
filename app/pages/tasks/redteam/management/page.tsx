@@ -7,7 +7,7 @@ import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
 import useStore from '@/store/dsStore';
-import { benchmarkFetch_get, getJobsProgress, reportFetch, reportFetch_get } from '@/properties/urlsNNTrust';
+import { benchmarkFetch_get, getJobsProgress, reportFetch_get } from '@/properties/urlsNNTrust';
 
 const TaskManagement: React.FC = () => {
     const { setReport, setBenchmark, executedAttacks, setExecutedAttacks } = useNNTrustStore()

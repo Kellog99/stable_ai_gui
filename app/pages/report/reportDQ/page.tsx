@@ -185,7 +185,7 @@ export default function Report() {
     };
 
     return (
-        <>
+        <div style={{marginTop: '20px'}}>
             <Flex direction="row" justify="space-between" pb="md">
                 <span style={{ display: 'flex', alignItems: 'center', gap: "8px" }}>
                     <Title order={2}>Report Brief</Title>
@@ -260,8 +260,9 @@ export default function Report() {
                                     ))}
                                 </Text>
                             </Box>
-                            <Title order={4} mb="sm">Prototypes Preview</Title>
+
                             {/*
+                            <Title order={4} mb="sm">Prototypes Preview</Title>
                             <ScrollArea >
                                 {prototypesData ? (<Flex
                                     mih={150}
@@ -443,6 +444,6 @@ export default function Report() {
                     </>
                 </Box>
             </Flex>
-        </>
+        </div>
     )
 }
