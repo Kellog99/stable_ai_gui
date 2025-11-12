@@ -4,19 +4,12 @@
 
 
 :root {
-  --navy-900: hsl(217, 33%, 11%);
-  --navy-800: hsl(210, 80%, 13%);
-  --navy-700: hsl(202, 100%, 15%);
-  --navy-600: hsl(202, 100%, 19%);
-  --navy-500: hsl(202, 100%, 24%);
-  --navy-400: hsl(202, 100%, 26%);
-  --navy-300: hsl(200, 57%, 38%);
-  --navy-200: hsl(199, 57%, 40%);
-  --navy-100: hsl(199, 44%, 49%);
-  --coral-600: #c22e38;
-  --coral-500: #FF6B6B;
-  --coral-400: #FF8A8A;
-  --coral-300: #FFB3B3;
+  --bg-dark: hsl(222, 47%, 11%);
+  --bg: hsl(200, 35, 25);
+  --bg-light: hsl(213, 48, 58);
+
+  --hover: rgba(213, 30, 62);
+
   --text-primary: hsl(210, 40%, 98%);
   /* Brightest - main content */
   --text-secondary: hsl(215, 30%, 88%);
@@ -27,7 +20,7 @@
   /* Dimmest - disabled state */
   --text-inverse: hsl(217, 33%, 11%);
   /* Dark text for light backgrounds */
-  --border-radius: 1vw;
+  --border-radius: 10px;
   --warning: #FFD800;
   --affermative: green;
 }
@@ -38,14 +31,13 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
-  background-color: var(--navy-900) !important;
+  background-color: var(--bg-dark) !important;
 }
 
 body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
 }
 
 h1 {

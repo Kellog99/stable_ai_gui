@@ -18,15 +18,14 @@
     display: flex;
     align-items: center;
     align-content: center;
-    height: 4vw;
-    width: 17vw;
-    min-width: 100px;
-    font-size: 1.1rem;
+    height: 30px;
+    width: 240px;
+    font-size: 1rem;
     font-weight: 700;
     justify-content: space-between;
     padding: 1.5vw;
     border-radius: 1vw;
-    background-color: var(--navy-600);
+    background-color: var(--bg);
     color: white;
 }
 
@@ -35,7 +34,7 @@
 }
 
 .header-button:hover:not(.disabled) {
-    background-color: var(--navy-400);
+    background-color: var(--bg-light);
 }
 
 .header-button:hover:not(.disabled) svg {

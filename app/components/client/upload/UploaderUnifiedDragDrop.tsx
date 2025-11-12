@@ -9,22 +9,22 @@ import { useState } from 'react';
 import { AlertCust } from '../AlertCustom';
 
 type Props = {
-  config: {
-    name: string;
-    fileType: string;
-    accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
-    description?: string;
-    uploadUrlCheck: string;
-    uploadUrl: string;
-    formFieldName: string;
-    refreshFunction: () => Promise<any>; // e.g., "DatasetsLoader" reloads the data with the new upload
-    setRefreshData: (data: any) => void;
-  };
-  infoModal: React.ReactNode;
+    config: {
+        name: string;
+        fileType: string;
+        accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
+        description?: string;
+        uploadUrlCheck: string;
+        uploadUrl: string;
+        formFieldName: string;
+        refreshFunction: () => Promise<any>; // e.g., "DatasetsLoader" reloads the data with the new upload
+        setRefreshData: (data: any) => void;
+    };
+    infoModal: React.ReactNode;
 };
 
 export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
-  
+
     const [file, setFile] = useState<File | null>(null);
     const [message, setMessage] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
@@ -54,7 +54,7 @@ export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
                 const data = await response.json();
                 setJsonUploaded(data)
             } else {
-                
+
                 const data = await response.json();
                 console.log("DATA", data)
                 setMessage(data.detail || "An error occurred during load check");

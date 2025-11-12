@@ -1,5 +1,5 @@
 .app-header {
-  background: rgba(15, 23, 42, 0.3);
+  background: var(--bg);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem 1.5rem;
@@ -31,7 +31,7 @@
 }
 
 .nav-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--hover);
   transform: translateY(-1px);
 }
 

@@ -42,20 +42,25 @@ const Header = () => {
       <div className="header-status">
         <div className="status-indicator">
           {modelLoaded ? (
-            <CheckCircle size={18} className="text-green-400" />
-          ) : (
-            <Circle size={18} className="text-gray-500" />
-          )}
-          <span>Model</span>
+            <CheckCircle size={20} className="var(--affermative)" />
+          ) :
+            <>
+              <Circle size={20} color="var(--warning)" />
+              <span>No Model</span>
+            </>
+          }
         </div>
         <div className="status-divider"></div>
         <div className="status-indicator">
           {datasetLoaded ? (
-            <CheckCircle size={18} className="text-green-400" />
-          ) : (
-            <Circle size={18} className="text-gray-500" />
-          )}
-          <span>Dataset</span>
+            <CheckCircle size={20} className="var(--affermative)" />
+          ) :
+            <>
+              <Circle size={20} color="var(--warning)" />
+              <span>No Dataset</span>
+            </>
+          }
+
         </div>
       </div>
     </header>

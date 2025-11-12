@@ -149,7 +149,9 @@ const TaskManagement: React.FC = () => {
             <div className='management-header'>
                 <div>
                     <h1>Job Status Management</h1>
-                    <p style={{ color: "lightgray" }}>Number of finished tested vulnearbilities {atkFinished}/{executedAttacks.length}</p>
+                    <p style={{ color: "lightgray" }}>
+                        Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the <b>Benchmark</b> page.
+                    </p>
                 </div>
 
                 <HoverCard
@@ -162,7 +164,7 @@ const TaskManagement: React.FC = () => {
                                 disabled={isDisabled()}
                                 onClick={handleClickReport}
                                 className={`header-button ${isDisabled() ? 'disabled' : ''}`}>
-                                See Report <CircleArrowRight size={"3vw"} />
+                                See Report <CircleArrowRight size={25} />
                             </button>
                         </div>
                     </HoverCard.Target>
@@ -172,9 +174,28 @@ const TaskManagement: React.FC = () => {
                         </p>
                     </HoverCard.Dropdown>
                 </HoverCard>
-
-
             </div>
+            {/* Status Summary Cards */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+                <div className="flex items-center justify-around gap-4 flex-wrap">
+                    {attackArray.map((job) => {
+                        const config = statusConfig[status];
+                        const Icon = config.icon;
+                        return (
+                            <div key={status} className="flex items-center gap-4 px-4 py-2">
+                                <div className={`${config.color} p-3 rounded-lg`}>
+                                    <Icon className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <div className="text-3xl font-bold text-slate-800">{statusCounts[status]}</div>
+                                    <h3 className="text-slate-600 font-medium">{status}</h3>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
             <div className="filters">
                 <div className="search-wrapper">
                     <Search className="search-icon" />

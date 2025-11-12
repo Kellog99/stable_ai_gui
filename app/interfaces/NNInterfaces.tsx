@@ -33,12 +33,15 @@ export interface ButtonProps {
 
 export interface FileDropZoneProps {
   id: string,
-  title: string;
-  Icon: LucideIcon;
-  acceptedTypes: string[];
-  description: string;
-  isLoaded?: boolean;
-  loadedFileName?: string;
+  title: string,
+  description: string,
+  Icon: LucideIcon,
+  fileType: string;
+  accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
+  drop_description?: string;
+  uploadUrlCheck: string;
+  uploadUrl: string;
+  formFieldName: string;
 }
 
 export interface ParametersProps {
