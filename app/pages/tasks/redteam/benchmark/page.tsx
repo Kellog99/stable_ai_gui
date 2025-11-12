@@ -30,9 +30,6 @@ const Benchmark: React.FC = () => {
   setIsBenchmarkAvailable(!(isAttacksEmpty || isMetricsEmpty));
 }, [selectedAttacks, selectedMetrics]);
 
-  console.log("SELECTED ATTACKS:", selectedAttacks)
-  console.log("SELECTED METRICS:", selectedMetrics)
-
 
   const handleSelectionClick = (
     id: string,
@@ -79,8 +76,6 @@ const Benchmark: React.FC = () => {
       currentMap[id] = currentObject;
       // Save to store
       setMap(currentMap);
-
-      console.log("current map", currentMap)
     }
   }
 
@@ -98,11 +93,6 @@ const Benchmark: React.FC = () => {
     dataset: datasetName,
     model: modelName
   };
-
-  console.log("benchmark to send", benchmarkDatas)
-
-
-
 
   // Click Execution Attack Handle
   const [isClicked, setIsCLicked] = useState<boolean>(false)
@@ -139,8 +129,8 @@ const Benchmark: React.FC = () => {
 
   };
 
-  console.log("benchmarkID from store", benchmarkID)
-
+  
+  
 
   return (
     <>

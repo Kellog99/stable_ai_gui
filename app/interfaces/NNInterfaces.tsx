@@ -3,7 +3,7 @@ import { ReactEventHandler } from "react";
 export interface ModelSpecs {
   name: string;
   task: string;
-  numClasses: number;
+  num_classes: number;
   pretrained: boolean;
   mode: string;
 }

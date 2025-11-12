@@ -3,6 +3,7 @@ import { Check, LucideIcon } from 'lucide-react';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import './AttackCard.css';
 import ParametersWindow from './Parameters';
+import useNNStore from '@/store/nnTrustStore';
 
 interface OptionCardProps {
   name: string,
@@ -25,7 +26,27 @@ export function OptionCard({
   Icon,
   tags,
 }: OptionCardProps) {
+
   const [openSettings, setIsExpanded] = useState(false);
+
+  const model = useNNStore((state) => state.models);
+  const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
+
+  console.log("cm in elements??", name=="confusionmatrix" )
+  console.log("is selected", isSelected )
+
+
+  ///////////////// gestire la logica e della grafica (soprattutto) della confusion matrix
+
+
+  let isCM = false;
+  if (numClasses > 9 &&  name=="confusionmatrix") {
+    isCM = true;
+  }
+
+  console.log("isCM", isCM)
+
+
   return (
     <>
       <div className="attack-card">
@@ -52,14 +73,15 @@ export function OptionCard({
         <div className='card-footer'>
           <Icon
             className='card-icon'
-            style={{ pointerEvents: parameters ? "auto" : "none"}} //TO MAKE CONFIG VISIBILE WHEN THE THEY CAN ACTUALLY BE SET
+            style={{ pointerEvents: parameters ? "auto" : "none" }}
             size={30}
             onClick={() => setIsExpanded(true)} />
           <label className="circle-checkbox">
             <input
               type="checkbox"
               onChange={onSelect}
-              checked={isSelected} />
+              checked={isSelected} 
+              disabled={isCM}/>
             <span className="checkmark">
               <Check className="check-icon" size={18} strokeWidth={3} />
             </span>
