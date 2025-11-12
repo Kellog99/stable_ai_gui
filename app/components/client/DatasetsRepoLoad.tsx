@@ -1,3 +1,4 @@
+"use client"
 import DatasetsLoader from "@/functionalities/DatasetsLoader";
 import useStore from "@/store/dsStore";
 import { Loader, Text } from "@mantine/core";

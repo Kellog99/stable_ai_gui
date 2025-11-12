@@ -1,3 +1,4 @@
+"use client"
 import classes from '@/styles/FileDropZone.module.css';
 import { ActionIcon, Box, Button, Code, Collapse, Divider, Flex, Group, List, Loader, Stack, Text, ThemeIcon } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';

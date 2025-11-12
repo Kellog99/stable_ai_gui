@@ -8,15 +8,6 @@ export interface ModelSpecs {
   mode: string;
 }
 
-export interface Task {
-  Icon: LucideIcon,
-  title: string,
-  description: string,
-  footer: string,
-  color: string,
-  href: string          // reprenset the page to navigate to
-}
-
 export interface LoadedFile {
   name: string;
   file: File;

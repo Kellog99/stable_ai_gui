@@ -1,3 +1,5 @@
+"use client"
+
 import { getModels } from "@/functionalities/NNTrustBackendUtils";
 import useStore from "@/store/nnTrustStore";
 import styles from "@/styles/ModelCard.module.css";

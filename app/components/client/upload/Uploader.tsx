@@ -1,3 +1,5 @@
+"use client"
+
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
 import { upload_post } from '@/properties/urls';
 import useStore from '@/store/dsStore';
@@ -5,10 +7,8 @@ import {
   Alert,
   Button,
   Center,
-  Container,
   Divider,
   FileInput,
-  Flex,
   Group,
   Paper,
   Progress,
@@ -268,7 +268,7 @@ const ZipUploadComponent = () => {
 
         </>
       )}
-      
+
       <Divider label="Optional Configuration" labelPosition="center" color="#334155" styles={{ label: { color: "#334155" } }} />
 
       <FileInput
@@ -284,7 +284,7 @@ const ZipUploadComponent = () => {
         description="Upload a JSON file containing description and label_dict"
         descriptionProps={{ style: { color: "#475569" } }}
       />
-      
+
       {file && (
         <>
           <Alert

@@ -7,7 +7,7 @@ import {
 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-
+  // This represent the Layout for the tasks' pages
   return (
     <MantineProvider >
       <AppShell withBorder={false}>
@@ -18,10 +18,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           height: '100%',
           paddingTop: '20px'
         }}>
-        <Navbar />
-        {children}
-      </div>
-    </AppShell>
+          <Navbar />
+          {children}
+        </div>
+      </AppShell>
     </MantineProvider >
   );
 }

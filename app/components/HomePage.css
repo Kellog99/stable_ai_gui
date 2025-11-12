@@ -1,5 +1,4 @@
-.home_page {
-  width: 100%;
+.home-page {
   height: 100%;
   display: flex;
   align-items: center;
@@ -7,7 +6,7 @@
   padding: 2rem;
 }
 
-.home_container {
+.home-container {
   max-width: 80rem;
   width: 100%;
   display: flex;
@@ -15,12 +14,12 @@
   gap: 2rem;
 }
 
-.home_header {
+.home-header {
   text-align: center;
   margin-bottom: 3rem;
 }
 
-.home_title {
+.home-title {
   font-size: 3rem;
   font-weight: 700;
   color: white;
@@ -32,19 +31,19 @@
   text-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
 }
 
-.home_subtitle {
+.home-subtitle {
   color: rgb(209, 213, 219);
   font-size: 1.125rem;
   line-height: 1.6;
 }
 
-.upload_grid {
+.upload-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-.home_actions {
+.home-actions {
   text-align: center;
   margin-top: 2rem;
   animation: fadeIn 0.5s ease;
@@ -84,11 +83,11 @@
 }
 
 @media (max-width: 768px) {
-  .home_title {
+  .home-title {
     font-size: 2rem;
   }
 
-  .home_subtitle {
+  .home-subtitle {
     font-size: 1rem;
   }
 

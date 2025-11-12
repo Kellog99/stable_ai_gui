@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import OptionCard from '@/components/client/redtool/OptionCard';
+import OptionCard from '@/components/redtool/OptionCard';
 import './TableWrapper.css';
 import { LucideIcon, Search } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
