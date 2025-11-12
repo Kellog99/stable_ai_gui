@@ -8,6 +8,7 @@ import {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // This represent the Layout for the tasks' pages
+  
   return (
     <MantineProvider >
       <AppShell withBorder={false}>

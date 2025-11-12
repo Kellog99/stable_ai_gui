@@ -71,3 +71,9 @@ export interface ParametersWindowProps {
   handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
 }
 
+export interface AttackManagementProps {
+  id: number;
+  name: string;
+  status: string;
+  progress: number
+}

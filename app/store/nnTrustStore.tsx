@@ -1,14 +1,8 @@
-import { ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { AttackManagementProps, ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 import { BenchmarkDataProps, ReportProps } from "@/interfaces/reportInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export interface AttackManagementProps {
-  id: number;
-  name: string;
-  status: string;
-  progress: number
-}
 
 interface AppState {
   models: ModelSpecs[] | null;

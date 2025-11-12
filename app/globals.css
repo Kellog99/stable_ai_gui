@@ -5,8 +5,8 @@
 
 :root {
   --bg-dark: hsl(222, 47%, 11%);
-  --bg: hsl(200, 35, 25);
-  --bg-light: hsl(213, 48, 58);
+  --bg: hsl(200, 35%, 25%);
+  --bg-light: hsl(213, 48%, 58%);
 
   --hover: rgba(213, 30, 62);
 

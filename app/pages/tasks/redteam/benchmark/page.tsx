@@ -1,11 +1,11 @@
 "use client"
 
 import React, { useState } from 'react';
-import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
+import { AttackManagementProps, RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
 import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
-import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
+import useNNTrustStore from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 
 const Benchmark: React.FC = () => {

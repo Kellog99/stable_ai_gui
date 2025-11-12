@@ -2,30 +2,39 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { ArrowDownUp, CircleArrowRight, RotateCw, Search } from 'lucide-react';
+import { ArrowDownUp, CircleArrowRight, GlassWater, RotateCw, Search } from 'lucide-react';
 import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
+import { AttackManagementProps } from '@/interfaces/NNInterfaces';
 
 const TaskManagement: React.FC = () => {
     const { setReport, setBenchmark, executedAttacks, setExecutedAttacks } = useNNTrustStore()
-    const [attackArray, setAttackArray] = useState<any[]>([]);
+    const [attackArray, setAttackArray] = useState<AttackManagementProps[]>([]);
+    const [attackStates, setAttackStates] = useState<{ [key: string]: number }>({});
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
-    const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({
+    const [sortConfig, setSortConfig] = useState<{ key: keyof AttackManagementProps | null, direction: 'asc' | 'desc' }>({
         key: null,
         direction: 'asc'
     });
-    console.log("in benchmark ", executedAttacks)
-
-
+    console.log(executedAttacks)
     // Convert Set to Array whenever executedAttacks changes
     useEffect(() => {
         const attacksArray = Array.from(executedAttacks);
         setAttackArray(attacksArray);
+
+        const statuses = ["Completed", "In Progress", "Pending", "Closed"] as const;
+        setAttackStates(Object.fromEntries(
+            statuses.map(status => [
+                status,
+                attackArray.filter(job => job.status === status).length
+            ])
+        ))
+
     }, [executedAttacks]);
 
-    const handleSort = (key: string) => {
+    const handleSort = (key: keyof AttackManagementProps) => {
         let direction: 'asc' | 'desc' = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {
             direction = 'desc';
@@ -34,59 +43,45 @@ const TaskManagement: React.FC = () => {
     };
 
     const filteredAndSortedJobs = useMemo(() => {
-        let filtered = attackArray.filter(job => {
-            // Handle both string and object cases
-            const jobName = typeof job === 'string' ? job : (job?.name || '');
-            const jobStatus = typeof job === 'string' ? '' : (job?.status || '');
-            const jobId = typeof job === 'string' ? job : (job?.id || '');
+        const normalize = (value: any) => String(value ?? '').toLowerCase();
 
+        const filtered = attackArray.filter(({ id, name, status }) => {
+            const term = searchTerm.toLowerCase();
             const matchesSearch =
-                jobName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                jobId.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-                jobStatus.toLowerCase().includes(searchTerm.toLowerCase());
+                normalize(id).includes(term) ||
+                normalize(name).includes(term) ||
+                normalize(status).includes(term);
 
-            const matchesStatus = statusFilter === 'All' || jobStatus === statusFilter;
-
+            const matchesStatus = statusFilter === 'All' || status === statusFilter;
             return matchesSearch && matchesStatus;
         });
 
-        if (sortConfig.key) {
-            filtered.sort((a, b) => {
-                let aValue, bValue;
+        if (!sortConfig.key) {
+            return filtered;
+        }
+        else {
+            const { key, direction } = sortConfig;
+            const multiplier = direction === 'asc' ? 1 : -1;
 
-                if (typeof a === 'string' && typeof b === 'string') {
-                    aValue = a;
-                    bValue = b;
-                } else {
-                    aValue = a?.[sortConfig.key!] || '';
-                    bValue = b?.[sortConfig.key!] || '';
-                }
+            return [...filtered].sort((a, b) => {
+                const aValue = a[key];
+                const bValue = b[key];
 
-                // Handle numeric sorting for IDs
-                if (sortConfig.key === 'id') {
-                    const aNum = Number(aValue);
-                    const bNum = Number(bValue);
-                    if (!isNaN(aNum) && !isNaN(bNum)) {
-                        return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
-                    }
+                const aNum = Number(aValue);
+                const bNum = Number(bValue);
+                if (key === 'id' && !isNaN(aNum) && !isNaN(bNum)) {
+                    return (aNum - bNum) * multiplier;
                 }
 
-                // String comparison
-                if (aValue < bValue) {
-                    return sortConfig.direction === 'asc' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortConfig.direction === 'asc' ? 1 : -1;
-                }
-                return 0;
+                return normalize(aValue).localeCompare(normalize(bValue)) * multiplier;
             });
         }
-
-        return filtered;
     }, [attackArray, searchTerm, statusFilter, sortConfig]);
 
     const [atkFinished, setAtkFinished] = useState<number>(0)
-    useEffect(() => { setAtkFinished(executedAttacks.filter(job => job.status === "Completed").length) }, [executedAttacks])
+    useEffect(() => {
+        setAtkFinished(executedAttacks.filter(job => job.status === "Completed").length)
+    }, [executedAttacks])
     const isDisabled = () => {
         console.log(executedAttacks.length > 0 && (atkFinished === executedAttacks.length))
         return false
@@ -122,6 +117,8 @@ const TaskManagement: React.FC = () => {
         }
         router.push("/pages/report/reportTITANN")
     }
+
+
     const [isRotating, setIsRotating] = useState(false);
 
     const handleRefresh = async () => {
@@ -164,7 +161,7 @@ const TaskManagement: React.FC = () => {
                                 disabled={isDisabled()}
                                 onClick={handleClickReport}
                                 className={`header-button ${isDisabled() ? 'disabled' : ''}`}>
-                                See Report <CircleArrowRight size={25} />
+                                Report <CircleArrowRight size={25} />
                             </button>
                         </div>
                     </HoverCard.Target>
@@ -176,119 +173,123 @@ const TaskManagement: React.FC = () => {
                 </HoverCard>
             </div>
             {/* Status Summary Cards */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
-                <div className="flex items-center justify-around gap-4 flex-wrap">
-                    {attackArray.map((job) => {
-                        const config = statusConfig[status];
-                        const Icon = config.icon;
-                        return (
-                            <div key={status} className="flex items-center gap-4 px-4 py-2">
-                                <div className={`${config.color} p-3 rounded-lg`}>
-                                    <Icon className="w-6 h-6 text-white" />
-                                </div>
-                                <div>
-                                    <div className="text-3xl font-bold text-slate-800">{statusCounts[status]}</div>
-                                    <h3 className="text-slate-600 font-medium">{status}</h3>
-                                </div>
+            <div >
+                <h3 style={{ color: 'white' }}>Summary</h3>
+                <p style={{ color: 'lightgray' }}>This represent the <b>execution</b> summary of all the vulnearbilities that have been tested.</p>
+
+                <div className="container-card">
+                    {Object.entries(attackStates).map(([status, value]) => (
+                        <div className="card-summary">
+                            <GlassWater size={30} className="w-6 h-6 text-white" />
+                            <div >
+                                <div >{status}:</div>
+                                {value}
                             </div>
-                        );
-                    })}
+                        </div>
+                    ))}
                 </div>
             </div>
+            {/* Table Management */}
+            <div >
+                <h3 style={{ color: 'white' }}>Info Vulnerabilities</h3>
+                <p style={{ color: 'lightgray' }}>
+                    Here below is shown the advancement status of all the the vulnerabilities that have been selected previously.
+                </p>
 
-            <div className="filters">
-                <div className="search-wrapper">
-                    <Search className="search-icon" />
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Search jobs..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
+                <div className="filters">
+                    <div className="search-wrapper">
+                        <Search className="search-icon" />
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search jobs..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
 
-                <button
-                    className={`updateButton ${isRotating ? 'rotating' : ''}`}
-                    onClick={handleRefresh}
-                >
-                    <RotateCw color='red' size={"2.3vw"} />
-                </button>
-                <div className='filter'>
-                    <div>Filter by:</div>
-                    <select
-                        className='selectionButton'
-                        id="statusFilter"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
+                    <button
+                        className={`updateButton ${isRotating ? 'rotating' : ''}`}
+                        onClick={handleRefresh}
                     >
-                        <option value="All">All Statuses</option>
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
+                        <RotateCw color='red' size={"2.3vw"} />
+                    </button>
+                    <div className='filter'>
+                        <div>Filter by:</div>
+                        <select
+                            className='selectionButton'
+                            id="statusFilter"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                        >
+                            <option value="All">All Statuses</option>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div className="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <button onClick={() => handleSort('id')}>
-                                    ID <ArrowDownUp />
-                                </button>
-                            </th>
-                            <th>
-                                <button onClick={() => handleSort('name')}>
-                                    Attack Name <ArrowDownUp />
-                                </button>
-                            </th>
-                            <th>
-                                <button onClick={() => handleSort('status')}>
-                                    Status <ArrowDownUp />
-                                </button>
-                            </th>
-                            <th>
-                                Progress
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredAndSortedJobs.length === 0 ? (
+                <div className="table-wrapper">
+                    <table>
+                        <thead>
                             <tr>
-                                <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
-                                    No jobs found
-                                </td>
+                                <th>
+                                    <button onClick={() => handleSort('id')}>
+                                        ID <ArrowDownUp />
+                                    </button>
+                                </th>
+                                <th>
+                                    <button onClick={() => handleSort('name')}>
+                                        Attack Name <ArrowDownUp />
+                                    </button>
+                                </th>
+                                <th>
+                                    <button onClick={() => handleSort('status')}>
+                                        Status <ArrowDownUp />
+                                    </button>
+                                </th>
+                                <th>
+                                    Progress
+                                </th>
                             </tr>
-                        ) : (
-                            filteredAndSortedJobs.map((job, index) => {
-                                const jobId = typeof job === 'string' ? job : (job?.id || index);
-                                const jobName = typeof job === 'string' ? job : (job?.name || 'N/A');
-                                const jobStatus = typeof job === 'string' ? 'N/A' : (job?.status || 'N/A');
+                        </thead>
+                        <tbody>
+                            {filteredAndSortedJobs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
+                                        No jobs found
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredAndSortedJobs.map((job, index) => {
+                                    const jobId = typeof job === 'string' ? job : (job?.id || index);
+                                    const jobName = typeof job === 'string' ? job : (job?.name || 'N/A');
+                                    const jobStatus = typeof job === 'string' ? 'N/A' : (job?.status || 'N/A');
 
-                                return (
-                                    <tr key={`${jobId}-${index}`}>
-                                        <td>
-                                            {jobId}
-                                        </td>
-                                        <td style={{ fontWeight: "bold" }}>
-                                            {jobName}
-                                        </td>
-                                        <td>
-                                            <p>{jobStatus}</p>
-                                        </td>
-                                        <td>
-                                            {job.progress === 100 ?
-                                                <Progress value={job.progress} color='green' />
-                                                : <Progress value={job.progress} color='blue' animated />}
-                                        </td>
+                                    return (
+                                        <tr key={`${jobId}-${index}`}>
+                                            <td>
+                                                {jobId}
+                                            </td>
+                                            <td style={{ fontWeight: "bold" }}>
+                                                {jobName}
+                                            </td>
+                                            <td>
+                                                <p>{jobStatus}</p>
+                                            </td>
+                                            <td>
+                                                {job.progress === 100 ?
+                                                    <Progress value={job.progress} color='green' />
+                                                    : <Progress value={job.progress} color='blue' animated />}
+                                            </td>
 
-                                    </tr>
-                                );
-                            })
-                        )}
-                    </tbody>
-                </table>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

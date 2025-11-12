@@ -45,6 +45,29 @@
     opacity: 0.6;
 }
 
+.container-card {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px;
+    border-radius: calc(2*var(--border-radius));
+    border: 1px solid gray;
+}
+
+.card-summary {
+    width: 180px;
+    height: 80px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 400;
+    color: white;
+    border-radius: var(--border-radius);
+    background-color: var(--bg);
+}
+
+
 .updateButton {
     height: auto;
     align-items: center;
