@@ -87,7 +87,6 @@ export default function AsyncTaskTracker({ action, startEndpoint, startParams, s
     }
   };
 
-  console.log("MESSAGE", message);
 
   const pollProgress = async () => {
     

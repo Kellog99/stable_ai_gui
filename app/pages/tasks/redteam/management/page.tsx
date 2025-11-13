@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { ArrowDownUp, CircleArrowRight, RotateCw, Search } from 'lucide-react';
+import { ArrowDownUp, CircleArrowRight, Search } from 'lucide-react';
 import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
@@ -20,14 +20,14 @@ const TaskManagement: React.FC = () => {
         direction: 'asc'
     });
 
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
     const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
     console.log("id from management", benchmarkID)
-    
-    
+
+
     console.log("in benchmark ", executedAttacks)
 
-
-    // Convert Set to Array whenever executedAttacks changes
     useEffect(() => {
         const attacksArray = Array.from(executedAttacks);
         setAttackArray(attacksArray);
@@ -43,7 +43,6 @@ const TaskManagement: React.FC = () => {
 
     const filteredAndSortedJobs = useMemo(() => {
         let filtered = attackArray.filter(job => {
-            // Handle both string and object cases
             const jobName = typeof job === 'string' ? job : (job?.name || '');
             const jobStatus = typeof job === 'string' ? '' : (job?.status || '');
             const jobId = typeof job === 'string' ? job : (job?.id || '');
@@ -70,7 +69,6 @@ const TaskManagement: React.FC = () => {
                     bValue = b?.[sortConfig.key!] || '';
                 }
 
-                // Handle numeric sorting for IDs
                 if (sortConfig.key === 'id') {
                     const aNum = Number(aValue);
                     const bNum = Number(bValue);
@@ -79,7 +77,6 @@ const TaskManagement: React.FC = () => {
                     }
                 }
 
-                // String comparison
                 if (aValue < bValue) {
                     return sortConfig.direction === 'asc' ? -1 : 1;
                 }
@@ -95,15 +92,15 @@ const TaskManagement: React.FC = () => {
 
     const [atkFinished, setAtkFinished] = useState<number>(0)
     useEffect(() => { setAtkFinished(executedAttacks.filter(job => job.status === "completed").length) }, [executedAttacks])
-    
+
     console.log("atk finished =", atkFinished)
-   
+
     const isDisabled = () => {
         return !(executedAttacks.length > 0 && (atkFinished === executedAttacks.length))
     }
 
     const router = useRouter()
-    // handle click for going to the Report page
+
     const handleClickReport = async () => {
         // If the button is clickable then all the attacks are done and the JSON has been produced
         async function fetchResult<T>(url: string): Promise<T | undefined> {
@@ -133,28 +130,41 @@ const TaskManagement: React.FC = () => {
         }
         router.push("/pages/report/reportTITANN")
     }
-    const [isRotating, setIsRotating] = useState(false);
 
-    const handleRefresh = async () => {
-        // This handle is for getting, every time the user clicke the Circle Arrow Icon, 
-        // the updates from the jobs that are running throught the backend
-        setIsRotating(true);
-        setTimeout(() => setIsRotating(false), 600); // Match animation duration
 
+
+    const pollProgress = async () => {
         try {
-            const response = await fetch(`${getJobsProgress}?id=${encodeURIComponent(benchmarkID)}`); 
-            
+            const url = `${getJobsProgress}?id=${encodeURIComponent(benchmarkID)}`;
+            const response = await fetch(url);
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`); // Fixed: parentheses, not backtick
+                throw new Error(`Failed to fetch progress: ${response.statusText}`);
             }
-            const data = await response.json(); // Parse the response
-            console.log("management ==", data)
-            setExecutedAttacks(data)
-        } catch (error) {
-            console.error('ERROR:', error);
-            return []; // Return empty array on error
+
+            const data = await response.json();
+            console.log("management ==", data);
+
+            setExecutedAttacks(data);
+
+        } catch (err: any) {
+            console.error("ERROR:", err);
         }
-    }
+    };
+
+    const startPolling = () => {
+        if (!intervalRef.current) {
+            pollProgress(); 
+            intervalRef.current = setInterval(pollProgress, 3000);
+        }
+    };
+
+    useEffect(() => {
+        if (!benchmarkID) return;
+        startPolling();
+
+    }, [benchmarkID]);
+
 
     return (
         <div className="container">
@@ -198,13 +208,6 @@ const TaskManagement: React.FC = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-
-                <button
-                    className={`updateButton ${isRotating ? 'rotating' : ''}`}
-                    onClick={handleRefresh}
-                >
-                    <RotateCw color='red' size={"2.3vw"} />
-                </button>
                 <div className='filter'>
                     <div>Filter by:</div>
                     <select
@@ -269,9 +272,16 @@ const TaskManagement: React.FC = () => {
                                             <p>{jobStatus}</p>
                                         </td>
                                         <td>
-                                            {job.progress === 100 ?
-                                                <Progress value={job.progress} color='green' />
-                                                : <Progress value={job.progress} color='blue' animated />}
+                                            {(() => {
+                                                if (job.progress === 100 && job.status === "completed") {
+                                                    return <Progress value={job.progress} color="green" />;
+                                                } else if (job.progress !== 100 && job.status !== "completed") {
+                                                    return <Progress value={job.progress} color="blue" animated />;
+                                                } else if (job.progress !== 100 && job.status === "completed") {
+                                                    return <Progress value={job.progress} color="red" />;
+                                                }
+                                            })()}
+
                                         </td>
 
                                     </tr>

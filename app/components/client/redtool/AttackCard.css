@@ -1,4 +1,5 @@
 .attack-card {
+  position:relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -18,6 +19,43 @@
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   border-color: #667eea;
+}
+
+.attack-card.inactive::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(128, 128, 128, 0.4); /* grey veil */
+  border-radius: var(--border-radius);
+  z-index: 1;
+}
+
+/* Ensure no hover effects when inactive */
+.attack-card.inactive:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(51, 51, 51, 0.85);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.attack-card.inactive:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 
 .card-header {

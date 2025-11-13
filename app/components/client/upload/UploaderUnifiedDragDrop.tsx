@@ -6,8 +6,6 @@ import { IconChevronDown, IconCloudUpload, IconDatabase, IconTrash, IconUpload, 
 import { Brain, CheckIcon, Database, FileText, FolderIcon } from 'lucide-react';
 import { useState } from 'react';
 import { AlertCust } from '../AlertCustom';
-import { fetchExternalImage } from 'next/dist/server/image-optimizer';
-import { json } from 'stream/consumers';
 import { uploadJsonReport_DQ } from '@/properties/urls';
 import { uploadJsonReport_NN } from '@/properties/urlsNNTrust';
 
@@ -15,20 +13,20 @@ type Props = {
     config: {
         name: string;
         fileType: string;
-        accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
+        accept: string; 
         description?: string;
         uploadUrlCheck: string;
         uploadUrl: string;
         formFieldName: string;
-        refreshFunction?: () => Promise<any>; // e.g., "DatasetsLoader" reloads the data with the new upload
+        refreshFunction?: () => Promise<any>; 
         setRefreshData?: (data: any) => void;
     };
     infoModal: React.ReactNode;
 };
 
 type UploadedJson = {
-  tool: string; // mandatory field
-  [key: string]: any; // any other optional fields
+  tool: string; 
+  [key: string]: any; 
 };
 
 export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {

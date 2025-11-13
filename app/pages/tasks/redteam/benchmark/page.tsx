@@ -5,10 +5,9 @@ import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
 import { Play, Settings, Ruler, Bug, Gauge, Info, ChevronRight, BrickWallFire } from 'lucide-react';
-import useNNTrustStore, { AttackManagementProps } from '@/store/nnTrustStore';
+import useNNTrustStore from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 import useStore from '@/store/dsStore';
-import { setKeyboardInteraction } from 'recharts/types/state/tooltipSlice';
 import { startJob } from '@/properties/urlsNNTrust';
 
 const Benchmark: React.FC = () => {
@@ -37,7 +36,7 @@ const Benchmark: React.FC = () => {
     setMap: (map: { [key: string]: RegisterObjectProps }) => void,
     completeList: { [key: string]: RegisterObjectProps }
   ) => {
-    //with the first two cases I handle the selection button for selecting every attacks or deselecting everything
+
     if (id === 'all') {
       setMap(completeList)
     }
@@ -57,35 +56,24 @@ const Benchmark: React.FC = () => {
     }
   };
 
-  // Handle the saving of a new set of parameters
   const handleParametersChange = (
     id: string,
     parameters: number[],
     setMap: (map: { [key: string]: RegisterObjectProps }) => void,
     registeredObject: { [key: string]: RegisterObjectProps },
   ) => {
-    // Get the appropriate map based on type
+
     const currentMap: { [key: string]: RegisterObjectProps } = { ...registeredObject };
     const currentObject = currentMap[id];
     if (currentObject && currentObject.parameters) {
-      // updating the new parameters that wants to be set
       currentObject.parameters.map((param, index) => {
         param.default = parameters[index]
       })
-      // Update the map
+
       currentMap[id] = currentObject;
-      // Save to store
       setMap(currentMap);
     }
   }
-
-  //preparing data to send to backend
-  const attacksCleaned = Object.fromEntries(
-    Object.entries(selectedAttacks).map(([key, value]) => [
-      key,
-      { name: value.id }
-    ])
-  );
 
   const benchmarkDatas = {
     attacks: Object.values(selectedAttacks),
@@ -129,7 +117,6 @@ const Benchmark: React.FC = () => {
 
   };
 
-  
   
 
   return (

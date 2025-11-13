@@ -66,13 +66,15 @@ const page = () => {
     const { vulnerabilitySelected, report } = useNNTrustStore()
     const [attackReport, setAttackReport] = useState<attacksProps>(report!.attacks[vulnerabilitySelected!])
 
+
+    console.log("attackReport", attackReport)
     useEffect(() => {
         setAttackReport(report!.attacks[vulnerabilitySelected!])
     }, [vulnerabilitySelected, report])
 
     console.log("attack = ", attackReport)
 
-    const attackMetrics = Object.keys(attackReport).filter(item => !["name", "risk", "confusion_matrix"].includes(item))
+    const attackMetrics = Object.keys(attackReport).filter(item => !["name", "risk", "confusionmatrix"].includes(item))
     console.log(attackMetrics)
 
     function formatNumber(value: number) {
@@ -127,8 +129,8 @@ const page = () => {
                 </div>
             </div>
 
-            {attackReport.confusion_matrix &&
-                <ConfusionMatrix matrix={attackReport.confusion_matrix} />}
+            {attackReport.confusionmatrix &&
+                <ConfusionMatrix matrix={attackReport.confusionmatrix} />}
         </div>
     )
 }

@@ -32,24 +32,20 @@ export function OptionCard({
   const model = useNNStore((state) => state.models);
   const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
 
-  console.log("cm in elements??", name=="confusionmatrix" )
-  console.log("is selected", isSelected )
-
-
-  ///////////////// gestire la logica e della grafica (soprattutto) della confusion matrix
-
+  console.log("cm in elements??", name == "confusionmatrix")
+  console.log("is selected", isSelected)
 
   let isCM = false;
-  if (numClasses > 9 &&  name=="confusionmatrix") {
+  if (numClasses > 100 && name == "confusionmatrix") {
     isCM = true;
   }
-
   console.log("isCM", isCM)
 
 
   return (
     <>
-      <div className="attack-card">
+      <div className={`attack-card ${isCM ? "inactive" : ""}`}>
+        {isCM && <span className="tooltip">The model you chose has too many classes, and do not allow a clear view of the confusion matrix</span>}
         <div className="card-header">
           <h3>{name}</h3>
           {
@@ -80,8 +76,8 @@ export function OptionCard({
             <input
               type="checkbox"
               onChange={onSelect}
-              checked={isSelected} 
-              disabled={isCM}/>
+              checked={isSelected && !isCM}
+            />
             <span className="checkmark">
               <Check className="check-icon" size={18} strokeWidth={3} />
             </span>

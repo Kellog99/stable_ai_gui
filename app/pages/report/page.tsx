@@ -6,7 +6,6 @@ import { Database, Upload } from "lucide-react";
 import { DragDrop } from "@/components/client/upload/UploaderUnifiedDragDrop";
 import { ModalUploadModel } from "@/components/client/upload/ModalUploadModel";
 import { JsonRepository } from "@/components/client/JsonRepository";
-import { uploadModel, uploadModel_check } from "@/properties/urlsNNTrust";
 
 
 

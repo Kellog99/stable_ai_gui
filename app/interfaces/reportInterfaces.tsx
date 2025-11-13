@@ -1,6 +1,5 @@
 import Dataset from "./genericInterface";
 
-// Report information
 interface infoProps {
     name: string;
     parameters: number;
@@ -31,7 +30,7 @@ export interface attacksProps {
     power?: number,
     num_queries?: number,
     robustness?: number,
-    confusion_matrix?: number[][]
+    confusionmatrix?: number[][]
 }
 
 export interface ReportProps {

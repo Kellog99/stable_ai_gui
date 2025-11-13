@@ -21,12 +21,11 @@ function Test() {
         }
     }, [attacks])
 
-    // This part is for defining the variables that will handle the loading of the image
+
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
     const [advanceOption, setAdvanceOption] = useState<boolean>(false)
-    // this variable is for seeing the metrics of one attack
     const [seeResults, setSeeResults] = useState<boolean>(false)
-
+    
     const [origImg, setOrigImg] = useState<string[] | null>(null)
     const [advImg, setAdvImg] = useState<string[] | null>(null)
     const [advPert, setAdvPert] = useState<string | null>(null)
