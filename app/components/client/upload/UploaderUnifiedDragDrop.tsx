@@ -56,7 +56,6 @@ export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
             } else {
 
                 const data = await response.json();
-                console.log("DATA", data)
                 setMessage(data.detail || "An error occurred during load check");
                 setUploadStatus('error');
 

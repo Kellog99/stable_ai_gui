@@ -4,12 +4,12 @@
 
 
 :root {
-  --bg-dark: hsl(222, 47%, 11%);
+  --bg-dark: hsl(222, 45%, 10%);
   --bg: hsl(200, 35%, 25%);
-  --bg-light: hsl(213, 48%, 58%);
+  --bg-light: hsl(202, 25%, 46%);
 
-  --hover: rgba(213, 30, 62);
-
+  --border-color: rgb(124, 122, 122);
+  --clicked: hsl(240, 31%, 52%);
   --text-primary: hsl(210, 40%, 98%);
   /* Brightest - main content */
   --text-secondary: hsl(215, 30%, 88%);
@@ -22,7 +22,11 @@
   /* Dark text for light backgrounds */
   --border-radius: 10px;
   --warning: #FFD800;
-  --affermative: green;
+  --affermative: lightgreen;
+  --error: red;
+  --icon-size: 30px;
+  --title:Stable AI;
+  --header-height: 90px
 }
 
 html,

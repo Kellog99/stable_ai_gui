@@ -1,54 +1,50 @@
-import { Shield, Menu, X, BarChart3, PieChart, TrendingUp, Activity, AlertCircle, FileCheck, FileText } from 'lucide-react';
+import { Shield, Menu, X, BarChart3, PieChart, TrendingUp, Activity, AlertCircle, FileCheck, FileText, UserRound } from 'lucide-react';
 import './Navbar.css';
 import { sections } from './config';
 import NavigationButton from './NavigationButton';
 import { useState } from 'react';
+import { Burger } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 
 export default function Navbar() {
     const collapsed = false
     const [activeLink, setActiveLink] = useState<string>("")
-
+    const [opened, { toggle }] = useDisclosure(true);
+    console.log("open?=", opened)
     return (
-        <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
-            <div className="sidebar-header">
-                {!collapsed && (
-                    <div className="sidebar-brand">
-                        <div className="brand-icon">
-                            <Shield size={18} className="text-white" />
-                        </div>
-                        <span className="brand-name">TrusthWorty</span>
-                    </div>
-                )}
-                <button className="sidebar-toggle">
-                    {collapsed ? <Menu size={20} /> : <X size={20} />}
-                </button>
+        <div className='container-nav'
+            style={{ width: `${opened ? "300px" : "140px"}` }}>
+            <div className='nav-header'>
+                <Burger size={20} color='white' opened={opened} onClick={toggle} />
+                {opened ?
+                    "Menu" : null}
             </div>
-
-            <nav className="sidebar-nav">
-                <div className="nav-section">
-                    {!collapsed ? (
-                        Object.entries(sections).map(([sectionName, elements]) => (
-                            <div key={sectionName}>
-                                <h3 className="section-title">{sectionName}</h3>
-                                <div className="nav-items">
-                                    {elements.map((element) => (
-                                        <NavigationButton
-                                            id={element.id}
-                                            title={element.title}
-                                            href={element.href}
-                                            Icon={element.Icon}
-                                            items={element.items}
-                                            setActiveLink={setActiveLink}
-                                            requiresEmbeddings={false}
-                                            isDisabled={false}
-                                            isClosed={false} />
-                                    ))}
-                                </div>
-                            </div>
-                        ))
-                    ) : null}
-                </div>
-            </nav>
-        </aside>
+            <div className="nav-section">
+                {Object.entries(sections).map(([sectionName, elements]) => (
+                    <div key={sectionName}>
+                        <h3 className="section-title">{sectionName}</h3>
+                        <div className="nav-items">
+                            {elements.map((element) => (
+                                <NavigationButton
+                                    id={element.id}
+                                    title={element.title}
+                                    href={element.href}
+                                    Icon={element.Icon}
+                                    items={element.items}
+                                    setActiveLink={setActiveLink}
+                                    requiresEmbeddings={false}
+                                    isDisabled={false}
+                                    isClosed={!opened} />
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div className='nav-profile'>
+                <UserRound size={"var(--icon-size)"} />
+                {opened ?
+                    "User Info" : null}
+            </div>
+        </div>
     );
 }

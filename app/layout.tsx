@@ -5,6 +5,7 @@ import "@mantine/core/styles.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./components/client/Header";
 import "./globals.css";
+import Navbar from './components/layout/Navbar';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,7 +57,17 @@ export default function RootLayout({
             <div className={styles.dashboard}>
               <Header />
               <main className={styles.mainContent}>
-                {children}
+                <AppShell withBorder={false}>
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '3vw',
+                    height: '100%'
+                  }}>
+                    <Navbar />
+                    {children}
+                  </div>
+                </AppShell>
               </main>
             </div>
           </AppShell>

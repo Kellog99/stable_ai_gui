@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, FileText, CheckCircle, Circle } from 'lucide-react';
+import { Home, FileText, CheckCircle, Circle, Shield } from 'lucide-react';
 import '@/styles/Header.css';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,26 +16,15 @@ const Header = () => {
   return (
     <header className="app-header">
       <div className="header-nav">
-
         <button
-          onClick={() => {
-            setCurrentPage('home')
-            router.push('/pages/tasks')
-          }}
-          className={`nav-button ${currentPage === 'home' ? 'active' : ''}`}
-        >
-          <Home size={18} />
-          <span>Home</span>
-        </button>
-        <button
-          onClick={() => {
-            setCurrentPage('report')
-            router.push('/pages/report')
-          }}
-          className={`nav-button ${currentPage === 'report' ? 'active' : ''}`}
-        >
-          <FileText size={18} />
-          <span>Report</span>
+          onClick={() => router.push("/")}
+          className="sidebar-brand">
+          <div className="brand-icon">
+            <Shield size={25} className="text-white" />
+          </div>
+          <span className="brand-name">{
+            getComputedStyle(document.documentElement).getPropertyValue('--title')
+          }</span>
         </button>
       </div>
 

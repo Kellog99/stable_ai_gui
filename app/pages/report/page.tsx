@@ -48,10 +48,10 @@ export default function ReportPage() {
 
   return (
     <div className={styles.reportContainer}>
-      <FileDropZone
+      {/* <FileDropZone
         sections={dropElement}
         defaultActiveSection={dropElement[0].id}
-      />
+      /> */}
     </div>
 
   );

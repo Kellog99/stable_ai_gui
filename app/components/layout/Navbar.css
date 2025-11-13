@@ -1,76 +1,57 @@
-.sidebar {
-  width: 16rem;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(12px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
+.container-nav {
+  display: grid;
+  grid-template-rows: 50px 1fr 80px;
+  /* header, scrollable section, footer */
+  height: calc(100vh - var(--header-height));
+
+  /* ensures it never exceeds the viewport */
+  max-height: 100vh;
+  overflow: hidden;
+  position: relative;
 }
 
-.sidebar.collapsed {
-  width: 4rem;
-}
 
-.sidebar-header {
-  padding: 1rem;
+.nav-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.brand-icon {
-  width: 2rem;
-  height: 2rem;
-  background: linear-gradient(135deg, rgb(59, 130, 246), rgb(147, 51, 234));
-  border-radius: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.brand-name {
   color: white;
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.sidebar-toggle {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
-  color: white;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  overflow-y: auto;
+  gap: 15px;
+  padding: 0 20px;
+  /* move padding to header instead of container */
 }
 
 .nav-section {
+  overflow-y: auto;
+  /* make this part scrollable vertically */
+  overflow-x: hidden;
+  /* disable horizontal scroll */
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  padding: 0 10px 0 20px;
+  /* inner spacing, consistent with header/footer */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  scroll-behavior: smooth;
 }
+
+.nav-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nav-section::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.nav-section::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.container-nav>div:last-child {
+  padding: 0 20px;
+  /* footer padding */
+}
+
 
 .section-title {
   font-size: 0.75rem;
@@ -121,6 +102,19 @@
   justify-content: center;
 }
 
-.sub-items{
-  background-color: transparent;
+.sub-items {
+  margin-left: 15px;
+  border-left: 1px solid darkgray;
+}
+
+.nav-profile {
+  height: 100%;
+  display: flex;
+  background-color: var(--bg);
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  border-radius: var(--border-radius);
 }

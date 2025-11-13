@@ -120,6 +120,14 @@ export const sections: { [key: string]: NavigationSection[] } = {
             href: '/pages/tasks/redteam/management',
             Icon: Info,
         },
+    ],
+    "Report": [
+        {
+            id: "report",
+            title: "Report",
+            href: "/pages/report",
+            Icon: FileText
+        }
     ]
 };
 

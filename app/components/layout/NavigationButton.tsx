@@ -38,11 +38,6 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
         e.preventDefault();
 
         if (isDisabled) return; // safeguard
-
-        if (hasChildren) {
-            setExpanded((prev) => !prev);
-        }
-
         if (href) {
             router.push(href);
             setActiveLink(id);
@@ -67,7 +62,7 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
                 </div>
 
                 {!isClosed && hasChildren && (
-                    expanded ? (
+                    isClosed ? (
                         <ChevronUp size={18} />
                     ) : (
                         <ChevronDown size={18} />
@@ -76,8 +71,8 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
             </button>
 
             {/* Sub-items */}
-            {hasChildren && expanded && (
-                <div className="pl-6 flex flex-col space-y-1 sub-items">
+            {!isClosed && hasChildren && expanded && (
+                <div className="sub-items">
                     {items!.map((item) => (
                         <NavigationButton
                             key={item.id}
