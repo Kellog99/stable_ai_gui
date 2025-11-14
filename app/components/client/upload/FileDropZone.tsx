@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import './FileDropZone.css';
-import { ButtonProps, FileDropZoneProps } from '@/interfaces/NNInterfaces';
+import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 import { uploadModel, uploadModel_check } from "@/properties/urls";
 import { getModels } from '@/functionalities/NNTrustBackendUtils';
 import { DragDrop, DragDropProps } from './DragDrop';
@@ -9,20 +9,6 @@ import useStore from '@/store/nnTrustStore';
 import { HardDrive, Upload } from 'lucide-react';
 import ZipUploadComponent from './Uploader';
 import { InfoLoader } from './InfoLoader';
-import { InfoCircle } from '@vectopus/atlas-icons-react';
-
-
-// interface config {
-//     name: string;
-//     fileType: string;
-//     accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
-//     description?: string;
-//     uploadUrlCheck: string;
-//     uploadUrl: string;
-//     formFieldName: string;
-//     refreshFunction: () => Promise<any>; // e.g., "DatasetsLoader" reloads the data with the new upload
-//     setRefreshData: (data: any) => void;
-// }
 
 const FileDropZone: React.FC<FileDropZoneProps> = ({
     id,
@@ -100,14 +86,6 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
                         >
                             <Upload /> Upload into the Repository.
                         </button>
-
-                        {/* {uploadStatus == "success" ? (
-                            <AlertCust result={'success'} textToDisplay={message} />
-                        ) : (
-                            uploadStatus == "error" ? (
-                                <AlertCust result={'error'} textToDisplay={message} />
-                            ) : null
-                        )} */}
                     </div>
                     : <ZipUploadComponent />
             }

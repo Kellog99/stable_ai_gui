@@ -5,6 +5,7 @@ import { LucideIcon, Search } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 
 interface TableWrapperProps {
+    title: string,
     elements: { [key: string]: RegisterObjectProps };
     selectedElement: { [key: string]: RegisterObjectProps };
     Icon: LucideIcon
@@ -13,6 +14,7 @@ interface TableWrapperProps {
 }
 
 const TableWrapper: React.FC<TableWrapperProps> = ({
+    title,
     elements,
     selectedElement,
     handleSelection,
@@ -44,7 +46,7 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
 
             <div className="header">
                 <div>
-                    <h2 className="table-title">Elements</h2>
+                    <h2 className="table-title">{title}</h2>
                     <p className="subtitle">
                         Selected: {Object.keys(selectedElement).length} / {Object.keys(elements).length}
                     </p>

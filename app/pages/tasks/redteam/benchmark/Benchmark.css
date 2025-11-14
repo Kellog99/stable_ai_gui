@@ -9,52 +9,36 @@
   color: rgb(187, 184, 184);
   align-content: center;
   align-items: center;
+  justify-content: space-between;
+  padding: 50px;
 }
 
 .attack-header {
-  width: 100%;
-  align-items: center;
-  text-align: left;
-  color: rgb(187, 184, 184);
-}
-
-.attack-icon {
   display: flex;
   align-items: center;
   align-content: center;
+  justify-content: space-between;
   gap: 2vw;
   margin-bottom: 0;
 }
 
 .attack-button {
   display: flex;
-  padding: 1.2vw;
-  max-width: 300px;
+  padding: 10px 20px 10px 20px;
+  width: 240px;
+  height: 50px;
   align-items: center;
-  align-content: space-between;
-  border-radius: 2vw;
-  background-color: var(--navy-700);
-  color: var(--primary-text);
-  font-weight: bold;
+  justify-content: space-between;
+  border-radius: var(--border-radius);
+  background-color: var(--bg);
+  color: white;
+  font-weight: 700;
+  font-size: 0.825rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-desc {
-  width: minmax(100px, 100%);
-  font-size: clamp(10px, 1vw, 14px);
 }
 
 .attack-button:hover {
   transform: translateY(-3px);
-}
-
-.icon {
-  width: 2vw;
-  height: 2vw;
-  max-width: 30px;
-  max-height: 30px;
-  margin: 0 auto;
-  transition: all 0.3s;
 }
 
 .btn-open {
@@ -119,7 +103,7 @@
   transform: translateX(5px);
 }
 
-.message-body{
+.message-body {
   height: 15vw;
   display: flex;
   flex-direction: column;

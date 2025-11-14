@@ -100,35 +100,27 @@ const Benchmark: React.FC = () => {
       < div className="attack-list" >
         <div className='attack-title'>
           <div className='attack-header'>
-            <div className='attack-icon'>
-              <BrickWallFireIcon size={'6vw'} color='red' />
-              <h1>Red Teaming</h1>
+            <BrickWallFireIcon size={"calc(var(--icon-size) * 3)"} color='red' />
+            <div>
+              <h1 style={{ margin: "0", fontSize: "2.5rem" }}>Red Teaming</h1>
+              <p style={{ margin: '0' }}>Choose all the vulnerabilities to test and the metrics that have to be computed for each attack.</p>
             </div>
-            <p style={{ margin: '0' }}>This page provides a set of vulnerabilities that can be used to test the model's robustness and a set of metrics to register the performance of each attack.</p>
           </div>
+          
           <button
             className='attack-button'
             disabled={!executeBenchmark}
             onClick={handleClick}>
-            <Play className='icon' />
-            <div className='btn-desc'> Execute benchmark</div>
+            <Play size={"calc(var(--icon-size) )"} />
+            <p>Execute benchmark</p>
           </button>
         </div>
 
 
         <div>
           {/* Attacks Selection */}
-          <div className='option-attacks'>
-            <div className='attack-icon'>
-              <Bug size={'3vw'} color='red' />
-              <h2>Vulnearbility selection</h2>
-            </div>
-            <p style={{ margin: 0 }}>
-              Here below, are listed all the possible vulnerabilities that can be tested on the selected model.
-              For customizing a vulnearbility click on the "Settings" icon on the right. A Panel will be shown on top where all the possible customizable parameters are shown.
-            </p>
-          </div>
           <TableWrapper
+            title='Vulnearbility selection'
             elements={attacks}
             selectedElement={selectedAttacks}
             handleSelection={(id: string) => handleSelectionClick(
@@ -149,14 +141,8 @@ const Benchmark: React.FC = () => {
           />
 
           {/* Metrics Selection */}
-          <div className='option-attacks'>
-            <div className='attack-icon'>
-              <Gauge size={'3vw'} color='red' />
-              <h2>Metric Selection</h2>
-            </div>
-            <p > Here it is possible to select all the metrics to measure during the vulnearbility test.</p>
-          </div>
           <TableWrapper
+            title='Metric Selection'
             elements={metrics}
             selectedElement={selectedMetrics}
             handleSelection={(id: string) => handleSelectionClick(
