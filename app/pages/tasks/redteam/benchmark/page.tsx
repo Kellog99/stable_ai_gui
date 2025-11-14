@@ -106,7 +106,7 @@ const Benchmark: React.FC = () => {
               <p style={{ margin: '0' }}>Choose all the vulnerabilities to test and the metrics that have to be computed for each attack.</p>
             </div>
           </div>
-          
+
           <button
             className='attack-button'
             disabled={!executeBenchmark}
