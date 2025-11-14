@@ -4,8 +4,8 @@ import FileDropZone from "@/components/client/FileDropZone";
 import styles from '@/styles/HomePage.module.css';
 import { Database, Upload } from "lucide-react";
 import { DragDrop } from "@/components/client/upload/UploaderUnifiedDragDrop";
-import { ModalUploadModel } from "@/components/client/upload/ModalUploadModel";
 import { JsonRepository } from "@/components/client/JsonRepository";
+import { ModalUploadJson } from "@/components/client/upload/ModalUploadJson";
 
 
 
@@ -27,7 +27,7 @@ export default function ReportPage() {
             uploadUrlCheck: "", 
             uploadUrl: "",
           }}
-          infoModal={<ModalUploadModel />} />
+          infoModal={<ModalUploadJson />} />
     },
     {
       id: "NNreportRepo",
