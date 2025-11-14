@@ -1,11 +1,13 @@
 "use client"
 
-import FileDropZone from '@/components/client/FileDropZone';
+import FileDropZone from '@/components/client/upload/FileDropZone';
 import styles from '@/styles/HomePage.module.css';
 import { listOfSections } from '@/components/layout/homePageConfig';
 import useStore from '@/store/nnTrustStore';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import { useEffect } from 'react';
+
+export const title = "Stable-AI"
 
 export default function HomePage() {
   // At this level It is asked for the list of all the attacks
@@ -32,7 +34,7 @@ export default function HomePage() {
       <div className={styles.home_container}>
         <div className={styles.home_header}>
           <h1 className={styles.home_title}>
-            Welcome to Stable-AI
+            Welcome to {title}
           </h1>
           <p className={styles.home_subtitle}>
             Upload the <b>Dataset</b> or the <b>Model</b> in the space below or upload them from the appropriate <b>Repository</b> to conduct a quality and vulnerability analysis.

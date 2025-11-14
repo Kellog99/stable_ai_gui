@@ -10,7 +10,6 @@ import {
   Divider,
   FileInput,
   Group,
-  Paper,
   Progress,
   Select,
   Stack,
@@ -31,7 +30,6 @@ import {
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import styles from '../../styles/Uploader.module.css';
-import { FileCheck } from 'lucide-react';
 import React from 'react';
 import { RgbaColor } from '@mantine/core/lib/components/ColorPicker/ColorPicker.types';
 import { darkenColor } from '@/functionalities/Utils';

@@ -33,11 +33,15 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
     }, [pathname, href]);
 
     const hasChildren = !!items && items.length > 0;
-
+    // Every time I explode the lateral navbar, the children are shown
+    useEffect(() => {
+        setExpanded(!isClosed)
+    }, [isClosed])
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
         if (isDisabled) return; // safeguard
+        if (hasChildren) setExpanded((prev) => !prev)
         if (href) {
             router.push(href);
             setActiveLink(id);

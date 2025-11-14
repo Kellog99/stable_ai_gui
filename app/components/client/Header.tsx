@@ -1,9 +1,10 @@
 "use client"
 
-import { Home, FileText, CheckCircle, Circle, Shield } from 'lucide-react';
+import { CheckCircle, Circle, Shield } from 'lucide-react';
 import '@/styles/Header.css';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { title } from '@/page';
 
 
 const Header = () => {
@@ -22,9 +23,7 @@ const Header = () => {
           <div className="brand-icon">
             <Shield size={25} className="text-white" />
           </div>
-          <span className="brand-name">{
-            getComputedStyle(document.documentElement).getPropertyValue('--title')
-          }</span>
+          <span className="brand-name">{title}</span>
         </button>
       </div>
 

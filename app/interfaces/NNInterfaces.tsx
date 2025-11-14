@@ -1,3 +1,4 @@
+import { InfoUploader } from "@/components/client/upload/config";
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
 export interface ModelSpecs {
@@ -36,6 +37,7 @@ export interface FileDropZoneProps {
   title: string,
   description: string,
   Icon: LucideIcon,
+  config: InfoUploader,
   fileType: string;
   accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
   drop_description?: string;
