@@ -54,7 +54,7 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 <div className='scroll-header'>
                     {/* Search bar */}
                     <div className="search-container">
-                        <Search size={34} className="search-icon" />
+                        <Search size={"var(--icon-size)"} color='gray' className="search-icon" />
                         <input
                             type="text"
                             placeholder="Search"
@@ -80,7 +80,7 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                         <OptionCard
                             key={id}
                             name={element.name}
-                            tags={getTags(element)}
+                            tags={getTags(element)!}
                             description={element.description}
                             parameters={element.parameters}
                             isSelected={id in selectedElement}

@@ -32,7 +32,7 @@ const ModelUploadComponent = () => {
   const [message, setMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null); // 'success', 'error', null
-  const setModels = useStore((state) => state.setModels)
+  const setModels = useStore((state) => state.setModel)
 
   const handleFileChange = async (selectedFile: File) => {
     console.log("Selected file:", selectedFile);

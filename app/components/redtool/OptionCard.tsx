@@ -10,7 +10,7 @@ interface OptionCardProps {
   parameters?: ParametersProps[],
   isSelected: boolean;
   Icon: LucideIcon
-  tags?: string[]
+  tags: string[]
   onSelect: () => void;
   handleParametersChange: (parameters: number[]) => void;
 }
@@ -29,31 +29,21 @@ export function OptionCard({
   return (
     <>
       <div className="attack-card">
-        <div className="card-header">
-          <h3>{name}</h3>
-          {
-            tags && tags.length > 0 && (
-              <div>
-                {tags.map((tag, index) => (
-                  <div key={`${tag}-${index}`}
-                    className='option-tag'>{tag}</div>
-                ))}
-              </div>)
-          }
+        <h3 color='black'>{name}</h3>
+
+        <div className='container-options'>
+          {tags.map((tag, index) => (
+            <div key={`${tag}-${index}`}
+              className='option-tag'>{tag}</div>
+          ))}
         </div>
 
-        {
-          description ?
-            <div className='card-body'>
-              {description}
-            </div>
-            : null
-        }
+        <span style={{fontSize:"0.7rem"}}>{description}</span>
         <div className='card-footer'>
           <Icon
             className='card-icon'
             style={{ pointerEvents: parameters ? "auto" : "none" }}
-            size={30}
+            size={"var(--icon-size)"}
             onClick={() => setIsExpanded(true)} />
           <label className="circle-checkbox">
             <input
@@ -61,7 +51,7 @@ export function OptionCard({
               onChange={onSelect}
               checked={isSelected} />
             <span className="checkmark">
-              <Check className="check-icon" size={18} strokeWidth={3} />
+              <Check className="check-icon" size={15} strokeWidth={3} />
             </span>
           </label>
         </div>

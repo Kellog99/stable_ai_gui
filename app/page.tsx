@@ -32,6 +32,7 @@ export default function HomePage() {
   return (
     <div className={styles.home_page}>
       <div className={styles.home_container}>
+        
         <div className={styles.home_header}>
           <h1 className={styles.home_title}>
             Welcome to {title}

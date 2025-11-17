@@ -74,7 +74,7 @@ select:focus {
 }
 
 .table-wrapper {
-    max-height: 600px;
+    max-height: 400px;
     overflow: auto;
     border-radius: var(--border-radius);
 }

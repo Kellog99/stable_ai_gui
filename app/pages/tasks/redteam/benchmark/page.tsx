@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AttackManagementProps, RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
-import { Play, Settings, Ruler, Bug, Gauge, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
+import { Settings, Ruler, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
 import useNNTrustStore from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 
 const Benchmark: React.FC = () => {
 
@@ -64,7 +65,26 @@ const Benchmark: React.FC = () => {
 
   // variables for executing the benchmarking
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
+  // Provides the context of why the Benchmarking is not executable
+  const [description, setDescription] = useState<string>("")
 
+  useEffect(() => {
+    setExecuteBenchmark(Object.keys(attacks).length > 0)
+    if (Object.keys(attacks).length === 0) {
+      setDescription("No attacks are available for the execution.")
+    }
+    else {
+      setExecuteBenchmark(Object.keys(selectedAttacks).length > 0)
+
+      if (Object.keys(selectedAttacks).length === 0) {
+        setDescription(`None of the ${Object.keys(attacks).length} attacks have been selected.`)
+      }
+      else {
+        setDescription("Another Benchmarking is running. Please wait till the end.")
+      }
+    }
+
+  }, [attacks, selectedAttacks])
 
   // Click Execution Attack Handle
   const [isClicked, setIsCLicked] = useState<boolean>(false)
@@ -97,68 +117,62 @@ const Benchmark: React.FC = () => {
 
   return (
     <>
-      < div className="attack-list" >
-        <div className='attack-title'>
-          <div className='attack-header'>
-            <BrickWallFireIcon size={"calc(var(--icon-size) * 3)"} color='red' />
-            <div>
-              <h1 style={{ margin: "0", fontSize: "2.5rem" }}>Red Teaming</h1>
-              <p style={{ margin: '0' }}>Choose all the vulnerabilities to test and the metrics that have to be computed for each attack.</p>
-            </div>
-          </div>
+      <div className="container-pages">
+        {/* Header */}
 
-          <button
-            className='attack-button'
-            disabled={!executeBenchmark}
-            onClick={handleClick}>
-            <Play size={"calc(var(--icon-size) )"} />
-            <p>Execute benchmark</p>
-          </button>
-        </div>
+        <HeaderPageTask
+          Icon={BrickWallFireIcon}
+          title="Red Teaming"
+          descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
+          buttonprops={{
+            description: "Management Report",
+            isDisabled: !executeBenchmark,
+            disabledDescription: description,
+            handleClick: handleClick
+          }}
+        />
 
 
-        <div>
-          {/* Attacks Selection */}
-          <TableWrapper
-            title='Vulnearbility selection'
-            elements={attacks}
-            selectedElement={selectedAttacks}
-            handleSelection={(id: string) => handleSelectionClick(
+        {/* Attacks Selection */}
+        <TableWrapper
+          title='Vulnearbility selection'
+          elements={attacks}
+          selectedElement={selectedAttacks}
+          handleSelection={(id: string) => handleSelectionClick(
+            id,
+            selectedAttacks,
+            setSelectedAttacks,
+            attacks
+          )}
+          handleParametersChange={(id: string, parameters: number[]) => {
+            handleParametersChange(
               id,
-              selectedAttacks,
+              parameters,
               setSelectedAttacks,
-              attacks
-            )}
-            handleParametersChange={(id: string, parameters: number[]) => {
-              handleParametersChange(
-                id,
-                parameters,
-                setSelectedAttacks,
-                selectedAttacks
-              )
-            }}
-            Icon={Settings}
-          />
+              selectedAttacks
+            )
+          }}
+          Icon={Settings}
+        />
 
-          {/* Metrics Selection */}
-          <TableWrapper
-            title='Metric Selection'
-            elements={metrics}
-            selectedElement={selectedMetrics}
-            handleSelection={(id: string) => handleSelectionClick(
-              id,
-              selectedMetrics,
+        {/* Metrics Selection */}
+        <TableWrapper
+          title='Metric Selection'
+          elements={metrics}
+          selectedElement={selectedMetrics}
+          handleSelection={(id: string) => handleSelectionClick(
+            id,
+            selectedMetrics,
+            setSelectedMetrics,
+            metrics
+          )}
+          Icon={Ruler}
+          handleParametersChange={(id: string, parameters: number[]) => {
+            handleParametersChange(id,
+              parameters,
               setSelectedMetrics,
-              metrics
-            )}
-            Icon={Ruler}
-            handleParametersChange={(id: string, parameters: number[]) => {
-              handleParametersChange(id,
-                parameters,
-                setSelectedMetrics,
-                selectedMetrics)
-            }} />
-        </div>
+              selectedMetrics)
+          }} />
 
       </div >
       {

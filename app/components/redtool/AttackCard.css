@@ -1,15 +1,15 @@
 .attack-card {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  padding: 1vw 2vw 0 2vw;
-  gap: 1.5vw;
+  display: grid;
+  grid-template-rows: 70px 15px 1fr 50px;
+  width: var(--card-width);
+  height: 250px;
+  gap: 10px;
   background: rgb(231, 229, 229);
   border-radius: var(--border-radius);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   align-items: center;
   align-self: end;
+  padding: 10px 20px 10px 20px;
   /* Ensure the card’s internal layout stretches properly */
   position: relative;
 }
@@ -18,19 +18,6 @@
   transform: translateY(-5px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   border-color: #667eea;
-}
-
-.card-header {
-  display: flex;
-  flex-direction: column;
-  height: fit-content;
-  width: 100%;
-  padding: 20px;
-  align-content: center;
-  align-items: center;
-  background-color: rgb(202, 200, 200);
-  border-radius: var(--border-radius);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 .attack-header h3 {
@@ -71,7 +58,7 @@
 }
 
 .circle-checkbox .checkmark {
-  width: 30px;
+  width: 25px;
   aspect-ratio: 1;
   border: 2px solid #888;
   border-radius: 50%;
@@ -84,7 +71,7 @@
 }
 
 .circle-checkbox input:checked+.checkmark {
-  background-color: var(--affermative, #4CAF50);
+  background-color: var(--affermative);
   border: none;
 }
 
@@ -110,16 +97,21 @@
   transform: translateY(-2px);
 }
 
+.container-options {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
 .option-tag {
-  width: fit-content;
-  min-width: 3vw;
+  width: 50px;
   font-size: 0.7rem;
   border-radius: 7px;
   background-color: #2a9d8f;
   color: white;
   align-content: center;
   text-align: center;
-  margin-bottom: 1.5vw;
 }
 
 

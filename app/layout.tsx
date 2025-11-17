@@ -56,19 +56,14 @@ export default function RootLayout({
           <AppShell withBorder={false}>
             <div className={styles.dashboard}>
               <Header />
-              <main className={styles.mainContent}>
-                <AppShell withBorder={false}>
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: '3vw',
-                    height: '100%'
-                  }}>
-                    <Navbar />
-                    {children}
-                  </div>
-                </AppShell>
-              </main>
+
+              <div className={styles.dashboard_layout}>
+                <Navbar />
+
+                <div className={styles.dashboard_main}>
+                  {children}
+                </div>
+              </div>
             </div>
           </AppShell>
         </MantineProvider>

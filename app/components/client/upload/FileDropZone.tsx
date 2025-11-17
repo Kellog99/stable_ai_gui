@@ -2,23 +2,32 @@
 import React, { useState } from 'react';
 import './FileDropZone.css';
 import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
-import { uploadModel, uploadModel_check } from "@/properties/urls";
-import { getModels } from '@/functionalities/NNTrustBackendUtils';
-import { DragDrop, DragDropProps } from './DragDrop';
-import useStore from '@/store/nnTrustStore';
+import { DragDrop } from './DragDrop';
 import { HardDrive, Upload } from 'lucide-react';
 import ZipUploadComponent from './Uploader';
 import { InfoLoader } from './InfoLoader';
+import JSZip from 'jszip';
+
+interface ParsedZipContent {
+    dataFile: File | null;
+    jsonFile: File | null;
+    jsonContent: any;
+}
 
 const FileDropZone: React.FC<FileDropZoneProps> = ({
     id,
     title,
     description,
     Icon,
-    config
+    config,
+    fileType,
+    storeSetter
 }) => {
-    const setModels = useStore((state) => state.setModels)
     const [upload, setUpload] = useState<boolean>(true);
+    const [zipFile, setZipFile] = useState<File | null>(null);
+    const [parsedContent, setParsedContent] = useState<ParsedZipContent | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [uploadStatus, setUploadStatus] = useState<'success' | 'error' | null>(null);
 
     // const [activeSection, setActiveSection] = useState<string>(
     //     defaultActiveSection || sections[0]?.id || "selection"
@@ -31,18 +40,86 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     // }));
 
     // const currentSection = sectionsWithHandlers.find(s => s.id === activeSection);
-    const dragdropinput: DragDropProps = {
-        name: title,
-        Icon: Icon,
-        fileType: 'zip',
-        accept: 'application/zip',
-        formFieldName: "file",
-        description: 'Make sure your zip contains raw data and a json config file.',
-        uploadUrlCheck: uploadModel_check,
-        uploadUrl: uploadModel,
-        refreshFunction: getModels,
-        setRefreshData: setModels,
-    }
+
+
+    // This function handles the upload of the  zip file 
+    // Hence, it handles the file decompression
+    // and to set all the variables 
+    const handleFileUpload = async (file: File | null) => {
+        if (!file) {
+            setZipFile(null);
+            setParsedContent(null);
+            setUploadStatus(null);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const zip = new JSZip();
+            const zipContent = await zip.loadAsync(file);
+
+            let dataFile: File | null = null;
+            let jsonContent: any = null;
+
+            for (const [filename, fileData] of Object.entries(zipContent.files)) {
+                if (fileData.dir) continue;
+
+                // Extract model/data file
+                if (filename.endsWith(`.${fileType}`)) {
+                    const blob = await fileData.async("blob");
+                    dataFile = new File([blob], filename);
+                }
+
+                // Extract JSON config
+                if (filename.endsWith(".json")) {
+                    const text = await fileData.async("string");
+                    jsonContent = JSON.parse(text);
+                }
+            }
+
+            if (!dataFile) {
+                console.log(`No .${fileType} file found in this ZIP.`);
+                setUploadStatus("error");
+                return;
+            }
+
+            if (!jsonContent) {
+                console.log("No JSON configuration file found in the ZIP.");
+                setUploadStatus("error");
+                return;
+            }
+
+            // Build parsed content
+            const parsed: ParsedZipContent = {
+                dataFile,
+                jsonFile: null,
+                jsonContent
+            };
+
+            setZipFile(file);
+            setParsedContent(parsed);
+            setUploadStatus("success");
+
+            // Call storeSetter with dataFile and spread jsonContent properties
+            if (storeSetter) {
+                storeSetter(dataFile, jsonContent.name, jsonContent.num_classes);
+            }
+
+            console.log("ZIP parsed successfully.");
+        } catch (error) {
+            console.error("Error parsing ZIP: ", error);
+            setUploadStatus("error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // This function handle the uploading of the model or dataset inside the repository
+    const handleRepositoryUpload = async () => {
+        // TO DO
+    };
+
+
     return (
         <div
             key={id}
@@ -78,11 +155,19 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
                 upload ?
                     <div className='container-upload'>
                         {/* Load Zone*/}
-                        <DragDrop {...dragdropinput} />
+                        <DragDrop
+                            name={title}
+                            Icon={Icon}
+                            acceptedType={"zip"}
+                            description={description}
+                            onFileSelect={handleFileUpload}
+                        />
+
                         {/* Load button */}
                         <button
-                            onClick={() => { }}
+                            onClick={handleRepositoryUpload}
                             className='load-button'
+                            disabled={zipFile ? true : false}
                         >
                             <Upload /> Upload into the Repository.
                         </button>

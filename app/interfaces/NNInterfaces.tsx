@@ -1,12 +1,12 @@
 import { InfoUploader } from "@/components/client/upload/config";
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
+
 export interface ModelSpecs {
   name: string;
   task: string;
+  file: File;
   numClasses: number;
-  pretrained: boolean;
-  mode: string;
 }
 
 export interface LoadedFile {
@@ -37,13 +37,11 @@ export interface FileDropZoneProps {
   title: string,
   description: string,
   Icon: LucideIcon,
-  config: InfoUploader,
-  fileType: string;
-  accept: string; // for a zip file in Linux the MIME type is "application/zip" while for Windows it's "application/x-zip-compressed"
+  config: InfoUploader,                     // This is the configuration file for the info
+  fileType: string;                         // Type of the true data, i.e. pth or zip
   drop_description?: string;
-  uploadUrlCheck: string;
-  uploadUrl: string;
   formFieldName: string;
+  storeSetter: (...args: any[]) => void;    //This is the store function for allocating the file into the correct space.
 }
 
 export interface ParametersProps {

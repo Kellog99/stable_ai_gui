@@ -22,11 +22,12 @@
   /* Dark text for light backgrounds */
   --border-radius: 10px;
   --warning: #FFD800;
-  --affermative: lightgreen;
+  --affermative: green;
   --error: red;
   --icon-size: 30px;
-  --title:Stable AI;
-  --header-height: 90px
+  --title: Stable AI;
+  --header-height: 90px;
+  --card-width: 380px;
 }
 
 html,
@@ -50,4 +51,10 @@ h1 {
 
 h2 {
   color: var(--text-secondary);
+}
+
+.container-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }

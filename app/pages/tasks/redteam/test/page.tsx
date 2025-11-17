@@ -92,13 +92,13 @@ function Test() {
 
 
     return (
-        <div className={styles.test}>
+        <div className="container-pages">
             {/* Header */}
-            <div className={styles.header}>
-                <Shield className={styles.header_icon} />
-                <div className={styles.header_content}>
-                    <h1>Testing Lab</h1>
-                    <p>Test on the loaded model single attack for a specific image.</p>
+            <div className="container-title">
+                <Shield size={"calc(var(--icon-size) * 3)"} color='red' />
+                <div>
+                    <h1 style={{ margin: "0", fontSize: "2.5rem" }}>Testing Lab</h1>
+                    <p style={{ margin: "0" }}>Test on the loaded model single attack for a specific image.</p>
                 </div>
             </div>
 

@@ -1,22 +1,22 @@
 .dashboard {
   height: 100vh;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, rgb(15, 23, 42) 0%, rgb(30, 41, 59) 100%);
   overflow: hidden;
 }
 
 .dashboard_layout {
-  display: flex;
   flex: 1;
-  overflow: hidden;
+  display: flex;
+  overflow: hidden; /* Prevent navbar from scrolling */
 }
 
-.dashboard-main {
-  flex: 1;
-  overflow: auto;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.8) 100%);
+.dashboard_main {
+  width: 100%;
+  padding-left: 40px;
+  padding-right: 40px;
+  overflow-x: hidden;
+  overflow-y: auto; 
 }
 
 .dashboard-main::-webkit-scrollbar {
@@ -36,3 +36,7 @@
   background: rgba(59, 130, 246, 0.5);
 }
 
+.mainContainer {
+  height: 100%;
+  width: 100%;
+}

@@ -11,19 +11,20 @@
 }
 
 .table-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     margin: 0 0 0.25rem 0;
 }
 
 .subtitle {
-    font-size: 1vw;
+    font-size: 1rem;
     color: #6b7280;
     margin: 0;
 }
 
 .scroll-header {
     display: flex;
+    width: 100%;
     flex-direction: row;
     align-items: center;
     gap: 2rem;
@@ -33,10 +34,8 @@
 
 /* Search bar */
 .search-container {
-    position: relative;
-    /* ADD THIS - needed for absolute positioning of icon */
     width: 100%;
-    max-width: 400px;
+    position: relative;
     margin-bottom: 0;
     /* Remove bottom margin since scroll-header handles spacing */
 }
@@ -49,14 +48,13 @@
     transform: translateY(-50%);
     /* Perfect vertical centering */
     color: #9ca3af;
-    width: 20px;
-    height: 20px;
     pointer-events: none;
     /* Prevent icon from blocking input clicks */
 }
 
 .search-input {
     width: 100%;
+    height: 40px;
     padding: 0.6rem 1rem 0.6rem 2.5rem;
     /* Increased left padding for icon */
     border: 1px solid #d1d5db;
@@ -74,8 +72,7 @@
 .buttons-container {
     display: flex;
     flex-direction: row;
-    gap: 1vw;
-    background-color: var(--navy-500);
+    gap: 10px;
     justify-content: space-between;
     align-items: center;
     padding: 0.8vw;
@@ -86,11 +83,11 @@
 
 .button {
     border-radius: 10px;
-    width: 8vw;
-    height: 2vw;
+    width: 150px;
+    height: 40px;
     font-size: 1vw;
     font-weight: 600;
-    background-color: var(--navy-700);
+    background-color: var(--bg);
     border: none;
     color: white;
     transition: 0.3s ease;
@@ -107,12 +104,14 @@
 /* Scrollable container */
 .scroll-container {
     width: 100%;
-    height: 70vh;
+    min-height: 100px;
+    max-height: 800px;
+    height: fit-content;
     overflow-y: auto;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--bg);
     border: 1px solid #e5e7eb;
     border-radius: 1rem;
-    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid gray;
     padding: 1.5rem;
 }
 
@@ -128,6 +127,8 @@
 /* Grid layout for cards */
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, var(--card-width));
+    justify-content: center;
+    /* optional: centers columns */
     gap: 1.5rem;
 }

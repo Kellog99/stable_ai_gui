@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 
 interface AppState {
-  models: ModelSpecs[] | null;
+  model: ModelSpecs | null;
   modelName: string | null;
   attacks: { [key: string]: RegisterObjectProps };
   metrics: { [key: string]: RegisterObjectProps };
@@ -24,7 +24,7 @@ interface AppState {
   benchmark: { [key: string]: BenchmarkDataProps } | null;
   vulnerabilitySelected: string | null;
 
-  setModels: (models: ModelSpecs[] | null) => void;
+  setModel: (models: ModelSpecs | null) => void;
   setModelName: (modelName: string | null) => void;
   setAttacks: (attaks: { [key: string]: RegisterObjectProps }) => void;
   setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
@@ -43,7 +43,7 @@ interface AppState {
 const useNNTrustStore = create<AppState>()(
   persist(
     (set) => ({
-      models: null,
+      model: null,
       modelName: null,
 
       attacks: {},
@@ -62,7 +62,7 @@ const useNNTrustStore = create<AppState>()(
       benchmark: null,
       vulnerabilitySelected: null,
 
-      setModels: (models) => set({ models }),
+      setModel: (models) => set({ model: models }),
       setModelName: (modelName) => set({ modelName }),
 
       setAttacks: (attacks) => set({ attacks }),
@@ -82,7 +82,7 @@ const useNNTrustStore = create<AppState>()(
       name: "app-storage",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
-        models: state.models,
+        model: state.model,
         modelName: state.modelName,
         attacks: state.attacks,
         metrics: state.metrics,

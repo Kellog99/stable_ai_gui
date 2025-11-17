@@ -10,8 +10,8 @@ export const ModelRepository: React.FC = () =>
 {
     const setModelName = useStore( ( state ) => state.setModelName )
     const modelName = useStore( ( state ) => state.modelName )
-    const setModels = useStore( ( state ) => state.setModels )
-    const models = useStore( ( state ) => state.models )
+    const setModels = useStore( ( state ) => state.setModel )
+    const models = useStore( ( state ) => state.model )
 
 
     const handleClick = ( clickedModelName: string ) =>
