@@ -64,7 +64,6 @@ export const DragDrop: React.FC<DragDropProps> = ({
             <Dropzone
                 onDrop={(files) => {
                     const newFile = files[0];
-                    console.log("ssssss")
                     if (newFile) {
                         handleFileSelection(newFile);
                     }

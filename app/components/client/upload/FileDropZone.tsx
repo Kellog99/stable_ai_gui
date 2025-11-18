@@ -4,7 +4,6 @@ import './FileDropZone.css';
 import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 import { DragDrop } from './DragDrop';
 import { HardDrive, Upload } from 'lucide-react';
-import ZipUploadComponent from './Uploader';
 import { InfoLoader } from './InfoLoader';
 import JSZip from 'jszip';
 
@@ -21,7 +20,8 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     Icon,
     config,
     fileType,
-    storeSetter
+    storeSetter, 
+    Repository
 }) => {
     const [upload, setUpload] = useState<boolean>(true);
     const [zipFile, setZipFile] = useState<File | null>(null);
@@ -153,8 +153,9 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
 
             {
                 upload ?
+                    // Upload Zone
                     <div className='container-upload'>
-                        {/* Load Zone*/}
+                        {/* Drag and drop Component */}
                         <DragDrop
                             name={title}
                             Icon={Icon}
@@ -163,7 +164,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
                             onFileSelect={handleFileUpload}
                         />
 
-                        {/* Load button */}
+                        {/* Button for loading the file into its repository */}
                         <button
                             onClick={handleRepositoryUpload}
                             className='load-button'
@@ -171,8 +172,10 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
                         >
                             <Upload /> Upload into the Repository.
                         </button>
-                    </div>
-                    : <ZipUploadComponent />
+                    </div> :
+
+                    // Repository Zone  
+                    <Repository />
             }
         </div >
     );

@@ -42,6 +42,7 @@ export interface FileDropZoneProps {
   drop_description?: string;
   formFieldName: string;
   storeSetter: (...args: any[]) => void;    //This is the store function for allocating the file into the correct space.
+  Repository: React.FC
 }
 
 export interface ParametersProps {

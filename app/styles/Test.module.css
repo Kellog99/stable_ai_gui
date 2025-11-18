@@ -2,13 +2,17 @@
   display: grid;
   width: 100%;
   grid-template-columns: 1fr 2fr;
-  column-gap: 4vw;
+  column-gap: 50px;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 
-.main {
+.column {
   display: flex;
   flex-direction: column;
-  gap: 1vw;
+  gap: 30px;
+  padding-left: 20px;
+  padding-left: 20px;
 }
 
 .section {
@@ -78,9 +82,11 @@
 .results_column {
   display: flex;
   flex-direction: column;
+  gap: 40px;
 }
 
 .image_grid {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   column-gap: 2vw;

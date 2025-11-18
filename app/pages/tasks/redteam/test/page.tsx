@@ -5,10 +5,11 @@ import { Book, Bug, Camera, ChevronDown, ChevronUp, Glasses, Play, Settings2, Sh
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
 import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
-import { AdvanceResult, AttackResult } from '@/interfaces/testInterfaces';
+import { SingleAttackProps } from '@/interfaces/testInterfaces';
 import styles from '@/styles/Test.module.css';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 
 function Test() {
 
@@ -30,7 +31,9 @@ function Test() {
     const [advImg, setAdvImg] = useState<string[] | null>(null)
     const [advPert, setAdvPert] = useState<string | null>(null)
 
-    const [atkResult, setAtkResult] = useState<AdvanceResult | undefined>();
+    const [atkResult, setAtkResult] = useState<{ [key: string]: number } | undefined>(undefined);
+    const [atkConf, setAtkConf] = useState<{ [key: string]: number[] } | undefined>(undefined);
+
     const [clicked, setClicked] = useState<Boolean>(false);
     const [loading, setLoading] = useState<Boolean>(false)
 
@@ -61,7 +64,7 @@ function Test() {
                 });
 
                 console.log('Status:', response.status);
-                const data: AttackResult = await response.json();
+                const data: SingleAttackProps = await response.json();
                 console.log('Response:', data);
 
                 if (!response.ok) {
@@ -74,11 +77,9 @@ function Test() {
                 setAdvPert(data.adv_perturbation)
                 console.log("pert=", data.adv_perturbation)
 
-                setAtkResult({
-                    "confidence": data.confidence,
-                    "ssim": data.ssim,
-                    "executionTime": data.executionTime,
-                })
+                setAtkResult({ ...data.advance_metrics })
+                setAtkConf(data.confidence)
+
             } catch (error) {
                 console.error('ERROR:', error);
             } finally {
@@ -94,30 +95,32 @@ function Test() {
     return (
         <div className="container-pages">
             {/* Header */}
-            <div className="container-title">
-                <Shield size={"calc(var(--icon-size) * 3)"} color='red' />
-                <div>
-                    <h1 style={{ margin: "0", fontSize: "2.5rem" }}>Testing Lab</h1>
-                    <p style={{ margin: "0" }}>Test on the loaded model single attack for a specific image.</p>
-                </div>
-            </div>
+            <HeaderPageTask
+                Icon={Shield}
+                title="Testing Lab"
+                descrition="Test on the loaded model single attack for a specific image."
+
+            />
+
 
             <div className={styles.test_components}>
                 {/* Left Column - Controls */}
-                <div className={styles.main}>
-                    <div className={styles.section}>
-                        <Camera size={'3vw'} color='#FF7F7F' />
-                        <p>
-                            Image Selection
-                        </p>
+                <div className={styles.column}>
+                    {/* Image Loader */}
+                    <div>
+                        <div className={styles.section}>
+                            <Camera size={'3vw'} color='#FF7F7F' />
+                            <p>
+                                Image Selection
+                            </p>
+                        </div>
+                        <ImageDisplay
+                            placeholder='Load an PNG or a JPG file.'
+                            footer='Here it is shown the selected image.'
+                            handleUpload={(file: string | null) => setUploadedFile(file)}
+                            loader={true}
+                        />
                     </div>
-                    <ImageDisplay
-                        placeholder='Load an PNG or a JPG file.'
-                        footer='Here it is shown the selected image.'
-                        loader={true}
-                        handleUpload={(file: string | null) => setUploadedFile(file)}
-                    />
-
                     {/* Selection of the attacks */}
                     <>
                         <div className={styles.section}>
@@ -195,37 +198,39 @@ function Test() {
 
                 {/* Right Column - Results */}
                 <div className={styles.results_column}>
-                    <div className={styles.section}>
-                        <Glasses size={'3vw'} color='#FF7F7F' />
-                        <p>
-                            See the Results
-                        </p>
-                    </div>
-                    <div className={styles.image_grid}>
-                        <ImageDisplay
-                            title="Original Image"
-                            placeholder="No image loaded"
-                            imageUrl={origImg ? origImg[0] : undefined}
-                            footer={origImg ? origImg[1] : undefined}
-                            loader={false}
-                        />
+                    <div>
+                        <div className={styles.section}>
+                            <Glasses size={'3vw'} color='#FF7F7F' />
+                            <p>
+                                See the Results
+                            </p>
+                        </div>
+                        <div className={styles.image_grid}>
+                            <ImageDisplay
+                                title="Original Image"
+                                placeholder="No image loaded"
+                                imageUrl={origImg ? origImg[0] : undefined}
+                                footer={origImg ? origImg[1] : undefined}
+                                loader={false}
+                            />
 
-                        <ImageDisplay
-                            title="Adversarial Perturbation"
-                            placeholder="No image loaded"
-                            imageUrl={advPert ? advPert : undefined}
-                            loader={false}
+                            <ImageDisplay
+                                title="Adversarial Perturbation"
+                                placeholder="No image loaded"
+                                imageUrl={advPert ? advPert : undefined}
+                                loader={false}
 
-                        />
+                            />
 
-                        <ImageDisplay
-                            title="Adversarial Example"
-                            placeholder="No image loaded"
-                            imageUrl={advImg ? advImg[0] : undefined}
-                            footer={advImg ? advImg[1] : undefined}
-                            loader={false}
+                            <ImageDisplay
+                                title="Adversarial Example"
+                                placeholder="No image loaded"
+                                imageUrl={advImg ? advImg[0] : undefined}
+                                footer={advImg ? advImg[1] : undefined}
+                                loader={false}
 
-                        />
+                            />
+                        </div>
                     </div>
                     <div className={styles.section}>
                         <TrendingUp size={'3vw'} color='#FF7F7F' />
@@ -243,6 +248,7 @@ function Test() {
                     {
                         seeResults ?
                             <AttackVisualization
+                                confidence={atkConf}
                                 results={atkResult} />
                             : null
                     }

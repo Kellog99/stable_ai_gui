@@ -3,10 +3,13 @@ import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
 import { infoDataset, infoModel } from '../client/upload/config';
 import useNNTrustStore from '@/store/nnTrustStore';
 
+// Repository
+import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
+import { ModelRepository } from '@/components/client/ModelDisplayer';
+
+
 // Helper to safely access Zustand without subscribing at module scope
 const getStore = () => useNNTrustStore.getState();
-
-
 // This contains the information 
 export const listOfSections: FileDropZoneProps[] = [
     {
@@ -34,7 +37,8 @@ export const listOfSections: FileDropZoneProps[] = [
             });
 
             setModelName(name);
-        }
+        },
+        Repository: DatasetRepository
     },
 
     {
@@ -51,7 +55,8 @@ export const listOfSections: FileDropZoneProps[] = [
             // To implement:
             // const { setDataset } = getStore();
             // setDataset(file);
-        }
+        },
+        Repository: ModelRepository
     }
 ];
 

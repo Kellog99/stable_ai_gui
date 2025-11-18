@@ -6,20 +6,14 @@ export interface AttackConfig {
   confidence?: number;
 }
 
-
-export interface AdvanceResult {
-  confidence: number[];
-  ssim: number;
-  executionTime: number
-}
-
-export interface AttackResult extends AdvanceResult {
+export interface SingleAttackProps {
   x: string;
   adv_perturbation: string;
   x_adv: string;
   original_prediction: string;
   adversarial_prediction: string;
-
+  confidence: {[key:string]: number[]},
+  advance_metrics: { [key: string]: number }
 }
 
 export interface AttackStats {

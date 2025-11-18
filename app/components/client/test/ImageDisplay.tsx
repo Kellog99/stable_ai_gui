@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, X } from 'lucide-react';
 import './test.css';
 
@@ -6,40 +6,40 @@ interface ImageDisplayProps {
   title?: string;
   placeholder: string;
   footer?: string;
-  imageUrl?: string;
+  imageUrl?: string           // image to display whenever it is passed.
+  loader: boolean             // tells wheter the component must act as an image loader or just displayer
   handleUpload?: (file: string | null) => void;
-  loader: boolean;
 }
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   title,
   footer,
-  imageUrl,
   handleUpload,
   placeholder,
-  loader = false
+  imageUrl,
+  loader
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loadedImage, setLoadedImage] = useState<string | null>(null);
 
-  const handleImageContainerClick = () => {
-    if (loader && fileInputRef.current && !loadedImage) {
-      fileInputRef.current.click();
+  useEffect(() => {
+    if (imageUrl) {
+      setLoadedImage(imageUrl)
     }
-  };
+  }, [imageUrl])
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleFileChange = (file: File | undefined) => {
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setLoadedImage(result);
+      reader.onload = () => {
+        const base64String = reader.result as string; // Now it's a string!
+        setLoadedImage(base64String);
         if (handleUpload) {
-          handleUpload(result)
+          handleUpload(base64String)
         }
       };
       reader.readAsDataURL(file);
+
     }
   };
 
@@ -54,50 +54,46 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
     }
   };
 
-  const displayImage = loadedImage || imageUrl;
-
   return (
     <div className="image-wrapper">
       {title && (<h3 className="image-title">{title}</h3>)}
-      <div
-        className="image"
-        onClick={handleImageContainerClick}
-        style={{ cursor: loader && !loadedImage ? 'pointer' : 'default', position: 'relative' }}
-      >
-        {displayImage ? (
-          <>
-            <img
-              src={displayImage}
-              alt={`Loaded image`}
-              className="image-img"
-            />
-            {loadedImage && (
-              <button
-                onClick={handleDeleteImage}
-                className='delete-button'
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'}
-              >
-                <X size={20} color="white" />
-              </button>
-            )}
-          </>
-        ) : (
-          <div className="image-placeholder">
-            <Image className="image-icon" />
-            <p className="image-text">{placeholder}</p>
-          </div>
-        )}
-        {loader && (
+      {loadedImage || !loader ? (
+        <div className="image-container">
+          <img
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
+            src={loadedImage ? loadedImage : undefined}
+            alt={`Waiting for an image to be displayed`}
+          />
+          {loader && (
+            <button
+              onClick={handleDeleteImage}
+              className='delete-button'
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'}
+            >
+              <X size={20} color="white" />
+            </button>)}
+        </div>
+      ) : (
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="image-container loader">
+          <Image size={"calc(2 * var(--icon-size))"} />
+          {placeholder}
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/png,image/jpeg,image/jpg"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFileChange(e.target.files?.[0])}
           />
-        )}
-      </div>
+        </div>
+      )}
+
       {
         footer && (<p style={{ color: 'grey' }}>{footer}</p>)
       }
