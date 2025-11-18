@@ -6,7 +6,6 @@ import useNNTrustStore from "@/store/nnTrustStore";
 import styles from "@/styles/JsonRepository.module.css"
 import { Bug, Cpu, Database } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { report } from "node:process";
 import React from "react";
 
 interface ReportCardProps {
@@ -16,7 +15,6 @@ interface ReportCardProps {
 
 export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
-
     const setReportFromBE = useStore((state) => state.setReportFromBE)
 
     const setReport = useNNTrustStore((state) => state.setReport)
@@ -24,7 +22,6 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
     const imageDatas = reportNN?.prototype || reportDQ?.dataset.prototype.datas[0];
 
-    console.log("imagedata", imageDatas)
 
     const { thumbnails, connectionStatus, requestThumbnail } = useThumbnailWS(
         image_type,
@@ -34,7 +31,6 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
 
     const handleClick = () => {
-        //reportName può essere o l'ID per i report di nntrust oppure il nome del dataset per dq
         if (reportNN) {
             setReport(reportNN as ReportProps)
             router.push("/pages/report/reportTITANN")
@@ -44,7 +40,6 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
             router.push("/pages/report/reportDQ")
         }
     }
-
 
     return (
         <>
@@ -82,12 +77,6 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                                 <h4>General</h4>
                             </div>
                             <div className={styles.panelBody}>
-                                {/*
-                                <div>
-                                    <span className={styles.subtitlePanel}>Task:</span>
-                                    {reportNN ? reportNN.info.task : reportDQ?.dataset.task}
-                                </div>
-                                */}
                                 {reportNN ? (
                                     <>
                                         <div>

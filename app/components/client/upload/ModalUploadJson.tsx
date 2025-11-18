@@ -58,7 +58,7 @@ export function ModalUploadJson() {
           2,
           2,
           2
-          // ... continues
+          // ... etc
         ]
       }
     }

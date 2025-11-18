@@ -30,9 +30,9 @@ ChartJS.register(
 );
 
 interface BenchmarkTableProps {
-    modelName?: string;                                    // name of the tested model
-    benchmark: { [key: string]: BenchmarkDataProps };     // stored benchmarks from previous models
-    data: metricsProps;                                   // metrics result from the benchmark
+    modelName?: string;                                    
+    benchmark: { [key: string]: BenchmarkDataProps };     
+    data: metricsProps;                                   
 }
 
 const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
@@ -71,7 +71,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         setBenchmarkData(out);
     }, [benchmark, availableBenchmarkingMetrics]);
 
-    console.log("benchmarkData = ", benchmarkData);
 
     const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
 
@@ -81,7 +80,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         }
     }, [availableBenchmarkingMetrics]);
 
-    // Sort data by value, descending
+    
     const [sortedData, setSortedData] = useState<[string, number][]>([]);
     const [chartBenchmarkData, setChartBenchmarkData] = useState<{ [key: string]: number }[]>([]);
     const [chartValueData, setChartValueData] = useState<{ [key: string]: number }[]>([]);
@@ -89,7 +88,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     useEffect(() => {
         if (!selectedBenchmark) return;
 
-        // Flatten and filter to ensure we only have numbers
         const flattenValue = (val: any): number[] => {
             if (val === undefined || val === null) return [];
             if (typeof val === 'number') return [val];
@@ -99,7 +97,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             return [];
         };
 
-        // Extract benchmark values for the selected metric
         const benchmarkEntries = Object.entries(benchmark);
         const benchmarkValues = benchmarkEntries.map(([id, benchmarkProp]) =>
             benchmarkProp.metrics[selectedBenchmark] ?? 0
@@ -120,9 +117,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                     params: data.params,
                     [selectedBenchmark]: dataValue[0],
                 }];
-
-                console.log("before filter benchmarkChartData= ", benchmarkChartData);
-                console.log("chartValueData BEFORE= ", chartValueData);
 
                 benchmarkChartData = benchmarkChartData.filter(
                     (entry) =>
@@ -169,7 +163,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         ],
     };
 
-    console.log("chartData2 = ", chartData2);
 
     const isHighlighted = (value: number) => {
         const testedValue = data[selectedBenchmark as keyof metricsProps];
@@ -180,7 +173,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
     console.log("sorted elements", sortedData);
 
-    const referenceY = data[selectedBenchmark];
+    const referenceY = data[selectedBenchmark as keyof metricsProps];
     const referenceLabel = modelName || 'Tested Model';
 
     const options = {
@@ -237,13 +230,11 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         },
     };
 
-    console.log("selectedBenchmark = ", availableBenchmarkingMetrics);
 
 
 
     return (
         <div className="benchmark-controls">
-            {/* Benchmark selector */}
             <select
                 value={selectedBenchmark}
                 onChange={(e) => setSelectedBenchmark(e.target.value)}
@@ -263,7 +254,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                 </div>
 
 
-                {/* Leaderboard */}
                 <div className="leaderboard">
                     <h3 className="leaderboard-title">
                         <Trophy className="icon trophy-large" />

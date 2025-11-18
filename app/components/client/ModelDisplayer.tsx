@@ -20,11 +20,8 @@ export const ModelRepository: React.FC = () => {
         }
     }
 
-
     useEffect(() => {
-        console.log("sono qui")
         getModels().then((fetchedModels) => {
-            console.log("Fetched models:", fetchedModels);
             setModels(fetchedModels.models);
         })
     }, [setModels])
@@ -60,7 +57,7 @@ export const ModelRepository: React.FC = () => {
                                     </div>
                                     <div className={styles.infoRow}>
                                         <span className={styles.label}>num_classes:</span>
-                                        <span className={styles.value}>{model.numClasses}</span>
+                                        <span className={styles.value}>{model.num_classes}</span>
                                     </div>
                                 </div>
 
@@ -70,8 +67,8 @@ export const ModelRepository: React.FC = () => {
                                         <span className={styles.value}>{model.pretrained ? "true" : "false"}</span>
                                     </div>
                                     <div className={styles.infoRow}>
-                                        <span className={styles.label}>mode:</span>
-                                        <span className={styles.value}>{model.mode}</span>
+                                        <span className={styles.label}>type:</span>
+                                        <span className={styles.value}>{model.type}</span>
                                     </div>
                                 </div>
                             </div>

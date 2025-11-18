@@ -5,7 +5,7 @@ export interface ModelSpecs {
   task: string;
   num_classes: number;
   pretrained: boolean;
-  mode: string;
+  type: string;
 }
 
 export interface Task {

@@ -51,7 +51,6 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
     const downloadPDF = () => {
         if (!pdfData) return;
         
-        // Convert base64 to blob
         const byteCharacters = atob(pdfData);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -60,7 +59,6 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'application/pdf' });
         
-        // Create download link
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;

@@ -62,7 +62,7 @@ const MovableWindow: React.FC<MovableWindowProps> = ( {
           
           return { 
             x: position.x, 
-            y: viewportSize.height - 190 // 40px is the header height
+            y: viewportSize.height - 190 
           };
         }
         return { x: position.x, y: viewportSize.height - 190 };
@@ -71,16 +71,14 @@ const MovableWindow: React.FC<MovableWindowProps> = ( {
     const toggleCollapse = () =>
     {
         if ( !collapsed ) {
-            // Save current position before collapsing
             setExpandedPosition( { x: position.x, y: position.y } );
             setCollapsed( true );
         } else {
-            // Restore to saved position when expanding
+            
             setCollapsed( false );
         }
     };
 
-    // Effect to update position when collapsed state changes
     useEffect( () =>
     {
         if ( collapsed && rndRef.current ) {
@@ -130,10 +128,8 @@ const MovableWindow: React.FC<MovableWindowProps> = ( {
                 setIsDragging(false)
             
                 if (collapsed) {
-                    // Update only the x coordinate of expandedPosition
                     setExpandedPosition(prev => ({ ...prev, x: newPos.x }));
                 } else {
-                    // Fully update expandedPosition
                     setExpandedPosition(newPos);
                 }
             }}

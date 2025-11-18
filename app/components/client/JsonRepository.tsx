@@ -1,9 +1,5 @@
 import { DQReportProps } from "@/interfaces/reportInterfaces";
-import useStore from "@/store/dsStore";
-
 import styles from "@/styles/JsonRepository.module.css"
-
-
 import React, { useEffect, useState } from "react";
 import ReportCard from "./ReportCard";
 import { getAllDQReports } from "@/functionalities/BackendUtils";
@@ -19,9 +15,6 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
 
     const [DQReports, setDQReports] = useState<DQReportProps[]>([]);
     const [NNReports, setNNReports] = useState<any[]>([]);
-
-
-
 
     useEffect(() => {
         if (tool === "dq") {

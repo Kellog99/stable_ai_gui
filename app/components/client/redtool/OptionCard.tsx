@@ -32,15 +32,10 @@ export function OptionCard({
   const model = useNNStore((state) => state.models);
   const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
 
-  console.log("cm in elements??", name == "confusionmatrix")
-  console.log("is selected", isSelected)
-
   let isCM = false;
   if (numClasses > 100 && name == "confusionmatrix") {
     isCM = true;
   }
-  console.log("isCM", isCM)
-
 
   return (
     <>

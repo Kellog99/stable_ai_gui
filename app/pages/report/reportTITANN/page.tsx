@@ -15,7 +15,7 @@ const SecurityReport = () => {
     
     // Bisogna pensare ad una logica in cui il benchmark viene anche caricato qua se e è nullo 
 
-    
+
     console.log("benchark fetch = ", benchmark)
     
     if (report && benchmark) {

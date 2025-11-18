@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react'
 import useNNTrustStore from '@/store/nnTrustStore';
-import { attacksProps, metricsProps } from '@/interfaces/reportInterfaces';
+import { attacksProps} from '@/interfaces/reportInterfaces';
 import { Target, Zap, GitBranch, LucideIcon, TreePine } from 'lucide-react';
 import './AttackPageStyle.css';
 

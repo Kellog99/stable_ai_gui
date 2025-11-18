@@ -1,6 +1,5 @@
 import DatasetsLoader from '@/functionalities/DatasetsLoader';
 import Dataset from '@/interfaces/genericInterface';
-import { dataset_upload } from '@/properties/urlsNNTrust';
 import useStore, { useActionStore } from '@/store/dsStore';
 import styles from '@/styles/AsyncTracker.module.css';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
@@ -8,8 +7,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 
 /**
- * AsyncTaskTracker - A reusable component for tracking Ray task progress
- * 
  * @param {Object} props
  * @param {string} props.action - The type of action the component is applied to 
  * @param {string} props.startEndpoint - The endpoint to start the task (e.g., "/actions/embedder")
@@ -18,9 +15,6 @@ import React, { useEffect, useRef, useState } from 'react';
  * @param {string} props.progressEndpoint - The endpoint to check progress (e.g., "/embedder/progress")
  * @param {number} props.pollInterval - Polling interval in ms (default: 2000)
  * @param {boolean} props.progressDisplayMode - If true, show progress bar; if false, show spinner (default: true)
- * @param {Function} props.onComplete - Callback when task completes successfully
- * @param {Function} props.onError - Callback when task errors
- * @param {React.ReactNode} props.children - Render prop function or trigger button
  */
 
 interface AsyncTaskTrackerProps {
