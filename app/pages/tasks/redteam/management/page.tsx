@@ -72,6 +72,28 @@ const TaskManagement: React.FC = () => {
     }
 
 
+    // ############## Polling the Benchmark status ##############
+    const { setExecutedAttacks } = useNNTrustStore()
+    const handleRefresh = async () => {
+        try {
+            const response = await fetch('http://127.0.0.1:8000/attacks/benchmarkStatus');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`); // Fixed: parentheses, not backtick
+            }
+            const data = await response.json(); // Parse the response
+            console.log("management ==", data)
+            setExecutedAttacks(data)
+        } catch (error) {
+            console.error('ERROR:', error);
+            return []; // Return empty array on error
+        }
+    }
+
+    useEffect(() => {
+        const timer = setInterval(handleRefresh, 6000);
+        return () => clearInterval(timer);
+    }, []);
+    // ##########################################################
 
     return (
         <div className="container-pages">
@@ -82,7 +104,7 @@ const TaskManagement: React.FC = () => {
                 descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
                 buttonprops={{
                     description: "Vulnerability Report",
-                    isDisabled: isDisabled,
+                    isDisabled: false,//isDisabled,
                     disabledDescription: description,
                     handleClick: handleClickReport
                 }}
@@ -90,7 +112,7 @@ const TaskManagement: React.FC = () => {
 
             {/* Status Summary Cards */}
             <>
-                <h3 style={{margin:0, padding:0, color:"white"}}>Overview Jobs:</h3>
+                <h3 style={{ margin: 0, padding: 0, color: "white" }}>Overview Jobs:</h3>
                 <div className="container-cards">
                     {Object.entries(attackStates).map(([status, value]) => (
                         <div className="card-summary">

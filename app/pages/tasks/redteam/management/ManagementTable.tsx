@@ -65,27 +65,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
         }
     }, [jobs, searchTerm, statusFilter, sortConfig]);
 
-    const { setExecutedAttacks } = useNNTrustStore()
-
-    const handleRefresh = async () => {
-        try {
-            const response = await fetch('http://127.0.0.1:8000/attacks/benchmarkStatus');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`); // Fixed: parentheses, not backtick
-            }
-            const data = await response.json(); // Parse the response
-            console.log("management ==", data)
-            setExecutedAttacks(data)
-        } catch (error) {
-            console.error('ERROR:', error);
-            return []; // Return empty array on error
-        }
-    }
-
-    useEffect(() => {
-        const timer = setInterval(handleRefresh, 6000);
-        return () => clearInterval(timer);
-    }, []);
+    
 
     return (
         <div className='table-container'>
