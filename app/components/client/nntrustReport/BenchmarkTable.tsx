@@ -12,7 +12,6 @@ import {
 } from 'chart.js';
 
 import annotationPlugin from 'chartjs-plugin-annotation';
-
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
 import { Scatter } from 'react-chartjs-2';
@@ -41,7 +40,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     data
 }) => {
 
-    // These are the metrics that were used during the evaluation of this model.
     const availableBenchmarkingMetrics = useMemo(() =>
         Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
             !key.endsWith("_rank")),
@@ -142,7 +140,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         setSortedData(combined);
     }, [selectedBenchmark, benchmark, data, modelName]);
 
-    const chartData2 = {
+    const chartData = {
         datasets: [
             {
                 label: 'Benchmark Element',
@@ -187,13 +185,13 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                         type: 'line',
                         yMin: referenceY,
                         yMax: referenceY,
-                        borderColor: 'rgba(239, 68, 68, 0.8)', // red.7
+                        borderColor: 'rgba(239, 68, 68, 0.8)',
                         borderWidth: 1,
                         label: {
                             display: true,
                             content: referenceLabel,
                             position: 'start',
-                            color: 'rgba(239, 68, 68, 0.8)', // red.7
+                            color: 'rgba(239, 68, 68, 0.8)', 
                             backgroundColor: 'transparent',
                             yAdjust: -10,
                         },
@@ -202,7 +200,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             },
             tooltip: {
                 callbacks: {
-                    title: () => '', // Remove title to eliminate the color box there
+                    title: () => '',
                     label: (context: any) => {
                         const point = context.raw;
                         const params = point.x;
@@ -250,7 +248,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             <div className='results-grid'>
             
                 <div style={{ width: '100%', height: 400 }}>
-                    <Scatter data={chartData2} options={options as any} />
+                    <Scatter data={chartData} options={options as any} />
                 </div>
 
 
