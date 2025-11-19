@@ -1,4 +1,3 @@
-import { InfoUploader } from "@/components/client/upload/config";
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
 
@@ -32,18 +31,7 @@ export interface ButtonProps {
   onClickHandle: ReactEventHandler
 }
 
-export interface FileDropZoneProps {
-  id: string,
-  title: string,
-  description: string,
-  Icon: LucideIcon,
-  config: InfoUploader,                     // This is the configuration file for the info
-  fileType: string;                         // Type of the true data, i.e. pth or zip
-  drop_description?: string;
-  formFieldName: string;
-  storeSetter: (...args: any[]) => void;    //This is the store function for allocating the file into the correct space.
-  Repository: React.FC
-}
+
 
 export interface ParametersProps {
   name: string

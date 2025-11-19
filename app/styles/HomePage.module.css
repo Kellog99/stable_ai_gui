@@ -98,3 +98,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.test_container{
+  display: flex;
+  height: 100%;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+
+}

@@ -38,6 +38,7 @@
   display: flex;
   gap: 10px;
   height: 50px;
+  margin-bottom: 10px;
   /* <-- This clips child corners */
 }
 
@@ -183,23 +184,6 @@
 }
 
 
-.delete-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  color: #FF6961;
-  align-items: center;
-  align-content: center;
-}
-
-.delete-btn:hover {
-  background: rgba(255, 105, 97, 0.12);
-}
-
-
 .container-idle {
   width: 100%;
   margin: 0;
@@ -226,23 +210,43 @@
   margin: auto;
 }
 
-.load-button {
-  width: 180px;
-  height: 50px;
+.btns-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  position: absolute;
+  bottom: 0.5rem;
+}
+
+.dragdrop-btn {
+  width: 50px;
+  aspect-ratio: 1;
   margin: 0;
-  background-color: var(--bg);
+  background-color: transparent;
   font-size: 0.6rem;
-  color: lightgray;
   border: none;
   border-radius: var(--border-radius);
   display: flex;
-  padding: 20px;
-  align-items: center;
   align-content: center;
+  justify-content: center;
 }
 
-.load-button:hover {
+.dragdrop-btn.delete {
+  color: red;
+  background-color: rgba(129, 76, 76, 0.8);
+}
+
+.dragdrop-btn.load {
+  background-color: rgba(52, 193, 248, 0.6);
+  color: rgb(135, 206, 235);
+}
+
+.load:hover {
   background-color: var(--bg-light);
+}
+
+.delete:hover {
+  background: rgba(255, 105, 97, 0.12);
 }
 
 .repositoryContainer {

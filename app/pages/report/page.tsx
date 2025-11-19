@@ -2,54 +2,17 @@
 
 import FileDropZone from "@/components/client/upload/FileDropZone";
 import styles from '@/styles/HomePage.module.css';
-import { Database, Upload } from "lucide-react";
-import { DragDrop } from "@/components/client/upload/DragDrop";
-import { uploadModel, uploadModel_check } from "@/properties/urls";
-import { getModels } from "@/functionalities/NNTrustBackendUtils";
-import { JsonRepository } from "@/components/client/ReportCard";
-
+import { reportSection } from "@/components/layout/homePageConfig";
 
 export default function ReportPage() {
 
-  // const ReportDragDrop = () => {
-  //   return (
-  //     <DragDrop
-  //       config={{
-  //         name: "report",
-  //         fileType: 'json',
-  //         accept: 'application/json',
-  //         formFieldName: "file",
-  //         description: 'Make sure your json contains a file.',
-  //         uploadUrlCheck: uploadModel_check, // DA MODIFICARE
-  //         uploadUrl: uploadModel, // DA MODIFICARE
-  //         refreshFunction: getModels, // DA MODIFICARE
-  //         setRefreshData: getModels // DA MODIFICARE
-
-  //       }}
-  // }
-
-  // const dropElement = [
-  //   {
-  //     id: "json",
-  //     title: "Upload Json",
-  //     Icon: Upload,
-  //     child: ReportDragDrop
-  //   },
-  //   {
-  //     id: "reportRepo",
-  //     title: "Report Repository",
-  //     Icon: Database,
-  //     child: JsonRepository   //questo deve diventare jsonRepository 
-  //   }
-  // ];
 
 
   return (
-    <div className={styles.reportContainer}>
-      {/* <FileDropZone
-        sections={dropElement}
-        defaultActiveSection={dropElement[0].id}
-      /> */}
+    <div className={styles.test_container}>
+      <div className={styles.reportContainer}>
+        <FileDropZone {...reportSection} />
+      </div>
     </div>
 
   );

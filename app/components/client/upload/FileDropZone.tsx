@@ -1,7 +1,7 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './FileDropZone.css';
-import { FileDropZoneProps } from '@/interfaces/NNInterfaces';
+import { FileDropZoneProps } from '@/interfaces/homePageInterface';
 import { DragDrop } from './DragDrop';
 import { HardDrive, Upload } from 'lucide-react';
 import { InfoLoader } from './InfoLoader';
@@ -18,9 +18,10 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     title,
     description,
     Icon,
-    config,
+    fileDropInformation,
     fileType,
-    storeSetter, 
+    storeSetter,
+    buttons,
     Repository
 }) => {
     const [upload, setUpload] = useState<boolean>(true);
@@ -28,6 +29,15 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     const [parsedContent, setParsedContent] = useState<ParsedZipContent | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [uploadStatus, setUploadStatus] = useState<'success' | 'error' | null>(null);
+
+    const [buttonId, setButtonId] = useState<string>("")
+    const [activeChild, setActiveChild] = useState<React.ReactNode | null>(null)
+    useEffect(() => {
+        if (buttons.length > 0) {
+            setButtonId(buttons[0].id)
+            setActiveChild(buttons[0].child)
+        }
+    }, [buttons])
 
     // const [activeSection, setActiveSection] = useState<string>(
     //     defaultActiveSection || sections[0]?.id || "selection"
@@ -125,7 +135,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
             key={id}
             className="containerDropzone">
             <p className="dropTitle">
-                <Icon size={35} /> {title} Selection <InfoLoader config={config} />
+                <Icon size={"var(--icon-size)"} /> {title} Selection <InfoLoader config={fileDropInformation} />
             </p>
             <p className="dropDescription">
                 {description}
@@ -133,50 +143,29 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
 
 
             <div className="selection-buttons">
-                <button
-                    onClick={() => setUpload(true)}
-                    className={`selection-button ${upload ? "active" : ""}`}>
 
-                    <Upload size={"var(--icon-size)"} />
-                    <span>Upload</span>
-                </button>
-
-                <button
-                    onClick={() => setUpload(false)}
-                    className={`selection-button ${!upload ? "active" : ""}`}>
-
-                    <HardDrive size={"var(--icon-size)"} />
-                    <span>Repository</span>
-                </button>
+                {buttons.map((infoButton, index) => {
+                    return (
+                        <button
+                            key={infoButton.id || index} // IMPORTANT: Add a unique key
+                            onClick={() => {
+                                setButtonId(infoButton.id);
+                                setActiveChild(infoButton.child);
+                            }}
+                            className={`selection-button ${infoButton.id === buttonId ? "active" : ""}`}>
+                            <infoButton.Icon size={"var(--icon-size)"} />
+                            <span>{infoButton.name}</span>
+                        </button>)
+                })}
             </div>
 
+            {activeChild}
 
-            {
-                upload ?
-                    // Upload Zone
-                    <div className='container-upload'>
-                        {/* Drag and drop Component */}
-                        <DragDrop
-                            name={title}
-                            Icon={Icon}
-                            acceptedType={"zip"}
-                            description={description}
-                            onFileSelect={handleFileUpload}
-                        />
 
-                        {/* Button for loading the file into its repository */}
-                        <button
-                            onClick={handleRepositoryUpload}
-                            className='load-button'
-                            disabled={zipFile ? true : false}
-                        >
-                            <Upload /> Upload into the Repository.
-                        </button>
-                    </div> :
 
-                    // Repository Zone  
-                    <Repository />
-            }
+            {/* Button for loading the file into its repository */}
+            {/* 
+        */}
         </div >
     );
 }

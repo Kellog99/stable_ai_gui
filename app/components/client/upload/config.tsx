@@ -1,18 +1,5 @@
-import { Box, Code, Divider, Group, Modal, Table, Text } from "@mantine/core";
+import { InfoUploader } from "@/interfaces/homePageInterface";
 
-interface field {
-    field: string,
-    type: string,
-    description: string,
-    properties?: field[]
-}
-
-export interface InfoUploader {
-    description: string,
-    scaffholding: { [key: string]: string[] },
-    fields: field[],
-    example: { [key: string]: any }
-}
 
 export const infoModel: InfoUploader =
 {

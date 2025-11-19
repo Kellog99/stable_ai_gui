@@ -1,7 +1,7 @@
-import { Box, Code, Divider, Group, Modal, Table, Text } from "@mantine/core";
+import { Code, Divider, Modal, Table, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { InfoIcon } from "lucide-react";
-import { InfoUploader } from "./config";
+import { InfoUploader } from "@/interfaces/homePageInterface";
 import "./FileDropZone.css"
 interface InfoLoaderProps {
     config: InfoUploader
@@ -16,7 +16,7 @@ export const InfoLoader: React.FC<InfoLoaderProps> = ({
                 <InfoIcon size={"calc(var(--icon-size) / 2)"} />
             </button >
             <Modal opened={opened} onClose={toggle} size="lg" color="black" >
-                <h2 style={{color:"black", margin:0, marginTop:"-10px"}}>Input Information</h2>
+                <h2 style={{ color: "black", margin: 0, marginTop: "-10px" }}>Input Information</h2>
                 <Divider my="xs" />
                 <div
                     style={{
