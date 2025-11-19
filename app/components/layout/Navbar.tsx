@@ -1,4 +1,4 @@
-import { Shield, Menu, X, BarChart3, PieChart, TrendingUp, Activity, AlertCircle, FileCheck, FileText, UserRound } from 'lucide-react';
+import { UserRound } from 'lucide-react';
 import './Navbar.css';
 import { sections } from './config';
 import NavigationButton from './NavigationButton';
@@ -7,7 +7,6 @@ import { Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
 export default function Navbar() {
-    const collapsed = false
     const [activeLink, setActiveLink] = useState<string>("")
     const [opened, { toggle }] = useDisclosure(true);
     console.log("open?=", opened)
@@ -26,6 +25,7 @@ export default function Navbar() {
                         <div className="nav-items">
                             {elements.map((element) => (
                                 <NavigationButton
+                                    key={element.id}
                                     id={element.id}
                                     title={element.title}
                                     href={element.href}

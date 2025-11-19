@@ -23,7 +23,6 @@ export const DragDrop: React.FC<DragDropProps> = ({
     onFileSelect,
     disabled = false
 }) => {
-
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -58,7 +57,6 @@ export const DragDrop: React.FC<DragDropProps> = ({
                         <IconTrash size={"calc(var(--icon-size))"} />
                     </button>
                 </div>
-
             </>
         ) : (
             <Dropzone
