@@ -12,6 +12,7 @@ import useStore from "@/store/dsStore";
 import { IsFeaturePresent } from "@/functionalities/Utils";
 import { embedding_type } from "@/properties/types";
 import useNNTrustStore from "@/store/nnTrustStore";
+import { getInfoAttacks, getInfoMetrics } from "@/properties/urlsNNTrust";
 
 function setEmbeddings(items: NavigationSection[], areEmbeddings: boolean, isNNTrust: boolean) {
     items.map((item) => {
@@ -61,8 +62,8 @@ export default function Navbar() {
         if (isNNTrust) {
             // Make the useEffect async by creating an async function inside
             const fetchData = async () => {
-                const fetchattack = await fetchItem('http://127.0.0.1:8000/attacks/getInfo');
-                const fetchmetrics = await fetchItem('http://127.0.0.1:8000/metrics/getInfo');
+                const fetchattack = await fetchItem(getInfoAttacks);
+                const fetchmetrics = await fetchItem(getInfoMetrics);
                 if (fetchattack) {
                     setAttacks(fetchattack);
                     setSelectedAttacks(fetchattack);
@@ -81,7 +82,6 @@ export default function Navbar() {
     }, [isNNTrust, setAttacks, setSelectedAttacks, setMetrics, setSelectedMetrics]);
 
 
-    // updating the starting section every time the "sections" variable is changed
     useEffect(() => {
         const areEmbeddings: boolean = datasetUsed ? IsFeaturePresent(datasetUsed as Dataset, embedding_type) : false;
         setEmbeddings(sections, areEmbeddings, isNNTrust)
@@ -112,7 +112,7 @@ export default function Navbar() {
             <ul className="nav-links"
                 style={{ padding: '0', marginTop: '0' }}>
                 {sections.length > 0 &&
-                    (sections.map((item) => (
+                    (sections.map((item, key) => (
                         <NavigationButton
                             key={item.id}
                             id={item.id}

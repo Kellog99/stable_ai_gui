@@ -4,45 +4,44 @@ import FileDropZone from "@/components/client/FileDropZone";
 import styles from '@/styles/HomePage.module.css';
 import { Database, Upload } from "lucide-react";
 import { DragDrop } from "@/components/client/upload/UploaderUnifiedDragDrop";
-import { uploadModel, uploadModel_check } from "@/properties/urls";
-import { getModels } from "@/functionalities/NNTrustBackendUtils";
-import { ModalUploadModel } from "@/components/client/upload/ModalUploadModel";
-import { JsonRepository } from "@/components/client/ReportCard";
+import { JsonRepository } from "@/components/client/JsonRepository";
+import { ModalUploadJson } from "@/components/client/upload/ModalUploadJson";
+
 
 
 export default function ReportPage() {
-
-  const ReportDragDrop = () => {
-    return (
-      <DragDrop
-        config={{
-          name: "report",
-          fileType: 'json',
-          accept: 'application/json',
-          formFieldName: "file",
-          description: 'Make sure your json contains a file.',
-          uploadUrlCheck: uploadModel_check, // DA MODIFICARE
-          uploadUrl: uploadModel, // DA MODIFICARE
-          refreshFunction: getModels, // DA MODIFICARE
-          setRefreshData: getModels // DA MODIFICARE
-
-        }}
-        infoModal={<ModalUploadModel />} />) // DA MODIFICARE
-  }
 
   const dropElement = [
     {
       id: "json",
       title: "Upload Json",
       Icon: Upload,
-      child: ReportDragDrop
+      child: () =>
+        <DragDrop
+          config={{
+            name: "report",
+            fileType: 'json',
+            accept: 'application/json',
+            formFieldName: "request",
+            description: 'Make sure your json contains a file.',
+            uploadUrlCheck: "", 
+            uploadUrl: "",
+          }}
+          infoModal={<ModalUploadJson />} />
     },
     {
-      id: "reportRepo",
-      title: "Report Repository",
+      id: "NNreportRepo",
+      title: "NNTrust Reports",
       Icon: Database,
-      child: JsonRepository   //questo deve diventare jsonRepository 
-    }
+      child: () => <JsonRepository tool="nntrust" />
+    },
+    {
+      id: "DQreportRepo",
+      title: "DQ Reports",
+      Icon: Database,
+      child: () => <JsonRepository tool="dq" />,
+    },
+
   ];
 
 

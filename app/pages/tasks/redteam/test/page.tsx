@@ -9,6 +9,7 @@ import { AdvanceResult, AttackResult } from '@/interfaces/testInterfaces';
 import styles from '@/styles/Test.module.css';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
+import { startAttack } from '@/properties/urlsNNTrust';
 
 function Test() {
 
@@ -20,12 +21,11 @@ function Test() {
         }
     }, [attacks])
 
-    // This part is for defining the variables that will handle the loading of the image
+
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
     const [advanceOption, setAdvanceOption] = useState<boolean>(false)
-    // this variable is for seeing the metrics of one attack
     const [seeResults, setSeeResults] = useState<boolean>(false)
-
+    
     const [origImg, setOrigImg] = useState<string[] | null>(null)
     const [advImg, setAdvImg] = useState<string[] | null>(null)
     const [advPert, setAdvPert] = useState<string | null>(null)
@@ -33,6 +33,8 @@ function Test() {
     const [atkResult, setAtkResult] = useState<AdvanceResult | undefined>();
     const [clicked, setClicked] = useState<Boolean>(false);
     const [loading, setLoading] = useState<Boolean>(false)
+
+    const modelName = useNNTrustStore((state) => state.modelName)
 
     const handleChange = (index: number, value: number) => {
         setSelectedAttack(prev => {
@@ -46,14 +48,17 @@ function Test() {
     }
 
     const handleClick = async () => {
-        if (!loading && clicked) {
+        if (!loading) {
+            setClicked(true);
             try {
                 setLoading(true);
-                const response = await fetch('http://127.0.0.1:8000/attacks/executeAttack', {
+                console.log(selectedAttack)
+                const response = await fetch(startAttack, {
                     method: "POST",
                     body: JSON.stringify({
                         "image": uploadedFile?.split(",")[1],
-                        "attack": selectedAttack
+                        "attack": selectedAttack,
+                        "model_name": modelName
                     }),
                     headers: {
                         'Content-type': 'application/json'
@@ -72,21 +77,19 @@ function Test() {
                 setOrigImg([uploadedFile!, data.original_prediction])
                 setAdvImg([data.x_adv, data.adversarial_prediction])
                 setAdvPert(data.adv_perturbation)
-                console.log("pert=", data.adv_perturbation)
-
+                console.log(data.executionTime)
+                console.log(data.ssim)
                 setAtkResult({
                     "confidence": data.confidence,
-                    "ssim": data.ssim,
-                    "executionTime": data.executionTime,
+                    "ssim": data.advance_metrics.ssim,
+                    "executionTime": data.advance_metrics.executionTime,
                 })
             } catch (error) {
                 console.error('ERROR:', error);
             } finally {
                 setLoading(false);
-                setClicked(!clicked);
+                setClicked(false);
             }
-        } else if (!loading && !clicked) {
-            setClicked(!clicked);
         }
     };
 
@@ -186,10 +189,14 @@ function Test() {
                     <button
                         disabled={!uploadedFile}
                         className={`${styles.execute_button} ${uploadedFile ? styles.active : styles.inactive}`}
-                        onClick={handleClick} // Added click handler
+                        onClick={handleClick}
                     >
-                        <Play size={'3vw'} />
-                        <p>Execute attack</p>
+                        {clicked ? (<p>Executing...</p>) :
+                            (<>
+                                <Play size={'3vw'} />
+                                <p>Execute attack</p>
+                            </>
+                            )}
                     </button>
                 </div>
 
@@ -213,7 +220,7 @@ function Test() {
                         <ImageDisplay
                             title="Adversarial Perturbation"
                             placeholder="No image loaded"
-                            imageUrl={advPert ? advPert : undefined}
+                            imageUrl={advPert ? "data:image/jpeg;base64," + advPert : undefined}
                             loader={false}
 
                         />
@@ -221,7 +228,7 @@ function Test() {
                         <ImageDisplay
                             title="Adversarial Example"
                             placeholder="No image loaded"
-                            imageUrl={advImg ? advImg[0] : undefined}
+                            imageUrl={advImg ? "data:image/jpeg;base64," + advImg[0] : undefined}
                             footer={advImg ? advImg[1] : undefined}
                             loader={false}
 

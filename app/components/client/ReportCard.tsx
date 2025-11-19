@@ -1,108 +1,161 @@
+import { useThumbnailWS } from "@/functionalities/useThumbnailWS";
+import { DQReportProps, ReportProps } from "@/interfaces/reportInterfaces";
+import { image_type } from "@/properties/types";
+import useStore from "@/store/dsStore";
+import useNNTrustStore from "@/store/nnTrustStore";
 import styles from "@/styles/JsonRepository.module.css"
-import { Flex } from "@mantine/core";
-import { Brain, Cpu, Database } from "lucide-react"
+import { Bug, Cpu, Database } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React from "react";
 
-export const JsonRepository: React.FC = () => {
-    const models = [{
-        name: "ResNet-50",
-        image: "https://upload.wikimedia.org/wikipedia/commons/2/2d/ResNet.png",
-        results: {
-            accuracy: "76.15%",
-            parameters: "25.6M",
-            flops: "4.1 GFLOPs",
-        },
-        task: "Image Classification",
-        domain: "Computer Vision",
-        description:
-            "ResNet-50 is a deep convolutional neural network with 50 layers. It introduced residual connections that help mitigate vanishing gradient problems, enabling the training of very deep architectures.",
-    }, {
-        name: "BERT-base",
-        image: "https://miro.medium.com/v2/resize:fit:1400/1*lMSmPZPp8BkQwQ9blvS-GQ.png",
-        results: {
-            accuracy: "84.7% (GLUE)",
-            parameters: "110M",
-            flops: "22 GFLOPs",
-        },
-        task: "Language Understanding",
-        domain: "NLP",
-        description:
-            "BERT-base is a bidirectional Transformer encoder pretrained on large text corpora. It’s widely used for natural language understanding tasks.",
-    }];
+interface ReportCardProps {
+    reportNN?: ReportProps;
+    reportDQ?: DQReportProps;
+}
+
+export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
+
+    const setReportFromBE = useStore((state) => state.setReportFromBE)
+
+    const setReport = useNNTrustStore((state) => state.setReport)
+    const router = useRouter()
+
+    const imageDatas = reportNN?.prototype || reportDQ?.dataset.prototype.datas[0];
+
+
+    const { thumbnails, connectionStatus, requestThumbnail } = useThumbnailWS(
+        image_type,
+        imageDatas as string
+    );
+    requestThumbnail(imageDatas as string)
+
+
+    const handleClick = () => {
+        if (reportNN) {
+            setReport(reportNN as ReportProps)
+            router.push("/pages/report/reportTITANN")
+        } else if (reportDQ) {
+            console.log("REPORTDQ CLICK", reportDQ)
+            setReportFromBE(reportDQ as DQReportProps)
+            router.push("/pages/report/reportDQ")
+        }
+    }
 
     return (
         <>
-        <Flex direction="row">
-            <div>
-                {models.map(model => (
-                    <div className={styles.card}>
+            <div className={styles.card} onClick={handleClick}>
+                {reportNN ? (
+                    <div className={styles.networkName}>
+                        <h3>{reportNN.info.name}</h3>
+                    </div>
+                ) : (reportDQ && (
+                    <div className={styles.networkName}>
+                        <h3>{reportDQ.dataset.name}</h3>
+                    </div>)
+                )}
 
-                        <div className={styles.left}>
-                            <div className={styles.networkName}>
-                                <h3>{model.name}</h3>
+                <div className={styles.cardSides}>
+                    <div className={styles.left}>
+                        <div className={styles.networkImage}>
+                            <img
+                                src={thumbnails.get(imageDatas as string)}
+                                alt={`image`}
+                                style={{
+                                    width: "100%",
+                                    objectFit: "contain",
+                                    display: "block",
+                                }}
+                            />
+                        </div>
+
+                    </div>
+                    <div className={styles.right}>
+
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <Database />
+                                <h4>General</h4>
                             </div>
+                            <div className={styles.panelBody}>
+                                {reportNN ? (
+                                    <>
+                                        <div>
+                                            <span className={styles.subtitlePanel}>Dataset:</span>
+                                            {reportNN.dataset}
+                                        </div>
+                                        <div>
+                                            <span className={styles.subtitlePanel}>Classes:</span>
+                                            {reportNN.info.classes}
+                                        </div>
+                                    </>
 
-                            <div className={styles.networkImage}>
-                                <img
-                                    src={model.image}
-                                    alt={`${model.name} architecture`}
-                                />
+                                ) : reportDQ && reportDQ.dataset.task === "classification" ? (
+                                    <div>
+                                        <span className={styles.subtitlePanel}>Classes:</span>
+                                        {reportDQ.dataset.n_classes}
+                                    </div>
+                                ) : null}
+
+                                {reportNN ? (
+                                    <div>
+                                        <span className={styles.subtitlePanel}>Params:</span> {reportNN.info.parameters}
+                                    </div>) : (reportDQ &&
+                                        <div>
+                                            <span className={styles.subtitlePanel}>Samples:</span> {reportDQ.dataset.n_samples}
+                                        </div>)}
+
                             </div>
                         </div>
 
+                    </div>
+                </div>
 
-                        <div className={styles.right}>
+                <div className={styles.cardFooter}>
+                    <div className={styles.panel}>
+                        <div className={styles.panelHeader}>
+                            <Cpu />
+                            <h4>Metrics</h4>
+                        </div>
+                        <div className={styles.panelBody}>
 
-                            <div className={styles.panel}>
-                                <div className={styles.panelHeader}>
-                                    <Cpu />
-                                    <h4>Results</h4>
-                                </div>
-                                <div className={styles.panelBody}>
-                                    {model.results.accuracy && (
-                                        <div>
-                                            <span className="font-medium">Acc:</span> {model.results.accuracy}
+                            {(reportNN?.metrics) ? (
+                                Object.entries(reportNN?.metrics)
+                                    .filter(([key]) => key !== "params" && key !== "confusion_matrix" && key !== "total benchmarks")
+                                    .map(([key, value]) => (
+                                        <div key={key}>
+                                            <span className={styles.subtitlePanel}>{key}:</span> {value.toFixed(2)}
                                         </div>
-                                    )}
-                                    {model.results.parameters && (
-                                        <div>
-                                            <span className="font-medium">Params:</span> {model.results.parameters}
-                                        </div>
-                                    )}
-                                    {model.results.flops && (
-                                        <div>
-                                            <span className="font-medium">FLOPs:</span> {model.results.flops}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className={styles.panel}>
-                                <div className={styles.panelHeader}>
-                                    <Database />
-                                    <h4>Domain</h4>
-                                </div>
-                                <div className={styles.panelBody}>
-                                    <div>
-                                        <span className="font-medium">Task:</span> {model.task}
+                                    ))) : (
+                                reportDQ &&
+                                reportDQ.metrics.map((metric, index) => (
+                                    <div key={index}>
+                                        <span className={styles.subtitlePanel}>{metric.results.name}:</span> {metric.results.score.toFixed(2)}
                                     </div>
-                                    <div>
-                                        <span className="font-medium">Field:</span> {model.domain}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className={`${styles.panel} ${styles.infoPanel}`}>
-                                <div className={styles.panelHeader}>
-                                    <Brain />
-                                    <h4>Info</h4>
-                                </div>
-                                <p>{model.description}</p>
-                            </div>
+                                ))
+                            )
+                            }
                         </div>
                     </div>
-                ))}
+
+                    {reportNN &&
+                        <div className={styles.panel}>
+                            <div className={styles.panelHeader}>
+                                <Bug />
+                                <h4>Attacks</h4>
+                            </div>
+                            <div className={styles.panelBody}>
+                                {reportNN.attacks && Object.keys(reportNN.attacks).map((attackKey) => (
+                                    <div key={attackKey}>
+                                        <span className={styles.subtitlePanel}>{attackKey}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    }
+
                 </div>
-                </Flex>
+
+            </div>
         </>
     )
 }

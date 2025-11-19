@@ -4,35 +4,24 @@ import { InfoIcon } from "lucide-react";
 
 
 
-export function ModalUploadModel() {
+export function ModalUploadJson() {
     const [opened, { toggle }] = useDisclosure(false);
 
     const jsonFields = [
         {
-            field: "name",
+            field: "dataset",
+            type: "Dataset",
+            description: 'The dataset DTO containing the information about the dataset'
+        },
+        {
+            field: "tool",
             type: "string",
-            description: 'The name of the model. This field in mandatory.'
+            description: (<>Specify the tool the report belongs to, E.g., <Code>dq</Code> for data quality reports and <Code>nntrust</Code> for TITANN reports.</>)
         },
         {
-            field: "type",
-            type: "string",
-            description: (<>Specify the type of the model. E.g., <Code>timm</Code> for models from the timm library.</>)
-        },
-        {
-            field: "pretrained",
-            type: "boolean",
-            description: "Whether the model is pretrained or not."
-        },
-
-        {
-            field: "num_classes",
-            type: "number",
-            description: "Specify the number of classes for the model."
-        },
-        {
-            field: "task",
-            type: "string",
-            description: (<>Specify the task for the model. E.g., <Code>classification</Code>, <Code>object detection</Code>, etc.</>)
+            field: "metrics",
+            type: "Object",
+            description: "The metrics object containing the various metrics computed for the dataset."
         }];
 
     const rows = jsonFields.map((element) => (
@@ -46,12 +35,36 @@ export function ModalUploadModel() {
     ));
 
     const jsonExample = `{
-    "name": "resnet50c",
-    "type": "timm",
-    "pretrained": true,
-    "num_classes": 1000,
+  "dataset": {
+    "name": "animals",
+    "n_samples": 5400,
     "task": "classification"
-}`
+    // ... etc
+  },
+  "tool": "dq",
+  "metrics": [
+    {
+      "internalConfigs": {},
+      "results": {
+        "name": "uniqueness",
+        "featureName": "image",
+        "score": 0.9927777777777778,
+        "indexes": [
+          39,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+          // ... etc
+        ]
+      }
+    }
+  ]
+}
+`
 
     return (
         <>
@@ -68,7 +81,7 @@ export function ModalUploadModel() {
                 <Group justify='space-between' >
                     <Group justify='flex-start'>
                         <InfoIcon size={12} />
-                        <Text size="0.6vw" c="var(--mantine-color-gray-7)">Info about the zip to upload</Text>
+                        <Text size="0.6vw" c="var(--mantine-color-gray-7)">Info about the json to upload</Text>
                     </Group>
                 </Group>
 
@@ -81,13 +94,6 @@ export function ModalUploadModel() {
                             marginBottom: "8px",
                         }}
                     >
-                        The zip you are going to upload must contain the <Code>.pth</Code> file and a json config file. In particular the following scaffolding must be followed:
-                        <div style={{ fontFamily: "monospace", fontSize: "14px", lineHeight: "20px", marginTop: "8px", marginBottom: "8px", backgroundColor: "var(--mantine-color-gray-0)", padding: "8px", borderRadius: "4px" }}>
-                            <div>modelName.zip</div>
-                            <div style={{ marginLeft: "20px" }}>|__ model.pth</div>
-                            <div style={{ marginLeft: "20px" }}>|__ modelName.json</div>
-                        </div>
-
                         The json config file must contain the following fields:
                     </div>
                     <Table>
@@ -100,7 +106,7 @@ export function ModalUploadModel() {
                         </Table.Thead>
                         <Table.Tbody>{rows}</Table.Tbody>
                     </Table>
-                    <Text size="sm" c="var(--mantine-color-gray-7)" m="8px">An example of json file is the following:</Text>
+                    <Text size="sm" c="var(--mantine-color-gray-7)" m="8px">An example of json file for a data quality report is the following:</Text>
                     <Code color="var(--mantine-color-gray-8)" c="white" block>
                         {jsonExample}
                     </Code>

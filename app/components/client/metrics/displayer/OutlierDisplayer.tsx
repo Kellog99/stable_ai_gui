@@ -93,13 +93,13 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
             ? feature.datas[clickedOutlierData.index]
             : undefined;
 
-    // 🧠 Step 2: call the hook unconditionally (can accept undefined/null)
+ 
     const { thumbnails, connectionStatus, requestThumbnail } = useThumbnailWS(
         image_type,
         currentData // 👈 this can be undefined — the hook should handle it
     );
 
-    // 🧠 Step 3: react to changes
+ 
     useEffect(() => {
         if (currentData) {
             const thumb = thumbnails.get(currentData);
@@ -267,7 +267,7 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
                 },
                 grid: {
                     color: '#dee2e6',
-                    borderDash: [2, 4], // Dotted line pattern for grid
+                    borderDash: [2, 4],
                     lineWidth: 1
                 },
                 border: {
@@ -344,6 +344,7 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
         };
     }, []);
 
+    
     return (
         <Flex direction="column" align="center" style={{ width: '100%', maxWidth: '100%' }}>
             <Title order={3}>Score computed on {featureName} with {mode} mode</Title>

@@ -35,7 +35,7 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
               <b>{results.ssim}</b>
             </div>
           </div>
-          <h3>
+          {/*<h3>
             Confidence Chart
           </h3>
           <LineChart
@@ -48,7 +48,7 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
             dataKey="step"
             series={[{ name: 'confidence', color: 'blue' }]}
             curveType="linear"
-          />
+          />*/}
 
         </div>
       ) : (

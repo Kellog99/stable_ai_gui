@@ -30,9 +30,9 @@ const TaskButton: React.FC<Task> = ({
     <button
       className={styles.card}
       onClick={handleClick}
-    // disabled={
-    //   ( ( title === "Test" || title === "Benchmark" ) && ( !isModel || !isDataset ) ) ||
-    //   ( title === "Data Quality Tool" && !isDataset )}
+      disabled={
+        ((title === "Custom Attack" || title === "RedTeaming Tool") && (!isModel || !isDataset)) ||
+        (title === "Data Quality" && !isDataset)}
     >
       <div className={styles.card_header}>
         <div

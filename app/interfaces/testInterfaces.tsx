@@ -19,6 +19,10 @@ export interface AttackResult extends AdvanceResult {
   x_adv: string;
   original_prediction: string;
   adversarial_prediction: string;
+  advance_metrics: {
+    ssim: number;
+    executionTime: number;
+  }
 
 }
 

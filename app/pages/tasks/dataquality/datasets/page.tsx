@@ -51,6 +51,7 @@ export default function Datasets() {
   const setFeatureToDisplay = useStore((state) => state.setFeatureToDisplay);
 
 
+  console.log("DatasetUsed", datasetUsed);
   const buildHistogram = useCallback((
     values: number[],
     binCount?: number
