@@ -1,4 +1,21 @@
-import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon, Info, FileText, BarChart3, InfoIcon } from "lucide-react";
+import {
+    ChartLine,
+    TestTube,
+    SquareActivity,
+    Ruler,
+    Image,
+    ChartScatter,
+    Bot,
+    BookCopy,
+    ShieldX,
+    CircleCheck,
+    Eraser,
+    Crop,
+    Database,
+    LucideIcon,
+    Info,
+    FileText
+} from "lucide-react";
 
 
 export interface NavigationSection {

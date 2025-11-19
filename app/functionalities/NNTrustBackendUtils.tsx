@@ -1,4 +1,4 @@
-import { datasets_get, jobProgress_get, jobsId_get, models_get, start_job } from "@/properties/urlsNNTrust";
+import { datasets_get, getAllNNReports, jobProgress_get, jobsId_get, models_get, start_job } from "@/properties/urlsNNTrust";
 
 export async function getDatasets() {
 
@@ -31,7 +31,7 @@ export async function startNewJob(jobConfig: Object) {
 
 }
 
-export async function getJobsId(){
+export async function getJobsId() {
 
   const response = await fetch(`${jobsId_get}`);
 
@@ -41,11 +41,21 @@ export async function getJobsId(){
   return jobsIds
 }
 
-export async function getProgress(id: number){
+export async function getProgress(id: number) {
   const response = await fetch(`${jobProgress_get}?id=${encodeURIComponent(id)}`);
 
   if (!response.ok) throw new Error('Failed to get jobs ids from the backend');
 
   const jobsIds = await response.json();
   return jobsIds
+}
+
+
+export async function getReports() {
+  const response = await fetch(`${getAllNNReports}`);
+
+  if (!response.ok) throw new Error('Failed to get NNTrust reports from the backend');
+
+  const reportsList = await response.json();
+  return reportsList
 }

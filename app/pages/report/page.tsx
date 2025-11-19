@@ -6,8 +6,6 @@ import { reportSection } from "@/components/layout/homePageConfig";
 
 export default function ReportPage() {
 
-
-
   return (
     <div className={styles.test_container}>
       <div className={styles.reportContainer}>

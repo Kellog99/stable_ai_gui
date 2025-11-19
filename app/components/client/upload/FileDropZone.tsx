@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import './FileDropZone.css';
 import { FileDropZoneProps } from '@/interfaces/homePageInterface';
-import { DragDrop } from './DragDrop';
-import { HardDrive, Upload } from 'lucide-react';
 import { InfoLoader } from './InfoLoader';
 import JSZip from 'jszip';
 
@@ -124,11 +122,6 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
         }
     };
 
-    // This function handle the uploading of the model or dataset inside the repository
-    const handleRepositoryUpload = async () => {
-        // TO DO
-    };
-
 
     return (
         <div
@@ -160,12 +153,6 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
             </div>
 
             {activeChild}
-
-
-
-            {/* Button for loading the file into its repository */}
-            {/* 
-        */}
         </div >
     );
 }

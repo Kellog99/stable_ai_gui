@@ -7,6 +7,7 @@ import useNNTrustStore from '@/store/nnTrustStore';
 import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
 import { ModelRepository } from '@/components/client/ModelDisplayer';
 import { DragDrop } from '../client/upload/DragDrop';
+import { JsonRepository } from '../client/repository/jsonRepository';
 
 
 // Helper to safely access Zustand without subscribing at module scope
@@ -121,15 +122,15 @@ export const reportSection: FileDropZoneProps =
         },
         {
             id: "repo-model-report",
-            name: "Repository Report Model",
+            name: "Repository Model",
             Icon: HardDrive,
-            child: <ModelRepository />,
+            child: <JsonRepository tool='nntrust' />,
         },
         {
             id: "repo-dataset-report",
-            name: "Repository report Dataset",
+            name: "Repository Dataset",
             Icon: HardDrive,
-            child: <ModelRepository />,
+            child: <JsonRepository tool='dq' />,
         }
     ],
     storeSetter: (

@@ -58,3 +58,9 @@ h2 {
   flex-direction: column;
   gap: 40px;
 }
+
+@layer base {
+  img {
+    display: initial;
+  }
+}

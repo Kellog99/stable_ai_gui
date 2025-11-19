@@ -5,13 +5,11 @@
     text-align: left;
     align-content: center;
     align-items: center;
-    color: black;
 }
 
 /* Table header */
 .vulnerability-grid thead {
     border-bottom: 1px solid #e5e7eb;
-    color: white;
 }
 
 /* Header cells */
