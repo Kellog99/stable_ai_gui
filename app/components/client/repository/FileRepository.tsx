@@ -23,9 +23,11 @@ const FileRepository: React.FC<FileRepositoryProps> = ({
                         handleClick={selectHandle}
                     />
                 )) :
-                <div className='warning'>
-                    <TriangleAlert size={"var(--icon-size)"} fill='var(--warning)' />
-                    <p>File not found</p>
+                <div className='container-warning'>
+                    <div className='warning'>
+                        <TriangleAlert size={"var(--icon-size)"} fill='var(--warning)' />
+                        <p>File not found</p>
+                    </div>
                 </div>
             }
         </div>

@@ -1,11 +1,15 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
 
-export interface ModelSpecs {
+export interface ModelInfo {
+  id: string
   name: string;
+  image: string | null,
   task: string;
-  file: File;
-  numClasses: number;
+  dataset: string,
+  parameters: string | null,
+  classes: number;
+  dimensionality: number[] | null
 }
 
 export interface LoadedFile {

@@ -19,8 +19,7 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     fileDropInformation,
     fileType,
     storeSetter,
-    buttons,
-    Repository
+    buttons
 }) => {
     const [upload, setUpload] = useState<boolean>(true);
     const [zipFile, setZipFile] = useState<File | null>(null);
@@ -32,8 +31,8 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     const [activeChild, setActiveChild] = useState<React.ReactNode | null>(null)
     useEffect(() => {
         if (buttons.length > 0) {
-            setButtonId(buttons[0].id)
-            setActiveChild(buttons[0].child)
+            setButtonId(buttons[1].id)
+            setActiveChild(buttons[1].child)
         }
     }, [buttons])
 

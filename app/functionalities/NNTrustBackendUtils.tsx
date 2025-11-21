@@ -30,7 +30,7 @@ export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectP
 // get all the models saved
 export async function getModelsList(): Promise<CardProps[]> {
 
-  const response = await fetch(`${models_get}`);
+  const response = await fetch('http://127.0.0.1:8000/repository/model');
 
   if (!response.ok) throw new Error('Failed to get model info from the backend');
 

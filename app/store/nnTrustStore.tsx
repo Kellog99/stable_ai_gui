@@ -1,13 +1,13 @@
-import { AttackManagementProps, ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { AttackManagementProps, ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 import { BenchmarkDataProps, ReportProps } from "@/interfaces/reportInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 
 interface AppState {
-  model: ModelSpecs | null;
+  model: ModelInfo | null;
   modelName: string | null;
-  listModels: ModelSpecs[]
+  listModels: ModelInfo[]
   attacks: { [key: string]: RegisterObjectProps };
   metrics: { [key: string]: RegisterObjectProps };
 
@@ -25,9 +25,9 @@ interface AppState {
   benchmark: { [key: string]: BenchmarkDataProps } | null;
   vulnerabilitySelected: string | null;
 
-  setModel: (models: ModelSpecs | null) => void;
+  setModel: (models: ModelInfo | null) => void;
   setModelName: (modelName: string | null) => void;
-  setListModels: (listModels: ModelSpecs[]) => void
+  setListModels: (listModels: ModelInfo[]) => void
   setAttacks: (attaks: { [key: string]: RegisterObjectProps }) => void;
   setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
   setSelectedAttacks: (selectedAttack: { [key: string]: RegisterObjectProps }) => void;

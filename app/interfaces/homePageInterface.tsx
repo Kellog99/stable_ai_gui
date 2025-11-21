@@ -30,5 +30,4 @@ export interface FileDropZoneProps {
     fileType: string;                         // Type of the true data, i.e. pth or zip
     buttons: ButtonProps[],
     storeSetter: (...args: any[]) => void;    //This is the store function for allocating the file into the correct space.
-    Repository: React.FC
 }

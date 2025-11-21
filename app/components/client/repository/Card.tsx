@@ -25,16 +25,16 @@ const RepositoryCard: React.FC<CardProps> = ({
         <button
             className="card"
             onClick={() => { handleClick ? handleClick(id) : null }}>
-            <div className="card-content">
+            <div className="card-header">
                 {
-                    image ? <img src={image} alt={name} /> : <HardDrive size={"var(--icon-size)"} />
+                    image ? <img src={image} alt={name} /> : <HardDrive size={"calc(var(--icon-size) /2)"} />
                 }
-                <h3>{name}</h3>
+                <p>{name}</p>
             </div>
             <div className="card-content">
-                <p>task: {task}</p>
+                <p><b>task:</b> {task}</p>
                 {Object.entries(args).map(([key, value]) => (
-                    <p key={key}>{key}: {value}</p>
+                    value ? <div key={key} className="card-element"><b>{key.replace("_", " ")}</b>: {value}</div> : null
                 ))}
             </div>
         </button>
