@@ -1,0 +1,46 @@
+.repository-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+}
+
+.warning {
+    width: 180px;
+    aspect-ratio: 3.14;
+    border-radius: var(--border-radius);
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(253, 253, 152);
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    gap: 10px;
+    font-weight: bold;
+}
+
+/* ################# Card style ################# */
+
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+    align-content: center;
+}

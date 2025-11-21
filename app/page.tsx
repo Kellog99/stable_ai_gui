@@ -2,35 +2,35 @@
 
 import FileDropZone from '@/components/client/upload/FileDropZone';
 import styles from '@/styles/HomePage.module.css';
-import useStore from '@/store/nnTrustStore';
-import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import { useEffect } from 'react';
 
 // Configuration file for creating the HomePage Drag and Drop components
-import { listOfSections } from '@/components/layout/homePageConfig';
+import { listOfSections } from '@/components/layout/configHomePage';
+import { getAttacksList, getModelsList } from './functionalities/NNTrustBackendUtils';
+import useNNTrustStore from '@/store/nnTrustStore';
 
 
 export const title = "Stable-AI"
 
 export default function HomePage() {
+
   // At this level It is asked for the list of all the attacks
   // const setAttacks = useStore((state) => state.setAttacks)
-  const { setAttacks } = useStore()
+  const { setAttacks, listModels, setListModels } = useNNTrustStore()
+  //Getting all the attacks
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/attacks/getInfo');
-        if (!response.ok) {
-          throw new Error(`HTTP error for the attacks' list! Status: ${response.status}`);
-        }
-
-        const listAttacks: { [key: string]: RegisterObjectProps } = await response.json();
-        setAttacks(listAttacks);
-      } catch (err) {
-        console.error(err instanceof Error ? err.message : "An unknown error occurred");
-      }
-    })();
+    getAttacksList()
+      .then(setAttacks)
+      .catch(err => console.error("Failed to load attacks:", err));
   }, [setAttacks]);
+
+  // Getting the list of all the available models 
+  useEffect(() => {
+    getModelsList()
+      .then(setListModels)
+      .catch(err => console.error("Failed to load attacks:", err));
+  }, [listModels, setListModels]);
+
 
   return (
     <div className={styles.home_page}>

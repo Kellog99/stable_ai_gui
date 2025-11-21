@@ -2,7 +2,7 @@
 
 import FileDropZone from "@/components/client/upload/FileDropZone";
 import styles from '@/styles/HomePage.module.css';
-import { reportSection } from "@/components/layout/homePageConfig";
+import { reportSection } from "@/components/layout/configHomePage";
 
 export default function ReportPage() {
 

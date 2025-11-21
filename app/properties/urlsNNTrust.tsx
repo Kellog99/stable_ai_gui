@@ -2,7 +2,7 @@ const host = "localhost"
 
 export const uploadModel_check = `http://${host}:8082/model/upload/check`
 export const uploadModel = `http://${host}:8082/model/upload`
-export const models_get = `http://${host}:8082/model/getModels`
+export const models_get = `http://${host}:8082/repository/model` //`http://${host}:8082/model/getModels`
 
 export const getAllNNReports = `http://${host}:8082/job/report/getReports`
 export const uploadJsonReport_NN = `http://${host}:8082/job/report/upload`

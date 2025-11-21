@@ -1,7 +1,7 @@
 .containerDropzone {
   display: flex;
   width: 500px;
-  aspect-ratio: calc(1.16);
+  height: calc(500px / 1.16);
   flex-direction: column;
   background-color: var(--bg);
   padding: 20px;

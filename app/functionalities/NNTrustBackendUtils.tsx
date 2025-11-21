@@ -1,23 +1,41 @@
-import { datasets_get, getAllNNReports, jobProgress_get, jobsId_get, models_get, start_job } from "@/properties/urlsNNTrust";
+import { getAllNNReports, jobProgress_get, jobsId_get, models_get, start_job } from "@/properties/urlsNNTrust";
+import { CardProps } from '@/components/client/repository/Card';
+import { RegisterObjectProps } from "@/interfaces/NNInterfaces";
 
-export async function getDatasets() {
-
-  const response = await fetch(`${datasets_get}`);
-
-  if (!response.ok) throw new Error('Failed to get model info from the backend');
-
-  const datasetsList = await response.json();
-  return datasetsList
+// get all the models saved
+export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectProps }> {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/attacks/getInfo');
+    if (!response.ok) {
+      throw new Error(`HTTP error for the attacks' list! Status: ${response.status}`);
+    }
+    const listAttacks: { [key: string]: RegisterObjectProps } = await response.json();
+    return listAttacks
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : "An unknown error occurred");
+    throw err; // Re-throw so the caller can handle it
+  }
 }
 
+// export async function getDatasets() {
 
-export async function getModels() {
+//   const response = await fetch(`${datasets_get}`);
+
+//   if (!response.ok) throw new Error('Failed to get model info from the backend');
+
+//   const datasetsList = await response.json();
+//   return datasetsList
+// }
+
+// get all the models saved
+export async function getModelsList(): Promise<CardProps[]> {
 
   const response = await fetch(`${models_get}`);
 
   if (!response.ok) throw new Error('Failed to get model info from the backend');
 
   const modelsList = await response.json();
+  console.log(modelsList)
   return modelsList
 }
 

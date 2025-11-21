@@ -134,14 +134,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         },
     ];
 
-    const isHighlighted = (value: number) => {
-        const testedValue = data[selectedBenchmark as keyof metricsProps];
-        const flatValue = typeof testedValue === 'number' ? testedValue :
-            Array.isArray(testedValue) ? testedValue[0] : null;
-        return value === flatValue ? "row highlighted" : "row";
-    };
-
-    console.log("sorted elements", sortedData);
 
     return (
         <div className="benchmark-controls">
@@ -161,10 +153,10 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             <div className='results-grid'>
                 {/* Scatter plot */}
                 <ScatterChart
-                    h={350}
+                    h={"100%"}
                     data={chartData}
                     dataKey={{ x: 'params', y: selectedBenchmark }}
-                    xAxisLabel="params"
+                    xAxisLabel="Model's parameters"
                     yAxisLabel={selectedBenchmark}
                     referenceLines={[
                         {
@@ -177,31 +169,39 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
                 {/* Leaderboard */}
                 <div className="leaderboard">
-                    <h3 className="leaderboard-title">
-                        <Trophy className="icon trophy-large" />
-                        Leaderboard -{' '}
-                        {selectedBenchmark.charAt(0).toUpperCase() +
-                            selectedBenchmark.slice(1).replace(/_/g, ' ')}
-                    </h3>
-
-                    <div className="entries">
-                        {sortedData.map(([name, value], index) => (
-                            <div key={index} className={isHighlighted(value)}>
-                                <div className="row-left">
-                                    <div className="rank-circle">{index + 1}</div>
-                                    <span className="row-label">{name}</span>
-                                </div>
-                                <div className="row-right">
-                                    <span className="row-value">
-                                        {value.toFixed(3)}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                    <div className="leaderboard-title">
+                        <Trophy size={"var(--icon-size)"} color='yellow' />
+                        <p>Leaderboard: {` `}
+                            {selectedBenchmark.charAt(0).toUpperCase() +
+                                selectedBenchmark.slice(1).replace(/_/g, ' ')}
+                        </p>
+                    </div>
+                    {/* Table */}
+                    <div className="table-container">
+                        <table className="entries-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Name</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sortedData.map(([name, value], index) => (
+                                    <tr key={index} className={name === modelName ? 'highlighted' : ''}>
+                                        <td className="rank-cell">
+                                            <div className="rank-circle">{index + 1}</div>
+                                        </td>
+                                        <td>{name}</td>
+                                        <td style={{ textAlign: "right" }}>{value.toFixed(3)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

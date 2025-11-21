@@ -6,12 +6,24 @@ import useNNTrustStore from '@/store/nnTrustStore';
 // Repository
 import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
 import { ModelRepository } from '@/components/client/ModelDisplayer';
-import { DragDrop } from '../client/upload/DragDrop';
-import { JsonRepository } from '../client/repository/jsonRepository';
+import { DragDrop } from '@/components/client/upload/DragDrop';
+import FileRepository from '@/components/client/repository/FileRepository';
+import { getModels } from '@/functionalities/NNTrustBackendUtils';
+import { useEffect, useState } from 'react';
+import { CardProps } from '../client/repository/Card';
 
 
 // Helper to safely access Zustand without subscribing at module scope
 const getStore = () => useNNTrustStore.getState();
+
+
+const [models, setModels] = useState<CardProps[]>([]);
+
+useEffect(() => {
+    getModels().then(setModels);
+}, []);
+
+
 // This contains the information 
 export const listOfSections: FileDropZoneProps[] = [
     {
@@ -38,7 +50,10 @@ export const listOfSections: FileDropZoneProps[] = [
                 id: "repository",
                 name: "Model Repository",
                 Icon: HardDrive,
-                child: <ModelRepository />,
+                child: <FileRepository
+                    elements={models}
+                    handleClick={(id: string) => { }}
+                />,
             }
         ],
         storeSetter: (
@@ -98,56 +113,3 @@ export const listOfSections: FileDropZoneProps[] = [
 
 
 
-// Configuration file of the Report's drag and drop component
-export const reportSection: FileDropZoneProps =
-{
-    id: "report_loader",
-    title: "Report",
-    description: "Drag and drop the JSON of the report.",
-    Icon: File,
-    fileDropInformation: infoModel,
-    fileType: ".json",
-    buttons: [
-        {
-            id: "report",
-            name: "Upload report",
-            Icon: Upload,
-            child: <DragDrop
-                name={"File"}
-                Icon={File}
-                acceptedType={"json"}
-                description={'Upload the JSON file related to the report.'}
-                onFileSelect={() => { }}
-            />,
-        },
-        {
-            id: "repo-model-report",
-            name: "Repository Model",
-            Icon: HardDrive,
-            child: <JsonRepository tool='nntrust' />,
-        },
-        {
-            id: "repo-dataset-report",
-            name: "Repository Dataset",
-            Icon: HardDrive,
-            child: <JsonRepository tool='dq' />,
-        }
-    ],
-    storeSetter: (
-        file: File,             // Actual model (.pth)
-        name: string,           // Extracted model name
-        numClasses: number      // Extracted class count
-    ) => {
-        const { setModel, setModelName } = getStore();
-
-        setModel({
-            name: name,
-            task: "Classification",
-            file: file,
-            numClasses: numClasses
-        });
-
-        setModelName(name);
-    },
-    Repository: DatasetRepository
-}

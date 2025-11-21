@@ -28,7 +28,7 @@ const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
     return (
         <div className='container-header'>
             <div className='container-title'>
-                <Icon size={"calc(var(--icon-size) * 5)"} color='red' />
+                <Icon size={"calc(var(--icon-size) * 4)"} color='red' />
                 <div>
                     <h1 style={{ margin: "0", fontSize: "2.5rem" }}>{title}</h1>
                     {descrition && (<p style={{ color: "lightgray", margin: 0 }}>{descrition}</p>)}
