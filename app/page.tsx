@@ -22,6 +22,12 @@ const HomePage: React.FC = ({ }) => {
 
   const datasetSections = [
     {
+      id: "repository",
+      title: "Dataset Repository",
+      Icon: Database,
+      child: DatasetRepository
+    },
+    {
       id: "selection",
       title: "Upload Dataset",
       Icon: Upload,
@@ -38,17 +44,16 @@ const HomePage: React.FC = ({ }) => {
           setRefreshData: setDatasets
         }}
         infoModal={<ModalUploadDataset />} />
-    },
-
-    {
-      id: "repository",
-      title: "Dataset Repository",
-      Icon: Database,
-      child: DatasetRepository
     }
   ];
 
   const modelSections = [
+    {
+      id: "modrepository",
+      title: "Model Repository",
+      Icon: Database,
+      child: ModelRepository
+    },
     {
       id: "model",
       title: "Upload Model",
@@ -67,12 +72,6 @@ const HomePage: React.FC = ({ }) => {
 
         }}
         infoModal={<ModalUploadModel />} />
-    },
-    {
-      id: "modrepository",
-      title: "Model Repository",
-      Icon: Database,
-      child: ModelRepository
     }
   ];
 

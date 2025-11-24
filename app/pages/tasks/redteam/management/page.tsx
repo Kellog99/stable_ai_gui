@@ -96,7 +96,7 @@ const TaskManagement: React.FC = () => {
     console.log("atk finished =", atkFinished)
 
     const isDisabled = () => {
-        return !(executedAttacks.length > 0 && (atkFinished === executedAttacks.length))
+        return false
     }
 
     const router = useRouter()

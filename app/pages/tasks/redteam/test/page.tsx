@@ -215,6 +215,7 @@ function Test() {
                             imageUrl={origImg ? origImg[0] : undefined}
                             footer={origImg ? origImg[1] : undefined}
                             loader={false}
+                            is_loading={clicked.valueOf()}
                         />
 
                         <ImageDisplay
@@ -222,7 +223,7 @@ function Test() {
                             placeholder="No image loaded"
                             imageUrl={advPert ? "data:image/jpeg;base64," + advPert : undefined}
                             loader={false}
-
+                            is_loading={clicked.valueOf()}
                         />
 
                         <ImageDisplay
@@ -231,6 +232,7 @@ function Test() {
                             imageUrl={advImg ? "data:image/jpeg;base64," + advImg[0] : undefined}
                             footer={advImg ? advImg[1] : undefined}
                             loader={false}
+                            is_loading={clicked.valueOf()}
 
                         />
                     </div>

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Image, X } from 'lucide-react';
 import './test.css';
+import { Loader } from '@mantine/core';
 
 interface ImageDisplayProps {
   title?: string;
@@ -9,6 +10,7 @@ interface ImageDisplayProps {
   imageUrl?: string;
   handleUpload?: (file: string | null) => void;
   loader: boolean;
+  is_loading? : boolean;
 }
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({
@@ -17,7 +19,8 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   imageUrl,
   handleUpload,
   placeholder,
-  loader = false
+  loader = false,
+  is_loading = false
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loadedImage, setLoadedImage] = useState<string | null>(null);
@@ -66,11 +69,16 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
       >
         {displayImage ? (
           <>
+          {is_loading ? (<div className="image-placeholder">
+                        <Loader className="image-icon" />
+                        <p className="image-text">Executing attack...</p>
+                    </div>) : (
             <img
               src={displayImage}
               alt={`Loaded image`}
               className="image-img"
             />
+          )}
             {loadedImage && (
               <button
                 onClick={handleDeleteImage}
@@ -84,8 +92,8 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
           </>
         ) : (
           <div className="image-placeholder">
-            <Image className="image-icon" />
-            <p className="image-text">{placeholder}</p>
+              <Image className="image-icon" />
+              <p className="image-text">{placeholder}</p>
           </div>
         )}
         {loader && (
