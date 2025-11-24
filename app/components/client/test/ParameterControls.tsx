@@ -33,21 +33,14 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
 
       <div className='block-parameters'>
         <div className='hyperparameters'>
-          <h4>
-            Hyper Parameters
-          </h4>
-          <button
-            onClick={handleReset}
-            className='reset-button'>
-            Reset
-          </button>
+
         </div>
         {parameters.map((parameter, index) => (
           <div
             className='parameter'
             key={parameter.name}>
-            <div style={{ fontWeight: '900', height: '100%' }}> {parameter.name.charAt(0).toUpperCase() + parameter.name.slice(1)}</div>
-            <div style={{ fontSize: "1vw" }}>{parameter.description}</div>
+            <span className="parameter-name"> {parameter.name.charAt(0).toUpperCase() + parameter.name.slice(1)}</span>
+            <span className='parameter-description'>{parameter.description}</span>
             <div className='value'>
               <input
                 style={{ width: '100%' }}
@@ -57,12 +50,29 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
                 step={(parameter.max - parameter.min) / 100}
                 value={parameters[index].default}
                 onChange={(e) => handleChange(index, parseFloat(e.target.value))} />
-              <div>{parameters[index].default}</div>
+              <div className='parameter-value'>{parameters[index].default}</div>
             </div>
           </div>
         ))}
       </div>
+      <div className="parameter-container-btn">
+        <button
+          onClick={handleReset}
+          className='button'
+          style={{
+            background: "var(--bg-light)",
+            color: "white"
+          }}>
+          Reset
+        </button>
+        <button className='button' style={{
+          backgroundColor: "lightgray",
+          color: "black"
+        }}>
+          Save
+        </button>
 
+      </div>
     </div>
   );
 };

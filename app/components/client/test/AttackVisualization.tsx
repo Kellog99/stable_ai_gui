@@ -83,9 +83,9 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
           />
         </div>
       ) : (
-        <p style={{ color: 'gray' }}>
+        <span style={{ color: 'lightgray' }}>
           Run an attack to see statistics and analysis
-        </p>
+        </span>
       )}
     </>
   );

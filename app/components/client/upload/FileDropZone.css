@@ -1,6 +1,6 @@
 .containerDropzone {
   display: flex;
-  width: 500px;
+  width: 550px;
   height: calc(500px / 1.16);
   flex-direction: column;
   background-color: var(--bg);

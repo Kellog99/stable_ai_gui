@@ -2,10 +2,14 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import Dataset, { Configs, datasetMock } from "../interfaces/genericInterface";
 import { ResultPoll } from "@/interfaces/metricsInterface";
+import { DatasetInfo } from "@/interfaces/NNInterfaces";
 
 interface AppState {
   datasets: Dataset[] | null;
   datasetUsed: Dataset | null;
+
+  dataset: DatasetInfo | null;
+
   queryDataset: string | '';
   selectedIndexes: number[];
   selectedPoints: number[];
@@ -37,20 +41,23 @@ interface AppState {
 
   activeTask: string;
 
-  
 
 
-  setSelectedIndexes: ( selectedIndexes: number[] ) => void;
-  setSelectedPoints: ( selectedPoints: number[] ) => void;
-  setHoverIndex: ( hoverIndex: number | null ) => void
-  setSelectedFeature: ( selectedFeature: string ) => void;
-  setData: ( datasetUsed: Dataset | null ) => void;
-  setDatasets: ( datasets: Dataset[] | null ) => void;
-  setLazoMode: ( lazoMode: boolean ) => void;
-  setQueryDataset: ( queryDataset: string ) => void;
-  setFeatureToDisplay: ( featureToDisplay: string | null ) => void;
-  setMetricsConfigs: ( metricsConfig: Configs[] | [] ) => void;
-  setInternalConfigs: ( internalConfigs: Object ) => void;
+
+  setSelectedIndexes: (selectedIndexes: number[]) => void;
+  setSelectedPoints: (selectedPoints: number[]) => void;
+  setHoverIndex: (hoverIndex: number | null) => void
+  setSelectedFeature: (selectedFeature: string) => void;
+  setData: (datasetUsed: Dataset | null) => void;
+  setDatasets: (datasets: Dataset[] | null) => void;
+
+  setDataset: (dataset: DatasetInfo | null) => void;
+
+  setLazoMode: (lazoMode: boolean) => void;
+  setQueryDataset: (queryDataset: string) => void;
+  setFeatureToDisplay: (featureToDisplay: string | null) => void;
+  setMetricsConfigs: (metricsConfig: Configs[] | []) => void;
+  setInternalConfigs: (internalConfigs: Object) => void;
   setLabelDict: (labelDict: { [key: number]: string } | null) => void;
 
   setAddToReport: (addToReport: boolean) => void;
@@ -68,13 +75,14 @@ interface AppState {
   setShowOverview: (showOverview: boolean) => void;
   setCollapsed: (collapsed: boolean) => void;
 
-  setActiveTask: ( activeTask: string ) => void;
+  setActiveTask: (activeTask: string) => void;
 
 }
 
 const useStore = create<AppState>()(
   persist(
     (set) => ({
+      dataset: null,
       datasets: null,
       datasetUsed: null,
       queryDataset: "",
@@ -107,6 +115,7 @@ const useStore = create<AppState>()(
 
 
       setData: (datasetUsed) => set({ datasetUsed }),
+      setDataset: (dataset: DatasetInfo | null) => set({ dataset }),
       setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
       setSelectedIndexes: (selectedIndexes: number[]) => set({ selectedIndexes }),
       setSelectedPoints: (selectedPoints: number[]) => set({ selectedPoints }),
@@ -132,16 +141,17 @@ const useStore = create<AppState>()(
       setLabelProtoData: (labelProtoData: number[] | null) => set({ labelProtoData }),
       setLabelToSamples: (labelToSamples: { label: string; samples: number }[]) => set({ labelToSamples }),
 
-      setShowOverview: ( showOverview: boolean ) => set( { showOverview } ),
-      setCollapsed: ( collapsed: boolean ) => set( { collapsed } ),
+      setShowOverview: (showOverview: boolean) => set({ showOverview }),
+      setCollapsed: (collapsed: boolean) => set({ collapsed }),
 
-      setActiveTask: ( activeTask: string ) => set( { activeTask } ),
-    } ),
+      setActiveTask: (activeTask: string) => set({ activeTask }),
+    }),
 
     {
       name: "app-storage",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
+        dataset: state.dataset,
         datasets: state.datasets,
         datasetUsed: state.datasetUsed,
         selectedFeature: state.selectedFeature,

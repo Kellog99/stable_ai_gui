@@ -40,34 +40,63 @@
     align-items: center;
 }
 
-.reset-button {
-    width: fit-content;
-    height: fit-content;
+.button {
+    width: 120px;
+    height: 30px;
     background-color: transparent;
-    color: white;
+    border: 1px solid gray;
     animation: 0.4s;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
-.reset-button:hover {
+.button:hover {
     text-decoration: underline;
 }
 
 .parameter {
-    display: grid;
-    grid-template-rows: auto;
+    display: flex;
+    flex-direction: column;
     color: gray;
-    padding-bottom: 1.2vw;
-    row-gap: 0.7vw;
+    gap: 2px;
+    padding-bottom: 3px;
+    margin-bottom: 10px;
     border-bottom: 1px solid gray;
+}
+
+.parameter-name {
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.parameter-description {
+    font-size: 0.65rem;
+}
+
+.parameter-value {
+    display: flex;
+    width: 30px;
+    font-size: 0.75rem;
+    text-align: right;
 }
 
 .value {
     width: 100%;
     display: flex;
     flex-direction: row;
-    gap: 10px
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
 }
+
+.parameter-container-btn {
+    width: 100%;
+    display: flex;
+    flex: row;
+    justify-content: space-between;
+}
+
 
 /* ################# Image display ################# */
 .image-wrapper {

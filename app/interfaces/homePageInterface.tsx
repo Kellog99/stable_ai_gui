@@ -1,4 +1,17 @@
 import { LucideIcon } from "lucide-react";
+
+export interface Info {
+    id: string                        // id for the file identification.
+    name: string,                     // File's name, ex. "Resnet50" or "Imagenette".
+    image?: string | null,            // an image that represents the file.
+    task: string,                     // task associated with, i.e. classification, detection, etc.
+    domain: string,                   // Domain of the file, i.e. RGB, ultraviolet, etc.
+    classes?: number,                 // number of classes in the output.
+    weights?: number,                 // Size of the file.
+    description?: string,             // description of the file.
+    input_dimensionality: number[]    // dimensionality of each input or domain's dimensionality.
+}
+
 interface field {
     field: string,
     type: string,
@@ -27,7 +40,5 @@ export interface FileDropZoneProps {
     description: string,
     Icon: LucideIcon,
     fileDropInformation: InfoUploader,        // This is the configuration file for the info
-    fileType: string;                         // Type of the true data, i.e. pth or zip
     buttons: ButtonProps[],
-    storeSetter: (...args: any[]) => void;    //This is the store function for allocating the file into the correct space.
 }

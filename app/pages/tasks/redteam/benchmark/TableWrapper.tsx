@@ -54,7 +54,7 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 <div className='scroll-header'>
                     {/* Search bar */}
                     <div className="search-container">
-                        <Search size={"var(--icon-size)"} color='gray' className="search-icon" />
+                        <Search size={"calc(var(--icon-size) * 0.8)"} color='gray' className="search-icon" />
                         <input
                             type="text"
                             placeholder="Search"

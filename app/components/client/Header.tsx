@@ -7,13 +7,13 @@ import { useRouter } from 'next/navigation';
 import { title } from '@/page';
 
 import useNNTrustStore from '@/store/nnTrustStore';
+import useStore from '@/store/dsStore';
 
 const Header = () => {
 
-  const [currentPage, setCurrentPage] = useState('home');
-  const { modelName } = useNNTrustStore()
-  const [datasetLoaded, setDatasetLoaded] = useState<boolean>(false);
-  console.log("model Name = ", modelName)
+  const { model } = useNNTrustStore()
+  const { dataset } = useStore()
+  console.log("model Name = ", model)
   const router = useRouter()
   return (
     <header className="app-header">
@@ -30,10 +30,10 @@ const Header = () => {
 
       <div className="header-status">
         <div className="status-indicator">
-          {modelName ? (
+          {model?.name ? (
             <>
               <CheckCircle size={"calc(var(--icon-size) / 1.5)"} color="var(--affermative)" />
-              <span>{modelName}</span>
+              <span>{model?.name}</span>
             </>
           ) :
             <>
@@ -44,8 +44,11 @@ const Header = () => {
         </div>
         <div className="status-divider"></div>
         <div className="status-indicator">
-          {datasetLoaded ? (
-            <CheckCircle size={"calc(var(--icon-size) / 1.5)"} color="var(--affermative)" />
+          {dataset ? (
+            <>
+              <CheckCircle size={"calc(var(--icon-size) / 1.5)"} color="var(--affermative)" />
+              <span>{dataset.name}</span>
+            </>
           ) :
             <>
               <Circle size={"calc(var(--icon-size) / 1.5)"} color="var(--warning)" />

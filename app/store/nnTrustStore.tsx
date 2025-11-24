@@ -6,7 +6,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 interface AppState {
   model: ModelInfo | null;
-  modelName: string | null;
   listModels: ModelInfo[]
   attacks: { [key: string]: RegisterObjectProps };
   metrics: { [key: string]: RegisterObjectProps };

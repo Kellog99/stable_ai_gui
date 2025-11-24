@@ -1,6 +1,6 @@
 import { getAllNNReports, jobProgress_get, jobsId_get, models_get, start_job } from "@/properties/urlsNNTrust";
 import { CardProps } from '@/components/client/repository/Card';
-import { RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 
 // get all the models saved
 export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectProps }> {
@@ -17,18 +17,18 @@ export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectP
   }
 }
 
-// export async function getDatasets() {
+export async function getDatasetsList() {
 
-//   const response = await fetch(`${datasets_get}`);
+  const response = await fetch('http://127.0.0.1:8000/repository/dataset');
 
-//   if (!response.ok) throw new Error('Failed to get model info from the backend');
+  if (!response.ok) throw new Error('Failed to get model info from the backend');
 
-//   const datasetsList = await response.json();
-//   return datasetsList
-// }
+  const datasetsList = await response.json();
+  return datasetsList
+}
 
 // get all the models saved
-export async function getModelsList(): Promise<CardProps[]> {
+export async function getModelsList(): Promise<ModelInfo[]> {
 
   const response = await fetch('http://127.0.0.1:8000/repository/model');
 

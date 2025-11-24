@@ -1,36 +1,59 @@
-.test_components {
-  display: grid;
-  width: 100%;
-  grid-template-columns: 1fr 2fr;
-  column-gap: 50px;
-  padding-left: 40px;
-  padding-right: 40px;
-}
-
-.column {
+.image_displayer {
   display: flex;
-  flex-direction: column;
-  gap: 30px;
-  padding-left: 20px;
-  padding-left: 20px;
+  flex-direction: row;
+  gap: 40px;
+  padding-left: 100px;
+  padding-right: 100px;
 }
 
 .section {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section_title {
+  display: flex;
   flex-direction: row;
-  width: 100%;
   color: white;
   align-items: center;
-  gap: 1vw;
+  gap: 30px;
   font-weight: 900;
 }
 
-.infoSection {
+.attack_selection {
+  width: 250px;
+  height: 45px;
+  background-color: var(--bg);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  color: lightgray;
+  font-weight: bold;
+}
+
+.buttons_container {
   display: flex;
   flex-direction: row;
+  gap: 20px;
+}
+
+.button {
+  aspect-ratio: 1;
+  display: flex;
   align-items: center;
-  gap: 1vw;
+  justify-content: center;
+  align-content: center;
+  padding: 5px;
+  background-color: var(--bg);
+  border: none;
+  border-radius: var(--border-radius);
   color: white;
+}
+
+.button:hover {
+  background-color: lightgray;
+  color: black;
 }
 
 .execute_button {

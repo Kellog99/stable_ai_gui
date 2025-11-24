@@ -42,49 +42,10 @@ export const DragDrop: React.FC<DragDropProps> = ({
 
         file ? (
             <div className="dropzone loaded">
-                <div className="file-info">
                     <CheckCircleIcon
                         size={"calc(var(--icon-size) * 2)"}
                         color="var(--affermative)" />
                     <span >{file?.name}</span>
-                </div>
-                <div className='btns-container'>
-                    {/* Delete Button */}
-                    <HoverCard width={180} shadow="md" >
-                        <HoverCard.Target>
-                            <button
-                                className="dragdrop-btn delete"
-                                onClick={() => { handleFileSelection(null) }}
-                            >
-                                <IconTrash size={"calc(var(--icon-size))"} />
-                            </button>
-                        </HoverCard.Target>
-                        <HoverCard.Dropdown>
-                            <p style={{ fontSize: "0.7rem" }}>
-                                Remove the uploaded File
-                            </p>
-                        </HoverCard.Dropdown>
-                    </HoverCard>
-                    
-                    {/* Upload Button */}
-                    <HoverCard width={180} shadow="md">
-                        <HoverCard.Target>
-                            <button
-                                onClick={() => { "handleRepositoryUpload" }}
-                                className='dragdrop-btn load'
-                                disabled={false}
-                            //zipFile ? true : false
-                            >
-                                <HardDriveUpload size={"calc(var(--icon-size))"} />
-                            </button>
-                        </HoverCard.Target>
-                        <HoverCard.Dropdown>
-                            <p style={{ fontSize: "0.7rem" }}>
-                                Upload the File into the repository.
-                            </p>
-                        </HoverCard.Dropdown>
-                    </HoverCard>
-                </div>
             </div>
 
         ) : (

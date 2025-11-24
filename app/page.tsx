@@ -2,18 +2,18 @@
 
 import FileDropZone from '@/components/client/upload/FileDropZone';
 import styles from '@/styles/HomePage.module.css';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 // Configuration file for creating the HomePage Drag and Drop components
-import { getAttacksList, getModelsList } from './functionalities/NNTrustBackendUtils';
+import { getAttacksList, getDatasetsList, getModelsList } from './functionalities/NNTrustBackendUtils';
 import useNNTrustStore from '@/store/nnTrustStore';
 import FileRepository from './components/client/repository/FileRepository';
 import { DragDrop } from './components/client/upload/DragDrop';
 import { Brain, Database, DatabaseIcon, HardDrive, Upload } from 'lucide-react';
 import { infoDataset, infoModel } from './components/client/upload/config';
-import { DatasetRepository } from './components/client/DatasetsRepoLoad';
 import { ButtonProps } from './interfaces/homePageInterface';
-import { ModelRepository } from './components/client/ModelDisplayer';
+import useStore from './store/dsStore';
+import { DatasetInfo, ModelInfo } from './interfaces/NNInterfaces';
 
 
 export const title = "Stable-AI"
@@ -22,21 +22,32 @@ export default function HomePage() {
 
   // At this level It is asked for the list of all the attacks
   // const setAttacks = useStore((state) => state.setAttacks)
-  const { setAttacks, listModels, setListModels } = useNNTrustStore()
+  const { model, setAttacks, setModel } = useNNTrustStore()
+  const { dataset, setDataset } = useStore()
 
-  //Getting all the attacks
+  const [listModels, setListModels] = useState<ModelInfo[]>([])
+  const [listDatasets, setListDataset] = useState<DatasetInfo[]>([])
+
+  // ################## Attacks' list ##################
   useEffect(() => {
     getAttacksList()
       .then(setAttacks)
       .catch(err => console.error("Failed to load attacks:", err));
   }, [setAttacks]);
 
-  // Getting the list of all the available models 
+  // ################## Models' list ################## 
   useEffect(() => {
     getModelsList()
       .then(setListModels)
       .catch(err => console.error("Failed to load attacks:", err));
   }, [setListModels]);
+
+  // ################## Datasets' list ################## 
+  useEffect(() => {
+    getDatasetsList()
+      .then(setListDataset)
+      .catch(err => console.error("Failed to load attacks:", err));
+  }, [setListDataset]);
 
   // Model selection's buttons
   const btnModel: ButtonProps[] = [
@@ -57,7 +68,12 @@ export default function HomePage() {
       Icon: HardDrive,
       child: <FileRepository
         elements={listModels}
-        handleClick={(id: string) => { }} />,
+        selectHandle={(model) => { setModel(model as ModelInfo) }}
+        activeId={model?.id}
+        handleDelete={(model) => {
+          setListModels(listModels.filter(modelContained => modelContained.id !== (model as ModelInfo).id))
+        }}
+      />,
     }
   ]
 
@@ -80,8 +96,12 @@ export default function HomePage() {
       Icon: HardDrive,
       name: "Model Repository",
       child: <FileRepository
-        elements={{}}
-        handleClick={(id: string) => { }} />,
+        elements={listDatasets}
+        selectHandle={(dataset) => { setDataset(dataset as DatasetInfo) }}
+        activeId={dataset?.id}
+        handleDelete={(dataset) => {
+          setListDataset(listDatasets.filter(datasetContained => datasetContained.id !== (dataset as DatasetInfo).id))
+        }} />,
     }
   ]
 
@@ -107,24 +127,8 @@ export default function HomePage() {
           description="Drag and drop your model or choose an existing model."
           Icon={Brain}
           fileDropInformation={infoModel}
-          fileType="pth"
           buttons={btnModel}
-          storeSetter={(
-            file: File, // Actual model (.pth)
-            name: string, // Extracted model name
-            numClasses: number // Extracted class count
-          ) => {
-            const { setModel, setModelName } = getStore();
-
-            setModel({
-              name: name,
-              task: "Classification",
-              file: file,
-              numClasses: numClasses
-            });
-
-            setModelName(name);
-          }} />
+        />
 
         {/* Dataset selection */}
         <FileDropZone
@@ -133,13 +137,7 @@ export default function HomePage() {
           description="Load your dataset or choose an existing dataset."
           Icon={DatabaseIcon}
           fileDropInformation={infoDataset}
-          fileType='zip'
           buttons={btnDataset}
-          storeSetter={(file: File) => {
-            // To implement:
-            // const { setDataset } = getStore();
-            // setDataset(file);
-          }}
         />
       </div>
     </div>

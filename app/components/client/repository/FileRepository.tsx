@@ -1,26 +1,35 @@
-import React from 'react'
-import RepositoryCard, { CardProps } from './Card';
+import React, { useState } from 'react'
+import RepositoryCard from './Card';
 import { TriangleAlert } from 'lucide-react';
 import './FileRepository.css'
+import { DatasetInfo, ModelInfo } from '@/interfaces/NNInterfaces';
 
 interface FileRepositoryProps {
-    elements: CardProps[],
-    selectHandle: (id: string) => void
+    elements: ModelInfo[] | DatasetInfo[],
+    activeId?: string,
+    handleDelete: (model: ModelInfo | DatasetInfo) => void,
+    selectHandle: (model: ModelInfo | DatasetInfo) => void,
 }
 
 // This component has the role to create the card associated to the model or dataset repository
 const FileRepository: React.FC<FileRepositoryProps> = ({
     elements,
+    activeId,
     selectHandle,
+    handleDelete,
 }) => {
     return (
         <div className='repository-container'>
             {elements.length > 0 ?
-                elements.map((element: CardProps) => (
+                elements.map((element: ModelInfo | DatasetInfo) => (
                     <RepositoryCard
                         key={element.id}
-                        {...element}
-                        handleClick={selectHandle}
+                        config={element}
+                        activeId={activeId}
+                        handleClick={() => {
+                            selectHandle(element)
+                        }}
+                        handleDelete={()=>handleDelete(element)}
                     />
                 )) :
                 <div className='container-warning'>

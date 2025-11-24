@@ -13,7 +13,7 @@
     overflow-y: scroll;
     overflow-x: hidden;
     gap: 10px;
-    padding: 10px;
+    padding: 17px;
     /* Add padding to prevent items touching edges */
 }
 
@@ -46,44 +46,79 @@
 .card {
     display: flex;
     flex-direction: column;
+    border-radius: var(--border-radius);
     align-items: center;
     align-content: center;
-    height: 100px;
+    height: 150px;
     width: 200px;
-    padding: 7px;
-    font-size: 0.5rem;
-    gap: 0;
+    padding: 20px 15px 20px 15px;
+    gap: 10px;
+    border: none;
+    background-color: lightgray;
+}
+
+.card.active {
+    background-color: rgb(193, 193, 250);
 }
 
 .card-header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     font-size: 0.8rem;
     font-weight: bold;
     gap: 10px;
-    margin: 0;
-    padding: 0;
+    padding-bottom: 16px;
     width: 100%;
     height: 15px;
+    border-bottom: 1px solid gray;
+}
+
+.card-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-btn-delete {
+    padding: 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--border-radius);
 
 }
 
+.card-btn-delete:hover {
+    background-color: rgb(255, 195, 195);
+}
+
 .card-content {
+    width: 100%;
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    height: fit-content;
-    align-items: center;
-    align-content: center;
-    overflow-y: scroll;
+    flex-direction: column;
+    max-height: 400px;
+    /* or whatever height you need */
+    align-items: flex-start;
+    text-align: left;
+    overflow-y: auto;
+    /* only show scrollbar when needed */
     overflow-x: hidden;
-    gap: 0;
+    color: black;
+    gap: 4px;
     margin: 0;
 }
 
 .card-element {
+    margin: 0;
     height: fit-content;
-    padding: 6px;
+    width: 100%;
+    font-size: 0.6rem;
 }
