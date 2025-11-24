@@ -1,9 +1,8 @@
 .image_displayer {
   display: flex;
   flex-direction: row;
+  height: 600px;
   gap: 40px;
-  padding-left: 100px;
-  padding-right: 100px;
 }
 
 .section {
@@ -35,11 +34,13 @@
 .buttons_container {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  width: 250px;
+  justify-content: space-between;
 }
 
 .button {
   aspect-ratio: 1;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;

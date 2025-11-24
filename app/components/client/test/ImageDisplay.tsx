@@ -5,7 +5,6 @@ import './test.css';
 interface ImageDisplayProps {
   title?: string;
   placeholder: string;
-  footer?: string;
   imageUrl?: string           // image to display whenever it is passed.
   loader: boolean             // tells wheter the component must act as an image loader or just displayer
   handleUpload?: (file: string | null) => void;
@@ -13,7 +12,6 @@ interface ImageDisplayProps {
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   title,
-  footer,
   handleUpload,
   placeholder,
   imageUrl,
@@ -56,15 +54,13 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
 
   return (
     <div className="image-wrapper">
-      {title && (<h3 className="image-title">{title}</h3>)}
+      <h3 className="image-title">
+        {title ? title : " "}
+      </h3>
       {loadedImage || !loader ? (
         <div className="image-container">
           <img
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
+            className='image'
             src={loadedImage ? loadedImage : undefined}
             alt={`Waiting for an image to be displayed`}
           />
@@ -93,10 +89,6 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
           />
         </div>
       )}
-
-      {
-        footer && (<p style={{ color: 'grey' }}>{footer}</p>)
-      }
     </div>
   );
 };

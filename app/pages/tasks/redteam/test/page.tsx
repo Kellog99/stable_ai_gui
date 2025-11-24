@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Book, Bug, Camera, ChevronDown, ChevronUp, Glasses, InfoIcon, Play, Settings, Settings2, Shield, TestTubeIcon, TrendingUp } from 'lucide-react';
+import { Bug, ChartCandlestick, InfoIcon, Play, Settings, Shield, TrendingUp } from 'lucide-react';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
-import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
 import { SingleAttackProps } from '@/interfaces/testInterfaces';
 import styles from '@/styles/Test.module.css';
@@ -11,6 +10,7 @@ import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import { Modal } from '@mantine/core';
+import ParametersWindow from '@/components/redtool/Parameters';
 
 function Test() {
 
@@ -24,9 +24,6 @@ function Test() {
 
     // This part is for defining the variables that will handle the loading of the image
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
-    const [advanceOption, setAdvanceOption] = useState<boolean>(false)
-    // this variable is for seeing the metrics of one attack
-    const [seeResults, setSeeResults] = useState<boolean>(false)
 
     const [origImg, setOrigImg] = useState<string[] | null>(null)
     const [advImg, setAdvImg] = useState<string[] | null>(null)
@@ -38,17 +35,18 @@ function Test() {
     const [clicked, setClicked] = useState<Boolean>(false);
     const [loading, setLoading] = useState<Boolean>(false)
 
-    const handleChange = (index: number, value: number) => {
+    const handleChange = (value: number[]) => {
         setSelectedAttack(prev => {
             if (!prev || !prev.parameters) return prev
 
-            const newParameters = prev.parameters.map((param, i) =>
-                i === index ? { ...param, ['default']: value } : param
-            )
+            const newParameters = prev.parameters.map((param, i) => ({
+                ...param,
+                default: value[i]
+            }))
+
             return { ...prev, parameters: newParameters }
         })
     }
-
     const handleClick = async () => {
         if (!loading && clicked) {
             try {
@@ -94,7 +92,8 @@ function Test() {
 
     // Variables for the Info's and Setting's modal
     const [infoModalOpened, setInfoModalOpened] = useState(false);
-    const [settingsModalOpened, setSettingsModalOpened] = useState(false);
+    const [infoResults, setInfoResults] = useState(false);
+    const [openSettings, setOpenSettings] = useState(false);
 
     return (
         <div className="container-pages">
@@ -105,33 +104,6 @@ function Test() {
                 descrition="Test on the loaded model single attack for a specific image."
 
             />
-            <div className={styles.image_displayer}>
-                <ImageDisplay
-                    title="Original Image"
-                    placeholder='Load an PNG or a JPG file.'
-                    footer='Here it is shown the selected image.'
-                    handleUpload={(file: string | null) => setUploadedFile(file)}
-                    loader={true}
-                />
-
-                <ImageDisplay
-                    title="Adversarial Perturbation"
-                    placeholder="No image loaded"
-                    imageUrl={advPert ? advPert : undefined}
-                    loader={false}
-
-                />
-
-                <ImageDisplay
-                    title="Adversarial Example"
-                    placeholder="No image loaded"
-                    imageUrl={advImg ? advImg[0] : undefined}
-                    footer={advImg ? advImg[1] : undefined}
-                    loader={false}
-
-                />
-            </div>
-
             {/* Selection of the attacks */}
             <div className={styles.section}>
                 <div className={styles.section_title}>
@@ -143,37 +115,51 @@ function Test() {
                 <label style={{ color: 'grey' }}>
                     Choose the vulnerability to test:
                 </label>
+
+                <select
+                    className={styles.attack_selection}
+                    onChange={(e) => {
+                        setSelectedAttack(attacks[e.target.value])
+                    }}>
+                    {Object.entries(attacks).map(([id, attack]) => (
+                        <option
+                            key={id}
+                            value={attack.id}
+                        >
+                            {attack.name.charAt(0).toUpperCase() + attack.name.slice(1)}
+                        </option>
+                    ))}
+                </select>
+
                 <div className={styles.buttons_container}>
-                    <select
-                        className={styles.attack_selection}
-                        onChange={(e) => {
-                            setSelectedAttack(attacks[e.target.value])
-                        }}>
-                        {Object.entries(attacks).map(([id, attack]) => (
-                            <option
-                                key={id}
-                                value={attack.id}
-                            >
-                                {attack.name.charAt(0).toUpperCase() + attack.name.slice(1)}
-                            </option>
-                        ))}
-                    </select>
                     <button
                         onClick={handleClick}
-                        className={styles.button}>
+                        style={{ backgroundColor: "#10b981" }}
+                        className={styles.button}
+                        disabled={uploadedFile ? false : true}>
                         <Play />
                     </button>
                     <button
                         className={styles.button}
+                        style={{ backgroundColor: "#3b82f6" }} // Bright blue
                         onClick={() => setInfoModalOpened(true)}>
                         <InfoIcon />
                     </button>
 
                     <button
                         className={styles.button}
-                        onClick={() => setSettingsModalOpened(true)}>
+                        style={{ backgroundColor: "#6366f1" }} // Indigo
+                        onClick={() => setOpenSettings(true)}>
                         <Settings />
                     </button>
+
+                    <button
+                        className={styles.button}
+                        style={{ backgroundColor: "#f59e0b" }} // Amber
+                        onClick={() => setInfoResults(true)}>
+                        <ChartCandlestick />
+                    </button>
+
                     {/* Info Modal */}
                     <Modal
                         opened={infoModalOpened}
@@ -201,40 +187,68 @@ function Test() {
                         </div>
                     </Modal>
 
-                    {/* Settings Modal */}
+                    {/* Results Modal */}
                     <Modal
-                        opened={settingsModalOpened}
+                        opened={infoResults}
+                        onClose={() => setInfoResults(false)}
+                        title="Information"
                         styles={{
                             title: {
                                 color: 'black',
                                 fontWeight: "bold",
                             }
                         }}
-                        onClose={() => setSettingsModalOpened(false)}
-                        title="Settings"
+                        size="auto"
                         centered>
-                        {
-                            selectedAttack && selectedAttack.parameters!.length > 0 ?
-                                <ParameterControls
-                                    handleChange={handleChange}
-                                    parameters={selectedAttack?.parameters} />
-                                : <p style={{ color: 'gray' }}>No parameters available for custom settings.</p>
-                        }
+                        <AttackVisualization
+                            prediction={{ original: "cat", adversarial: "dog" }}
+                            confidence={atkConf}
+                            results={atkResult} />
                     </Modal>
-                </div>
 
+                    {/* Settings Modal */}
+
+                    {
+                        selectedAttack ?
+                            selectedAttack.parameters ?
+                                selectedAttack.parameters?.length > 0 ?
+                                    <ParametersWindow
+                                        isOpen={openSettings}
+                                        parameters={selectedAttack?.parameters}
+                                        onClose={() => { setOpenSettings(false) }}
+                                        handleParametersChange={handleChange}
+
+                                    />
+                                    : <p style={{ color: 'gray' }}>There are no parameters to set.</p>
+                                : <p style={{ color: 'gray' }}>No parameters have been defined.</p>
+
+                            : <p style={{ color: 'gray' }}>No parameters available for custom settings.</p>
+                    }
+                </div>
             </div>
-            <div className={styles.section}>
-                <div className={styles.section_title}>
-                    <TrendingUp size={'calc(var(--icon-size) * 1.5)'} color='red' />
-                    <p>
-                        See the Results
-                    </p>
-                </div>
-                <AttackVisualization
-                    confidence={atkConf}
-                    results={atkResult} />
+            <div className={styles.image_displayer}>
+                <ImageDisplay
+                    title="Original Image"
+                    placeholder='Load an PNG or a JPG file.'
+                    handleUpload={(file: string | null) => setUploadedFile(file)}
+                    loader={true}
+                />
 
+                <ImageDisplay
+                    title="Adversarial Perturbation"
+                    placeholder="No image loaded"
+                    imageUrl={advPert ? advPert : undefined}
+                    loader={false}
+
+                />
+
+                <ImageDisplay
+                    title="Adversarial Example"
+                    placeholder="No image loaded"
+                    imageUrl={advImg ? advImg[0] : undefined}
+                    loader={false}
+
+                />
             </div>
         </div>
     );
