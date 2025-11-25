@@ -26,8 +26,8 @@
   --error: red;
   --icon-size: 30px;
   --title: Stable AI;
-  --header-height: 90px;
-  --card-width: 380px;
+  --header-height: 100px;
+  --card-width: 350px;
 }
 
 html,

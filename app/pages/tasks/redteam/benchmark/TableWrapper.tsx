@@ -45,32 +45,30 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
         <div className="wrapper">
 
             <div className="header">
-                <div>
-                    <h2 className="table-title">{title}</h2>
-                    <p className="subtitle">
-                        Selected: {Object.keys(selectedElement).length} / {Object.keys(elements).length}
-                    </p>
+                <h2 className="table-title">{title}</h2>
+                <p className="subtitle">
+                    Selected: {Object.keys(selectedElement).length} / {Object.keys(elements).length}
+                </p>
+            </div>
+            <div className='scroll-header'>
+                {/* Search bar */}
+                <div className="search-container">
+                    <Search size={"calc(var(--icon-size) * 0.8)"} color='gray' className="search-icon" />
+                    <input
+                        type="text"
+                        placeholder="Search"
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="search-input"
+                    />
                 </div>
-                <div className='scroll-header'>
-                    {/* Search bar */}
-                    <div className="search-container">
-                        <Search size={"calc(var(--icon-size) * 0.8)"} color='gray' className="search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            onChange={(e) => setQuery(e.target.value)}
-                            className="search-input"
-                        />
-                    </div>
-                    <div className='buttons-container'>
-                        <button
-                            className="button"
-                            onClick={() => { handleSelection("all") }}
-                        > Select All </button>
-                        <button
-                            className="button"
-                            onClick={() => { handleSelection("none") }}> Deselect All </button>
-                    </div>
+                <div className='buttons-container'>
+                    <button
+                        className="button"
+                        onClick={() => { handleSelection("all") }}
+                    > Select All </button>
+                    <button
+                        className="button"
+                        onClick={() => { handleSelection("none") }}> Deselect All </button>
                 </div>
             </div>
 

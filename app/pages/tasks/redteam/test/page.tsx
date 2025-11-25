@@ -9,8 +9,9 @@ import styles from '@/styles/Test.module.css';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import { Modal } from '@mantine/core';
+import { HoverCard, Modal, Text } from '@mantine/core';
 import ParametersWindow from '@/components/redtool/Parameters';
+import ModalButton from './ModalButton';
 
 function Test() {
 
@@ -132,33 +133,41 @@ function Test() {
                 </select>
 
                 <div className={styles.buttons_container}>
-                    <button
-                        onClick={handleClick}
-                        style={{ backgroundColor: "#10b981" }}
-                        className={styles.button}
-                        disabled={uploadedFile ? false : true}>
-                        <Play />
-                    </button>
-                    <button
-                        className={styles.button}
-                        style={{ backgroundColor: "#3b82f6" }} // Bright blue
-                        onClick={() => setInfoModalOpened(true)}>
-                        <InfoIcon />
-                    </button>
+                    {/* Execute button */}
+                    <ModalButton
+                        Icon={Play}
+                        background="#10b981"
+                        disabled={!uploadedFile}
+                        hoverDescription='Click the button to execute the attack.'
+                        handleClick={handleClick}
+                    />
 
-                    <button
-                        className={styles.button}
-                        style={{ backgroundColor: "#6366f1" }} // Indigo
-                        onClick={() => setOpenSettings(true)}>
-                        <Settings />
-                    </button>
+                    {/* Info button */}
+                    <ModalButton
+                        Icon={InfoIcon}
+                        background="#3b82f6"
+                        disabled={false}
+                        hoverDescription='View information and help documentation.'
+                        handleClick={() => setInfoModalOpened(true)}
+                    />
 
-                    <button
-                        className={styles.button}
-                        style={{ backgroundColor: "#f59e0b" }} // Amber
-                        onClick={() => setInfoResults(true)}>
-                        <ChartCandlestick />
-                    </button>
+                    {/* Attack settings button */}
+                    <ModalButton
+                        Icon={Settings}
+                        background="#6366f1"
+                        disabled={false}
+                        hoverDescription='Configure settings and preferences.'
+                        handleClick={() => setOpenSettings(true)}
+                    />
+
+                    {/* Attack settings button */}
+                    <ModalButton
+                        Icon={ChartCandlestick}
+                        background="#f59e0b"
+                        disabled={false}
+                        hoverDescription='View attack results and analytics.'
+                        handleClick={() => setInfoResults(true)}
+                    />
 
                     {/* Info Modal */}
                     <Modal
@@ -250,7 +259,7 @@ function Test() {
 
                 />
             </div>
-        </div>
+        </div >
     );
 }
 
