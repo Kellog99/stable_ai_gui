@@ -1,3 +1,4 @@
+"use client"
 import { UserRound } from 'lucide-react';
 import './Navbar.css';
 import { sections } from './config';
@@ -9,12 +10,16 @@ import { useDisclosure } from '@mantine/hooks';
 export default function Navbar() {
     const [activeLink, setActiveLink] = useState<string>("")
     const [opened, { toggle }] = useDisclosure(true);
-    console.log("open?=", opened)
     return (
         <div className='container-nav'
-            style={{ width: `${opened ? "300px" : "140px"}` }}>
+            style={{ width: `${opened ? "300px" : "120px"}` }}>
             <div className='nav-header'>
-                <Burger size={20} color='white' opened={opened} onClick={toggle} />
+                <Burger
+                    size={20}
+                    color='white'
+                    opened={opened}
+                    onClick={toggle}
+                />
                 {opened ?
                     "Menu" : null}
             </div>

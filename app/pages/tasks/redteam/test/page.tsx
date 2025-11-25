@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Bug, ChartCandlestick, InfoIcon, Play, Settings, Shield, TrendingUp } from 'lucide-react';
+import { Bug, ChartCandlestick, InfoIcon, Play, Settings, Shield } from 'lucide-react';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
 import { SingleAttackProps } from '@/interfaces/testInterfaces';
@@ -9,7 +9,7 @@ import styles from '@/styles/Test.module.css';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import { HoverCard, Modal, Text } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import ParametersWindow from '@/components/redtool/Parameters';
 import ModalButton from './ModalButton';
 
@@ -25,7 +25,6 @@ function Test() {
 
 
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
-    const [origImg, setOrigImg] = useState<string[] | null>(null)
     const [advImg, setAdvImg] = useState<string[] | null>(null)
     const [advPert, setAdvPert] = useState<string | null>(null)
 
@@ -53,12 +52,12 @@ function Test() {
             try {
                 setLoading(true);
                 console.log(selectedAttack)
-                const response = await fetch(startAttack, {
+                const response = await fetch("startAttack", {
                     method: "POST",
                     body: JSON.stringify({
                         "image": uploadedFile?.split(",")[1],
                         "attack": selectedAttack,
-                        "model_name": modelName
+                        "model_name": "modelName"
                     }),
                     headers: {
                         'Content-type': 'application/json'
@@ -74,7 +73,6 @@ function Test() {
                 }
 
                 // the attack has been done and it has to handle the results
-                setOrigImg([uploadedFile!, data.original_prediction])
                 setAdvImg([data.x_adv, data.adversarial_prediction])
                 setAdvPert(data.adv_perturbation)
                 console.log("pert=", data.adv_perturbation)

@@ -3,8 +3,6 @@
   grid-template-rows: 50px 1fr 80px;
   /* header, scrollable section, footer */
   height: calc(100vh - var(--header-height));
-
-  /* ensures it never exceeds the viewport */
   max-height: 100vh;
   overflow: hidden;
   position: relative;

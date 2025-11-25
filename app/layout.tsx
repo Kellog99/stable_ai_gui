@@ -1,11 +1,11 @@
 "use client";
 import styles from '@/layout.module.css';
 import { AppShell, createTheme, MantineProvider } from "@mantine/core";
-import "@mantine/core/styles.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./components/client/Header";
-import "./globals.css";
 import Navbar from './components/layout/Navbar';
+import "./globals.css";
+import "@mantine/core/styles.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

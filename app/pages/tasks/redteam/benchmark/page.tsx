@@ -1,35 +1,26 @@
 "use client"
 
 import React, { useEffect, useState } from 'react';
-import { AttackManagementProps, RegisterObjectProps } from '@/interfaces/NNInterfaces';
+import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
 import { Settings, Ruler, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
 import useNNTrustStore from '@/store/nnTrustStore';
-import { Alert } from '@mantine/core';
+import { Alert, Group, Modal } from '@mantine/core';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import useStore from '@/store/dsStore';
-
+import { startJob } from '@/properties/urlsNNTrust';
 const Benchmark: React.FC = () => {
 
-  const { attacks, metrics, selectedAttacks, selectedMetrics, setSelectedAttacks, setSelectedMetrics, setExecutedAttacks } = useNNTrustStore()
+  const {
+    attacks,
+    metrics,
+    setBenchmarkId
+  } = useNNTrustStore()
 
-  const datasetName = useStore((state) => state.datasetUsed)?.name
-  const modelName = useNNTrustStore((state) => state.modelName)
-  const setBenchmarkID = useNNTrustStore((state) => state.setBenchmarkID)
-  const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
-  // variables for executing the benchmarking
-  const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
-  const [isBenchmarkAvailable, setIsBenchmarkAvailable] = useState<boolean>(false)
+  const [selectedAttacks, setSelectedAttacks] = useState<{ [key: string]: RegisterObjectProps }>({})
+  const [selectedMetrics, setSelectedMetrics] = useState<{ [key: string]: RegisterObjectProps }>({})
 
-  useEffect(() => {
-    const isAttacksEmpty = !selectedAttacks || Object.keys(selectedAttacks).length === 0;
-    const isMetricsEmpty = !selectedMetrics || Object.keys(selectedMetrics).length === 0;
-
-    setIsBenchmarkAvailable(!(isAttacksEmpty || isMetricsEmpty));
-  }, [selectedAttacks, selectedMetrics]);
-
-
+  // Handler for the element's 
   const handleSelectionClick = (
     id: string,
     map: { [key: string]: RegisterObjectProps },
@@ -56,6 +47,7 @@ const Benchmark: React.FC = () => {
     }
   };
 
+  // handler for changing the parameters
   const handleParametersChange = (
     id: string,
     parameters: number[],
@@ -109,21 +101,14 @@ const Benchmark: React.FC = () => {
 
       const response = await fetch(startJob, {
         method: "POST",
-        body: JSON.stringify(benchmarkDatas),
+        body: JSON.stringify(selectedAttacks),
         headers: {
           'Content-type': 'application/json'
         }
       });
-
-      console.log('Status:', response.status);
-      //const status: AttackManagementProps[] = await response.json();
-      //setExecutedAttacks(status)
-      //console.log(status)
-
-
       const id = await response.json();
       console.log("id:", id)
-      setBenchmarkID(id)
+      setBenchmarkId(id)
 
       setIsCLicked(true)
     } catch (error) {
@@ -146,7 +131,7 @@ const Benchmark: React.FC = () => {
           title="Red Teaming"
           descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
           buttonprops={{
-            description: "Management Report",
+            description: "Execute Benchmark",
             isDisabled: !executeBenchmark,
             disabledDescription: description,
             handleClick: handleClick
@@ -196,34 +181,44 @@ const Benchmark: React.FC = () => {
           }} />
 
       </div >
-      {
-        isClicked && (
-          <div className="alert-message">
-            <Alert
-              icon={<Info size={20} />}
-              title="Alert Message"
-              variant="filled"
-              color="blue"
-              radius="lg"
-              withCloseButton
-              style={{ width: "32vw", aspectRatio: "1.6", background: "var(--navy-400)" }}
-              onClose={() => setIsCLicked(false)}
-            >
-              <div className='message-body'>
-                <p style={{ fontSize: "1vw" }}>
-                  A Benchmark containing {Object.keys(selectedAttacks).length} vulnearbilities has been scheduled.
-                  Visit the management page for checking the advancement of the experiments.
-                </p>
-                <button
-                  onClick={() => window.location.href = "/pages/tasks/redteam/management"}
-                  className="allert-button"
-                >
-                  Go to Management Table <ChevronRight size={"2vw"} />
-                </button>
-              </div>
-            </Alert>
-          </div>
-        )}
+
+      <Modal
+        opened={isClicked}
+        className='alert-message'
+        onClose={() => setIsCLicked(false)}
+        withCloseButton={false}
+        styles={{
+          title: {
+            color: "white",
+            fontWeight: "bold",
+            marginBottom: "15px"
+          },
+          content: {
+            backgroundColor: "var(--bg-light)",
+            borderRadius: "var(--border-radius)",
+            color: "white",
+            fontSize: "0.8rem"
+
+          }
+        }}
+        centered>
+        <Modal.Title>
+          <Group >
+            <Info /> Information
+          </Group>
+        </Modal.Title>
+
+        A Benchmark containing {Object.keys(selectedAttacks).length} vulnearbilities has been scheduled.
+        Visit the management page for checking the advancement of the experiments.
+
+        <button
+          onClick={() => window.location.href = "/pages/tasks/redteam/management"}
+          className="allert-button"
+        >
+          Go to Management Table <ChevronRight size={"var(--icon-size)"} />
+        </button>
+      </Modal>
+
     </>)
 };
 

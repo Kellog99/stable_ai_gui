@@ -1,4 +1,4 @@
-import { getAllNNReports, jobProgress_get, jobsId_get, models_get, start_job } from "@/properties/urlsNNTrust";
+import { getAllNNReports, jobsId_get, start_job } from "@/properties/urlsNNTrust";
 import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 
 // get all the models saved
@@ -10,6 +10,21 @@ export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectP
     }
     const listAttacks: { [key: string]: RegisterObjectProps } = await response.json();
     return listAttacks
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : "An unknown error occurred");
+    throw err; // Re-throw so the caller can handle it
+  }
+}
+
+// get all the models saved
+export async function getMetricsList(): Promise<{ [key: string]: RegisterObjectProps }> {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/metrics/getInfo');
+    if (!response.ok) {
+      throw new Error(`HTTP error for the attacks' list! Status: ${response.status}`);
+    }
+    const listMetrics: { [key: string]: RegisterObjectProps } = await response.json();
+    return listMetrics
   } catch (err) {
     console.error(err instanceof Error ? err.message : "An unknown error occurred");
     throw err; // Re-throw so the caller can handle it
@@ -58,14 +73,6 @@ export async function getJobsId() {
   return jobsIds
 }
 
-export async function getProgress(id: number) {
-  const response = await fetch(`${jobProgress_get}?id=${encodeURIComponent(id)}`);
-
-  if (!response.ok) throw new Error('Failed to get jobs ids from the backend');
-
-  const jobsIds = await response.json();
-  return jobsIds
-}
 
 
 export async function getReports() {

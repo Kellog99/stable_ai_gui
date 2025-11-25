@@ -1,9 +1,8 @@
 import { AttackManagementProps } from '@/interfaces/NNInterfaces';
 import { Progress } from '@mantine/core';
 import { ArrowDownUp, Search } from 'lucide-react';
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import './ManagementTable.css';
-import useNNTrustStore from '@/store/nnTrustStore';
 import { getStatusIcon, getStatusColor, statuses } from './utils';
 interface ManagementTableProps {
     jobs: AttackManagementProps[]
@@ -21,51 +20,22 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
         direction: 'asc'
     });
 
-    const handleSort = (key: keyof AttackManagementProps) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
-
     const filteredAndSortedJobs = useMemo(() => {
-        const normalize = (value: any) => String(value ?? '').toLowerCase();
-
-        const filtered = jobs.filter(({ id, name, status }) => {
-            const term = searchTerm.toLowerCase();
+        let filtered = jobs.filter(job => {
             const matchesSearch =
-                normalize(id).includes(term) ||
-                normalize(name).includes(term) ||
-                normalize(status).includes(term);
+                job.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                job.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+                job.status.toLowerCase().includes(searchTerm.toLowerCase());
 
-            const matchesStatus = statusFilter === 'All' || status === statusFilter;
+            const matchesStatus = statusFilter === 'All' || job.status === statusFilter;
+
             return matchesSearch && matchesStatus;
         });
 
-        if (!sortConfig.key) {
-            return filtered;
-        }
-        else {
-            const { key, direction } = sortConfig;
-            const multiplier = direction === 'asc' ? 1 : -1;
+        return filtered;
+    }, [jobs, searchTerm, statusFilter]);
 
-            return [...filtered].sort((a, b) => {
-                const aValue = a[key];
-                const bValue = b[key];
 
-                const aNum = Number(aValue);
-                const bNum = Number(bValue);
-                if (key === 'id' && !isNaN(aNum) && !isNaN(bNum)) {
-                    return (aNum - bNum) * multiplier;
-                }
-
-                return normalize(aValue).localeCompare(normalize(bValue)) * multiplier;
-            });
-        }
-    }, [jobs, searchTerm, statusFilter, sortConfig]);
-
-    
 
     return (
         <div className='table-container'>
@@ -92,7 +62,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                         >
                             <option value="All">All Statuses</option>
                             {statuses.map(status => {
-                                return <option value={status}>{status}</option>
+                                return <option key={status} value={status}>{status}</option>
                             })
                             }
                         </select>
@@ -103,21 +73,9 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                     <table>
                         <thead>
                             <tr>
-                                <th>
-                                    <button onClick={() => handleSort('id')}>
-                                        ID <ArrowDownUp />
-                                    </button>
-                                </th>
-                                <th>
-                                    <button onClick={() => handleSort('name')}>
-                                        Attack Name <ArrowDownUp />
-                                    </button>
-                                </th>
-                                <th>
-                                    <button onClick={() => handleSort('status')}>
-                                        Status & Progress <ArrowDownUp />
-                                    </button>
-                                </th>
+                                <th>ID</th>
+                                <th>Attack Name </th>
+                                <th>Status & Progress</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -13,7 +13,7 @@ export const getJobsProgress = `http://${host}:8082/job/getJobs`
 export const getInfoAttacks = `http://${host}:8082/info/attacks/getInfo`
 export const getInfoMetrics = `http://${host}:8082/info/metrics/getInfo`
 
-export const startJob = `http://${host}:8082/job/start`
+export const startJob = `http://127.0.0.1:8000/attacks/executeBenchmark` //`http://${host}:8082/job/start`
 export const startAttack = `http://${host}:8082/job/attack`
 
 
@@ -26,4 +26,4 @@ export const dataset_upload = "http://localhost:8082/dataset/upload"
 
 export const start_job = "http://localhost:8082/job/start"
 export const jobsId_get = "http://localhost:8082/job/getJobsId"
-export const jobProgress_get = "http://localhost:8082/job/getProgress"
+export const jobProgress_get = "http://127.0.0.1:8000/job/getProgress"

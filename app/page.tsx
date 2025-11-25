@@ -5,7 +5,7 @@ import styles from '@/styles/HomePage.module.css';
 import { useEffect, useState } from 'react';
 
 // Configuration file for creating the HomePage Drag and Drop components
-import { getAttacksList, getDatasetsList, getModelsList } from './functionalities/NNTrustBackendUtils';
+import { getAttacksList, getDatasetsList, getMetricsList, getModelsList } from './functionalities/NNTrustBackendUtils';
 import useNNTrustStore from '@/store/nnTrustStore';
 import FileRepository from './components/client/repository/FileRepository';
 import { DragDrop } from './components/client/upload/DragDrop';
@@ -22,13 +22,19 @@ export default function HomePage() {
 
   // At this level It is asked for the list of all the attacks
   // const setAttacks = useStore((state) => state.setAttacks)
-  const { model, setAttacks, setModel } = useNNTrustStore()
+  const { model, setAttacks, setModel, setMetrics } = useNNTrustStore()
   const { dataset, setDataset } = useStore()
 
   const [listModels, setListModels] = useState<ModelInfo[]>([])
   const [listDatasets, setListDataset] = useState<DatasetInfo[]>([])
 
   // ################## Attacks' list ##################
+  useEffect(() => {
+    getMetricsList()
+      .then(setMetrics)
+      .catch(err => console.error("Failed to load attacks:", err));
+  }, [setAttacks]);
+
   useEffect(() => {
     getAttacksList()
       .then(setAttacks)

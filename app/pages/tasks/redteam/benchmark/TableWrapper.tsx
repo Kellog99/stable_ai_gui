@@ -3,7 +3,7 @@ import OptionCard from '@/components/redtool/OptionCard';
 import './TableWrapper.css';
 import { LucideIcon, Search } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
-import useNNStore from '@/store/nnTrustStore';
+
 
 interface TableWrapperProps {
     title: string,
@@ -22,6 +22,7 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
     handleParametersChange,
     Icon
 }) => {
+    console.log("elements = ", elements)
     // Type guard to check if element is AttackProps
     const getTags = (element: RegisterObjectProps) => {
         const tags = []
@@ -43,30 +44,12 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
         ));
     }, [query, elements]);
 
-
-
-    const model = useNNStore((state) => state.models);
-    const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
-
-    let isCM = false;
-    let modifiedSelectedElement = { ...selectedElement };
-
-    if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
-        isCM = true;
-        delete modifiedSelectedElement.confusionmatrix;
-    }
-
-    console.log("modifiedSelectedElement", modifiedSelectedElement);
-    console.log("original elements", elements);
-    console.log("isCM in table wrapper?", isCM)
-
     return (
         <div className="wrapper">
-
             <div className="header">
                 <h2 className="table-title">{title}</h2>
                 <p className="subtitle">
-                    Selected: {Object.keys(selectedElement).length} / {Object.keys(elements).length}
+                    Selected: {selectedElement ? Object.keys(selectedElement).length : 0} / {Object.keys(elements).length}
                 </p>
             </div>
             <div className='scroll-header'>
@@ -90,23 +73,35 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                         onClick={() => { handleSelection("none") }}> Deselect All </button>
                 </div>
             </div>
-
-            <div className="scroll-container">
-                <div className="card-grid">
-                    {Object.entries(filteredItems).map(([id, element]) => (
-                        <OptionCard
-                            key={id}
-                            name={element.name}
-                            tags={getTags(element)!}
-                            description={element.description}
-                            parameters={element.parameters}
-                            isSelected={id in selectedElement}
-                            onSelect={() => handleSelection(element.id)}
-                            Icon={Icon}
-                            handleParametersChange={(parameters: number[]) => { handleParametersChange(id, parameters) }} />
-                    ))}
+            {Object.entries(filteredItems).length > 0 ?
+                <div className="scroll-container">
+                    <div className="card-grid">
+                        {Object.entries(filteredItems).map(([id, element]) => (
+                            <OptionCard
+                                key={id}
+                                name={element.name}
+                                tags={getTags(element) || []}
+                                description={element.description}
+                                parameters={element.parameters}
+                                isSelected={id in selectedElement}
+                                onSelect={() => handleSelection(element.id)}
+                                Icon={Icon}
+                                handleParametersChange={(parameters: number[]) => { handleParametersChange(id, parameters) }} />
+                        ))}
+                    </div>
                 </div>
-            </div>
+                : <div className='scroll-text'>
+                    {
+                        Object.entries(filteredItems).length > 0 ?
+                            <p>
+                                No element with <b>{query}</b> inside.
+                            </p> :
+                            <p>
+                                No elements have been passed.
+                            </p>
+                    }
+                </div>
+            }
         </div>
     );
 }

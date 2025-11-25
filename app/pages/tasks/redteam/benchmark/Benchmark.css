@@ -8,34 +8,25 @@
 
 
 .alert-message {
-  position: fixed;
-  pointer-events: auto;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  z-index: 50;
+  width: 500px;
+  aspect-ratio: 1.6;
+  background-color: var(--bg);
 }
 
 .allert-button {
   display: flex;
   align-items: center;
   align-content: center;
-  height: 3vw;
-  min-width: 100px;
-  width: 17vw;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  padding: 7px;
+  padding-left: 16px;
   justify-content: space-between;
-  padding: 1.5vw;
   border-radius: 1vw;
-  background-color: var(--navy-700);
+  background-color: var(--bg);
   color: white;
   gap: 20px;
+  margin-top: 30px;
+  border: none;
 }
 
 .allert-button svg {
@@ -43,7 +34,8 @@
 }
 
 .allert-button:hover:not(.disabled) {
-  background-color: var(--navy-100);
+  background-color: white;
+  color: black;
 }
 
 .allert-button:hover:not(.disabled) svg {
@@ -55,4 +47,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  font-size: 0.9rem;
+
 }
