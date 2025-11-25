@@ -6,7 +6,7 @@ import styles from '@/styles/HomePage.module.css';
 import { Database, Upload } from 'lucide-react';
 import { DatasetRepository } from './components/client/DatasetsRepoLoad';
 import FileDropZone from './components/client/FileDropZone';
-import { ModelRepository } from './components/client/ModelDisplayer';
+import { ModelRepository } from './components/client/ModelRepository';
 import { ModalUploadDataset } from './components/client/upload/ModalUploadDataset';
 import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
 import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
