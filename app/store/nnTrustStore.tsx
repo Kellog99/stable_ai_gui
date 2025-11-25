@@ -1,5 +1,6 @@
 import { AttackManagementProps, ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 import { BenchmarkDataProps, ReportProps } from "@/interfaces/reportInterfaces";
+import Benchmark from "@/pages/tasks/redteam/benchmark/page";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -12,6 +13,7 @@ interface AppState {
 
   selectedAttacks: { [key: string]: RegisterObjectProps };
   selectedMetrics: { [key: string]: RegisterObjectProps };
+
 
 
   testAttack: RegisterObjectProps | null; // this variable saves the attack to test on the Test Page
@@ -39,6 +41,8 @@ interface AppState {
   setReport: (report: ReportProps) => void;
   setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => void;
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
+
+  setBenchmarkID: (benchmarkID: string) => void;
 }
 
 const useNNTrustStore = create<AppState>()(
@@ -53,7 +57,12 @@ const useNNTrustStore = create<AppState>()(
       selectedAttacks: {},
       selectedMetrics: {},
 
-      executedAttacks: [],
+      executedAttacks: [{
+        id: "",
+        name: "",
+        status: "",
+        progress: 0
+      }],
 
       testAttack: null,
 
@@ -78,11 +87,12 @@ const useNNTrustStore = create<AppState>()(
 
       setReport: (report: ReportProps) => set({ report }),
       setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => set({ benchmark }),
-      setVulnerabilitySelected: (vulnerabilitySelected: string) => set({ vulnerabilitySelected })
+      setVulnerabilitySelected: (vulnerabilitySelected: string) => set({ vulnerabilitySelected }),
+      setBenchmarkID: (benchmarkID: string) => set({ benchmarkID }),
     }),
 
     {
-      name: "app-storage",
+      name: "app-storage-models",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         model: state.model,
@@ -94,6 +104,7 @@ const useNNTrustStore = create<AppState>()(
         benchmark: state.benchmark,
         vulnerabilitySelected: state.vulnerabilitySelected,
         executedAttacks: state.executedAttacks,
+        benchmarkID: state.benchmarkID
         // Don't persist loading and error states
       }),
     }

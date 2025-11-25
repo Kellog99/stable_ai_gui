@@ -3,6 +3,7 @@ import OptionCard from '@/components/redtool/OptionCard';
 import './TableWrapper.css';
 import { LucideIcon, Search } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
+import useNNStore from '@/store/nnTrustStore';
 
 interface TableWrapperProps {
     title: string,
@@ -40,7 +41,25 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 value.name.toLowerCase().includes(query.toLowerCase()) ||
                 value.description.toLowerCase().includes(query.toLowerCase())
         ));
-    }, [query, elements]); // Added 'elements' here
+    }, [query, elements]);
+
+
+
+    const model = useNNStore((state) => state.models);
+    const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
+
+    let isCM = false;
+    let modifiedSelectedElement = { ...selectedElement };
+
+    if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
+        isCM = true;
+        delete modifiedSelectedElement.confusionmatrix;
+    }
+
+    console.log("modifiedSelectedElement", modifiedSelectedElement);
+    console.log("original elements", elements);
+    console.log("isCM in table wrapper?", isCM)
+
     return (
         <div className="wrapper">
 

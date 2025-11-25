@@ -1,10 +1,7 @@
 "use server"
 
-import { getCompleteness, getDuplicates, getOutliers } from "@/functionalities/BackendUtils";
 import { MetricType } from "@/interfaces/metricsInterface";
 import { completeness_start, duplicates_start, outliers_start } from "@/properties/urls";
-import internal from "stream";
-
 
 export default async function metricsFetcher (
     metric: MetricType,
@@ -15,7 +12,6 @@ export default async function metricsFetcher (
     if ( outliers_mode == "isolation forest" ) {
         outliers_mode = "iforest"
     }
-
 
     const analysisMap = {
         "duplicates": duplicates_start,

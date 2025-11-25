@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Image, X } from 'lucide-react';
 import './test.css';
+import { Loader } from '@mantine/core';
 
 interface ImageDisplayProps {
   title?: string;

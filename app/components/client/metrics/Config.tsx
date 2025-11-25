@@ -1,6 +1,6 @@
 "use client";
 
-import { getCompletenessOK } from "@/functionalities/BackendUtils";
+import { getCompletenessOK, saveMetricToReport } from "@/functionalities/BackendUtils";
 import { ReportMetric } from "@/interfaces/genericInterface";
 import { CompletenessDTO, DuplicatesDTO, OutliersDTO } from "@/interfaces/metricsInterface";
 import { image_type, label_type, text_type } from "@/properties/types";
@@ -62,7 +62,6 @@ export default function Config ( props: ConfigsProps )
     const datasetName = datasetUsed?.name
 
     const configs = useStore( ( state ) => state.metricsConfig )
-    const setConfigs = useStore( ( state ) => state.setMetricsConfigs )
     const internalConfigs = useStore.getState().internalConfigs;
     const setInternalConfigs = useStore( ( state ) => state.setInternalConfigs )
 
@@ -127,10 +126,11 @@ export default function Config ( props: ConfigsProps )
     const [ isCompletenessOK, setIsCompletenessOK ] = useState<boolean>( true )
 
     const report = useStore( ( state ) => state.report )
-    const [ reportMetric, setReportMetric ] = useState<ReportMetric | null>( null )
     const setReport = useStore( ( state ) => state.setReport )
 
-    const setAddToReport = useStore( ( state ) => state.setAddToReport )
+    const [reportToSave, setReportToSave] = useState<Object[]>( [] )
+    const [ reportMetric, setReportMetric ] = useState<ReportMetric | null>( null )
+    
 
     const endoPointMap: Record<string, string> = {
         duplicates: duplicates_start,
@@ -254,6 +254,9 @@ export default function Config ( props: ConfigsProps )
     const handleSaveToReport = () =>
     {
         if ( reportMetric ) {
+
+            console.log("REPORT METRIC TO SAVE:", reportMetric)
+
             setClicked( true )
             setTimeout( () =>
             {
@@ -261,12 +264,18 @@ export default function Config ( props: ConfigsProps )
                 setComputed( false )
             }, 3000 );
             setIsDuplicate( false )
-            setReport( [ ...report, reportMetric ] );
-            //qua bisogna fare la chiamata a backend che salva/aggiorna il report da mostrare 
+
+            setReport( [ ...report, reportMetric ] );  ///deve diventare una variabile di useState e non dello store!! 
+            
+            setReportToSave([...reportToSave, reportMetric.results]);
+            saveMetricToReport( datasetName as string, [ ...report, reportMetric ] );
+            setReportToSave( [] )
+             
         }
 
     }
 
+    console.log("Report TO SAVE", reportToSave)
     console.log( "REPORT:", report )
 
 

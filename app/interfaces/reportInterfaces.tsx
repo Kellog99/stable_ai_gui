@@ -1,4 +1,5 @@
-// Report information
+import Dataset from "./genericInterface";
+
 interface infoProps {
     name: string;
     parameters: number;
@@ -29,10 +30,13 @@ export interface attacksProps {
     power?: number,
     num_queries?: number,
     robustness?: number,
-    confusion_matrix?: number[][]
+    confusionmatrix?: number[][]
 }
 
 export interface ReportProps {
+    prototype: string;
+    dataset: string;
+    tool: string;
     info: infoProps;
     metrics: metricsProps;
     attacks: { [key: string]: attacksProps }
@@ -43,4 +47,10 @@ export interface BenchmarkDataProps {
     param: number
     task: string
     metrics: { [key: string | number]: number }
+}
+
+export interface DQReportProps{
+    tool: string
+    dataset: Dataset;
+    metrics: Object[]; 
 }

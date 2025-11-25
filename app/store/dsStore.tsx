@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import Dataset, { Configs, datasetMock } from "../interfaces/genericInterface";
+import Dataset, { Configs} from "../interfaces/genericInterface";
 import { ResultPoll } from "@/interfaces/metricsInterface";
 import { DatasetInfo } from "@/interfaces/NNInterfaces";
+import { DQReportProps } from "@/interfaces/reportInterfaces";
 
 interface AppState {
   datasets: Dataset[] | null;
@@ -20,6 +21,9 @@ interface AppState {
   featureToDisplay: string | null;
   metricsConfig: Configs[];
   internalConfigs: Object;
+  reportFromBE: DQReportProps | null;
+
+
   labelDict: { [key: number]: string } | null;
 
   addToReport: boolean;
@@ -94,6 +98,8 @@ const useStore = create<AppState>()(
       featureToDisplay: null,
       metricsConfig: [],
       internalConfigs: {},
+      reportFromBE: null,
+
       labelDict: null,
 
       addToReport: false,
@@ -126,6 +132,8 @@ const useStore = create<AppState>()(
       setFeatureToDisplay: (featureToDisplay: string | null) => set({ featureToDisplay }),
       setMetricsConfigs: (metricsConfig: Configs[] | []) => set({ metricsConfig }),
       setInternalConfigs: (internalConfigs: Object) => set({ internalConfigs }),
+      setReportFromBE: (reportFromBE: DQReportProps | null) => set({ reportFromBE }),
+
       setLabelDict: (labelDict: { [key: number]: string } | null) => set({ labelDict }),
 
       setAddToReport: (addToReport: boolean) => set({ addToReport }),
@@ -148,7 +156,7 @@ const useStore = create<AppState>()(
     }),
 
     {
-      name: "app-storage",
+      name: "app-storage-dq",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         dataset: state.dataset,

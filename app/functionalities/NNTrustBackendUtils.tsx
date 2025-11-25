@@ -1,5 +1,4 @@
 import { getAllNNReports, jobProgress_get, jobsId_get, models_get, start_job } from "@/properties/urlsNNTrust";
-import { CardProps } from '@/components/client/repository/Card';
 import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 
 // get all the models saved

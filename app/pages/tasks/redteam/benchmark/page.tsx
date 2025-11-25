@@ -8,19 +8,35 @@ import { Settings, Ruler, BrickWallFireIcon, Info, ChevronRight } from 'lucide-r
 import useNNTrustStore from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
+import useStore from '@/store/dsStore';
 
 const Benchmark: React.FC = () => {
 
   const { attacks, metrics, selectedAttacks, selectedMetrics, setSelectedAttacks, setSelectedMetrics, setExecutedAttacks } = useNNTrustStore()
 
-  // Handle the selection of an attack
+  const datasetName = useStore((state) => state.datasetUsed)?.name
+  const modelName = useNNTrustStore((state) => state.modelName)
+  const setBenchmarkID = useNNTrustStore((state) => state.setBenchmarkID)
+  const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
+  // variables for executing the benchmarking
+  const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
+  const [isBenchmarkAvailable, setIsBenchmarkAvailable] = useState<boolean>(false)
+
+  useEffect(() => {
+    const isAttacksEmpty = !selectedAttacks || Object.keys(selectedAttacks).length === 0;
+    const isMetricsEmpty = !selectedMetrics || Object.keys(selectedMetrics).length === 0;
+
+    setIsBenchmarkAvailable(!(isAttacksEmpty || isMetricsEmpty));
+  }, [selectedAttacks, selectedMetrics]);
+
+
   const handleSelectionClick = (
     id: string,
     map: { [key: string]: RegisterObjectProps },
     setMap: (map: { [key: string]: RegisterObjectProps }) => void,
     completeList: { [key: string]: RegisterObjectProps }
   ) => {
-    //with the first two cases I handle the selection button for selecting every attacks or deselecting everything
+
     if (id === 'all') {
       setMap(completeList)
     }
@@ -40,24 +56,21 @@ const Benchmark: React.FC = () => {
     }
   };
 
-  // Handle the saving of a new set of parameters
   const handleParametersChange = (
     id: string,
     parameters: number[],
     setMap: (map: { [key: string]: RegisterObjectProps }) => void,
     registeredObject: { [key: string]: RegisterObjectProps },
   ) => {
-    // Get the appropriate map based on type
+
     const currentMap: { [key: string]: RegisterObjectProps } = { ...registeredObject };
     const currentObject = currentMap[id];
     if (currentObject && currentObject.parameters) {
-      // updating the new parameters that wants to be set
       currentObject.parameters.map((param, index) => {
         param.default = parameters[index]
       })
-      // Update the map
+
       currentMap[id] = currentObject;
-      // Save to store
       setMap(currentMap);
     }
   }
@@ -93,18 +106,25 @@ const Benchmark: React.FC = () => {
     try {
       // Block any new click on the button
       setExecuteBenchmark(false);
-      const response = await fetch('http://127.0.0.1:8000/attacks/executeBenchmark', {
+
+      const response = await fetch(startJob, {
         method: "POST",
-        body: JSON.stringify(selectedAttacks),
+        body: JSON.stringify(benchmarkDatas),
         headers: {
           'Content-type': 'application/json'
         }
       });
 
       console.log('Status:', response.status);
-      const status: AttackManagementProps[] = await response.json();
-      setExecutedAttacks(status)
-      console.log(status)
+      //const status: AttackManagementProps[] = await response.json();
+      //setExecutedAttacks(status)
+      //console.log(status)
+
+
+      const id = await response.json();
+      console.log("id:", id)
+      setBenchmarkID(id)
+
       setIsCLicked(true)
     } catch (error) {
       console.error('ERROR:', error);
@@ -113,6 +133,7 @@ const Benchmark: React.FC = () => {
     }
 
   };
+
 
 
   return (

@@ -37,7 +37,7 @@ const darkenHexColor = ( color: string ): string =>
 const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: SchemaVisualizationProps ) =>
 {
   const nodeSize = 80;
-  const horizontalSpacing = 160; // Fixed horizontal spacing between nodes
+  const horizontalSpacing = 160;
   const verticalSpacing = 120;
 
  
@@ -112,8 +112,8 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
       },
       sourcePosition: Position.Right,
       targetPosition: Position.Left,
-      draggable: false, // Prevent dragging
-      selectable: false, // Prevent selection
+      draggable: false, 
+      selectable: false, 
       connectable: false
     };
   } );
@@ -126,7 +126,7 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
     sourcePosition: Position.Left,
     targetPosition: Position.Right,
     style: { strokeWidth: 1, stroke: "black" },
-    interactionWidth: 0 // Disable interaction with edges
+    interactionWidth: 0 
   } ) );
 
   const maxX = Math.max( ...nodes.map( node => node.position.x ) ) + nodeSize + horizontalSpacing;
@@ -176,7 +176,7 @@ const SchemaGraph: React.FC<{
 
     const handleNodeClick = useCallback( ( event: React.MouseEvent, node: Node ) =>
     {
-      setFeatureToDisplay( node.id ); // Logs the name of the clicked node (id in this case)
+      setFeatureToDisplay( node.id );
     }, [] );
 
     return (

@@ -261,7 +261,6 @@ export async function getDQReport(datasetName: string) {
   const url = new URL(`${getDQReportByName}?datasetName=${encodeURIComponent(datasetName)}`);
 
   const response = await fetch(url);
-
   if (!response.ok) throw new Error('Failed to get model info from the backend');
 
   const DQReport = await response.json();
@@ -275,7 +274,6 @@ export async function getAllDQReports() {
   const url = new URL(`${getAllReports_get}`);
 
   const response = await fetch(url);
-
   if (!response.ok) throw new Error('Failed to get all the reports from the backend');
 
   const DQReports = await response.json();

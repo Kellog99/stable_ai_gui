@@ -14,19 +14,14 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   const lassoMode = useStore((state) => state.lazoMode);
 
   useEffect(() => {
-    console.log("USEEFFECT",lassoMode)
     setPoints([])
   }, [lassoMode]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
 
-    console.log("LASSO IN",lassoMode)
     if (lassoMode) return;
     if (!containerRef.current) return;
     //if (e.button!==1) return;
-    console.log("QUI")
-    console.log(lassoMode)
-    console.log("QUI2")
     const rect = containerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -36,7 +31,7 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   }, [lassoMode]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    console.log("MOVE",lassoMode)
+    
     if (!lassoMode) return;
     if (!isDrawing || !containerRef.current) return;
     //if (e.button!==1) return;
@@ -49,7 +44,6 @@ const LassoDrawer: React.FC<LassoDrawerProps> = ({ children }) => {
   }, [lassoMode]);
 
   const handleMouseUp = useCallback((e: React.MouseEvent) => {
-    console.log("LASSO OUT",lassoMode)
     if (!lassoMode) return;
     //if (e.button!==1) return;
     setIsDrawing(false);

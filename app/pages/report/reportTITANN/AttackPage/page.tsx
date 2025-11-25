@@ -1,17 +1,17 @@
 'use client';
 import React, { useEffect, useState } from 'react'
 import useNNTrustStore from '@/store/nnTrustStore';
-import { attacksProps, metricsProps } from '@/interfaces/reportInterfaces';
+import { attacksProps} from '@/interfaces/reportInterfaces';
 import { Target, Zap, GitBranch, LucideIcon, TreePine } from 'lucide-react';
 import './AttackPageStyle.css';
 
-interface MatricCardProps {
+interface MetricCardProps {
     title: string,
-    value?: number,
+    value?: string,
     Icon: LucideIcon,
     color: string
 }
-const MetricCard: React.FC<MatricCardProps> = ({
+const MetricCard: React.FC<MetricCardProps> = ({
     title,
     value,
     Icon,
@@ -66,37 +66,47 @@ const page = () => {
     const { vulnerabilitySelected, report } = useNNTrustStore()
     const [attackReport, setAttackReport] = useState<attacksProps>(report!.attacks[vulnerabilitySelected!])
 
+
+    console.log("attackReport", attackReport)
     useEffect(() => {
         setAttackReport(report!.attacks[vulnerabilitySelected!])
     }, [vulnerabilitySelected, report])
 
     console.log("attack = ", attackReport)
 
-    const attackMetrics = Object.keys(attackReport).filter(item => !["name", "risk", "confusion_matrix"].includes(item))
+    const attackMetrics = Object.keys(attackReport).filter(item => !["name", "risk", "confusionmatrix"].includes(item))
     console.log(attackMetrics)
 
-    const metricCardList: MatricCardProps[] = [
+    function formatNumber(value: number) {
+        if (value === 0) return "0";
+        const exponent = Math.floor(Math.log10(Math.abs(value)));
+        return (exponent > 2 || exponent < -2)
+            ? value.toExponential(2)
+            : value.toFixed(2);
+    }
+
+    const metricCardList: MetricCardProps[] = [
         {
             title: "Accuracy",
-            value: attackReport.accuracy,
+            value: formatNumber(attackReport.accuracy as number),
             Icon: Target,
             color: "#10b981"
         },
         {
             title: "Precision",
-            value: attackReport.precision,
+            value: formatNumber(attackReport.precision as number),
             Icon: Zap,
             color: "#f59e0b"
         },
         {
             title: "f1score",
-            value: attackReport.f1score,
+            value: formatNumber(attackReport.f1score as number),
             Icon: GitBranch,
             color: "#8b5cf6"
         },
         {
             title: "robustness",
-            value: attackReport.robustness,
+            value: formatNumber(attackReport.robustness as number),
             Icon: TreePine,
             color: "#8b5cf6"
         }
@@ -111,15 +121,16 @@ const page = () => {
 
                 <div className="metrics-grid">
                     {
-                        metricCardList.map((metric) => <div>
-                            <MetricCard {...metric} />
-                        </div>)
+                        metricCardList.map((metric, key) =>
+                            <div key={key}>
+                                <MetricCard  {...metric} />
+                            </div>)
                     }
                 </div>
             </div>
 
-            {attackReport.confusion_matrix &&
-                <ConfusionMatrix matrix={attackReport.confusion_matrix} />}
+            {attackReport.confusionmatrix &&
+                <ConfusionMatrix matrix={attackReport.confusionmatrix} />}
         </div>
     )
 }

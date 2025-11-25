@@ -1,13 +1,36 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { BenchmarkDataProps, metricsProps } from '@/interfaces/reportInterfaces';
-import { ScatterChart } from '@mantine/charts';
+import {
+    Chart as ChartJS,
+    ScatterController,
+    PointElement,
+    LinearScale,
+    Title,
+    Tooltip,
+    Legend,
+    LineElement,
+} from 'chart.js';
+
+import annotationPlugin from 'chartjs-plugin-annotation';
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
 
+
+ChartJS.register(annotationPlugin);
+ChartJS.register(
+    ScatterController,
+    PointElement,
+    LineElement,
+    LinearScale,
+    Title,
+    Tooltip,
+    Legend
+);
+
 interface BenchmarkTableProps {
-    modelName?: string;                                    // name of the tested model
-    benchmark: { [key: string]: BenchmarkDataProps };     // stored benchmarks from previous models
-    data: metricsProps;                                   // metrics result from the benchmark
+    modelName?: string;                                    
+    benchmark: { [key: string]: BenchmarkDataProps };     
+    data: metricsProps;                                   
 }
 
 const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
@@ -15,9 +38,10 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     benchmark,
     data
 }) => {
-    // These are the metrics that were used during the evaluation of this model.
+
     const availableBenchmarkingMetrics = useMemo(() =>
-        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix"].includes(key)),
+        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
+            !key.endsWith("_rank")),
         [data]
     );
 
@@ -44,7 +68,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         setBenchmarkData(out);
     }, [benchmark, availableBenchmarkingMetrics]);
 
-    console.log("benchmarkData = ", benchmarkData);
 
     const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
 
@@ -54,7 +77,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         }
     }, [availableBenchmarkingMetrics]);
 
-    // Sort data by value, descending
+    
     const [sortedData, setSortedData] = useState<[string, number][]>([]);
     const [chartBenchmarkData, setChartBenchmarkData] = useState<{ [key: string]: number }[]>([]);
     const [chartValueData, setChartValueData] = useState<{ [key: string]: number }[]>([]);
@@ -62,7 +85,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     useEffect(() => {
         if (!selectedBenchmark) return;
 
-        // Flatten and filter to ensure we only have numbers
         const flattenValue = (val: any): number[] => {
             if (val === undefined || val === null) return [];
             if (typeof val === 'number') return [val];
@@ -72,7 +94,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
             return [];
         };
 
-        // Extract benchmark values for the selected metric
         const benchmarkEntries = Object.entries(benchmark);
         const benchmarkValues = benchmarkEntries.map(([id, benchmarkProp]) =>
             benchmarkProp.metrics[selectedBenchmark] ?? 0
@@ -80,64 +101,129 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
         const dataValue = flattenValue(data[selectedBenchmark as keyof metricsProps]);
 
-        // Create chart data for benchmark points
+
         if (benchmarkValues.length > 0) {
-            const benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
-                "params": benchmarkProp.param,
+            let benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
+                params: benchmarkProp.param,
                 [selectedBenchmark]: benchmarkValues[index],
             }));
 
+            let chartValueData: any[] = [];
+            if (dataValue.length > 0 && data.params !== undefined) {
+                chartValueData = [{
+                    params: data.params,
+                    [selectedBenchmark]: dataValue[0],
+                }];
+
+                benchmarkChartData = benchmarkChartData.filter(
+                    (entry) =>
+                        !(entry.params === data.params && entry[selectedBenchmark] === dataValue[0])
+                )
+            }
+
             setChartBenchmarkData(benchmarkChartData);
+            setChartValueData(chartValueData);
         } else {
             setChartBenchmarkData([]);
-        }
-
-        // Create chart data for the tested model value
-        if (dataValue.length > 0 && data.params !== undefined) {
-            setChartValueData([{
-                "params": data.params,
-                [selectedBenchmark]: dataValue[0],
-            }]);
-        } else {
             setChartValueData([]);
         }
 
-        // Combine into [name, value] tuples and sort by value descending
         const combined: [string, number][] = [];
 
-        // Add benchmark values with their names
         benchmarkEntries.forEach(([id, benchmarkProp], index) => {
             combined.push([benchmarkProp.name, benchmarkValues[index]]);
         });
 
-        // Add the tested model value
-        if (dataValue.length > 0) {
-            combined.push([modelName || 'Target Model', dataValue[0]]);
-        }
-
-        // Sort by value (descending)
         combined.sort((a, b) => b[1] - a[1]);
+
         setSortedData(combined);
     }, [selectedBenchmark, benchmark, data, modelName]);
 
-    // Chart data
-    const chartData = [
-        {
-            color: 'blue.5',
-            name: 'Benchmark Elements',
-            data: chartBenchmarkData
+    const chartData = {
+        datasets: [
+            {
+                label: 'Benchmark Element',
+                data: chartBenchmarkData.map((d) => ({
+                    x: d.params,
+                    y: d[selectedBenchmark],
+                })),
+                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            },
+            {
+                label: 'Tested Model',
+                data: chartValueData.map((d) => ({
+                    x: d.params,
+                    y: d[selectedBenchmark],
+                })),
+                backgroundColor: 'rgba(239, 68, 68, 0.7)',
+            },
+        ],
+    };
+
+
+
+    const referenceY = data[selectedBenchmark as keyof metricsProps];
+    const referenceLabel = modelName || 'Tested Model';
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' as const },
+            annotation: {
+                annotations: {
+                    referenceLine: {
+                        type: 'line',
+                        yMin: referenceY,
+                        yMax: referenceY,
+                        borderColor: 'rgba(239, 68, 68, 0.8)',
+                        borderWidth: 1,
+                        label: {
+                            display: true,
+                            content: referenceLabel,
+                            position: 'start',
+                            color: 'rgba(239, 68, 68, 0.8)', 
+                            backgroundColor: 'transparent',
+                            yAdjust: -10,
+                        },
+                    },
+                },
+            },
+            tooltip: {
+                callbacks: {
+                    title: () => '',
+                    label: (context: any) => {
+                        const point = context.raw;
+                        const params = point.x;
+                        const value = point.y;
+                        const modelName = context.dataset.label || '';
+
+                        return [
+                            `Group: ${modelName}`,
+                            `Params: ${params}`,
+                            `Value: ${value.toFixed(2)}`
+                        ];
+                    },
+                },
+            },
         },
-        {
-            color: 'red.5',
-            name: 'Tested Model',
-            data: chartValueData
+        scales: {
+            x: {
+                title: { display: true, text: 'params' },
+                type: 'linear' as const,
+                position: 'bottom' as const,
+            },
+            y: {
+                title: { display: true, text: selectedBenchmark },
+            },
         },
-    ];
+    };
+
+
 
 
     return (
         <div className="benchmark-controls">
-            {/* Benchmark selector */}
             <select
                 value={selectedBenchmark}
                 onChange={(e) => setSelectedBenchmark(e.target.value)}
@@ -167,7 +253,6 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                     ]}
                 />
 
-                {/* Leaderboard */}
                 <div className="leaderboard">
                     <div className="leaderboard-title">
                         <Trophy size={"var(--icon-size)"} color='yellow' />

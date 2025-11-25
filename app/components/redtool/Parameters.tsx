@@ -2,6 +2,8 @@ import { Settings, X } from 'lucide-react';
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 
 interface ParametersWindowProps {
     isOpen: boolean;
@@ -15,8 +17,10 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
     parameters,
     onClose,
     handleParametersChange
+
 }) => {
     const [values, setValues] = useState<number[]>(parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []);
+    const [clicked, setClicked] = useState<boolean>(false);
     const defaultParameters = parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []
 
     // Update values when parameters change or modal opens
@@ -101,9 +105,19 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                             Cancel
                         </button>
                         <button
-                            onClick={() => handleParametersChange(values)}
-                            className="save-button">
-                            Save Changes
+                            onClick={() => {
+                                handleParametersChange(values);
+                                setClicked(true);
+                                setTimeout(() => {
+                                    setClicked(false);
+                                }, 1000);
+                            }}
+                            className="save-button"
+                        >
+                            {clicked ? <>
+                                <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
+                                <span>Saved</span>
+                            </> : <p>Save Changes</p>}
                         </button>
                     </div>
                 </div>

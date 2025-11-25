@@ -23,9 +23,8 @@ function Test() {
         }
     }, [attacks])
 
-    // This part is for defining the variables that will handle the loading of the image
-    const [uploadedFile, setUploadedFile] = useState<string | null>(null);
 
+    const [uploadedFile, setUploadedFile] = useState<string | null>(null);
     const [origImg, setOrigImg] = useState<string[] | null>(null)
     const [advImg, setAdvImg] = useState<string[] | null>(null)
     const [advPert, setAdvPert] = useState<string | null>(null)
@@ -49,14 +48,17 @@ function Test() {
         })
     }
     const handleClick = async () => {
-        if (!loading && clicked) {
+        if (!loading) {
+            setClicked(true);
             try {
                 setLoading(true);
-                const response = await fetch('http://127.0.0.1:8000/attacks/executeAttack', {
+                console.log(selectedAttack)
+                const response = await fetch(startAttack, {
                     method: "POST",
                     body: JSON.stringify({
                         "image": uploadedFile?.split(",")[1],
-                        "attack": selectedAttack
+                        "attack": selectedAttack,
+                        "model_name": modelName
                     }),
                     headers: {
                         'Content-type': 'application/json'
@@ -84,10 +86,8 @@ function Test() {
                 console.error('ERROR:', error);
             } finally {
                 setLoading(false);
-                setClicked(!clicked);
+                setClicked(false);
             }
-        } else if (!loading && !clicked) {
-            setClicked(!clicked);
         }
     };
 
