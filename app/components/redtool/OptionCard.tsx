@@ -49,7 +49,7 @@ export function OptionCard({
           ))}
         </div>
 
-        <span style={{fontSize:"0.7rem"}}>{description}</span>
+        <span style={{ fontSize: "0.7rem" }}>{description}</span>
         <div className='card-footer'>
           <Icon
             className='card-icon'

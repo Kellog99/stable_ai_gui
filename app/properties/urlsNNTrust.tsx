@@ -1,29 +1,29 @@
 const host = "localhost"
+const port = 8000
 
-export const uploadModel_check = `http://${host}:8082/model/upload/check`
-export const uploadModel = `http://${host}:8082/model/upload`
-export const models_get = `http://${host}:8082/repository/model` //`http://${host}:8082/model/getModels`
+export const getInfoAttacks = `http://${host}:${port}/info/attacks/getInfo`
+export const getInfoMetrics = `http://${host}:${port}/info/metrics/getInfo`
+export const getListModels = `http://${host}:${port}/model/getModels`
+export const getListDataset = `http://${host}:${port}/dataset/getDatasets`
 
-export const getAllNNReports = `http://${host}:8082/job/report/getReports`
-export const uploadJsonReport_NN = `http://${host}:8082/job/report/upload`
+export const uploadModel_check = `http://${host}:${port}/model/upload/check`
+export const uploadModel = `http://${host}:${port}/model/upload`
 
-export const reportFetch_get = `http://${host}:8082/job/report/getResult`
-export const benchmarkFetch_get = `http://${host}:8082/job/benchmark/getResult`
-export const getJobsProgress = `http://${host}:8082/job/getJobs`
-export const getInfoAttacks = `http://${host}:8082/info/attacks/getInfo`
-export const getInfoMetrics = `http://${host}:8082/info/metrics/getInfo`
+export const getAllNNReports = `http://${host}:${port}/job/report/getReports`
+export const uploadJsonReport_NN = `http://${host}:${port}/job/report/upload`
 
-export const startJob = `http://127.0.0.1:8000/attacks/executeBenchmark` //`http://${host}:8082/job/start`
-export const startAttack = `http://${host}:8082/job/attack`
+export const reportFetch_get = `http://${host}:${port}/job/report/getResult`
+export const benchmarkFetch_get = `http://${host}:${port}/job/benchmark/getResult`
+export const getJobsProgress = `http://${host}:${port}/job/getJobs`
 
-
+export const startJob = `http://${host}:${port}/job/start`
+export const startAttack = `http://${host}:${port}/job/attack`
 
 
 /////////////////////////////////////////////////////////////
+export const dataset_upload = `http://${host}:${port}/dataset/upload`
 
-export const datasets_get = "http://localhost:8082/dataset/getDatasets"
-export const dataset_upload = "http://localhost:8082/dataset/upload"
+export const start_job = `http://${host}:${port}/job/start`
+export const jobsId_get = `http://${host}:${port}/job/getJobsId`
 
-export const start_job = "http://localhost:8082/job/start"
-export const jobsId_get = "http://localhost:8082/job/getJobsId"
-export const jobProgress_get = "http://127.0.0.1:8000/job/getProgress"
+export const jobProgress_get = `http://${host}:${port}/job/getProgress`

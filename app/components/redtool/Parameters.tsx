@@ -44,7 +44,10 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-window" onClick={(e) => e.stopPropagation()}>
+            <div
+                className="modal-window"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Header */}
                 <div className="modal-header">
                     <h2 className="modal-title">
@@ -84,7 +87,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                 type="range"
                                 min={param.min}
                                 max={param.max}
-                                step={(param.max - param.min) / 100}
+                                step={param.step}
                                 value={values[index] ?? param.default}
                                 onChange={(e) => handleChange(index, parseFloat(e.target.value))}
                                 className="form-slider"

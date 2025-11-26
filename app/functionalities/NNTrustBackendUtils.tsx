@@ -1,10 +1,10 @@
-import { getAllNNReports, jobsId_get, start_job } from "@/properties/urlsNNTrust";
+import { getAllNNReports, getInfoAttacks, getInfoMetrics, jobsId_get, getListModels, start_job, getListDataset } from "@/properties/urlsNNTrust";
 import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 
 // get all the models saved
 export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectProps }> {
   try {
-    const response = await fetch('http://127.0.0.1:8000/attacks/getInfo');
+    const response = await fetch(getInfoAttacks);
     if (!response.ok) {
       throw new Error(`HTTP error for the attacks' list! Status: ${response.status}`);
     }
@@ -19,7 +19,7 @@ export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectP
 // get all the models saved
 export async function getMetricsList(): Promise<{ [key: string]: RegisterObjectProps }> {
   try {
-    const response = await fetch('http://127.0.0.1:8000/metrics/getInfo');
+    const response = await fetch(getInfoMetrics);
     if (!response.ok) {
       throw new Error(`HTTP error for the attacks' list! Status: ${response.status}`);
     }
@@ -33,7 +33,7 @@ export async function getMetricsList(): Promise<{ [key: string]: RegisterObjectP
 
 export async function getDatasetsList() {
 
-  const response = await fetch('http://127.0.0.1:8000/repository/dataset');
+  const response = await fetch(getListDataset);
 
   if (!response.ok) throw new Error('Failed to get model info from the backend');
 
@@ -44,7 +44,7 @@ export async function getDatasetsList() {
 // get all the models saved
 export async function getModelsList(): Promise<ModelInfo[]> {
 
-  const response = await fetch('http://127.0.0.1:8000/repository/model');
+  const response = await fetch(getListModels);
 
   if (!response.ok) throw new Error('Failed to get model info from the backend');
 

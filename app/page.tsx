@@ -62,7 +62,7 @@ export default function HomePage() {
       name: "Upload model",
       Icon: Upload,
       child: <DragDrop
-        name={"title"}
+        name={"Load your Model"}
         Icon={Brain}
         acceptedType={"zip"}
         description={'Make sure your zip contains raw data and a json config file.'}
@@ -90,7 +90,7 @@ export default function HomePage() {
       name: "Upload dataset",
       Icon: Upload,
       child: <DragDrop
-        name={"title"}
+        name={"Load your Dataset"}
         Icon={Database}
         acceptedType={"zip"}
         description={'Make sure your zip contains raw data and a json config file.'}
@@ -100,7 +100,7 @@ export default function HomePage() {
     {
       id: "repository",
       Icon: HardDrive,
-      name: "Model Repository",
+      name: "Dataset Repository",
       child: <FileRepository
         elements={listDatasets}
         selectHandle={(dataset) => { setDataset(dataset as DatasetInfo) }}

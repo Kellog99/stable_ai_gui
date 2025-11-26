@@ -6,7 +6,7 @@ import './Benchmark.css';
 import TableWrapper from "./TableWrapper"
 import { Settings, Ruler, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
 import useNNTrustStore from '@/store/nnTrustStore';
-import { Alert, Group, Modal } from '@mantine/core';
+import { Group, Modal } from '@mantine/core';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import { startJob } from '@/properties/urlsNNTrust';
 const Benchmark: React.FC = () => {
