@@ -5,10 +5,10 @@ import './FileRepository.css'
 import { DatasetInfo, ModelInfo } from '@/interfaces/NNInterfaces';
 
 interface FileRepositoryProps {
-    elements: ModelInfo[] | DatasetInfo[],
+    elements: any[] ,
     activeId?: string,
-    handleDelete: (model: ModelInfo | DatasetInfo) => void,
-    selectHandle: (model: ModelInfo | DatasetInfo) => void,
+    handleDelete: (model: any) => void,
+    selectHandle: (model: any) => void,
 }
 
 // This component has the role to create the card associated to the model or dataset repository

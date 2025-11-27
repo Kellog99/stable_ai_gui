@@ -33,8 +33,10 @@ export interface attacksProps {
     confusionmatrix?: number[][]
 }
 
-export interface ReportProps {
+//  Interface for the report page
+export interface ReportAttacksProps {
     prototype: string;
+    id: string;
     dataset: string;
     tool: string;
     info: infoProps;
@@ -42,15 +44,17 @@ export interface ReportProps {
     attacks: { [key: string]: attacksProps }
 }
 
+// Interface associated for retriving the values in the report.
 export interface BenchmarkDataProps {
     name: string
     param: number
     task: string
-    metrics: { [key: string | number]: number }
+    metrics: { [key: string | number]: number[] }
 }
 
-export interface DQReportProps{
+export interface DQReportProps {
+    id: string;
     tool: string
     dataset: Dataset;
-    metrics: Object[]; 
+    metrics: Object[];
 }

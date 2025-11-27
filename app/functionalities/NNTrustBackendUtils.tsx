@@ -1,4 +1,4 @@
-import { getAllNNReports, getInfoAttacks, getInfoMetrics, jobsId_get, getListModels, start_job, getListDataset } from "@/properties/urlsNNTrust";
+import { getListModelsReport, getInfoAttacks, getInfoMetrics, jobsId_get, getListModels, start_job, getListDataset } from "@/properties/urlsNNTrust";
 import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 
 // get all the models saved
@@ -74,9 +74,9 @@ export async function getJobsId() {
 }
 
 
-
-export async function getReports() {
-  const response = await fetch(`${getAllNNReports}`);
+// get all the reports from the 
+export async function getModelsReport() {
+  const response = await fetch(`${getListModelsReport}`);
 
   if (!response.ok) throw new Error('Failed to get NNTrust reports from the backend');
 

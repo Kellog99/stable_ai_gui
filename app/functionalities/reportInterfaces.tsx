@@ -35,6 +35,7 @@ export interface attacksProps {
 
 export interface ReportProps {
     prototype: string;
+    id: string,
     dataset: string;
     tool: string;
     info: infoProps;
@@ -42,6 +43,9 @@ export interface ReportProps {
     attacks: { [key: string]: attacksProps }
 }
 
+// ##################### Benchmark Data #####################
+// This interface refears to a single model-dataset 
+// Hence the whole dataset of past results is given by a list of BenchmarkDataProps
 export interface BenchmarkDataProps {
     name: string
     param: number
@@ -49,8 +53,10 @@ export interface BenchmarkDataProps {
     metrics: { [key: string | number]: number }
 }
 
+// ##################### Data Quality Report #####################
 export interface DQReportProps {
-    tool: string
+    id?: string;
+    tool: string;
     dataset: Dataset;
     metrics: Object[];
 }

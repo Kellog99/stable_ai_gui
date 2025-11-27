@@ -3,13 +3,16 @@ const port = 8000
 
 export const getInfoAttacks = `http://${host}:${port}/info/attacks/getInfo`
 export const getInfoMetrics = `http://${host}:${port}/info/metrics/getInfo`
+
 export const getListModels = `http://${host}:${port}/model/getModels`
 export const getListDataset = `http://${host}:${port}/dataset/getDatasets`
+
+// report repository
+export const getListModelsReport = `http://${host}:${port}/job/report/getReports`
 
 export const uploadModel_check = `http://${host}:${port}/model/upload/check`
 export const uploadModel = `http://${host}:${port}/model/upload`
 
-export const getAllNNReports = `http://${host}:${port}/job/report/getReports`
 export const uploadJsonReport_NN = `http://${host}:${port}/job/report/upload`
 
 export const reportFetch_get = `http://${host}:${port}/job/report/getResult`

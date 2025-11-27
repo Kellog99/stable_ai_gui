@@ -1,11 +1,11 @@
 import React from 'react';
 import { Document, Page, Text, View } from '@react-pdf/renderer';
-import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
+import { BenchmarkDataProps, ReportAttacksProps } from '@/interfaces/reportInterfaces';
 import { getRiskColor, getRiskLevel, stylesPDF } from './SecurityReportStyle';
 
 
 interface SecurityReportPDFProps {
-    report: ReportProps,
+    report: ReportAttacksProps,
     benchmark: { [key: string]: BenchmarkDataProps }
 
 }

@@ -4,7 +4,7 @@ import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { AppWindowIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
+import { BenchmarkDataProps, ReportAttacksProps } from '@/interfaces/reportInterfaces';
 import { benchmarkFetch_get, jobProgress_get, reportFetch_get } from '@/properties/urlsNNTrust';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import ManagementTable from './ManagementTable';
@@ -13,7 +13,7 @@ import { AttackManagementProps } from '@/interfaces/NNInterfaces';
 
 const TaskManagement: React.FC = () => {
     const {
-        setReport,
+        setAttackReport: setReport,
         setBenchmark,
         benchmarkId,
     } = useNNTrustStore()
@@ -111,7 +111,7 @@ const TaskManagement: React.FC = () => {
             }
         }
         // fetching the report
-        const reportFetch = await fetchResult<ReportProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId)}`);
+        const reportFetch = await fetchResult<ReportAttacksProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId)}`);
         if (reportFetch) {
             setReport(reportFetch);
         }

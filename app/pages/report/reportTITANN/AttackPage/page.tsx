@@ -63,7 +63,7 @@ const ConfusionMatrix: React.FC<{ matrix: number[][] }> = ({ matrix }) => {
 };
 
 const page = () => {
-    const { vulnerabilitySelected, report } = useNNTrustStore()
+    const { vulnerabilitySelected, attackReport: report } = useNNTrustStore()
     const [attackReport, setAttackReport] = useState<attacksProps>(report!.attacks[vulnerabilitySelected!])
 
 

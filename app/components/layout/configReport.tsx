@@ -16,7 +16,6 @@ export const reportSection: FileDropZoneProps =
     description: "Drag and drop the JSON of the report.",
     Icon: File,
     fileDropInformation: infoModel,
-    fileType: ".json",
     buttons: [
         {
             id: "report",

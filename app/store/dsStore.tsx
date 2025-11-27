@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import Dataset, { Configs} from "../interfaces/genericInterface";
+import Dataset, { Configs } from "../interfaces/genericInterface";
 import { ResultPoll } from "@/interfaces/metricsInterface";
 import { DatasetInfo } from "@/interfaces/NNInterfaces";
 import { DQReportProps } from "@/interfaces/reportInterfaces";
@@ -29,7 +29,7 @@ interface AppState {
   addToReport: boolean;
   isLoadingEmbs: boolean;
 
-  report: Object[];
+  report: DQReportProps | null;
   colorMap: Partial<Record<number, number[]>>;
   uqColors: [number, number, number][] | null;
 
@@ -66,7 +66,7 @@ interface AppState {
 
   setAddToReport: (addToReport: boolean) => void;
   setIsLoadingEmbs: (isLoadingEmbs: boolean) => void;
-  setReport: (report: Object[] | []) => void;
+  setReport: (report: DQReportProps | null) => void;
   setColorMap: (colorMap: Partial<Record<number, number[]>>) => void;
   setUqColors: (uqColors: [number, number, number][] | null) => void;
 
@@ -104,7 +104,7 @@ const useStore = create<AppState>()(
 
       addToReport: false,
       isLoadingEmbs: true,
-      report: [],
+      report: null,
       colorMap: {},
       filteredLabels: [],
       size: { width: 690, height: 500 },
@@ -138,7 +138,7 @@ const useStore = create<AppState>()(
 
       setAddToReport: (addToReport: boolean) => set({ addToReport }),
       setIsLoadingEmbs: (isLoadingEmbs: boolean) => set({ isLoadingEmbs }),
-      setReport: (report: Object[] | []) => set({ report }),
+      setReport: (report: DQReportProps | null) => set({ report }),
       setColorMap: (colorMap: Partial<Record<number, number[]>>) => set({ colorMap }),
       setUqColors: (uqColors: [number, number, number][] | null) => set({ uqColors }),
 

@@ -5,7 +5,7 @@ import { Info } from "./homePageInterface";
 // Model's information
 export interface ModelInfo extends Info {
   dataset: string,                  // Dataset where the model had been optimized on 
-  parameters: string | null,        // Number of the models' parameters
+  parameters: number | null,        // Number of the models' parameters
 }
 
 export interface DatasetInfo extends Info {

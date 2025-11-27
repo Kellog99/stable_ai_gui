@@ -14,7 +14,7 @@ import InfoTable from './InfoTable';
 
 const SecurityReport = () => {
 
-    const { report, benchmark } = useNNTrustStore()
+    const { attackReport: report, benchmark } = useNNTrustStore()
     const [modelInfo, setModelInfo] = useState<{ [key: string]: string | number }>({})
     const [modelMetrics, setModelMetric] = useState<{ [key: string]: string | number }>({})
 

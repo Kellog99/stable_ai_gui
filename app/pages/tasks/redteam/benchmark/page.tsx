@@ -68,7 +68,7 @@ const Benchmark: React.FC = () => {
   }
 
 
-  // variables for executing the benchmarking
+  // #################### Benchmark constraints #################### 
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
   // Provides the context of why the Benchmarking is not executable
   const [description, setDescription] = useState<string>("")
