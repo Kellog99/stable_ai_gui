@@ -29,4 +29,4 @@ export const dataset_upload = `http://${host}:${port}/dataset/upload`
 export const start_job = `http://${host}:${port}/job/start`
 export const jobsId_get = `http://${host}:${port}/job/getJobsId`
 
-export const jobProgress_get = `http://${host}:${port}/job/getProgress`
+export const jobProgress_get = `http://${host}:${port}/job/getJobs`

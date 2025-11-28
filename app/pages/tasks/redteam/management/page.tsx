@@ -29,13 +29,10 @@ const TaskManagement: React.FC = () => {
         }
 
         try {
-            const response = await fetch(jobProgress_get, {
-                method: "POST",
-                body: JSON.stringify({
-                    "id": benchmarkId,
-                }),
+            const response = await fetch(`${jobProgress_get}?id=${encodeURIComponent(benchmarkId)}`, {
+                method: "GET",
                 headers: {
-                    'Content-type': 'application/json'
+                    "Content-Type": "application/json"
                 }
             });
 
