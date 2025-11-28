@@ -6,7 +6,7 @@ export interface Info {
     image?: string | null,            // an image that represents the file.
     task: string,                     // task associated with, i.e. classification, detection, etc.
     domain: string,                   // Domain of the file, i.e. RGB, ultraviolet, etc.
-    classes?: number,                 // number of classes in the output.
+    num_classes?: number,             // number of classes in the output.
     weights?: number,                 // Size of the file.
     description?: string,             // description of the file.
     input_dimensionality: number[]    // dimensionality of each input or domain's dimensionality.

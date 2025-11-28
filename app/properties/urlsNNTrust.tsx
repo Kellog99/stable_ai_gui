@@ -20,7 +20,7 @@ export const benchmarkFetch_get = `http://${host}:${port}/job/benchmark/getResul
 export const getJobsProgress = `http://${host}:${port}/job/getJobs`
 
 export const startJob = `http://${host}:${port}/job/start`
-export const startAttack = `http://${host}:${port}/job/attack`
+export const startSingleAttack = `http://${host}:${port}/job/attack`
 
 
 /////////////////////////////////////////////////////////////

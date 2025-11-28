@@ -12,10 +12,11 @@ import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import { Modal } from '@mantine/core';
 import ParametersWindow from '@/components/redtool/Parameters';
 import ModalButton from './ModalButton';
+import { startSingleAttack } from '@/properties/urlsNNTrust';
 
 function Test() {
 
-    const { attacks } = useNNTrustStore()
+    const { attacks, model } = useNNTrustStore()
     const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps | undefined>()
     useEffect(() => {
         if (Object.keys(attacks).length > 0) {
@@ -25,14 +26,15 @@ function Test() {
 
 
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
-    const [advImg, setAdvImg] = useState<string[] | null>(null)
+    const [advImg, setAdvImg] = useState<string | null>(null)
+    const [advPred, setAdvPred] = useState<string>("")
     const [advPert, setAdvPert] = useState<string | null>(null)
+    const [pred, setPred] = useState<string>("")
 
     const [atkResult, setAtkResult] = useState<{ [key: string]: number } | undefined>(undefined);
     const [atkConf, setAtkConf] = useState<{ [key: string]: number[] } | undefined>(undefined);
 
     const [clicked, setClicked] = useState<Boolean>(false);
-    const [loading, setLoading] = useState<Boolean>(false)
 
     const handleChange = (value: number[]) => {
         setSelectedAttack(prev => {
@@ -46,21 +48,24 @@ function Test() {
             return { ...prev, parameters: newParameters }
         })
     }
+
     const handleClick = async () => {
-        if (!loading) {
+        // At this moment there could be one click at the time
+        // If an attack has been executed then the button will not be available untill the attack finishes its process. 
+        if (!clicked && uploadedFile && model) {
             setClicked(true);
             try {
-                setLoading(true);
-                console.log(selectedAttack)
-                const response = await fetch("startAttack", {
+                console.log("the route is ", startSingleAttack)
+                console.log(model.id)
+                const response = await fetch(startSingleAttack, {
                     method: "POST",
                     body: JSON.stringify({
-                        "image": uploadedFile?.split(",")[1],
+                        "image": uploadedFile.split(",")[1],
                         "attack": selectedAttack,
-                        "model_name": "modelName"
+                        "id_model": model.id
                     }),
                     headers: {
-                        'Content-type': 'application/json'
+                        'Content-Type': 'application/json'
                     }
                 });
 
@@ -69,12 +74,16 @@ function Test() {
                 console.log('Response:', data);
 
                 if (!response.ok) {
+
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 // the attack has been done and it has to handle the results
-                setAdvImg([data.x_adv, data.adversarial_prediction])
+                setAdvImg(data.x_adv)
+                setAdvPred(data.adversarial_prediction)
                 setAdvPert(data.adv_perturbation)
+                setPred(data.original_prediction)
+
                 console.log("pert=", data.adv_perturbation)
 
                 setAtkResult({ ...data.advance_metrics })
@@ -83,7 +92,6 @@ function Test() {
             } catch (error) {
                 console.error('ERROR:', error);
             } finally {
-                setLoading(false);
                 setClicked(false);
             }
         }
@@ -208,7 +216,7 @@ function Test() {
                         size="auto"
                         centered>
                         <AttackVisualization
-                            prediction={{ original: "cat", adversarial: "dog" }}
+                            prediction={{ original: pred, adversarial: advPred }}
                             confidence={atkConf}
                             results={atkResult} />
                     </Modal>
@@ -244,7 +252,7 @@ function Test() {
                 <ImageDisplay
                     title="Adversarial Perturbation"
                     placeholder="No image loaded"
-                    imageUrl={advPert ? advPert : undefined}
+                    imageUrl={advPert ? "data:image/jpeg;base64," + advPert : undefined}
                     loader={false}
 
                 />
@@ -252,7 +260,7 @@ function Test() {
                 <ImageDisplay
                     title="Adversarial Example"
                     placeholder="No image loaded"
-                    imageUrl={advImg ? advImg[0] : undefined}
+                    imageUrl={advImg ? "data:image/jpeg;base64," + advImg : undefined}
                     loader={false}
 
                 />
