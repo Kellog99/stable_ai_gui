@@ -1,5 +1,5 @@
 const host = "localhost"
-const port = 8000
+const port = 8082
 
 export const getInfoAttacks = `http://${host}:${port}/info/attacks/getInfo`
 export const getInfoMetrics = `http://${host}:${port}/info/metrics/getInfo`

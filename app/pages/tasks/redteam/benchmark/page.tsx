@@ -9,6 +9,7 @@ import useNNTrustStore from '@/store/nnTrustStore';
 import { Group, Modal } from '@mantine/core';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import { startJob } from '@/properties/urlsNNTrust';
+import useStore from '@/store/dsStore';
 const Benchmark: React.FC = () => {
 
   const {
@@ -19,6 +20,24 @@ const Benchmark: React.FC = () => {
 
   const [selectedAttacks, setSelectedAttacks] = useState<{ [key: string]: RegisterObjectProps }>({})
   const [selectedMetrics, setSelectedMetrics] = useState<{ [key: string]: RegisterObjectProps }>({})
+
+  const model = useNNTrustStore((state) => state.model);
+
+  const numClasses = model?.classes as number
+
+  let modifiedSelectedElement = { ...selectedMetrics };
+  if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
+    delete modifiedSelectedElement.confusionmatrix;
+  }
+  const datasetName = useStore((state) => state.dataset)?.name
+  const modelName = useNNTrustStore((state) => state.model)?.name
+
+  const benchmarkDatas = {
+    attacks: Object.values(selectedAttacks),
+    metrics: Object.values(modifiedSelectedElement),
+    dataset: datasetName,
+    model: modelName
+  };
 
   // Handler for the element's 
   const handleSelectionClick = (
@@ -101,7 +120,7 @@ const Benchmark: React.FC = () => {
 
       const response = await fetch(startJob, {
         method: "POST",
-        body: JSON.stringify(selectedAttacks),
+        body: JSON.stringify(benchmarkDatas),
         headers: {
           'Content-type': 'application/json'
         }
