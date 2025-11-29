@@ -56,13 +56,13 @@ function Test() {
             setClicked(true);
             try {
                 console.log("the route is ", startSingleAttack)
-                console.log(model.id)
+
                 const response = await fetch(startSingleAttack, {
                     method: "POST",
                     body: JSON.stringify({
                         "image": uploadedFile.split(",")[1],
                         "attack": selectedAttack,
-                        "id_model": model.id
+                        "model_name": !model.id ? model.name : undefined
                     }),
                     headers: {
                         'Content-Type': 'application/json'

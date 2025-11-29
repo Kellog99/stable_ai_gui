@@ -10,6 +10,7 @@ import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import ManagementTable from './ManagementTable';
 import { getStatusIcon } from './utils';
 import { AttackManagementProps } from '@/interfaces/NNInterfaces';
+import useStore from '@/store/dsStore';
 
 const TaskManagement: React.FC = () => {
     const {
@@ -20,6 +21,7 @@ const TaskManagement: React.FC = () => {
 
     const [listExecutedAttacks, setListExecutedAttacks] = useState<AttackManagementProps[]>([]);
     const [description, setDescription] = useState<string>('');
+    const datasetName = useStore((state) => state.dataset)?.name
 
     // getting the advancement status from the job, starting from the id
     const handleRefresh = async () => {
@@ -114,7 +116,7 @@ const TaskManagement: React.FC = () => {
         }
 
         // fetching the benchmark
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${benchmarkId}`);
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
         if (benchmarkFetch && benchmarkId) {
             setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
         }

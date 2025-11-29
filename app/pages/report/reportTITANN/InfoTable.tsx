@@ -13,13 +13,14 @@ const InfoTable: React.FC<InfoTableProps> = ({
     return (
         <table className='info-table'>
             <thead style={{ borderBottom: "1px solid gray" }}>
+                <tr>
                 <th
                     colSpan={1}
                     style={{
                         textAlign: "left",
                         padding: "20px",
                         fontWeight: "bold"
-                    }}> {title}</th>
+                    }}> {title}</th></tr>
             </thead>
             <tbody>
                 {Object.entries(props).map(([key, value]) => (
