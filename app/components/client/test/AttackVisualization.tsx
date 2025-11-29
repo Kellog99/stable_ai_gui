@@ -52,8 +52,8 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
           <span> Original prediction: {prediction.original}</span>
           <span> Adversarial prediction: {prediction.adversarial}</span>
         </div>
+        <span style={{fontSize:"0.9rem"}}>{prediction.original !== prediction.adversarial ? "The attack has successfully evade the model prediction" : "The attack could not fool the model."}</span>
       </div>
-
       {/* Statistics Table */}
       <div>
         <h3 className="card-title">Statistics</h3>
@@ -79,43 +79,48 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
       </table>
 
       {/* Confidence Chart */}
-      <div>
-        <h3 className="card-title">Confidence Chart</h3>
-        <span style={{ fontSize: "0.8rem" }}>
-          The following graph shows the trend in confidence for the original class and the opposing class.        </span>
-      </div>
-      <div className="chart-wrapper">
-        <LineChart
-          h={500}
-          w={800}
-          data={chartData}
-          withLegend
-          legendProps={{
-            verticalAlign: 'bottom',
-            layout: 'horizontal',
-            height: 60,
-            align: 'center'
-          }}
-          styles={{
-            legend: {
-              display: 'flex',
-              flexDirection: 'row',
-              gap: '16px',
-              paddingTop: '32px',
-              fontSize: '0.875rem',
-              flexWrap: 'wrap',
-              justifyContent: 'center'
-            }
-          }}
-          dataKey="step"
-          xAxisLabel="Iteration Step"
-          yAxisLabel="Model Confidence"
-          series={series}
-          curveType="monotone"
-          strokeWidth={2}
-          gridAxis="xy"
-        />
-      </div>
+      {
+        confidence['adversarial'].length > 0 && confidence['original'].length > 0 ?
+          <>
+            <div>
+              <h3 className="card-title">Confidence Chart</h3>
+              <span style={{ fontSize: "0.8rem" }}>
+                The following graph shows the trend in confidence for the original class and the opposing class.        </span>
+            </div>
+            <div className="chart-wrapper">
+              <LineChart
+                h={500}
+                w={800}
+                data={chartData}
+                withLegend
+                legendProps={{
+                  verticalAlign: 'bottom',
+                  layout: 'horizontal',
+                  height: 60,
+                  align: 'center'
+                }}
+                styles={{
+                  legend: {
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '16px',
+                    paddingTop: '32px',
+                    fontSize: '0.875rem',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center'
+                  }
+                }}
+                dataKey="step"
+                xAxisLabel="Iteration Step"
+                yAxisLabel="Model Confidence"
+                series={series}
+                curveType="monotone"
+                strokeWidth={2}
+                gridAxis="xy"
+              />
+            </div>
+          </>
+          : null}
     </div>
   );
 };

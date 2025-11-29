@@ -39,8 +39,8 @@ export interface ButtonProps {
 
 
 export interface ParametersProps {
+  id: string
   name: string
-  label: string
   min: number
   max: number
   step: number

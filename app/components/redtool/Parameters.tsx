@@ -62,9 +62,9 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                 {/* Settings Content */}
                 <div className="modal-content">
                     {parameters.map((param, index) => (
-                        <div key={`${param.label}-${index}`} className="form-group">
+                        <div key={`${param.name}-${index}`} className="form-group">
                             <label className="form-label">
-                                {param.label}
+                                {param.name}
                                 <span style={{
                                     float: 'right',
                                     fontWeight: 'bold',
