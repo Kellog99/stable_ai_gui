@@ -61,6 +61,8 @@ const TaskManagement: React.FC = () => {
     const [attackStates, setAttackStates] = useState<{ [key: string]: number }>({})
     const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
+
+
     useEffect(() => {
         const status = {
             "Completed": 0,
@@ -70,8 +72,11 @@ const TaskManagement: React.FC = () => {
         };
 
         listExecutedAttacks.forEach((job: AttackManagementProps) => {
-            status[job.status] = status[job.status] + 1;
+            if (status.hasOwnProperty(job.status)) {
+                status[job.status] += 1;
+            }
         });
+
 
         setAttackStates(status);
 
@@ -91,7 +96,7 @@ const TaskManagement: React.FC = () => {
         setIsDisabled((notFinished > 0 && listExecutedAttacks.length > 0) || listExecutedAttacks.length === 0);
     }, [listExecutedAttacks]);
 
-
+    console.log("attacks state dopo", attackStates)
     const router = useRouter()
 
     const handleClickReport = async () => {
@@ -110,7 +115,7 @@ const TaskManagement: React.FC = () => {
             }
         }
         // fetching the report
-        const reportFetch = await fetchResult<ReportAttacksProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId)}`);
+        const reportFetch = await fetchResult<ReportAttacksProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId as string)}`);
         if (reportFetch) {
             setReport(reportFetch);
         }

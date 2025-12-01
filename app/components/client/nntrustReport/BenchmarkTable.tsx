@@ -11,6 +11,8 @@ import {
     LineElement,
 } from 'chart.js';
 
+import { Scatter } from 'react-chartjs-2';
+
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
@@ -28,9 +30,9 @@ ChartJS.register(
 );
 
 interface BenchmarkTableProps {
-    modelName?: string;                                    
-    benchmark: { [key: string]: BenchmarkDataProps };     
-    data: metricsProps;                                   
+    modelName?: string;
+    benchmark: { [key: string]: BenchmarkDataProps };
+    data: metricsProps;
 }
 
 const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
@@ -66,9 +68,11 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         }));
 
         setBenchmarkData(out);
+
     }, [benchmark, availableBenchmarkingMetrics]);
 
 
+    console.log("benchaìmarkdata", benchmarkData)
     const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
 
     useEffect(() => {
@@ -77,7 +81,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
         }
     }, [availableBenchmarkingMetrics]);
 
-    
+
     const [sortedData, setSortedData] = useState<[string, number][]>([]);
     const [chartBenchmarkData, setChartBenchmarkData] = useState<{ [key: string]: number }[]>([]);
     const [chartValueData, setChartValueData] = useState<{ [key: string]: number }[]>([]);
@@ -182,7 +186,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                             display: true,
                             content: referenceLabel,
                             position: 'start',
-                            color: 'rgba(239, 68, 68, 0.8)', 
+                            color: 'rgba(239, 68, 68, 0.8)',
                             backgroundColor: 'transparent',
                             yAdjust: -10,
                         },
@@ -238,20 +242,9 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
             <div className='results-grid'>
                 {/* Scatter plot */}
-                <ScatterChart
-                    h={"100%"}
-                    data={chartData}
-                    dataKey={{ x: 'params', y: selectedBenchmark }}
-                    xAxisLabel="Model's parameters"
-                    yAxisLabel={selectedBenchmark}
-                    referenceLines={[
-                        {
-                            y: data[selectedBenchmark as keyof metricsProps] as number,
-                            label: modelName ? modelName : 'Tested Model',
-                            color: 'red.7',
-                        },
-                    ]}
-                />
+                <div style={{ width: '100%', height: 400 }}>
+                    <Scatter data={chartData} options={options as any} />
+                </div>
 
                 <div className="leaderboard">
                     <div className="leaderboard-title">

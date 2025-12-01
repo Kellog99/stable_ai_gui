@@ -23,7 +23,7 @@ const Benchmark: React.FC = () => {
 
   const model = useNNTrustStore((state) => state.model);
 
-  const numClasses = model?.classes as number
+  const numClasses = model?.num_classes as number
 
   let modifiedSelectedElement = { ...selectedMetrics };
   if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
