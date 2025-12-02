@@ -26,7 +26,7 @@ export const reportSection: FileDropZoneProps =
                 Icon={File}
                 acceptedType={"json"}
                 description={'Upload the JSON file related to the report.'}
-                onFileSelect={() => { }}
+                onFileUpload={() => { }}
             />,
         },
         {

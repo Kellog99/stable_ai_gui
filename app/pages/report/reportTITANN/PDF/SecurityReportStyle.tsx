@@ -29,10 +29,17 @@ export const stylesPDF = StyleSheet.create({
         backgroundColor: '#ffffff',
         fontFamily: 'Helvetica',
     },
+
     header: {
-        marginBottom: 20,
+        marginBottom: 10,
         borderBottom: '2 solid #1B9AAA',
         paddingBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    titleContainer: {
+        flexDirection:"column"
     },
     title: {
         fontSize: 28,
@@ -44,6 +51,10 @@ export const stylesPDF = StyleSheet.create({
         fontSize: 12,
         color: '#666666',
         marginBottom: 20,
+    },
+    logo: {
+        width: 100,       // adjust as needed
+        margin:0
     },
     sectionTitle: {
         fontSize: 18,

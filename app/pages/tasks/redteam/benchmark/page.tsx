@@ -141,66 +141,19 @@ const Benchmark: React.FC = () => {
 
 
   return (
-    <>
-      <div className="container-pages">
-        {/* Header */}
-
-        <HeaderPageTask
-          Icon={BrickWallFireIcon}
-          title="Red Teaming"
-          descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
-          buttonprops={{
-            description: "Execute Benchmark",
-            isDisabled: !executeBenchmark,
-            disabledDescription: description,
-            handleClick: handleClick
-          }}
-        />
-
-
-        {/* Attacks Selection */}
-        <TableWrapper
-          title='Vulnearbility selection'
-          elements={attacks}
-          selectedElement={selectedAttacks}
-          handleSelection={(id: string) => handleSelectionClick(
-            id,
-            selectedAttacks,
-            setSelectedAttacks,
-            attacks
-          )}
-          handleParametersChange={(id: string, parameters: number[]) => {
-            handleParametersChange(
-              id,
-              parameters,
-              setSelectedAttacks,
-              selectedAttacks
-            )
-          }}
-          Icon={Settings}
-        />
-
-        {/* Metrics Selection */}
-        <TableWrapper
-          title='Metric Selection'
-          elements={metrics}
-          selectedElement={selectedMetrics}
-          handleSelection={(id: string) => handleSelectionClick(
-            id,
-            selectedMetrics,
-            setSelectedMetrics,
-            metrics
-          )}
-          Icon={Ruler}
-          handleParametersChange={(id: string, parameters: number[]) => {
-            handleParametersChange(id,
-              parameters,
-              setSelectedMetrics,
-              selectedMetrics)
-          }} />
-
-      </div >
-
+    <div>
+      {/* Header */}
+      <HeaderPageTask
+        Icon={BrickWallFireIcon}
+        title="Red Teaming"
+        descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
+        buttonprops={{
+          description: "Execute Benchmark",
+          isDisabled: !executeBenchmark,
+          disabledDescription: description,
+          handleClick: handleClick
+        }}
+      />
       <Modal
         opened={isClicked}
         className='alert-message'
@@ -238,7 +191,48 @@ const Benchmark: React.FC = () => {
         </button>
       </Modal>
 
-    </>)
+      {/* Attacks Selection */}
+      <TableWrapper
+        title='Vulnearbility selection'
+        elements={attacks}
+        selectedElement={selectedAttacks}
+        handleSelection={(id: string) => handleSelectionClick(
+          id,
+          selectedAttacks,
+          setSelectedAttacks,
+          attacks
+        )}
+        handleParametersChange={(id: string, parameters: number[]) => {
+          handleParametersChange(
+            id,
+            parameters,
+            setSelectedAttacks,
+            selectedAttacks
+          )
+        }}
+        Icon={Settings}
+      />
+
+      {/* Metrics Selection */}
+      <TableWrapper
+        title='Metric Selection'
+        elements={metrics}
+        selectedElement={selectedMetrics}
+        handleSelection={(id: string) => handleSelectionClick(
+          id,
+          selectedMetrics,
+          setSelectedMetrics,
+          metrics
+        )}
+        Icon={Ruler}
+        handleParametersChange={(id: string, parameters: number[]) => {
+          handleParametersChange(id,
+            parameters,
+            setSelectedMetrics,
+            selectedMetrics)
+        }} />
+    </div >
+  )
 };
 
 export default Benchmark;

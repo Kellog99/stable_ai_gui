@@ -8,23 +8,23 @@ import { infoModel } from "@/components/client/upload/config";
 import { DragDrop } from "@/components/client/upload/DragDrop";
 import { ButtonProps } from "@/interfaces/homePageInterface";
 import { useEffect, useState } from "react";
-import { getModelsReport } from "@/functionalities/NNTrustBackendUtils";
+import { getReports, uploadReport } from "@/functionalities/NNTrustBackendUtils";
 import FileRepository from "@/components/client/repository/FileRepository";
 import useNNTrustStore from "@/store/nnTrustStore";
-import { BenchmarkDataProps, DQReportProps } from "@/interfaces/reportInterfaces";
+import { DQReportProps, infoProps, ReportAttacksProps } from "@/interfaces/reportInterfaces";
 import { ReportProps } from "@/functionalities/reportInterfaces";
 import useStore from "@/store/dsStore";
 import { useRouter } from "next/navigation";
+import { getListModelsReport, uploadRepo } from "@/properties/urlsNNTrust";
 
 export default function ReportPage() {
 
-  const [listAttacksReport, setListAttacksReport] = useState<ReportProps[]>([])
-  const [listDatasetsReport, setListDatasetsReport] = useState<DQReportProps[]>([])
+  const [listAttacksReport, setListAttacksReport] = useState<ReportAttacksProps[]>([])
+  // const [listDatasetsReport, setListDatasetsReport] = useState<DQReportProps[]>([])
 
   const {
     attackReport,
     setAttackReport,
-    setBenchmark,
   } = useNNTrustStore()
 
   const {
@@ -35,87 +35,80 @@ export default function ReportPage() {
 
   // ################## Reports' list ##################
   useEffect(() => {
-    getModelsReport()
+    getReports(getListModelsReport)
       .then(setListAttacksReport)
       .catch(err => console.error("Failed to load attacks:", err));
-
   }, [setListAttacksReport]);
 
-  // ################## Benchmarking ##################  
-  useEffect(() => {
-    if (!listAttacksReport) return;
+  // useEffect(() => {
+  //   getReports(getListDatasetsReport)
+  //     .then(setListDatasetsReport)
+  //     .catch(err => console.error("Failed to load attacks:", err));
+  // }, [setListDatasetsReport]);
 
-    const benchmarkData: { [key: string]: BenchmarkDataProps } = {};
-
-    listAttacksReport.forEach((report: ReportProps) => {
-      if (!report?.info?.name) return; // skip if id is missing
-
-
-      benchmarkData[report.info.name] = {
-        name: report.info.name,
-        param: report.info.parameters,
-        task: report.info.task,
-        metrics: Object.fromEntries(
-          Object.entries(report.metrics).filter(([metric, value]) => metric !== "confusionmatrix")),
-      };
-    });
-
-    setBenchmark(benchmarkData);
-  }, [listAttacksReport]);
 
   // ################# router ################# 
   const router = useRouter()
 
+  // ################# Report's buttons ################# 
   const btnReport: ButtonProps[] = [
     {
-      id: "report",
+      id: "dragDropReport",
       name: "Upload report",
       Icon: Upload,
       child: <DragDrop
         name={"File"}
         Icon={File}
-        acceptedType={"json"}
+        acceptedType={"application/json"}
         description={'Upload the JSON file related to the report.'}
-        onFileSelect={() => { }}
+        onFileUpload={(file: File | null) => {
+          if (file) {
+            uploadReport(uploadRepo, file)
+              .then(setAttackReport)
+              .then(() => router.push("/pages/report/reportTITANN"))
+          }
+        }}
       />,
     },
     {
-      id: "repo-model-report",
+      id: "repoModelReport",
       name: "Repository Model",
       Icon: HardDrive,
       child: <FileRepository
-        elements={listAttacksReport}
-        selectHandle={(report: ReportProps) => {
-          setAttackReport(report);
-          router.push("./reportTITANN")
+        elements={listAttacksReport.map(element => element.info)}
+        selectHandle={(report: infoProps) => {
+          const selectedReport: ReportAttacksProps | undefined = listAttacksReport.find(value => value.info.id === report.id)
+          if (selectedReport) {
+            setAttackReport(selectedReport)
+            router.push("/pages/report/reportTITANN")
+          }
         }}
-        activeId={attackReport?.id}
+        activeId={attackReport?.info.id}
         handleDelete={(report: ReportProps) => {
           setListAttacksReport(listAttacksReport.filter(reportContained => reportContained.id !== report?.id))
         }} />,
     },
-    {
-      id: "repo-dataset-report",
-      name: "Repository Dataset",
-      Icon: HardDrive,
-      child: <FileRepository
-        elements={listDatasetsReport}
-        selectHandle={(dataset: DQReportProps) => {
-          setReport(dataset);
-          router.push("./reportDQ")
-        }}
-        activeId={report?.id}
-        handleDelete={(report) => {
-          setListDatasetsReport(listDatasetsReport.filter(datasetContained => datasetContained.id !== report.id))
-        }} />,
-    },
+    // {
+    //   id: "repoDatasetReport",
+    //   name: "Repository Dataset",
+    //   Icon: HardDrive,
+    //   child: <FileRepository
+    //     elements={listDatasetsReport}
+    //     selectHandle={(dataset: DQReportProps) => {
+    //       setReport(dataset);
+    //       router.push("./reportDQ")
+    //     }}
+    //     activeId={report?.id}
+    //     handleDelete={(report) => {
+    //       setListDatasetsReport(listDatasetsReport.filter(datasetContained => datasetContained.id !== report.id))
+    //     }} />,
+    // },
   ]
 
   return (
     <div className={styles.test_container}>
       <div className={styles.upload_container}>
         <FileDropZone
-          key={"report"}
           id="report_loader"
           title="Report"
           description="Drag and drop the JSON of the report."

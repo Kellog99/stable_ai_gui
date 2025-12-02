@@ -124,3 +124,28 @@ export const getStatusIcon = (uploadStatus: string) => {
   if (uploadStatus === "warning") return <IconAlertTriangle size={20} />;
   return <IconUpload size={20} />;
 };
+
+
+
+// Color scheme for different risk levels
+export function getRiskColor(value: number) {
+  // Clamp the value between 0 and 100
+  value = Math.max(0, Math.min(100, value));
+
+  // Normalize to 0-1 range
+  const t = value / 100;
+
+  // Light green RGB values
+  const lightGreen = { r: 144, g: 238, b: 144 };
+
+  // Dark red RGB values
+  const darkRed = { r: 139, g: 0, b: 0 };
+
+  // Interpolate between the colors
+  const r = Math.round(lightGreen.r + (darkRed.r - lightGreen.r) * t);
+  const g = Math.round(lightGreen.g + (darkRed.g - lightGreen.g) * t);
+  const b = Math.round(lightGreen.b + (darkRed.b - lightGreen.b) * t);
+
+  // Return as RGB string
+  return `rgb(${r}, ${g}, ${b})`;
+}

@@ -22,7 +22,12 @@ export default function HomePage() {
 
   // At this level It is asked for the list of all the attacks
   // const setAttacks = useStore((state) => state.setAttacks)
-  const { model, setAttacks, setModel, setMetrics } = useNNTrustStore()
+  const {
+    model,
+    setAttacks,
+    setModel,
+    setMetrics, 
+  } = useNNTrustStore()
   const { dataset, setDataset } = useStore()
 
   const [listModels, setListModels] = useState<ModelInfo[]>([])
@@ -55,6 +60,8 @@ export default function HomePage() {
       .catch(err => console.error("Failed to load attacks:", err));
   }, [setListDataset]);
 
+  
+
   // Model selection's buttons
   const btnModel: ButtonProps[] = [
     {
@@ -66,7 +73,7 @@ export default function HomePage() {
         Icon={Brain}
         acceptedType={"zip"}
         description={'Make sure your zip contains raw data and a json config file.'}
-        onFileSelect={() => { }} />,
+        onFileUpload={() => { }} />,
     },
     {
       id: "repository",
@@ -74,7 +81,13 @@ export default function HomePage() {
       Icon: HardDrive,
       child: <FileRepository
         elements={listModels}
-        selectHandle={(model) => { setModel(model as ModelInfo) }}
+        selectHandle={(selectedModel: ModelInfo | null) => {
+          if (selectedModel) {
+            if (!model) { setModel(selectedModel) }
+            else { setModel(selectedModel && selectedModel.id === model.id ? null : selectedModel) }
+          }
+        }
+        }
         activeId={model?.id}
         handleDelete={(model) => {
           setListModels(listModels.filter(modelContained => modelContained.id !== (model as ModelInfo).id))
@@ -94,7 +107,7 @@ export default function HomePage() {
         Icon={Database}
         acceptedType={"zip"}
         description={'Make sure your zip contains raw data and a json config file.'}
-        onFileSelect={() => { }}
+        onFileUpload={() => { }}
       />,
     },
     {
@@ -103,7 +116,12 @@ export default function HomePage() {
       name: "Dataset Repository",
       child: <FileRepository
         elements={listDatasets}
-        selectHandle={(dataset) => { setDataset(dataset as DatasetInfo) }}
+        selectHandle={(selectDataset: DatasetInfo | null) => {
+          if (selectDataset) {
+            if (!dataset) setDataset(selectDataset)
+            else { setDataset(selectDataset && selectDataset.id === dataset.id ? null : selectDataset) }
+          }
+        }}
         activeId={dataset?.id}
         handleDelete={(dataset) => {
           setListDataset(listDatasets.filter(datasetContained => datasetContained.id !== (dataset as DatasetInfo).id))

@@ -1,5 +1,6 @@
-import { getListModelsReport, getInfoAttacks, getInfoMetrics, jobsId_get, getListModels, start_job, getListDataset } from "@/properties/urlsNNTrust";
+import { getInfoAttacks, getInfoMetrics, jobsId_get, getListModels, start_job, getListDataset, getListModelsReport } from "@/properties/urlsNNTrust";
 import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { BenchmarkDataProps, ReportAttacksProps } from "@/interfaces/reportInterfaces";
 
 // get all the models saved
 export async function getAttacksList(): Promise<{ [key: string]: RegisterObjectProps }> {
@@ -75,11 +76,39 @@ export async function getJobsId() {
 
 
 // get all the reports from the 
-export async function getModelsReport() {
-  const response = await fetch(`${getListModelsReport}`);
+export async function getReports(url: string) {
+  const response = await fetch(url);
 
   if (!response.ok) throw new Error('Failed to get NNTrust reports from the backend');
 
-  const reportsList = await response.json();
+  const reportsList: Promise<ReportAttacksProps[]> = await response.json();
+  console.log("report list ", reportsList)
   return reportsList
+}
+
+export async function uploadReport(url: string, file: File) {
+  console.log("file = ", file)
+  const fileContents = await file.text(); // or file.arrayBuffer() then decode
+  const jsonData = JSON.parse(fileContents);
+
+  const response = await fetch(url, {
+    method: "POST",
+    body: JSON.stringify(jsonData),
+    headers: {
+      "Content-type": "application/json; charset=UTF-8"
+    }
+  });
+  if (!response.ok) throw new Error('Failed to get NNTrust reports from the backend');
+  const report = await response.json();
+  return report
+}
+
+export async function getBenchmarkList(){
+  const response = await fetch(getListModelsReport);
+
+  if (!response.ok) throw new Error('Failed to get NNTrust reports from the backend');
+
+  const benchmarklist: Promise<BenchmarkDataProps[]> = await response.json();
+  console.log("report list ", benchmarklist)
+  return benchmarklist
 }

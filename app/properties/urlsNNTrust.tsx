@@ -1,5 +1,11 @@
 const host = "localhost"
-const port = 8082
+const port = 8000
+
+const scaffholding = "/home/andrea/Desktop/TITANN"
+const reportsModelPath = `${scaffholding}/model`
+const reportsDatasetPath = `${scaffholding}/dataset`
+
+const task = "Classification"
 
 export const getInfoAttacks = `http://${host}:${port}/info/attacks/getInfo`
 export const getInfoMetrics = `http://${host}:${port}/info/metrics/getInfo`
@@ -8,7 +14,11 @@ export const getListModels = `http://${host}:${port}/model/getModels`
 export const getListDataset = `http://${host}:${port}/dataset/getDatasets`
 
 // report repository
-export const getListModelsReport = `http://${host}:${port}/job/report/getReports`
+export const getListModelsReport = `http://${host}:${port}/report/repository?repo_path=${reportsModelPath}&task=${task}`
+export const getListDatasetsReport = `http://${host}:${port}/report/repository?repo_path=${reportsDatasetPath}&task=${task}`
+
+// upload report
+export const uploadRepo = `http://${host}:${port}/report/upload/model?report_path=${reportsModelPath}`
 
 export const uploadModel_check = `http://${host}:${port}/model/upload/check`
 export const uploadModel = `http://${host}:${port}/model/upload`

@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React from 'react'
 import RepositoryCard from './Card';
 import { TriangleAlert } from 'lucide-react';
 import './FileRepository.css'
 import { DatasetInfo, ModelInfo } from '@/interfaces/NNInterfaces';
 
 interface FileRepositoryProps {
-    elements: any[] ,
+    elements: any[],
     activeId?: string,
     handleDelete: (model: any) => void,
     selectHandle: (model: any) => void,
@@ -18,6 +18,7 @@ const FileRepository: React.FC<FileRepositoryProps> = ({
     selectHandle,
     handleDelete,
 }) => {
+    console.log("elements ", elements[0])
     return (
         <div className='repository-container'>
             {elements.length > 0 ?
@@ -26,10 +27,8 @@ const FileRepository: React.FC<FileRepositoryProps> = ({
                         key={element.id}
                         config={element}
                         activeId={activeId}
-                        handleClick={() => {
-                            selectHandle(element)
-                        }}
-                        handleDelete={()=>handleDelete(element)}
+                        handleClick={() => selectHandle(element)}
+                        handleDelete={() => handleDelete(element)}
                     />
                 )) :
                 <div className='container-warning'>

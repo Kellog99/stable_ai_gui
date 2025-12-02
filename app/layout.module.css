@@ -1,22 +1,22 @@
 .dashboard {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .dashboard_layout {
-  flex: 1;
   display: flex;
-  overflow: hidden; /* Prevent navbar from scrolling */
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  max-height: 100%;
 }
 
 .dashboard_main {
-  width: 100%;
-  padding-left: 40px;
-  padding-right: 40px;
   overflow-x: hidden;
-  overflow-y: auto; 
+  overflow-y: scroll;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
 }
 
 .dashboard-main::-webkit-scrollbar {

@@ -1,12 +1,12 @@
 import React from 'react';
-import { Document, Page, Text, View } from '@react-pdf/renderer';
+import { Document, Page, Text, View, Image } from '@react-pdf/renderer';
 import { BenchmarkDataProps, ReportAttacksProps } from '@/interfaces/reportInterfaces';
 import { getRiskColor, getRiskLevel, stylesPDF } from './SecurityReportStyle';
 
 
 interface SecurityReportPDFProps {
     report: ReportAttacksProps,
-    benchmark: { [key: string]: BenchmarkDataProps }
+    benchmark: BenchmarkDataProps[]
 
 }
 // PDF Document Component
@@ -16,10 +16,17 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({ report, benchmark
         <Page size="A4" style={stylesPDF.page}>
             {/* Header */}
             <View style={stylesPDF.header}>
-                <Text style={stylesPDF.title}>Security Report</Text>
-                <Text style={stylesPDF.subtitle}>
-                    Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
-                </Text>
+                <View style={stylesPDF.titleContainer}>
+                    <Text style={stylesPDF.title}>Security Report</Text>
+                    <Text style={stylesPDF.subtitle}>
+                        Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+                    </Text>
+                </View>
+                <Image
+                    source="/logo_leonardo.png"
+                    style={stylesPDF.logo}
+
+                />
             </View>
 
             {/* Model Information */}

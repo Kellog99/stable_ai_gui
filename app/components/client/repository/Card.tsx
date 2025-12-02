@@ -21,6 +21,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
     handleClick,
     handleDelete
 }) => {
+    console.log(config)
     return (
         <div
             className={`${activeId === config.id ? "card active" : "card"}`}
@@ -30,7 +31,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                     {
                         config.image ? <img src={config.image} alt={config.name} /> : <HardDrive size={"calc(var(--icon-size) /2)"} />
                     }
-                    <p>{config.name.replace("_", " ")}</p>
+                    <p className="title">{config.name}</p>
                 </div>
                 <button
                     onClick={(e) => {
@@ -44,7 +45,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
             <div className="card-content">
                 {Object.entries(config).map(([key, value]) => (
                     value && !notShow.includes(key) ?
-                        <p key={key} className="card-element"><b>{key.replace("_", " ")}</b>: {value}</p>
+                        <p key={key} className="card-element"><b>{key}</b>: {value}</p>
                         : null
                 ))}
             </div>

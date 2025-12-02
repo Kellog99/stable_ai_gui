@@ -4,12 +4,6 @@ import './FileDropZone.css';
 import { FileDropZoneProps } from '@/interfaces/homePageInterface';
 import { InfoLoader } from './InfoLoader';
 
-interface ParsedZipContent {
-    dataFile: File | null;
-    jsonFile: File | null;
-    jsonContent: any;
-}
-
 const FileDropZone: React.FC<FileDropZoneProps> = ({
     id,
     title,
@@ -18,17 +12,15 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
     fileDropInformation,
     buttons
 }) => {
-
     const [buttonId, setButtonId] = useState<string>("")
     const [activeChild, setActiveChild] = useState<React.ReactNode | null>(null)
+
     useEffect(() => {
         if (buttons.length > 0) {
             setButtonId(buttons[1].id)
             setActiveChild(buttons[1].child)
         }
     }, [buttons])
-
-
 
     return (
         <div
@@ -40,13 +32,11 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
             <p className="dropDescription">
                 {description}
             </p>
-
-
             <div className="selection-buttons">
                 {buttons.map((infoButton, index) => {
                     return (
                         <button
-                            key={infoButton.id || index}
+                            key={`${infoButton.id}_${index}`}
                             onClick={() => {
                                 setButtonId(infoButton.id);
                                 setActiveChild(infoButton.child);
@@ -54,12 +44,12 @@ const FileDropZone: React.FC<FileDropZoneProps> = ({
                             className={`selection-button ${infoButton.id === buttonId ? "active" : ""}`}>
                             <infoButton.Icon size={"var(--icon-size)"} />
                             <span>{infoButton.name}</span>
-                        </button>)
+                        </button>
+                    )
                 })}
             </div>
-
             {activeChild}
-        </div >
+        </div>
     );
 }
 
