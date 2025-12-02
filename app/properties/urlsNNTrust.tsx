@@ -1,9 +1,10 @@
 const host = "localhost"
-const port = 8000
+const port = 8082
 
 const scaffholding = "/home/andrea/Desktop/TITANN"
-const reportsModelPath = `${scaffholding}/model`
-const reportsDatasetPath = `${scaffholding}/dataset`
+const reportsModelPath = `/home/roberta-stellino/Desktop/modelRepo`
+const reportsDatasetPath = `/home/roberta-stellino/Desktop/datasetRepo`
+const outputRepo = "/home/roberta-stellino/Desktop/output"
 
 const task = "Classification"
 
@@ -14,7 +15,7 @@ export const getListModels = `http://${host}:${port}/model/getModels`
 export const getListDataset = `http://${host}:${port}/dataset/getDatasets`
 
 // report repository
-export const getListModelsReport = `http://${host}:${port}/report/repository?repo_path=${reportsModelPath}&task=${task}`
+export const getListModelsReport = `http://${host}:${port}/report/repository?repo_path=${outputRepo}&task=${task}`
 export const getListDatasetsReport = `http://${host}:${port}/report/repository?repo_path=${reportsDatasetPath}&task=${task}`
 
 // upload report

@@ -40,7 +40,7 @@ const SecurityReport = () => {
     }, [report])
 
     const reportRef = useRef<HTMLDivElement>(null);
-
+    console.log("benchamakdfffff", benchmark)
     //####################### PDF GENERATION #######################
     const handleDownloadPDF = async () => {
         try {

@@ -103,12 +103,12 @@ export async function uploadReport(url: string, file: File) {
   return report
 }
 
-export async function getBenchmarkList(){
+export async function getBenchmarkList() {
   const response = await fetch(getListModelsReport);
-
   if (!response.ok) throw new Error('Failed to get NNTrust reports from the backend');
 
   const benchmarklist: Promise<BenchmarkDataProps[]> = await response.json();
+
   console.log("report list ", benchmarklist)
   return benchmarklist
 }

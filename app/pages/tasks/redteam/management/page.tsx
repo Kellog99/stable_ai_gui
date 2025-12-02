@@ -129,14 +129,7 @@ const TaskManagement: React.FC = () => {
             setReport(reportFetch);
         }
 
-        // fetching the benchmark
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
-        console.log("fetchato?????", benchmarkFetch)
-        if (benchmarkFetch) {
-            console.log("benchmark fetch", benchmarkFetch)
-            //setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
-            setBenchmarkPROVA(benchmarkFetch)
-        }
+       
         router.push("/pages/report/reportTITANN")
     }
 

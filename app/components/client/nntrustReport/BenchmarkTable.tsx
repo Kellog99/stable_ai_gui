@@ -40,45 +40,14 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     benchmark,
     data
 }) => {
-
-    console.log("benchmark prova?????", benchmark)
-    console.log("data", data)
     const availableBenchmarkingMetrics = useMemo(() =>
         Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
             !key.endsWith("_rank")),
         [data]
     );
 
-
-    const [benchmarkData, setBenchmarkData] = useState<Array<{
-        name: string;
-        param: number;
-        task: string;
-        metrics: { [key: string]: number };
-    }>>([]);
-
-    useEffect(() => {
-        const out = Object.entries(benchmark).map(([id, benchmarkProps]) => ({
-            name: benchmarkProps.name,
-            param: benchmarkProps.param,
-            task: benchmarkProps.task,
-            metrics: availableBenchmarkingMetrics.reduce((acc, metricKey) => {
-                if (benchmarkProps.metrics[metricKey] !== undefined) {
-                    acc[metricKey] = benchmarkProps.metrics[metricKey];
-                }
-                return acc;
-            }, {} as { [key: string]: number })
-        }));
-        
-
-        setBenchmarkData(benchmark);
-
-    }, [benchmark, availableBenchmarkingMetrics]);
-
-
-    console.log("benchaìmarkdata", benchmarkData)
     const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
-
+    // by default it set the selected metric as the first of the list of available metrics
     useEffect(() => {
         if (availableBenchmarkingMetrics.length > 0) {
             setSelectedBenchmark(availableBenchmarkingMetrics[0]);
@@ -90,29 +59,20 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     const [chartBenchmarkData, setChartBenchmarkData] = useState<{ [key: string]: number }[]>([]);
     const [chartValueData, setChartValueData] = useState<{ [key: string]: number }[]>([]);
 
+    // Updating chart and sorted data when selectedBenchmark, benchmark, or data changes
     useEffect(() => {
         if (!selectedBenchmark) return;
 
-        const flattenValue = (val: any): number[] => {
-            if (val === undefined || val === null) return [];
-            if (typeof val === 'number') return [val];
-            if (Array.isArray(val)) {
-                return val.flatMap(item => flattenValue(item));
-            }
-            return [];
-        };
-
-        const benchmarkEntries = Object.entries(benchmark);
-        const benchmarkValues = benchmarkEntries.map(([id, benchmarkProp]) =>
+        const benchmarkValues: number[] = benchmark.map((benchmarkProp: BenchmarkDataProps) =>
             benchmarkProp.metrics[selectedBenchmark] ?? 0
         );
 
-        const dataValue = flattenValue(data[selectedBenchmark as keyof metricsProps]);
+        const dataValue = [data[selectedBenchmark as keyof metricsProps]];
 
 
         if (benchmarkValues.length > 0) {
-            let benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
-                params: benchmarkProp.param,
+            let benchmarkChartData = benchmark.map((benchmarkProp, index) => ({
+                params: benchmarkProp.info.parameters,
                 [selectedBenchmark]: benchmarkValues[index],
             }));
 
@@ -138,8 +98,8 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
         const combined: [string, number][] = [];
 
-        benchmarkEntries.forEach(([id, benchmarkProp], index) => {
-            combined.push([benchmarkProp.name, benchmarkValues[index]]);
+        benchmark.map((bench, index) => {
+            combined.push([bench.info.name, benchmarkValues[index]]);
         });
 
         combined.sort((a, b) => b[1] - a[1]);
