@@ -14,7 +14,11 @@ import InfoTable from './InfoTable';
 
 const SecurityReport = () => {
 
-    const { attackReport: report, benchmark } = useNNTrustStore()
+    const { attackReport: report, benchmark, benchmarkPROVA } = useNNTrustStore()
+    
+    console.log("benchmark prova report page", benchmarkPROVA)
+
+
     const [modelInfo, setModelInfo] = useState<{ [key: string]: string | number }>({})
     const [modelMetrics, setModelMetric] = useState<{ [key: string]: string | number }>({})
 
@@ -65,7 +69,7 @@ const SecurityReport = () => {
         }
     };
 
-    if (report && benchmark) {
+    if (report && benchmarkPROVA) {
         return (
             <div className='report-container'>
                 <HeaderPageTask
@@ -127,7 +131,7 @@ const SecurityReport = () => {
                         <BenchmarkTable
                             modelName={report.info.name}
                             data={report.metrics}
-                            benchmark={benchmark} />
+                            benchmark={benchmarkPROVA} />
                     </div>
                     {/* Vulnerability Section */}
                     <div className="section">

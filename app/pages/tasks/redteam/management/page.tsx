@@ -17,6 +17,7 @@ const TaskManagement: React.FC = () => {
         setAttackReport: setReport,
         setBenchmark,
         benchmarkId,
+        setBenchmarkPROVA
     } = useNNTrustStore()
 
     const [listExecutedAttacks, setListExecutedAttacks] = useState<AttackManagementProps[]>([]);
@@ -42,8 +43,8 @@ const TaskManagement: React.FC = () => {
                 throw new Error(`Failed to get jobs ids from the backend: ${response.status}`);
             }
 
+
             const listAttacks: AttackManagementProps[] = await response.json();
-            console.log("Fetched attacks:", listAttacks);
             setListExecutedAttacks(listAttacks);
         } catch (error) {
             console.error("Error fetching job progress:", error);
@@ -71,12 +72,21 @@ const TaskManagement: React.FC = () => {
             "Closed": 0
         };
 
+        const statusMap: Record<string, keyof typeof status> = {
+            "completed": "Completed",
+            "in_progress": "In Progress",
+            "pending": "Pending",
+            "closed": "Closed",
+        };
+
         listExecutedAttacks.forEach((job: AttackManagementProps) => {
-            if (status.hasOwnProperty(job.status)) {
-                status[job.status] += 1;
+            const normalized = job.status.toLowerCase(); // ensure lowercase
+            const key = statusMap[normalized]; // find matching frontend key
+
+            if (key) {
+                status[key] += 1;
             }
         });
-
 
         setAttackStates(status);
 
@@ -84,7 +94,7 @@ const TaskManagement: React.FC = () => {
         if (listExecutedAttacks.length > 0) {
             notFinished = status["Pending"] + status["In Progress"];
             if (notFinished > 0) {
-                setDescription(`It remains ${notFinished} to be finished.`);
+                setDescription(`It remains ${notFinished} attackto be finished.`);
             } else {
                 setDescription("All jobs completed.");
             }
@@ -96,7 +106,6 @@ const TaskManagement: React.FC = () => {
         setIsDisabled((notFinished > 0 && listExecutedAttacks.length > 0) || listExecutedAttacks.length === 0);
     }, [listExecutedAttacks]);
 
-    console.log("attacks state dopo", attackStates)
     const router = useRouter()
 
     const handleClickReport = async () => {
@@ -122,8 +131,11 @@ const TaskManagement: React.FC = () => {
 
         // fetching the benchmark
         const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
-        if (benchmarkFetch && benchmarkId) {
-            setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
+        console.log("fetchato?????", benchmarkFetch)
+        if (benchmarkFetch) {
+            console.log("benchmark fetch", benchmarkFetch)
+            //setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
+            setBenchmarkPROVA(benchmarkFetch)
         }
         router.push("/pages/report/reportTITANN")
     }

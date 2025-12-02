@@ -31,7 +31,7 @@ ChartJS.register(
 
 interface BenchmarkTableProps {
     modelName?: string;
-    benchmark: { [key: string]: BenchmarkDataProps };
+    benchmark: BenchmarkDataProps[];
     data: metricsProps;
 }
 
@@ -41,11 +41,14 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     data
 }) => {
 
+    console.log("benchmark prova?????", benchmark)
+    console.log("data", data)
     const availableBenchmarkingMetrics = useMemo(() =>
         Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
             !key.endsWith("_rank")),
         [data]
     );
+
 
     const [benchmarkData, setBenchmarkData] = useState<Array<{
         name: string;
@@ -66,8 +69,9 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                 return acc;
             }, {} as { [key: string]: number })
         }));
+        
 
-        setBenchmarkData(out);
+        setBenchmarkData(benchmark);
 
     }, [benchmark, availableBenchmarkingMetrics]);
 

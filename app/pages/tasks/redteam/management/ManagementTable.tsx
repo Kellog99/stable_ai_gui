@@ -20,14 +20,23 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
         direction: 'asc'
     });
 
+
     const filteredAndSortedJobs = useMemo(() => {
+        const statusMap = {
+            "completed": "Completed",
+            "in_progress": "In Progress",
+            "pending": "Pending",
+            "closed": "Closed",
+        };
+        
         let filtered = jobs.filter(job => {
             const matchesSearch =
                 job.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 job.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
                 job.status.toLowerCase().includes(searchTerm.toLowerCase());
 
-            const matchesStatus = statusFilter === 'All' || job.status === statusFilter;
+            const matchesStatus = statusFilter === 'All' || statusMap[job.status] === statusFilter
+;
 
             return matchesSearch && matchesStatus;
         });
@@ -96,7 +105,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                                                 {job.name}
                                             </td>
                                             <td>
-                                                {job.status === "In Progress" ?
+                                                {job.status === "in_progress" ?
                                                     <Progress value={job.progress} color='blue' animated />
                                                     :
                                                     <div className={`status-badge ${getStatusColor(job.status)}`}>

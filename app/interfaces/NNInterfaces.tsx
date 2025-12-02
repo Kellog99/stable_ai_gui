@@ -68,6 +68,6 @@ export interface ParametersWindowProps {
 export interface AttackManagementProps {
   id: number;
   name: string;
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Closed';
+  status: 'pending' | 'in_progress' | 'completed' | 'closed';
   progress: number
 }

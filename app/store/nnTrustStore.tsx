@@ -12,12 +12,14 @@ interface AppState {
 
   benchmarkId: string | number | null;
   benchmark: { [key: string]: BenchmarkDataProps } | null;
+  benchmarkPROVA: BenchmarkDataProps[];
 
   testAttack: RegisterObjectProps | null;
   loading: boolean;
   error: string | null;
   attackReport: ReportAttacksProps | null;
   vulnerabilitySelected: string | null;
+
 
   setModel: (models: ModelInfo | null) => void;
   setListModels: (listModels: ModelInfo[]) => void;
@@ -30,6 +32,8 @@ interface AppState {
   ) => void;
   setAttackReport: (attackReport: ReportAttacksProps) => void;
   setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps }) => void;
+  setBenchmarkPROVA: (benchmarkPROVA: BenchmarkDataProps[]) => void;
+
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
 }
 
@@ -46,6 +50,7 @@ const useNNTrustStore = create<AppState>()(
       error: null,
       attackReport: null,
       benchmark: null,
+      benchmarkPROVA: [],
       vulnerabilitySelected: null,
 
       setModel: (models) => set({ model: models }),
@@ -56,6 +61,7 @@ const useNNTrustStore = create<AppState>()(
       setMap: (map, name) => set({ [name]: map }),
       setAttackReport: (attackReport) => set({ attackReport }),
       setBenchmark: (benchmark) => set({ benchmark }),
+      setBenchmarkPROVA: (benchmarkPROVA) => set({ benchmarkPROVA }),
       setVulnerabilitySelected: (vulnerabilitySelected) => set({ vulnerabilitySelected }),
     }),
     {
