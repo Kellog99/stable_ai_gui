@@ -47,9 +47,12 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
 
     // ################################## Vulnerability Table ##################################
     const refAtkProps: attacksProps = Object.values(report.attacks)[0]
-    const availableMetrics = Object.entries(refAtkProps)
-        .filter(([key, value]) => !["risk", "confusion_matrix"].includes(key) && value !== undefined && value !== null)
-        .map(([key]) => key);
+    const availableMetrics = [
+        "name",
+        ...Object.entries(refAtkProps)
+            .filter(([key, value]) => !["risk", "confusion_matrix", "countsamples", "num_queries", "power", "name"].includes(key) && value !== undefined && value !== null)
+            .map(([key]) => key)
+    ];
 
     console.log("available metrics = ", availableMetrics);
     // Initialize table: each metric → empty list
@@ -181,7 +184,7 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
                             style={stylesPDF.paramContainer}
                         >
                             <View style={stylesPDF.paramName}>
-                                <Text>{atk}</Text>
+                                <Text>{atkProps.name}</Text>
                             </View>
                             {
                                 atkProps.parameters && atkProps.parameters.length > 0 ?
@@ -190,8 +193,9 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
                                             <View
                                                 key={`${param.id}_${atk}`}
                                             >
-                                                <Text>{param.name}: {param.default} </Text>
-                                            </View>)
+                                                <Text style={{ fontSize: 8 }}>{param.name}: {param.default} </Text>
+                                            </View>
+                                        )
                                     }) : null
                             }
                         </View>
