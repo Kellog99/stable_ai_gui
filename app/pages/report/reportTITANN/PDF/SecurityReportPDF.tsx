@@ -3,6 +3,7 @@ import { Document, Page, Text, View, Image } from '@react-pdf/renderer';
 import { attacksProps, BenchmarkDataProps, ReportAttacksProps } from '@/interfaces/reportInterfaces';
 import { getRiskColor, getRiskLevel, stylesPDF } from './SecurityReportStyle';
 import useNNTrustStore from '@/store/nnTrustStore';
+import { ParametersProps, RegisterObjectProps } from '@/interfaces/NNInterfaces';
 
 
 interface SecurityReportPDFProps {
@@ -71,7 +72,7 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
     console.log("vulnerabilityTable = ", vulnerabilityTable);
 
     // ################################## Parameters ##################################
-    const {listModels} = useNNTrustStore()
+    const { selectedAttacks } = useNNTrustStore()
     return (
         <Document>
             <Page size="A4" style={stylesPDF.page}>
@@ -138,7 +139,7 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
             </Page>
 
 
-            {/* Third Page - Vulnerabilities */}
+            {/* Second Page - Vulnerabilities */}
             <Page size="A4" style={stylesPDF.page}>
                 <Text style={stylesPDF.sectionTitle}>Vulnerability Assessment</Text>
                 <Text style={stylesPDF.sectionDescription}>
@@ -163,6 +164,42 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
 
                 <Text style={stylesPDF.footer} fixed>
                     Security Report - Page 2
+                </Text>
+            </Page>
+
+            {/* Third Page - Vulnerabilities */}
+            <Page size="A4" style={stylesPDF.page}>
+                <Text style={stylesPDF.sectionTitle}>Attack Parameters</Text>
+                <Text style={stylesPDF.sectionDescription}>
+                    This section lists all the parameters used during the benchmark for each attack.
+                </Text>
+
+                <View style={stylesPDF.listParams}>
+                    {Object.entries(selectedAttacks).map(([atk, atkProps]: [string, RegisterObjectProps]) => (
+                        <View
+                            key={atk}
+                            style={stylesPDF.paramContainer}
+                        >
+                            <View style={stylesPDF.paramName}>
+                                <Text>{atk}</Text>
+                            </View>
+                            {
+                                atkProps.parameters && atkProps.parameters.length > 0 ?
+                                    atkProps.parameters?.map((param: ParametersProps) => {
+                                        return (
+                                            <View
+                                                key={`${param.id}_${atk}`}
+                                            >
+                                                <Text>{param.name}: {param.default} </Text>
+                                            </View>)
+                                    }) : null
+                            }
+                        </View>
+                    ))}
+                </View>
+
+                <Text style={stylesPDF.footer} fixed>
+                    Security Report - Page 3
                 </Text>
             </Page>
         </Document>

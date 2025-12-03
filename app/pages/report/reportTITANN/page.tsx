@@ -52,22 +52,22 @@ const SecurityReport = () => {
                     />
                 ).toBlob();
 
-                // // Create download link
-                // const url = URL.createObjectURL(blob);
-                // const link = document.createElement('a');
-                // link.href = url;
-                // link.download = `Security_Report_${report.info?.name}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-                // // Trigger download
-                // document.body.appendChild(link);
-                // link.click();
-
-                // // Cleanup
-                // document.body.removeChild(link);
-                // URL.revokeObjectURL(url);
-                // Create URL and open PDF in a new tab
+                // Create download link
                 const url = URL.createObjectURL(blob);
-                window.open(url, "_blank");
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `Security_Report_${report.info?.name}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+
+                // Cleanup
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                // Create URL and open PDF in a new tab
+                // const url = URL.createObjectURL(blob);
+                // window.open(url, "_blank");
                 console.log('PDF downloaded successfully');
             }
         } catch (error) {

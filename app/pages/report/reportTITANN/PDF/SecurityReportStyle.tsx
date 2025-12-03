@@ -182,5 +182,16 @@ export const stylesPDF = StyleSheet.create({
         flexGrow: 1,
         textAlign: "center",
         alignItems: "center"
+    },
+    listParams: {
+        flexDirection: "column",
+        gap: 10,
+    },
+    paramContainer: {
+        flexDirection: "column",
+    },
+    paramName: {
+        backgroundColor: "#1B9AAA",
+        color: "white"
     }
 });
