@@ -21,6 +21,8 @@ const SecurityReport = () => {
     const [modelInfo, setModelInfo] = useState<{ [key: string]: string | number }>({})
     const [modelMetrics, setModelMetric] = useState<{ [key: string]: string | number }>({})
     const [benchmark, setBenchmark] = useState<BenchmarkDataProps[]>([])
+
+    console.log("model metrisssss", modelMetrics)
     useEffect(() => {
         if (report) {
             setModelInfo(Object.fromEntries(
@@ -28,10 +30,16 @@ const SecurityReport = () => {
             ))
             setModelMetric(
                 Object.fromEntries(
-                    Object.entries(report.metrics).filter(([key]) => !['id', 'confusion_matrix'].includes(key))
-                ))
+                    Object.entries(report.metrics).filter(
+                        ([key, value]) =>
+                            !['id', 'confusion_matrix'].includes(key) && value !== null
+                    )
+                )
+            );
+
         }
 
+        console.log("metrics reportssss", report?.metrics)
         //####################### benchmarking list #######################
         getBenchmarkList()
             .then(setBenchmark)
@@ -139,10 +147,10 @@ const SecurityReport = () => {
 
                 <BenchmarkTable
                     modelName={report.info.name}
-                    data={report.metrics}
+                    data={modelMetrics}
                     benchmark={benchmark ? benchmark : []} />
             </div>
-            
+
             {/* Vulnerability Section */}
             <div className="section">
 

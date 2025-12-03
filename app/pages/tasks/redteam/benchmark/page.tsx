@@ -116,7 +116,7 @@ const Benchmark: React.FC = () => {
   const handleClick = async () => {
     try {
       // Block any new click on the button
-      setExecuteBenchmark(false);
+      //setExecuteBenchmark(false);
 
       const response = await fetch(startJob, {
         method: "POST",

@@ -17,6 +17,7 @@ export const getListDataset = `http://${host}:${port}/dataset/getDatasets`
 // report repository
 export const getListModelsReport = `http://${host}:${port}/report/repository?repo_path=${outputRepo}&task=${task}`
 export const getListDatasetsReport = `http://${host}:${port}/report/repository?repo_path=${reportsDatasetPath}&task=${task}`
+export const getListBenchmarks = `http://${host}:${port}/report/listBenchmarking?repo_path=${outputRepo}&task=${task}`
 
 // upload report
 export const uploadRepo = `http://${host}:${port}/report/upload/model?report_path=${reportsModelPath}`

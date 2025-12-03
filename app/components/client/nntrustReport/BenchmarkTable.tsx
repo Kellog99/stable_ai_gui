@@ -234,7 +234,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                                         <td className="rank-cell">
                                             <div className="rank-circle">{index + 1}</div>
                                         </td>
-                                        <td>{name}</td>
+                                        <td>{name.length > 10 ? name.slice(0, 10) + "…" : name}</td>
                                         <td style={{ textAlign: "right" }}>{value.toFixed(3)}</td>
                                     </tr>
                                 ))}

@@ -108,7 +108,7 @@ export async function getBenchmarkList() {
   if (!response.ok) throw new Error('Failed to get NNTrust reports from the backend');
 
   const benchmarklist: Promise<BenchmarkDataProps[]> = await response.json();
-
+  
   console.log("report list ", benchmarklist)
   return benchmarklist
 }

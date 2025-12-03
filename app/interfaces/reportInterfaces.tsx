@@ -12,7 +12,7 @@ export interface infoProps {
 }
 
 export interface metricsProps {
-    params: number;
+    params?: number;
     accuracy?: number;
     precision?: number;
     f1score?: number;
