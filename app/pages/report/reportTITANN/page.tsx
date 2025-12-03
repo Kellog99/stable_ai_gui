@@ -40,7 +40,6 @@ const SecurityReport = () => {
     }, [report])
 
     const reportRef = useRef<HTMLDivElement>(null);
-    console.log("benchamakdfffff", benchmark)
     //####################### PDF GENERATION #######################
     const handleDownloadPDF = async () => {
         try {
@@ -53,20 +52,22 @@ const SecurityReport = () => {
                     />
                 ).toBlob();
 
-                // Create download link
+                // // Create download link
+                // const url = URL.createObjectURL(blob);
+                // const link = document.createElement('a');
+                // link.href = url;
+                // link.download = `Security_Report_${report.info?.name}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+                // // Trigger download
+                // document.body.appendChild(link);
+                // link.click();
+
+                // // Cleanup
+                // document.body.removeChild(link);
+                // URL.revokeObjectURL(url);
+                // Create URL and open PDF in a new tab
                 const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `Security_Report_${report.info?.name}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-                // Trigger download
-                document.body.appendChild(link);
-                link.click();
-
-                // Cleanup
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-
+                window.open(url, "_blank");
                 console.log('PDF downloaded successfully');
             }
         } catch (error) {
@@ -142,7 +143,7 @@ const SecurityReport = () => {
                     data={report.metrics}
                     benchmark={benchmark ? benchmark : []} />
             </div>
-            
+
             {/* Vulnerability Section */}
             <div className="section">
 

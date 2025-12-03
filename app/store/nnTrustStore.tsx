@@ -10,9 +10,10 @@ interface AppState {
   attacks: { [key: string]: RegisterObjectProps };
   metrics: { [key: string]: RegisterObjectProps };
 
+  selectedAttacks: { [key: string]: RegisterObjectProps };
+
   benchmarkId: string | number | null;
   benchmark: { [key: string]: BenchmarkDataProps } | null;
-  benchmarkPROVA: BenchmarkDataProps[];
 
   testAttack: RegisterObjectProps | null;
   loading: boolean;
@@ -25,6 +26,7 @@ interface AppState {
   setListModels: (listModels: ModelInfo[]) => void;
   setAttacks: (attacks: { [key: string]: RegisterObjectProps }) => void;
   setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
+  setSelectedAttackList: (selectedAttacks: { [key: string]: RegisterObjectProps }) => void
   setBenchmarkId: (benchmarkId: string | number | null) => void;
   setMap: (
     map: { [key: string]: RegisterObjectProps },
@@ -32,7 +34,6 @@ interface AppState {
   ) => void;
   setAttackReport: (attackReport: ReportAttacksProps) => void;
   setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps }) => void;
-  setBenchmarkPROVA: (benchmarkPROVA: BenchmarkDataProps[]) => void;
 
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
 }
@@ -44,6 +45,7 @@ const useNNTrustStore = create<AppState>()(
       listModels: [],
       attacks: {},
       metrics: {},
+      selectedAttacks: {},
       benchmarkId: null,
       testAttack: null,
       loading: false,
@@ -57,11 +59,11 @@ const useNNTrustStore = create<AppState>()(
       setListModels: (listModels) => set({ listModels }),
       setAttacks: (attacks) => set({ attacks }),
       setMetrics: (metrics) => set({ metrics }),
+      setSelectedAttackList: (selectedAttacks) => set({ selectedAttacks }),
       setBenchmarkId: (benchmarkId) => set({ benchmarkId }),
       setMap: (map, name) => set({ [name]: map }),
       setAttackReport: (attackReport) => set({ attackReport }),
       setBenchmark: (benchmark) => set({ benchmark }),
-      setBenchmarkPROVA: (benchmarkPROVA) => set({ benchmarkPROVA }),
       setVulnerabilitySelected: (vulnerabilitySelected) => set({ vulnerabilitySelected }),
     }),
     {
@@ -74,6 +76,7 @@ const useNNTrustStore = create<AppState>()(
         attackReport: state.attackReport,
         benchmark: state.benchmark,
         benchmarkId: state.benchmarkId,
+        selectedAttacks: state.selectedAttacks
       }),
     }
   )

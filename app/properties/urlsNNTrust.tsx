@@ -1,10 +1,10 @@
 const host = "localhost"
-const port = 8082
+const port = 8000
 
 const scaffholding = "/home/andrea/Desktop/TITANN"
-const reportsModelPath = `/home/roberta-stellino/Desktop/modelRepo`
-const reportsDatasetPath = `/home/roberta-stellino/Desktop/datasetRepo`
-const outputRepo = "/home/roberta-stellino/Desktop/output"
+const reportsModelPath = `/home/andrea/Desktop/TITANN/model`
+const reportsDatasetPath = `/home/andrea/Desktop/TITANN/dataset`
+const outputRepo = "/home/andrea/Desktop/TITANN/model"
 
 const task = "Classification"
 

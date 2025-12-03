@@ -21,7 +21,10 @@ const Benchmark: React.FC = () => {
   const [selectedAttacks, setSelectedAttacks] = useState<{ [key: string]: RegisterObjectProps }>({})
   const [selectedMetrics, setSelectedMetrics] = useState<{ [key: string]: RegisterObjectProps }>({})
 
-  const model = useNNTrustStore((state) => state.model);
+  const {
+    model,                    //model to use in the benchmark
+    setSelectedAttackList     //variable for setting the list of attacks that have been executed
+  } = useNNTrustStore();
 
   const numClasses = model?.num_classes as number
 
@@ -117,6 +120,7 @@ const Benchmark: React.FC = () => {
     try {
       // Block any new click on the button
       setExecuteBenchmark(false);
+      setSelectedAttackList(selectedAttacks);
 
       const response = await fetch(startJob, {
         method: "POST",
