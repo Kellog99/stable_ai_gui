@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import './AttackTable.css';
 import { attacksProps } from '@/interfaces/reportInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
-import { getRiskColor } from '@/functionalities/Utils';
+import { getRobustnessColor, getRiskColor } from '@/functionalities/Utils';
 
 
 
@@ -23,35 +23,37 @@ const AttackTable: React.FC<AttackTableProps> = ({
             <thead>
                 <tr>
                     <th>Vulnerabilities tested</th>
-                    <th>Risk</th>
+                    <th>Robustness</th>
                 </tr>
             </thead>
             <tbody>
                 {Object.entries(data).map(([key, value]) => (
                     <tr key={key}>
                         <td>
-                            <button
-                                onClick={() => {
+                        <button
+                        onClick={() => {
                                     setVulnerabilitySelected(key)
-                                    router.push(`/pages/report/reportTITANN/AttackPage?atkId=${key}`);
-                                }}
-                                className="btn-table"
-                            >
-                                {value.name}
-                            </button>
+                            router.push(`/pages/report/reportTITANN/AttackPage?atkId=${key}`);
+                        }}
+                        className="btn-table"
+                        >
+                        {value.name}
+                        </button>
                         </td>
                         <td className="place-content-center">
-                            <SemiCircleProgress
-                                fillDirection="left-to-right"
-                                orientation="up"
-                                size={130}
-                                value={value.risk}
-                                filledSegmentColor={getRiskColor(value.risk)}
-                                label={`${(value.risk).toFixed(1)}%`}
-                            />
+                            {value.robustness && (
+                                <SemiCircleProgress
+                                    fillDirection="left-to-right"
+                                    orientation="up"
+                                    size={100}
+                                    value={value.robustness * 100 / 3}
+                                    filledSegmentColor={getRobustnessColor(value.robustness * 100 / 3)}
+                                    label={`${(value.robustness).toFixed(2)}`}
+                                />
+                                )}
                         </td>
                     </tr>
-                ))}
+                    ))}
             </tbody>
         </table>
     )

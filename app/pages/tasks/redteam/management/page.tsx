@@ -52,7 +52,7 @@ const TaskManagement: React.FC = () => {
     };
 
     useEffect(() => {
-        const timer = setInterval(handleRefresh, 3000);
+        const timer = setInterval(handleRefresh, 1000);
         return () => clearInterval(timer);
     }, [benchmarkId]);
 

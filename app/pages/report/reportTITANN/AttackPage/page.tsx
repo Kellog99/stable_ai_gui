@@ -12,13 +12,18 @@ const AttackPage = () => {
 
     const { attackReport } = useNNTrustStore();
     const [attack, setAttack] = useState<attacksProps | null>(null);
+    const [usedParams, setUsedParams] = useState<any>(null)
 
+    const {
+        selectedAttacks,
+    } = useNNTrustStore();
 
+    //console.log("ATTACK!",selectedAttacks[atkId?.toLowerCase()])
     // Wait for router to be ready and initialize attackReport
     useEffect(() => {
         if (attackReport && atkId) {
             setAttack(attackReport.attacks[atkId]);
-
+            setUsedParams(selectedAttacks[atkId?.toLowerCase()].parameters)
         }
     }, [atkId, attackReport]);
 
@@ -44,16 +49,31 @@ const AttackPage = () => {
                 </div>
                 <div className="metrics-container">
                     {Object.entries(attack).map(([metric, value]) => {
-                        if (!["name", "id", "confusion_matrix"].includes(metric) && value) {
+                        if (!["name", "id", "confusion_matrix", "risk","num_queries","power"].includes(metric) && value) {
                             return (
                                 <div className='metric-container'>
                                     <p className='metric-title'>{metric}:</p>
-                                    <p className='metric-value'>{value.toFixed(3)}</p>
+                                    <p className='metric-value'>{value.toFixed(2)}</p>
                                 </div>
                             );
                         }
                         return null;
                     })}
+                </div>
+
+            </div>
+            <div className="container">
+                <div className="header">
+                    <h1>  </h1>
+                    <p>Parameters used</p>
+                </div>
+                <div className="metrics-container">
+                    {usedParams.map((param) => (
+                        <div className='metric-container'>
+                            <p className='metric-title'>{param.id}:</p>
+                            <p className='metric-value'>{param.default.toFixed(2)}</p>
+                        </div>
+                        ))}
                 </div>
 
             </div>
