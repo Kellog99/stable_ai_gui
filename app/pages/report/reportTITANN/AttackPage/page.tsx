@@ -49,7 +49,7 @@ const AttackPage = () => {
                 </div>
                 <div className="metrics-container">
                     {Object.entries(attack).map(([metric, value]) => {
-                        if (!["name", "id", "confusion_matrix", "risk","num_queries","power"].includes(metric) && value) {
+                        if (!["name", "id", "confusion_matrix", "risk","num_queries","power"].includes(metric)) {
                             return (
                                 <div className='metric-container'>
                                     <p className='metric-title'>{metric}:</p>
@@ -71,7 +71,7 @@ const AttackPage = () => {
                     {usedParams.map((param) => (
                         <div className='metric-container'>
                             <p className='metric-title'>{param.id}:</p>
-                            <p className='metric-value'>{param.default.toFixed(2)}</p>
+                            <p className='metric-value'>{param.default.toFixed(4)}</p>
                         </div>
                         ))}
                 </div>
