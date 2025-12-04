@@ -35,12 +35,16 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
                 const benchmarkValue = benchmarkReport.metrics[metric]
                 return benchmarkValue !== null && benchmarkValue !== undefined && benchmarkValue > value
             }).length
-
-            const reference: number = benchmark.filter(benchmarkReport => {
-                const benchmarkValue = benchmarkReport.metrics[metric]
-                return benchmarkValue !== null && benchmarkValue !== undefined
-            }).length
-            metricTable["ranking"].push(`${ranking + 1}/${reference + 1}`)
+            if (["imagevariance", "imagemean"].includes(metric)) {
+                metricTable["ranking"].push("Not comparable.")
+            }
+            else {
+                const reference: number = benchmark.filter(benchmarkReport => {
+                    const benchmarkValue = benchmarkReport.metrics[metric]
+                    return benchmarkValue !== null && benchmarkValue !== undefined
+                }).length
+                metricTable["ranking"].push(`${ranking + 1}/${reference + 1}`)
+            }
         }
     })
 
@@ -158,7 +162,9 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
                             </View>
                             {values.map((value, index) => (
                                 <View key={index} style={stylesPDF.cell}>
-                                    <Text>{metric === "name" ? value : value.toFixed(3)}</Text>
+                                    <Text>{!["name", "imagemean", "imagevariance"].includes(metric) ?
+                                        value :
+                                        value.toFixed(3)}</Text>
                                 </View>
                             ))}
                         </View>
