@@ -14,6 +14,8 @@ import { infoDataset, infoModel } from './components/client/upload/config';
 import { ButtonProps } from './interfaces/homePageInterface';
 import useStore from './store/dsStore';
 import { DatasetInfo, ModelInfo } from './interfaces/NNInterfaces';
+import { list } from 'postcss';
+import DatasetsLoader from './functionalities/DatasetsLoader';
 
 
 export const title = "Stable-AI"
@@ -55,13 +57,14 @@ export default function HomePage() {
 
   // ################## Datasets' list ################## 
   useEffect(() => {
-    getDatasetsList()
-      .then(setListDataset)
-      .catch(err => console.error("Failed to load attacks:", err));
+    DatasetsLoader().then(fetchedData => {
+      console.log("fectehd vecchio", fetchedData)
+      setListDataset(fetchedData)
+    }).catch (err => console.error("Failed to load attacks:", err));
   }, [setListDataset]);
-
   
-
+  console.log("list models", listModels)
+  console.log("list datasets", listDatasets)
   // Model selection's buttons
   const btnModel: ButtonProps[] = [
     {

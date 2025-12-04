@@ -29,7 +29,7 @@ export interface NavigationSection {
 
 
 export const sections: { [key: string]: NavigationSection[] } = {
-    /*"Data Quality":
+    "Data Quality":
         [
             {
                 id: "dataset",
@@ -117,7 +117,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
                     },
                 ],
             },
-        ],*/
+        ],
     "Red Teaming Tool": [
         {
             id: 'home',

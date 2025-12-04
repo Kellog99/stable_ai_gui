@@ -6,7 +6,6 @@ import { IsFeatureBond, IsFeatureSameLength } from '@/functionalities/Utils';
 import Dataset, { FeatureDTO } from '@/interfaces/genericInterface';
 import { embedding_type, image_type, numberic_type, text_type } from '@/properties/types';
 import { Box, Center, Checkbox, Flex, Group, MultiSelect, MultiSelectProps, Paper, RingProgress, Select, Text } from '@mantine/core';
-import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import classes from './page.module.css';
 import { MousePointerClick, ScanSearch } from 'lucide-react';
@@ -14,6 +13,8 @@ import useStore from '@/store/dsStore';
 import featureLoader from '@/functionalities/FeatureLoader';
 import ScatterPlotVisualization from '@/components/client/ScatterPlotVisualization';
 import { AlertCust } from '@/components/client/AlertCustom';
+import { DatasetInfo } from '@/interfaces/NNInterfaces';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 
 interface Feature {
 
@@ -51,7 +52,8 @@ function EmbeddingsPage() {
 
   const indexes = useStore((state) => state.selectedIndexes);
 
-  const datasetUsed = useStore((state) => state.datasetUsed)
+  //const datasetUsed = useStore((state) => state.datasetUsed)
+  const datasetUsed = useStore((state) => state.dataset)
 
   const isLoadingEmbs = useStore((state) => state.isLoadingEmbs)
   const dimensions = useStore((state) => state.size)
@@ -70,7 +72,7 @@ function EmbeddingsPage() {
 
       if (featureName !== "" && feature) {
         const load_labels = async () => {
-          const lb_feature = await IsFeatureSameLength(datasetUsed as Dataset, feature.datas.length);
+          const lb_feature = await IsFeatureSameLength(datasetUsed as DatasetInfo, feature.datas.length);
           console.log("LX", feature.datas.length)
           setLabelFeatures(lb_feature as string[])
         };
@@ -83,7 +85,7 @@ function EmbeddingsPage() {
 
 
 
-  const datasetName = useStore((state) => state.datasetUsed)?.name
+  const datasetName = useStore((state) => state.dataset)?.name
 
 
   useEffect(() => {
@@ -108,7 +110,7 @@ function EmbeddingsPage() {
   useEffect(() => {
 
     if (datasetUsed) {
-      const embsNames = IsFeatureBond(datasetUsed as Dataset, featureName, embedding_type)
+      const embsNames = IsFeatureBond(datasetUsed as DatasetInfo, featureName, embedding_type)
 
       if (Array.isArray(datasetUsed?.features) && Array.isArray(embsNames)) {
         const extractedModels = datasetUsed.features
@@ -203,7 +205,7 @@ function EmbeddingsPage() {
   useEffect(() => {
 
     if (datasetUsed) {
-      const uncertanties = IsFeatureBond(datasetUsed as Dataset, featureName, numberic_type, "image_uq")
+      const uncertanties = IsFeatureBond(datasetUsed as DatasetInfo, featureName, numberic_type, "image_uq")
       setAreUncertanties(uncertanties as boolean)
     }
   }, [featureName])
@@ -327,7 +329,9 @@ function EmbeddingsPage() {
   );
 
   return (
+    
     <div>
+      {/*
       <Box
         className={classes.title}
         style={{ display: "flex", flexDirection: "column", gap: "0px" }}
@@ -341,6 +345,13 @@ function EmbeddingsPage() {
         <div className={classes.datasetDivider}></div>
 
       </Box>
+      */}
+
+      <HeaderPageTask
+          Icon={ScanSearch}
+          title="Embeddings exploration"
+          descrition="Here you can explore the latent space of you dataset"
+        />
       <div className={classes.featureBox} style={{ marginTop: "30px" }}>
         <Flex direction="row" justify="space-between">
           <Group>

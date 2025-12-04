@@ -6,28 +6,30 @@ import { cropper_get } from '@/properties/urls';
 import Link from "next/link";
 import { GetDatasetAndSave } from '@/functionalities/DatasetsLoader';
 import classes from "@/pages/tasks/dataquality/datasets/page.module.css"
-import { CropPathfinder } from '@vectopus/atlas-icons-react';
+import { Crop } from 'lucide-react';
 import { MousePointerClick } from 'lucide-react';
 import { AlertCust } from '@/components/client/AlertCustom';
 import buttonsStyles from "@/styles/Config.module.css"
 import useStore from '@/store/dsStore';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 
-export default function Crop() {
+export default function Cropping() {
 
   const [featureName, setFeatureName] = useState<any>("")
   const [bboxFeatureName, setBboxFeatureName] = useState<any>("")
   const [features, setFeatures] = useState<string[]>([])
   const [bboxFeatures, setBboxFeatures] = useState<string[]>([])
 
-  const datasetName = useStore((state) => state.datasetUsed)?.name
+  const datasetName = useStore((state) => state.dataset)?.name
 
   const [isCropping, setIsCropping] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const [result, setResult] = useState<string | null>(null);
 
-  const datasetUsed = useStore((state) => state.datasetUsed)
-  const setData = useStore((state) => (state.setData));
+  const datasetUsed = useStore((state) => state.dataset)
+  //const setData = useStore((state) => (state.setData));
+  const setDataset = useStore((state) => state.setDataset);
 
 
   async function ssl_crop(bboxFeatureName: string) {
@@ -71,7 +73,7 @@ export default function Crop() {
                   console.log("Process completed:", jsonData.result);
                   if (jsonData.dataset) {
                     const dataset = await GetDatasetAndSave(jsonData.dataset)
-                    setData(dataset)
+                    setDataset(dataset)
                   }
                   setResult(jsonData.result)
                 } else if (jsonData.progress !== undefined) {
@@ -114,6 +116,7 @@ export default function Crop() {
   return (
     <div>
 
+      {/*
       <Box
         className={classes.title}
         style={{ display: "flex", flexDirection: "column", gap: "0px" }}
@@ -127,6 +130,12 @@ export default function Crop() {
         <div className={classes.datasetDivider}></div>
 
       </Box>
+      */}
+      <HeaderPageTask
+        Icon={Crop}
+        title="Cropping"
+        descrition="Here you can crop the images of your dataset"
+      />
 
       <div className={classes.featureBox}>
 

@@ -11,12 +11,11 @@ export interface FeatureDTO
 }
 
 
-
 export default interface Dataset
 {
   name: string;
-  n_samples: number;
-  task: string;
+  n_samples: number; //ok ma si chiama in modo diverso
+  task: string; 
   features: FeatureDTO[];
   prototype: {
     type: string;
@@ -28,9 +27,9 @@ export default interface Dataset
     label_dict?: any;
   };
   edges: [ string, string ][];
-  n_classes: number;
+  n_classes: number; //ok ma si chiama in modo diverso
   samples_per_class?: { [ key: number ]: number };
-  description?: string;
+  description?: string; 
   bboxes_areas?: number[];
   bboxes_per_sample?: number[];
   default_embedding_model?:string

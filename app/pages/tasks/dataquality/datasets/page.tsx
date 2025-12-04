@@ -5,7 +5,7 @@ import FeatureDisplayer from "@/components/client/FeatureDisplayer";
 import SchemaShower from "@/components/client/SchemaShower";
 import featureLoader from "@/functionalities/FeatureLoader";
 import { IsFeatureBond, IsFeaturePresent } from "@/functionalities/Utils";
-import Dataset, { FeatureSchema } from "@/interfaces/genericInterface";
+import { FeatureSchema } from "@/interfaces/genericInterface";
 import { labelColorMapType } from "@/properties/static";
 import { bbox_type, embedding_type, image_type, label_type, text_type } from "@/properties/types";
 import useStore from '@/store/dsStore';
@@ -13,6 +13,8 @@ import { motion } from 'framer-motion';
 import { Database, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classes from './page.module.css';
+import { DatasetInfo } from "@/interfaces/NNInterfaces";
+import HeaderPageTask from "@/components/client/utils/HeaderPageTask";
 
 interface Feature {
   type: string;
@@ -39,7 +41,9 @@ export default function Datasets() {
 
   const datasets = useStore((state) => state.datasets);
   const setDatasets = useStore((state) => state.setDatasets);
-  const datasetUsed = useStore((state) => state.datasetUsed);
+  //const datasetUsed = useStore((state) => state.datasetUsed);
+
+  const datasetUsed = useStore((state) => state.dataset);
   const datasetName = datasetUsed?.name;
   const setData = useStore((state) => state.setData);
   const setReport = useStore((state) => state.setReport);
@@ -113,7 +117,7 @@ export default function Datasets() {
     if (filteredDataset) {
       setData(filteredDataset);
       setDatasets(null);
-      setReport([]);
+      setReport(null);
       setPrototypesData(null);
       setLabelProtoData(null);
       setLabelToSamples([]);
@@ -169,7 +173,7 @@ export default function Datasets() {
 
 
           if (labelFeature && !IsFeatureBond(
-            datasetUsed as Dataset,
+            datasetUsed as DatasetInfo,
             featureLoaded?.name as string,
             labelFeature.type,
             labelFeature.name
@@ -179,7 +183,7 @@ export default function Datasets() {
         } else if (featureLoaded.type === label_type) {
 
           if (feature && IsFeatureBond(
-            datasetUsed as Dataset,
+            datasetUsed as DatasetInfo,
             feature?.name as string,
             featureLoaded.type,
             featureLoaded.name
@@ -283,6 +287,7 @@ export default function Datasets() {
     <>
 
       <div className={classes.pageContainer}>
+        {/*
         <div
           className={classes.title}
           style={{ display: "flex", flexDirection: "column", gap: "0px" }}
@@ -298,6 +303,15 @@ export default function Datasets() {
           <div className={classes.datasetDivider}></div>
 
         </div>
+        */}
+
+        <HeaderPageTask
+          Icon={Database}
+          title={datasetUsed?.name
+                ? datasetUsed.name.charAt(0).toUpperCase() + datasetUsed.name.slice(1) + " dataset"
+                : "dataset"}
+          descrition="Here you can check the generalities of your dataset: from its feature schema to some statistics."
+        />
 
         <div className={classes.featureBox}>
           <div className={classes.fixedTitle}>
@@ -382,6 +396,7 @@ export default function Datasets() {
                         onClick={handleonClose}
                         style={{
                           background: "transparent",
+                          color: "#94a3b8",
                           border: "none",
                           borderRadius: "50%",
                           width: "28px",
@@ -417,7 +432,7 @@ export default function Datasets() {
 
 
         <h2 style={{ color: "white", marginBottom: "0px" }}>Description</h2>
-        <div className={classes.datasetDividerDesc}></div>
+        <div className={classes.datasetDivider}></div>
 
         <div style={{ display: 'flex', marginBottom: '30px' }}>
           <p style={{ color: "white" }}>
@@ -425,10 +440,10 @@ export default function Datasets() {
               {datasetUsed?.name || ""}
             </span>{" "}
             is a dataset for {datasetUsed?.task || ""}.
-            {datasetUsed?.n_classes ? (
-              <> {" "} It has {datasetUsed?.n_classes || ""} classes and {datasetUsed?.n_samples} samples.{" "}</>
+            {datasetUsed?.num_classes ? (
+              <> {" "} It has {datasetUsed?.num_classes || ""} classes and {datasetUsed?.num_samples} samples.{" "}</>
             ) : (
-              <>It has {datasetUsed?.n_samples}{" "}</>
+              <>It has {datasetUsed?.num_samples}{" "}</>
             )}
             {descriptions?.map((description, index) => (
               <span key={index}>{description} </span>
@@ -440,7 +455,7 @@ export default function Datasets() {
         {datasetUsed?.samples_per_class ? (
           <>
             <h2 style={{ color: "white", marginBottom: "0px" }}>Numerosity per class</h2>
-            <div className={classes.datasetDividerNum}></div>
+            <div className={classes.datasetDivider}></div>
             <div style={{ margin: '20px' }}>
               <div style={{
                 display: "flex",
@@ -488,7 +503,7 @@ export default function Datasets() {
                   <h2 style={{ color: "white" }}>
                     Number of Bounding Boxes per Image
                   </h2>
-                  <div className={classes.datasetDividerDesc}></div>
+                  <div className={classes.datasetDivider}></div>
                 </div>
               </div>
 
@@ -544,7 +559,7 @@ export default function Datasets() {
                   <h2 style={{ color: "white" }}>
                     Number of Bounding Boxes per Image
                   </h2>
-                  <div className={classes.datasetDividerNum}></div>
+                  <div className={classes.datasetDivider}></div>
                 </div>
               </div>
 

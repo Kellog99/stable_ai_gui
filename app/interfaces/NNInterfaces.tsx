@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
 import { Info } from "./homePageInterface";
+import { FeatureDTO } from "./genericInterface";
 
 // Model's information
 export interface ModelInfo extends Info {
@@ -10,6 +11,21 @@ export interface ModelInfo extends Info {
 
 export interface DatasetInfo extends Info {
   num_samples: number,              // Number of the dataset' samples
+  features: FeatureDTO[];
+  prototype: {
+    type: string;
+    name: string;
+    depth: number,
+    datas: any[];
+    is_logic: boolean
+    description?: string;
+    label_dict?: any;
+  };
+  edges: [string, string][];
+  samples_per_class?: { [key: number]: number };
+  bboxes_areas?: number[];
+  bboxes_per_sample?: number[];
+  default_embedding_model?: string
 }
 
 

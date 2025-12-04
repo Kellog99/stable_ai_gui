@@ -12,6 +12,8 @@ import classes from './page.module.css';
 import { Layers, MousePointerClick } from "lucide-react";
 import useStore from "@/store/dsStore";
 import buttonsStyles from "@/styles/Config.module.css"
+import { DatasetInfo } from "@/interfaces/NNInterfaces";
+import HeaderPageTask from "@/components/client/utils/HeaderPageTask";
 
 
 
@@ -36,7 +38,7 @@ export default function Prototypes() {
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    const datasetUsed = useStore((state) => state.datasetUsed)
+    const datasetUsed = useStore((state) => state.dataset)
 
     const datasetName = datasetUsed?.name
 
@@ -51,7 +53,7 @@ export default function Prototypes() {
             if (featureName !== "") {
                 const load_labels = async () => {
                     const feature = await featureLoader(datasetUsed.name, featureName)
-                    const lb_feature = await IsFeatureSameLength(datasetUsed as Dataset, feature.datas.length);
+                    const lb_feature = await IsFeatureSameLength(datasetUsed as DatasetInfo, feature.datas.length);
                     setLabelFeatures(lb_feature as string[])
                 };
                 load_labels()
@@ -97,6 +99,7 @@ export default function Prototypes() {
 
     return (
         <div>
+            {/*}
             <Box
                 className={classes.title}
                 style={{ display: "flex", flexDirection: "column", gap: "0px" }}
@@ -110,6 +113,14 @@ export default function Prototypes() {
                 <div className={classes.datasetDivider}></div>
 
             </Box>
+            */}
+
+            <HeaderPageTask
+                Icon={Layers}
+                title="Prototypes visualization"
+                descrition="Here you can visualize the prototypes of your dataset"
+            />
+
             <div className={classes.featureBox}>
                 <Flex
                     direction="row"

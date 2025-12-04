@@ -67,9 +67,9 @@
   flex: 1;
   
   margin-bottom: 30px;
-  border: 2px solid #64748b;
+  border: 1px solid #47556966;
   border-radius: 1rem;
-  background-color: #334155;
+  background-color: #33415566;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 1rem;
   
@@ -107,7 +107,7 @@
   justify-content: center;
   margin-bottom: 20px;
   gap: 0.5rem;                 /* space between icon and text */
-  background-color: #1e293b;    /* dark blue-gray */
+  background-color: var(--bg-dark);    /* dark blue-gray */
   color: #f1f5f9;               /* light text */
   padding: 0.5rem 1rem;          /* vertical and horizontal padding */
   border-radius: 9999px;         /* fully rounded like a pill */

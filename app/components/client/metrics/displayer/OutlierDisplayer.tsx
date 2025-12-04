@@ -47,7 +47,7 @@ function OutlierDisplayer({ outliers: outliersProp }: { outliers: OutliersDTO })
     const scoreRound = (score * 100).toFixed(1);
     const [feature, setFeature] = useState<FeatureDTO | null>(null);
     const [type, setType] = useState("");
-    const datasetName = useStore((state) => state.datasetUsed?.name)
+    const datasetName = useStore((state) => state.dataset?.name)
 
     const [clickedOutlierData, setClickedOutlierData] = useState<DataPoint | null>(null);
     const [clicked, setClicked] = useState<boolean>(false)

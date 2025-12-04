@@ -125,7 +125,7 @@ const buildTreeLayout = ( { features, connections, labelColorMap, clickable }: S
     animated: false,
     sourcePosition: Position.Left,
     targetPosition: Position.Right,
-    style: { strokeWidth: 1, stroke: "black" },
+    style: { strokeWidth: 1, stroke: "#94a3b8" },
     interactionWidth: 0 
   } ) );
 

@@ -3,10 +3,12 @@
 import Config from "@/components/client/metrics/Config";
 import { Copy } from "lucide-react";
 import classes from "../../datasets/page.module.css"
+import HeaderPageTask from "@/components/client/utils/HeaderPageTask";
 
 export default function Duplicates() {
     return (
         <>
+            {/*
             <div
                 className={classes.title}
                 style={{ display: "flex", flexDirection: "column", gap: "0px" }}
@@ -20,6 +22,12 @@ export default function Duplicates() {
                 <div className={classes.datasetDivider}></div>
 
             </div>
+            */}
+            <HeaderPageTask
+                Icon={Copy}
+                title="Duplicates Evaluation"
+                descrition="Here you can check the amount of duplicate samples in your dataset."
+            />
 
             <Config metricName="duplicates" />
         </>

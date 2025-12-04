@@ -22,7 +22,7 @@ export default function DuplicatesDisplayer(props: { duplicates: DuplicatesDTO }
   const [type, setType] = useState("")
 
 
-  const datasetName = useStore((state) => state.datasetUsed)?.name
+  const datasetName = useStore((state) => state.dataset)?.name
 
 
   useEffect(() => {

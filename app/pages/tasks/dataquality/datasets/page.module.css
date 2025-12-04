@@ -1,6 +1,7 @@
 .pageContainer {
   width: 100%;
   overflow: hidden;
+  
 }
 
 
@@ -26,9 +27,9 @@
   flex: 1;
   margin-top: 30px;
   margin-bottom: 30px;
-  border: 2px solid #64748b;
+  border: 1px solid #47556966;
   border-radius: 1rem;
-  background-color: #334155;
+  background-color: #33415566;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 1rem;
  
@@ -62,7 +63,7 @@
   /* same as w-8 */
   height: 2rem;
   /* same as h-8 */
-  color: #60a5fa;
+  color: rgb(147, 51, 234)
   /* Tailwind's blue-400 */
 }
 
@@ -71,7 +72,7 @@
   /* same as text-4xl */
   font-weight: 700;
   /* same as font-bold */
-  background-image: linear-gradient(to right, #93c5fd, #86efac);
+  background-image: linear-gradient(135deg,rgb(147, 51, 234), rgb(59, 130, 246));
   /* from-blue-300 (#93c5fd) to-green-300 (#86efac) */
 
   background-clip: text;
@@ -85,7 +86,7 @@
 .datasetDivider {
   width: 6rem;   /* Tailwind w-24 */
   height: 0.25rem; /* Tailwind h-1 */
-  background-image: linear-gradient(to right, #3b82f6, #22c55e);  
+  background-image: linear-gradient(135deg,rgb(147, 51, 234), rgb(59, 130, 246));
   border-radius: 9999px; /* Tailwind rounded-full */
 }
 
@@ -130,7 +131,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;                 /* space between icon and text */
-  background-color: #1e293b;    /* dark blue-gray */
+  background-color: var(--bg-dark);    /* dark blue-gray */
   color: #f1f5f9;               /* light text */
   padding: 0.5rem 1rem;          /* vertical and horizontal padding */
   border-radius: 9999px;         /* fully rounded like a pill */

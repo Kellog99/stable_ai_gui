@@ -58,7 +58,8 @@ export default function Config ( props: ConfigsProps )
     const [ opened, { open, close } ] = useDisclosure( false );
 
 
-    const datasetUsed = useStore( ( state ) => state.datasetUsed )
+    //const datasetUsed = useStore( ( state ) => state.datasetUsed )
+    const datasetUsed = useStore((state) => state.dataset)
     const datasetName = datasetUsed?.name
 
     const configs = useStore( ( state ) => state.metricsConfig )
@@ -203,7 +204,7 @@ export default function Config ( props: ConfigsProps )
         }
 
 
-        const isDuplicate = report.some( ( metricReport ) =>
+        const isDuplicate = report?.some( ( metricReport ) =>
             (
                 props.metricName === "duplicates"
                     ? metricReport.results.name === "uniqueness"

@@ -17,7 +17,7 @@ export interface RepositoryCardProps {
 const RepositoryCard: React.FC<RepositoryCardProps> = ({
     config,
     activeId,
-    notShow = ["image", "id", "name"],
+    notShow = ["image", "id", "name", "features", "edges", "prototype", "samples_per_class", "bboxes_areas", "bboxes_per_sample", "default_embedding_model"],
     handleClick,
     handleDelete
 }) => {

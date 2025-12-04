@@ -2,6 +2,7 @@ import Dataset from "@/interfaces/genericInterface";
 import { label_type } from "@/properties/types";
 import featureLoader from "./FeatureLoader";
 import { IconAlertTriangle, IconCheck, IconUpload, IconX } from "@tabler/icons-react";
+import { DatasetInfo } from "@/interfaces/NNInterfaces";
 
 export function getScoreColor(score: number) {
   if (score >= 0.8) {
@@ -14,7 +15,7 @@ export function getScoreColor(score: number) {
 }
 
 export function IsFeatureBond(
-  dataset: Dataset,
+  dataset: DatasetInfo,
   nameFeature1: string,
   typeFeature2: string,
   nameFeature2?: string
@@ -46,7 +47,7 @@ export function IsFeatureBond(
 }
 
 export async function IsFeatureSameLength(
-  dataset: Dataset,
+  dataset: DatasetInfo,
   featureLength: number
 ): Promise<string[]> {
   console.log("RX", dataset)
@@ -69,7 +70,7 @@ export async function IsFeatureSameLength(
   return [];
 }
 export function IsFeaturePresent(
-  dataset: Dataset,
+  dataset: DatasetInfo,
   featureType: string
 ): boolean {
 
