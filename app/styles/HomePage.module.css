@@ -39,16 +39,14 @@
 
 .task {
   width: 100%;
-  align-items: center;
-  align-content: center;
 }
 
 .taskgrid {
-  width: 80%;
+  width: 100%;
   margin: auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 3vw;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 10vw;
 }
 
 .reportContainer {

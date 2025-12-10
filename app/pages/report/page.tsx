@@ -31,16 +31,10 @@ export default function ReportPage() {
     },
     {
       id: "NNreportRepo",
-      title: "NNTrust Reports",
+      title: "Loaded Reports",
       Icon: Database,
-      child: () => <JsonRepository tool="nntrust" />
-    },
-    {
-      id: "DQreportRepo",
-      title: "DQ Reports",
-      Icon: Database,
-      child: () => <JsonRepository tool="dq" />,
-    },
+      child: () => <JsonRepository />
+    }
 
   ];
 

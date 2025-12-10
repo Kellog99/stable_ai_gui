@@ -1,6 +1,7 @@
 // useThumbnailWebSocket.ts
 import { image_type } from "@/properties/types";
-import { wsUrl } from "@/properties/urls";
+import { wsUrl } from "@/properties/urlsNNTrust";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useThumbnailWS ( featureType: string, featureData: string[] | string )

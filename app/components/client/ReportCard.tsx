@@ -1,7 +1,6 @@
 import { useThumbnailWS } from "@/functionalities/useThumbnailWS";
-import { DQReportProps, ReportProps } from "@/interfaces/reportInterfaces";
+import { ReportProps } from "@/interfaces/reportInterfaces";
 import { image_type } from "@/properties/types";
-import useStore from "@/store/dsStore";
 import useNNTrustStore from "@/store/nnTrustStore";
 import styles from "@/styles/JsonRepository.module.css"
 import { Bug, Cpu, Database } from "lucide-react";
@@ -9,58 +8,40 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 interface ReportCardProps {
-    reportNN?: ReportProps;
-    reportDQ?: DQReportProps;
+    report: ReportProps;
+
 }
 
-export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
-
-    const setReportFromBE = useStore((state) => state.setReportFromBE)
+export default function ReportCard({ report }: ReportCardProps) {
 
     const setReport = useNNTrustStore((state) => state.setReport)
     const router = useRouter()
 
-    const imageDatas = reportNN?.prototype || reportDQ?.dataset.prototype.datas[0];
-
-
-    const { thumbnails, connectionStatus, requestThumbnail } = useThumbnailWS(
-        image_type,
-        imageDatas as string
-    );
-    requestThumbnail(imageDatas as string)
-
-
     const handleClick = () => {
-        if (reportNN) {
-            setReport(reportNN as ReportProps)
-            router.push("/pages/report/reportTITANN")
-        } else if (reportDQ) {
-            console.log("REPORTDQ CLICK", reportDQ)
-            setReportFromBE(reportDQ as DQReportProps)
-            router.push("/pages/report/reportDQ")
-        }
+        setReport(report as ReportProps)
+        router.push("/pages/report/reportTITANN")
+
     }
 
+    //////////////// da modificare il servizio che riporta l'immagine del prototipo //////////////
+    
+    
     return (
         <>
             <div className={styles.card} onClick={handleClick}>
-                {reportNN ? (
-                    <div className={styles.networkName}>
-                        <h3>{reportNN.info.name}</h3>
-                    </div>
-                ) : (reportDQ && (
-                    <div className={styles.networkName}>
-                        <h3>{reportDQ.dataset.name}</h3>
-                    </div>)
-                )}
+
+                <div className={styles.networkName}>
+                    <h3>{report.info.name}</h3>
+                </div>
+
 
                 <div className={styles.cardSides}>
                     <div className={styles.left}>
                         <div className={styles.networkImage}>
                             <img
-                                src={thumbnails.get(imageDatas as string)}
+                                src={`data:image/jpeg;base64,${report.prototype}`}
                                 alt={`image`}
-                                style={{
+                                 style={{
                                     width: "100%",
                                     objectFit: "contain",
                                     display: "block",
@@ -77,32 +58,19 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                                 <h4>General</h4>
                             </div>
                             <div className={styles.panelBody}>
-                                {reportNN ? (
-                                    <>
-                                        <div>
-                                            <span className={styles.subtitlePanel}>Dataset:</span>
-                                            {reportNN.dataset}
-                                        </div>
-                                        <div>
-                                            <span className={styles.subtitlePanel}>Classes:</span>
-                                            {reportNN.info.classes}
-                                        </div>
-                                    </>
 
-                                ) : reportDQ && reportDQ.dataset.task === "classification" ? (
-                                    <div>
-                                        <span className={styles.subtitlePanel}>Classes:</span>
-                                        {reportDQ.dataset.n_classes}
-                                    </div>
-                                ) : null}
+                                <div>
+                                    <span className={styles.subtitlePanel}>Dataset:</span>
+                                    {report.dataset}
+                                </div>
+                                <div>
+                                    <span className={styles.subtitlePanel}>Classes:</span>
+                                    {report.info.classes}
+                                </div>
 
-                                {reportNN ? (
-                                    <div>
-                                        <span className={styles.subtitlePanel}>Params:</span> {reportNN.info.parameters}
-                                    </div>) : (reportDQ &&
-                                        <div>
-                                            <span className={styles.subtitlePanel}>Samples:</span> {reportDQ.dataset.n_samples}
-                                        </div>)}
+                                <div>
+                                    <span className={styles.subtitlePanel}>Params:</span> {report.info.parameters}
+                                </div>
 
                             </div>
                         </div>
@@ -117,41 +85,33 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
                             <h4>Metrics</h4>
                         </div>
                         <div className={styles.panelBody}>
-
-                            {(reportNN?.metrics) ? (
-                                Object.entries(reportNN?.metrics)
+                            {(report.metrics) ? (
+                                Object.entries(report.metrics)
                                     .filter(([key]) => key !== "params" && key !== "confusion_matrix" && key !== "total benchmarks")
                                     .map(([key, value]) => (
                                         <div key={key}>
                                             <span className={styles.subtitlePanel}>{key}:</span> {value.toFixed(2)}
                                         </div>
-                                    ))) : (
-                                reportDQ &&
-                                reportDQ.metrics.map((metric, index) => (
-                                    <div key={index}>
-                                        <span className={styles.subtitlePanel}>{metric.results.name}:</span> {metric.results.score.toFixed(2)}
-                                    </div>
-                                ))
-                            )
+                                    ))) : null
                             }
                         </div>
                     </div>
 
-                    {reportNN &&
-                        <div className={styles.panel}>
-                            <div className={styles.panelHeader}>
-                                <Bug />
-                                <h4>Attacks</h4>
-                            </div>
-                            <div className={styles.panelBody}>
-                                {reportNN.attacks && Object.keys(reportNN.attacks).map((attackKey) => (
-                                    <div key={attackKey}>
-                                        <span className={styles.subtitlePanel}>{attackKey}</span>
-                                    </div>
-                                ))}
-                            </div>
+
+                    <div className={styles.panel}>
+                        <div className={styles.panelHeader}>
+                            <Bug />
+                            <h4>Attacks</h4>
                         </div>
-                    }
+                        <div className={styles.panelBody}>
+                            {report.attacks && Object.keys(report.attacks).map((attackKey) => (
+                                <div key={attackKey}>
+                                    <span className={styles.subtitlePanel}>{attackKey}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
 
                 </div>
 

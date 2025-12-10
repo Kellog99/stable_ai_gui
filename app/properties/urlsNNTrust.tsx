@@ -17,13 +17,12 @@ export const startJob = `http://${host}:8082/job/start`
 export const startAttack = `http://${host}:8082/job/attack`
 
 
+//////////////////////// DAL BE DATAQUALITY ---> SONO DA CAMBIARE /////////////////////////
 
+export const uploadDataset_check = `http://${host}:8000/upload_folder/check`
+export const uploaderDataset = `http://${host}:8000/upload_folder`
+export const datasets_get = `http://${host}:8082/dataset/getDatasets`
+export const dataset_get = `http://${host}:8000/getDataset`
+export const save_get = `http://${host}:8000/save`
 
-/////////////////////////////////////////////////////////////
-
-export const datasets_get = "http://localhost:8082/dataset/getDatasets"
-export const dataset_upload = "http://localhost:8082/dataset/upload"
-
-export const start_job ="http://localhost:8082/job/start"
-export const jobsId_get = "http://localhost:8082/job/getJobsId"
-export const jobProgress_get ="http://localhost:8082/job/getProgress"
+export const wsUrl = `ws://${host}:8085`

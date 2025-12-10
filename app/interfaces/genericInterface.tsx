@@ -37,31 +37,6 @@ export default interface Dataset
 }
 
 
-export interface FeatureSchema
-{
-  type: string;
-  name: string;
-  depth: number;
-  model_name?: string;
-}
-
-
-export interface Configs
-{
-  metricName: string
-  featureName: string,
-  outliersMode?: string,
-  labelFeatureName?: string,
-  internalConfigs: any,
-  results: Object
-}
-
-export interface ReportMetric {
-  internalConfigs: any,
-  results: Object
-}
-
-
 export interface ModelInfo {
   name: string;
   model_type: string;
@@ -73,16 +48,6 @@ export interface ModelInfo {
   max_length: number;
 }
 
-export interface PrototypesData
-{
-    data: any,
-    label_data: number
-}
-export interface PrototypesInt
-{
-    type: string,
-    datas: PrototypesData[]
-}
 
 export interface UploadConfig {
   fileType: 'zip' | 'pth';

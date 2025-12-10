@@ -10,7 +10,7 @@ interface ImageDisplayProps {
   imageUrl?: string;
   handleUpload?: (file: string | null) => void;
   loader: boolean;
-  is_loading? : boolean;
+  is_loading?: boolean;
 }
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({
@@ -58,6 +58,8 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   };
 
   const displayImage = loadedImage || imageUrl;
+  console.log("image display", displayImage)
+  console.log("loaded image", loadedImage)
 
   return (
     <div className="image-wrapper">
@@ -69,16 +71,17 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
       >
         {displayImage ? (
           <>
-          {is_loading ? (<div className="image-placeholder">
-                        <Loader className="image-icon" />
-                        <p className="image-text">Executing attack...</p>
-                    </div>) : (
-            <img
-              src={displayImage}
-              alt={`Loaded image`}
-              className="image-img"
-            />
-          )}
+            {is_loading ?
+              (<div className="image-placeholder">
+                <Loader className="image-icon" />
+                <p className="image-text">Executing attack...</p>
+              </div>) : (
+                <img
+                  src={displayImage}
+                  alt={`Loaded image`}
+                  className="image-img"
+                />
+              )}
             {loadedImage && (
               <button
                 onClick={handleDeleteImage}
@@ -92,8 +95,12 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
           </>
         ) : (
           <div className="image-placeholder">
-              <Image className="image-icon" />
-              <p className="image-text">{placeholder}</p>
+            {is_loading ?
+              (<div className="image-placeholder">
+                <Loader className="image-icon" />
+                <p className="image-text">Executing attack...</p>
+              </div>) :(<><Image className="image-icon" />
+            <p className="image-text">{placeholder}</p></>)}
           </div>
         )}
         {loader && (

@@ -1,8 +1,8 @@
 import DatasetsLoader from "@/functionalities/DatasetsLoader";
-import useStore from "@/store/dsStore";
 import { Loader, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import DatasetBT from "../server/DatasetBT";
+import useStore from "@/store/nnTrustStore";
 
 
 export const DatasetRepository: React.FC = () =>
@@ -27,7 +27,7 @@ export const DatasetRepository: React.FC = () =>
     const query = useStore( ( state ) => ( state.queryDataset ) );
 
     return (
-        <div style={ { position: 'relative', width: '100%', height:"340px", overflowY: "auto", overflowX: 'hidden',  } }>
+        <div style={ { position: 'relative', width: '100%', height:"35vh", overflowY: "auto", overflowX: 'hidden',  } }>
             { isLoading && (
                 <div style={ {
                     position: 'absolute',

@@ -1,18 +1,18 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { DQsections, NavigationSection, TitannSections } from "./config";
+import { NavigationSection, TitannSections } from "./config";
 import Dataset from "@/interfaces/genericInterface";
 import { useEffect, useState } from "react";
 import React from "react";
 import './Navbar.css'
 import { Menu, X } from "lucide-react";
 import NavigationButton from "./NavigationButton";
-import useStore from "@/store/dsStore";
-import { IsFeaturePresent } from "@/functionalities/Utils";
-import { embedding_type } from "@/properties/types";
+import useStore from "@/store/nnTrustStore";
+
 import useNNTrustStore from "@/store/nnTrustStore";
 import { getInfoAttacks, getInfoMetrics } from "@/properties/urlsNNTrust";
+import { RegisterObjectProps } from "@/interfaces/NNInterfaces";
 
 function setEmbeddings(items: NavigationSection[], areEmbeddings: boolean, isNNTrust: boolean) {
     items.map((item) => {
@@ -65,8 +65,18 @@ export default function Navbar() {
                 const fetchattack = await fetchItem(getInfoAttacks);
                 const fetchmetrics = await fetchItem(getInfoMetrics);
                 if (fetchattack) {
-                    setAttacks(fetchattack);
-                    setSelectedAttacks(fetchattack);
+                    const allowedIds = ["fgsm", "pgd", "deepfool", "banditprior", "signopt", "fuap"];
+
+                    const filteredAttacks = Object.fromEntries(
+                        (Object.entries(fetchattack) as [string, RegisterObjectProps][]).filter(
+                            ([key, attack]) => allowedIds.includes(attack.id)
+                        )
+                    );
+
+                    console.log("filtered", filteredAttacks)
+                    console.log("attacks", fetchattack) 
+                    setAttacks(filteredAttacks);
+                    setSelectedAttacks(filteredAttacks);
                 }
                 if (fetchmetrics) {
                     setMetrics(fetchmetrics);
@@ -76,24 +86,11 @@ export default function Navbar() {
 
             fetchData();
             setSections(TitannSections);
-        } else {
-            setSections(DQsections);
         }
     }, [isNNTrust, setAttacks, setSelectedAttacks, setMetrics, setSelectedMetrics]);
 
 
-    useEffect(() => {
-        const areEmbeddings: boolean = datasetUsed ? IsFeaturePresent(datasetUsed as Dataset, embedding_type) : false;
-        setEmbeddings(sections, areEmbeddings, isNNTrust)
-        if (sections.length > 0) {
-            sections.map((section) => {
-                if (section.href && section.href === pathName) {
-                    setActiveLink(section.id)
-                }
-            })
-        }
 
-    }, [sections, datasetUsed])
 
     return (
         <div className="navbar-container">
@@ -123,7 +120,7 @@ export default function Navbar() {
                             activeLink={activeLink}
                             setActiveLink={setActiveLink}
                             isClosed={isClosed}
-                            isActive={item.requiresEmbeddings ? item.requiresEmbeddings : false}
+                            isActive={true}
                         />
                     )))}
             </ul>

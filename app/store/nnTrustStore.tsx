@@ -1,6 +1,6 @@
+import Dataset from "@/interfaces/genericInterface";
 import { ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
 import { BenchmarkDataProps, ReportProps } from "@/interfaces/reportInterfaces";
-import Benchmark from "@/pages/tasks/redteam/benchmark/page";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -12,6 +12,9 @@ export interface AttackManagementProps {
 }
 
 interface AppState {
+  datasets: Dataset[] | null;
+  datasetUsed: Dataset | null;
+  queryDataset: string | '';
   models: ModelSpecs[] | null;
   modelName: string | null;
   attacks: { [key: string]: RegisterObjectProps };
@@ -34,6 +37,9 @@ interface AppState {
 
   benchmarkID: string;
 
+  setData: (datasetUsed: Dataset | null) => void;
+  setDatasets: (datasets: Dataset[] | null) => void;
+  setQueryDataset: (queryDataset: string) => void;
   setModels: (models: ModelSpecs[] | null) => void;
   setModelName: (modelName: string | null) => void;
   setAttacks: (attaks: { [key: string]: RegisterObjectProps }) => void;
@@ -55,6 +61,9 @@ interface AppState {
 const useNNTrustStore = create<AppState>()(
   persist(
     (set) => ({
+      datasets: null,
+      datasetUsed: null,
+      queryDataset: "",
       models: null,
       modelName: null,
 
@@ -81,6 +90,9 @@ const useNNTrustStore = create<AppState>()(
 
       benchmarkID: "",
 
+      setData: (datasetUsed) => set({ datasetUsed }),
+      setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
+      setQueryDataset: (queryDataset: string) => set({ queryDataset }),
       setModels: (models) => set({ models }),
       setModelName: (modelName) => set({ modelName }),
 
@@ -102,6 +114,8 @@ const useNNTrustStore = create<AppState>()(
       name: "app-storage-models",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
+        datasets: state.datasets,
+        datasetUsed: state.datasetUsed,
         models: state.models,
         modelName: state.modelName,
         attacks: state.attacks,

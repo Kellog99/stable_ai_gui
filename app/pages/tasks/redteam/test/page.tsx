@@ -65,10 +65,8 @@ function Test() {
                     }
                 });
 
-                console.log('Status:', response.status);
                 const data: AttackResult = await response.json();
-                console.log('Response:', data);
-
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -209,6 +207,7 @@ function Test() {
                         </p>
                     </div>
                     <div className={styles.image_grid}>
+                        
                         <ImageDisplay
                             title="Original Image"
                             placeholder="No image loaded"

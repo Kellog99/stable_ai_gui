@@ -42,21 +42,16 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
     }, [query, elements]);
 
 
-
+   
     const model = useNNStore((state) => state.models);
     const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
+    //const setSelectedMetrics = useNNStore((state) => state.setSelectedMetrics);
 
-    let isCM = false;
     let modifiedSelectedElement = { ...selectedElement };
-
     if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
-        isCM = true;
         delete modifiedSelectedElement.confusionmatrix;
+        
     }
-
-    console.log("modifiedSelectedElement", modifiedSelectedElement);
-    console.log("original elements", elements);
-    console.log("isCM in table wrapper?", isCM)
 
     return (
         <div className="wrapper">

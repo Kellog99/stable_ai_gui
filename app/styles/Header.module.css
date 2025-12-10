@@ -1,6 +1,6 @@
 .container {
   display: flex;
-  height: 10vh;
+  height: 13vh;
   max-height: 120px;
   width: 100%;
   background-color: var(--navy-700);
@@ -15,7 +15,7 @@
 .buttons {
   display: flex;
   position: relative;
-  width: 15vw;
+  width: 10vw; /*da modificare con 15vw quando il report sarà disponibile*/
   height: 4vh;
   min-height: 50px;
   max-height: 80px;
@@ -67,7 +67,14 @@
   display: flex;
   flex-direction: column;
   color: white;
-  gap: 2px
+  gap: 2px;
+  justify-content:center;
+  align-items:center;
+}
+
+.title p:nth-child(2) {
+  font-size: 1rem;
+  opacity: 0.8;
 }
 
 .title p {

@@ -6,8 +6,9 @@ import { ArrowDownUp, CircleArrowRight, Search } from 'lucide-react';
 import { HoverCard, Progress } from '@mantine/core';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
-import useStore from '@/store/dsStore';
+import useStore from '@/store/nnTrustStore';
 import { benchmarkFetch_get, getJobsProgress, reportFetch_get } from '@/properties/urlsNNTrust';
+import OpenPdfButton from '@/components/client/PDFViewer';
 
 const TaskManagement: React.FC = () => {
     const { setReport, setBenchmark, executedAttacks, setExecutedAttacks } = useNNTrustStore()
@@ -178,16 +179,12 @@ const TaskManagement: React.FC = () => {
                     width={170}
                     shadow="md"
                     disabled={!isDisabled()}>
-                    <HoverCard.Target>
-                        <div>
-                            <button
-                                disabled={isDisabled()}
-                                onClick={handleClickReport}
-                                className={`header-button ${isDisabled() ? 'disabled' : ''}`}>
-                                See Report <CircleArrowRight size={"3vw"} />
-                            </button>
-                        </div>
-                    </HoverCard.Target>
+                    <div>
+                    <OpenPdfButton
+                        param1={benchmarkID}
+                        param2={"True"}
+                        />
+                    </div>
                     <HoverCard.Dropdown>
                         <p style={{ fontSize: "0.7rem" }}>
                             This button is currently disabled. Because {executedAttacks.length === 0 ? "there are no vulnearbilities scheduled." : `${executedAttacks.length - atkFinished} vulnearbily(s) remains to be finished.`}

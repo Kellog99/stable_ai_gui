@@ -7,8 +7,9 @@ import TableWrapper from "./TableWrapper"
 import { Play, Settings, Ruler, Bug, Gauge, Info, ChevronRight, BrickWallFire } from 'lucide-react';
 import useNNTrustStore from '@/store/nnTrustStore';
 import { Alert } from '@mantine/core';
-import useStore from '@/store/dsStore';
+import useStore from '@/store/nnTrustStore';
 import { startJob } from '@/properties/urlsNNTrust';
+import useNNStore from '@/store/nnTrustStore';
 
 const Benchmark: React.FC = () => {
 
@@ -22,12 +23,12 @@ const Benchmark: React.FC = () => {
   const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
   const [isBenchmarkAvailable, setIsBenchmarkAvailable] = useState<boolean>(false)
 
- useEffect(() => {
-  const isAttacksEmpty = !selectedAttacks || Object.keys(selectedAttacks).length === 0;
-  const isMetricsEmpty = !selectedMetrics || Object.keys(selectedMetrics).length === 0;
+  useEffect(() => {
+    const isAttacksEmpty = !selectedAttacks || Object.keys(selectedAttacks).length === 0;
+    const isMetricsEmpty = !selectedMetrics || Object.keys(selectedMetrics).length === 0;
 
-  setIsBenchmarkAvailable(!(isAttacksEmpty || isMetricsEmpty));
-}, [selectedAttacks, selectedMetrics]);
+    setIsBenchmarkAvailable(!(isAttacksEmpty || isMetricsEmpty));
+  }, [selectedAttacks, selectedMetrics]);
 
 
   const handleSelectionClick = (
@@ -75,9 +76,20 @@ const Benchmark: React.FC = () => {
     }
   }
 
+  console.log("Selected Metrics:", selectedMetrics)
+
+
+  const model = useNNStore((state) => state.models);
+  const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
+  let modifiedSelectedElement = { ...selectedMetrics };
+  if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
+    delete modifiedSelectedElement.confusionmatrix;
+  }
+
+  console.log("metrics to send", modifiedSelectedElement)
   const benchmarkDatas = {
     attacks: Object.values(selectedAttacks),
-    metrics: Object.values(selectedMetrics),
+    metrics: Object.values(modifiedSelectedElement),
     dataset: datasetName,
     model: modelName
   };
@@ -117,7 +129,7 @@ const Benchmark: React.FC = () => {
 
   };
 
-  
+
 
   return (
     <>

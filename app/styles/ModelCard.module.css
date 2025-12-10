@@ -1,8 +1,7 @@
 .modelsContainer {
-  max-height: 40vh;
+  height: 35vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px;
   padding-right: calc(16px + 10px);
   box-sizing: content-box;
 }

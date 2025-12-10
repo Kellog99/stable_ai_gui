@@ -1,5 +1,4 @@
 import { Task } from '@/interfaces/NNInterfaces';
-import useStoreDQ from '@/store/dsStore';
 import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/TaskButton.module.css';
 import { ChevronRight } from 'lucide-react';
@@ -18,7 +17,7 @@ const TaskButton: React.FC<Task> = ({
   const router = useRouter();
 
   const isModel = useStore((state) => state.modelName) !== null
-  const isDataset = useStoreDQ((state) => state.datasetUsed) !== null
+  const isDataset = useStore((state) => state.datasetUsed) !== null
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()

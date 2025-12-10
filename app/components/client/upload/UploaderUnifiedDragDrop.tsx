@@ -6,7 +6,6 @@ import { IconChevronDown, IconCloudUpload, IconDatabase, IconTrash, IconUpload, 
 import { Brain, CheckIcon, Database, FileText, FolderIcon } from 'lucide-react';
 import { useState } from 'react';
 import { AlertCust } from '../AlertCustom';
-import { uploadJsonReport_DQ } from '@/properties/urls';
 import { uploadJsonReport_NN } from '@/properties/urlsNNTrust';
 
 type Props = {
@@ -183,12 +182,8 @@ export const DragDrop: React.FC<Props> = ({ config, infoModal }) => {
             try {
                 const body = JSON.stringify(jsonUploaded);
                 const headers = { "Content-Type": "application/json" };
-                
-                const tool = jsonUploaded.tool
 
-                const url = tool === "dq"? uploadJsonReport_DQ : uploadJsonReport_NN
-
-                const response = await fetch(url, {
+                const response = await fetch(uploadJsonReport_NN, {
                     method: 'POST',
                     headers,
                     body,

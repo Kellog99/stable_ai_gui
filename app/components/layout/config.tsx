@@ -1,17 +1,8 @@
 import { Task } from "@/interfaces/NNInterfaces";
-import { ChartLine, TestTube, SquareActivity, Ruler, Image, ChartScatter, Bot, BookCopy, ShieldX, CircleCheck, Eraser, Crop, Database, LucideIcon, Info, FileText, BarChart3 } from "lucide-react";
+import { ChartLine, TestTube, LucideIcon, Info, BarChart3 } from "lucide-react";
 
 
-// These are the major buttons to show on the homepage
 export const AvailableTasks: Task[] = [
-    {
-        title: "Data Quality",
-        Icon: FileText,
-        description: 'View the analysis on the loaded dataset.',
-        footer: "See Analysis",
-        color: "linear-gradient(to bottom right, #059669, #533A71)",
-        href: "/pages/tasks/dataquality/datasets",
-    },
     {
         title: "RedTeaming Tool",
         Icon: BarChart3,
@@ -38,97 +29,6 @@ export interface NavigationSection {
     items?: NavigationSection[];
     requiresEmbeddings?: boolean
 }
-
-
-export const DQsections: NavigationSection[] = [
-    {
-        id: "dataset",
-        title: "Dataset",
-        Icon: Database,
-        href: "/pages/tasks/dataquality/datasets"
-    },
-    {
-        id: 'visualization',
-        title: 'Visualization',
-        Icon: Image,
-        items: [
-            {
-                id: 'embeddings',
-                title: 'Embeddings',
-                href: '/pages/tasks/dataquality/embeddings',
-                Icon: ChartScatter,
-                requiresEmbeddings: true,
-
-            },
-            {
-                id: 'prototypes',
-                title: 'Prototypes',
-                href: '/pages/tasks/dataquality/prototypes',
-                Icon: Bot,
-                requiresEmbeddings: true,
-
-            },
-        ],
-    },
-    {
-        id: 'metrics',
-        title: 'Metrics',
-        Icon: Ruler,
-        items: [
-            {
-                id: 'duplicates',
-                title: 'Duplicates',
-                href: '/pages/tasks/dataquality/metrics/duplicates',
-                Icon: BookCopy,
-                requiresEmbeddings: true,
-
-            },
-            {
-                id: 'outliers',
-                title: 'Outliers',
-                href: '/pages/tasks/dataquality/metrics/outliers',
-                Icon: ShieldX,
-                requiresEmbeddings: true,
-
-            },
-            {
-                id: 'completeness',
-                title: 'Completeness',
-                href: '/pages/tasks/dataquality/metrics/completeness',
-                Icon: CircleCheck,
-                requiresEmbeddings: true,
-
-            },
-        ],
-    },
-    {
-        id: 'actions',
-        title: 'Actions',
-        Icon: SquareActivity,
-        items: [
-            {
-                id: 'embedder',
-                title: 'Embedder',
-                href: '/pages/tasks/dataquality/actions/embeddings',
-                Icon: ChartScatter,
-            },
-            {
-                id: 'cleanDuplicates',
-                title: 'Clean Duplicates',
-                href: '/pages/tasks/dataquality/actions/cleanDuplicates',
-                Icon: Eraser,
-                requiresEmbeddings: true,
-            },
-            {
-                id: 'cropping',
-                title: 'Cropping',
-                href: '/pages/tasks/dataquality/actions/cropping',
-                Icon: Crop
-            },
-        ],
-    },
-];
-
 
 
 export const TitannSections: NavigationSection[] = [

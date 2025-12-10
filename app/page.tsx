@@ -1,6 +1,5 @@
 "use client";
 import TaskButton from '@/components/client/buttons/TaskButton';
-import useStoreDQ from '@/store/dsStore';
 import useStore from '@/store/nnTrustStore';
 import styles from '@/styles/HomePage.module.css';
 import { Database, Upload } from 'lucide-react';
@@ -12,13 +11,12 @@ import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
 import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
 import DatasetsLoader from './functionalities/DatasetsLoader';
 import { getModels } from './functionalities/NNTrustBackendUtils';
-import { uploadDataset_check, uploaderDataset } from './properties/urls';
 import { AvailableTasks } from './components/layout/config';
-import { uploadModel, uploadModel_check } from './properties/urlsNNTrust';
+import { uploadDataset_check, uploaderDataset, uploadModel, uploadModel_check } from './properties/urlsNNTrust';
 
 const HomePage: React.FC = ({ }) => {
   const setModels = useStore((state) => state.setModels)
-  const setDatasets = useStoreDQ((state) => state.setDatasets)
+  const setDatasets = useStore((state) => state.setDatasets)
 
   const datasetSections = [
     {
@@ -26,8 +24,8 @@ const HomePage: React.FC = ({ }) => {
       title: "Dataset Repository",
       Icon: Database,
       child: DatasetRepository
-    },
-    {
+    }
+    /*{
       id: "selection",
       title: "Upload Dataset",
       Icon: Upload,
@@ -44,7 +42,7 @@ const HomePage: React.FC = ({ }) => {
           setRefreshData: setDatasets
         }}
         infoModal={<ModalUploadDataset />} />
-    }
+    }*/
   ];
 
   const modelSections = [
@@ -53,8 +51,8 @@ const HomePage: React.FC = ({ }) => {
       title: "Model Repository",
       Icon: Database,
       child: ModelRepository
-    },
-    {
+    }
+    /*{
       id: "model",
       title: "Upload Model",
       Icon: Upload,
@@ -72,7 +70,7 @@ const HomePage: React.FC = ({ }) => {
 
         }}
         infoModal={<ModalUploadModel />} />
-    }
+    }*/
   ];
 
   const listOfSections = [datasetSections, modelSections];
@@ -100,7 +98,7 @@ const HomePage: React.FC = ({ }) => {
           </p>
         </div>
 
-        <div className={styles.taskgrid}>
+        <div className={styles.filegrid}>
           {
             AvailableTasks.map((task) =>
               <TaskButton

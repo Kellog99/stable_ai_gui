@@ -1,6 +1,6 @@
 "use client";
 
-import useStore from '@/store/dsStore';
+import useStore from '@/store/nnTrustStore';
 import useNNTrustStore from '@/store/nnTrustStore';
 import { Brain, Database, FileText, Home, LucideIcon, Option } from 'lucide-react';
 import styles from '@/styles/Header.module.css';
@@ -24,12 +24,12 @@ const btns: HeaderButtonProps[] = [
     href: "/",
     name: "home"
   },
-  {
-    id: 'ReportPage',
-    Icon: FileText,
-    href: "/pages/report",
-    name: "report"
-  }
+  //{
+  //  id: 'ReportPage',
+  //  Icon: FileText,
+  //  href: "/pages/report",
+  //  name: "report"
+  //}
 ]
 type Option = typeof btns[number]['id'];
 const possiblePages: Option[] = btns.map((btn) => btn.id);
@@ -70,7 +70,9 @@ const Header = () => {
 
       {/* Title */}
       <div className={styles.title}>
-        <p>TrustWorthy</p>
+        <p>TITANN
+        </p>
+         <p>Tool for Inspection and Trustworthiness Assesment of Neural Networks</p>
         <img
           src="/logo_leonardo.png"
           alt="logo"
@@ -83,7 +85,7 @@ const Header = () => {
         <div className={`${styles.item} ${modelName ? styles.loaded : ''}`}>
           <Brain />
           <span>
-            {modelName || 'No model'}
+            {modelName ? modelName.slice(0, 10) + (modelName.length > 10 ? '…' : '') : 'No model'}
           </span>
         </div>
         <div className={`${styles.item} ${datasetName ? styles.loaded : ''}`}>
