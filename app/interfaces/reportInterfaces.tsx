@@ -1,6 +1,7 @@
 import Dataset from "./genericInterface";
 
-interface infoProps {
+export interface infoProps {
+    id: string;
     name: string;
     parameters: number;
     task: string
@@ -35,10 +36,6 @@ export interface attacksProps {
 
 //  Interface for the report page
 export interface ReportAttacksProps {
-    prototype: string;
-    id: string;
-    dataset: string;
-    tool: string;
     info: infoProps;
     metrics: metricsProps;
     attacks: { [key: string]: attacksProps }

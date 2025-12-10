@@ -17,6 +17,7 @@ const TaskManagement: React.FC = () => {
         setAttackReport: setReport,
         setBenchmark,
         benchmarkId,
+        setBenchmarkPROVA
     } = useNNTrustStore()
 
     const [listExecutedAttacks, setListExecutedAttacks] = useState<AttackManagementProps[]>([]);
@@ -42,20 +43,8 @@ const TaskManagement: React.FC = () => {
                 throw new Error(`Failed to get jobs ids from the backend: ${response.status}`);
             }
 
-            const rawAttacks = await response.json();
 
-            const statusMap: Record<string, AttackManagementProps["status"]> = {
-                in_progress: "In Progress",
-                completed: "Completed",
-                created: "Pending",
-                closed: "Closed"
-            };
-
-            const listAttacks: AttackManagementProps[] = rawAttacks.map((item: any) => ({
-                ...item,
-                status: statusMap[item.status] ?? "Pending"  // fallback if unknown
-            }));
-            console.log("Fetched attacks:", listAttacks);
+            const listAttacks: AttackManagementProps[] = await response.json();
             setListExecutedAttacks(listAttacks);
         } catch (error) {
             console.error("Error fetching job progress:", error);
@@ -73,6 +62,8 @@ const TaskManagement: React.FC = () => {
     const [attackStates, setAttackStates] = useState<{ [key: string]: number }>({})
     const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
+
+
     useEffect(() => {
         const status = {
             "Completed": 0,
@@ -81,8 +72,20 @@ const TaskManagement: React.FC = () => {
             "Closed": 0
         };
 
+        const statusMap: Record<string, keyof typeof status> = {
+            "completed": "Completed",
+            "in_progress": "In Progress",
+            "pending": "Pending",
+            "closed": "Closed",
+        };
+
         listExecutedAttacks.forEach((job: AttackManagementProps) => {
-            status[job.status] = status[job.status] + 1;
+            const normalized = job.status.toLowerCase(); // ensure lowercase
+            const key = statusMap[normalized]; // find matching frontend key
+
+            if (key) {
+                status[key] += 1;
+            }
         });
 
         setAttackStates(status);
@@ -91,7 +94,7 @@ const TaskManagement: React.FC = () => {
         if (listExecutedAttacks.length > 0) {
             notFinished = status["Pending"] + status["In Progress"];
             if (notFinished > 0) {
-                setDescription(`It remains ${notFinished} to be finished.`);
+                setDescription(`It remains ${notFinished} attackto be finished.`);
             } else {
                 setDescription("All jobs completed.");
             }
@@ -102,7 +105,6 @@ const TaskManagement: React.FC = () => {
         // the report button is disabled if there are still jobs that are pending or in progress to be finished
         setIsDisabled((notFinished > 0 && listExecutedAttacks.length > 0) || listExecutedAttacks.length === 0);
     }, [listExecutedAttacks]);
-
 
     const router = useRouter()
 
@@ -122,16 +124,12 @@ const TaskManagement: React.FC = () => {
             }
         }
         // fetching the report
-        const reportFetch = await fetchResult<ReportAttacksProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId)}`);
+        const reportFetch = await fetchResult<ReportAttacksProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId as string)}`);
         if (reportFetch) {
             setReport(reportFetch);
         }
 
-        // fetching the benchmark
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
-        if (benchmarkFetch && benchmarkId) {
-            setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
-        }
+       
         router.push("/pages/report/reportTITANN")
     }
 

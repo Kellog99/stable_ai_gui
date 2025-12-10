@@ -70,7 +70,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                     fontWeight: 'bold',
                                     color: '#3b82f6'
                                 }}>
-                                    {values[index]?.toFixed(2) ?? param.default}
+                                    {values[index]?.toFixed(4) ?? param.default}
                                 </span>
                             </label>
                             {param.description && (

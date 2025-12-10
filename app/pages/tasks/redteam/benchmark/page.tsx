@@ -21,9 +21,12 @@ const Benchmark: React.FC = () => {
   const [selectedAttacks, setSelectedAttacks] = useState<{ [key: string]: RegisterObjectProps }>({})
   const [selectedMetrics, setSelectedMetrics] = useState<{ [key: string]: RegisterObjectProps }>({})
 
-  const model = useNNTrustStore((state) => state.model);
+  const {
+    model,                    //model to use in the benchmark
+    setSelectedAttackList     //variable for setting the list of attacks that have been executed
+  } = useNNTrustStore();
 
-  const numClasses = model?.classes as number
+  const numClasses = model?.num_classes as number
 
   let modifiedSelectedElement = { ...selectedMetrics };
   if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
@@ -117,6 +120,7 @@ const Benchmark: React.FC = () => {
     try {
       // Block any new click on the button
       setExecuteBenchmark(false);
+      setSelectedAttackList(selectedAttacks);
 
       const response = await fetch(startJob, {
         method: "POST",
@@ -141,66 +145,19 @@ const Benchmark: React.FC = () => {
 
 
   return (
-    <>
-      <div className="container-pages">
-        {/* Header */}
-
-        <HeaderPageTask
-          Icon={BrickWallFireIcon}
-          title="Red Teaming"
-          descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
-          buttonprops={{
-            description: "Execute Benchmark",
-            isDisabled: !executeBenchmark,
-            disabledDescription: description,
-            handleClick: handleClick
-          }}
-        />
-
-
-        {/* Attacks Selection */}
-        <TableWrapper
-          title='Vulnearbility selection'
-          elements={attacks}
-          selectedElement={selectedAttacks}
-          handleSelection={(id: string) => handleSelectionClick(
-            id,
-            selectedAttacks,
-            setSelectedAttacks,
-            attacks
-          )}
-          handleParametersChange={(id: string, parameters: number[]) => {
-            handleParametersChange(
-              id,
-              parameters,
-              setSelectedAttacks,
-              selectedAttacks
-            )
-          }}
-          Icon={Settings}
-        />
-
-        {/* Metrics Selection */}
-        <TableWrapper
-          title='Metric Selection'
-          elements={metrics}
-          selectedElement={selectedMetrics}
-          handleSelection={(id: string) => handleSelectionClick(
-            id,
-            selectedMetrics,
-            setSelectedMetrics,
-            metrics
-          )}
-          Icon={Ruler}
-          handleParametersChange={(id: string, parameters: number[]) => {
-            handleParametersChange(id,
-              parameters,
-              setSelectedMetrics,
-              selectedMetrics)
-          }} />
-
-      </div >
-
+    <div>
+      {/* Header */}
+      <HeaderPageTask
+        Icon={BrickWallFireIcon}
+        title="Red Teaming"
+        descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
+        buttonprops={{
+          description: "Execute Benchmark",
+          isDisabled: !executeBenchmark,
+          disabledDescription: description,
+          handleClick: handleClick
+        }}
+      />
       <Modal
         opened={isClicked}
         className='alert-message'
@@ -238,7 +195,48 @@ const Benchmark: React.FC = () => {
         </button>
       </Modal>
 
-    </>)
+      {/* Attacks Selection */}
+      <TableWrapper
+        title='Vulnearbility selection'
+        elements={attacks}
+        selectedElement={selectedAttacks}
+        handleSelection={(id: string) => handleSelectionClick(
+          id,
+          selectedAttacks,
+          setSelectedAttacks,
+          attacks
+        )}
+        handleParametersChange={(id: string, parameters: number[]) => {
+          handleParametersChange(
+            id,
+            parameters,
+            setSelectedAttacks,
+            selectedAttacks
+          )
+        }}
+        Icon={Settings}
+      />
+
+      {/* Metrics Selection */}
+      <TableWrapper
+        title='Metric Selection'
+        elements={metrics}
+        selectedElement={selectedMetrics}
+        handleSelection={(id: string) => handleSelectionClick(
+          id,
+          selectedMetrics,
+          setSelectedMetrics,
+          metrics
+        )}
+        Icon={Ruler}
+        handleParametersChange={(id: string, parameters: number[]) => {
+          handleParametersChange(id,
+            parameters,
+            setSelectedMetrics,
+            selectedMetrics)
+        }} />
+    </div >
+  )
 };
 
 export default Benchmark;

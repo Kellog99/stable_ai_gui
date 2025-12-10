@@ -10,6 +10,8 @@ interface AppState {
   attacks: { [key: string]: RegisterObjectProps };
   metrics: { [key: string]: RegisterObjectProps };
 
+  selectedAttacks: { [key: string]: RegisterObjectProps };
+
   benchmarkId: string | number | null;
   benchmark: { [key: string]: BenchmarkDataProps } | null;
 
@@ -19,10 +21,12 @@ interface AppState {
   attackReport: ReportAttacksProps | null;
   vulnerabilitySelected: string | null;
 
+
   setModel: (models: ModelInfo | null) => void;
   setListModels: (listModels: ModelInfo[]) => void;
   setAttacks: (attacks: { [key: string]: RegisterObjectProps }) => void;
   setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
+  setSelectedAttackList: (selectedAttacks: { [key: string]: RegisterObjectProps }) => void
   setBenchmarkId: (benchmarkId: string | number | null) => void;
   setMap: (
     map: { [key: string]: RegisterObjectProps },
@@ -30,6 +34,7 @@ interface AppState {
   ) => void;
   setAttackReport: (attackReport: ReportAttacksProps) => void;
   setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps }) => void;
+
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
 }
 
@@ -40,18 +45,21 @@ const useNNTrustStore = create<AppState>()(
       listModels: [],
       attacks: {},
       metrics: {},
+      selectedAttacks: {},
       benchmarkId: null,
       testAttack: null,
       loading: false,
       error: null,
       attackReport: null,
       benchmark: null,
+      benchmarkPROVA: [],
       vulnerabilitySelected: null,
 
       setModel: (models) => set({ model: models }),
       setListModels: (listModels) => set({ listModels }),
       setAttacks: (attacks) => set({ attacks }),
       setMetrics: (metrics) => set({ metrics }),
+      setSelectedAttackList: (selectedAttacks) => set({ selectedAttacks }),
       setBenchmarkId: (benchmarkId) => set({ benchmarkId }),
       setMap: (map, name) => set({ [name]: map }),
       setAttackReport: (attackReport) => set({ attackReport }),
@@ -68,6 +76,7 @@ const useNNTrustStore = create<AppState>()(
         attackReport: state.attackReport,
         benchmark: state.benchmark,
         benchmarkId: state.benchmarkId,
+        selectedAttacks: state.selectedAttacks
       }),
     }
   )

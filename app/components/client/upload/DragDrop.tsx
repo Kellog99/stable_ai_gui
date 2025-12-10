@@ -1,8 +1,8 @@
 "use client"
 import './FileDropZone.css';
-import { Group, HoverCard, Loader, Text } from '@mantine/core';
+import { Group, Loader } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
-import { IconTrash, IconX } from '@tabler/icons-react';
+import { IconX } from '@tabler/icons-react';
 import { CheckCircleIcon, HardDriveUpload, LucideIcon, Upload } from 'lucide-react';
 import { useState } from 'react';
 
@@ -11,7 +11,7 @@ export interface DragDropProps {
     Icon: LucideIcon;
     acceptedType: string;
     description?: string;
-    onFileSelect: (file: File | null) => void;
+    onFileUpload: (file: File | null) => void;
     disabled?: boolean;
 }
 
@@ -20,13 +20,14 @@ export const DragDrop: React.FC<DragDropProps> = ({
     Icon,
     acceptedType,
     description,
-    onFileSelect,
+    onFileUpload: onFileSelect,
     disabled = false
 }) => {
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleFileSelection = async (selectedFile: File | null) => {
+    const handleFileUpload = async (selectedFile: File | null) => {
+        console.log(file)
         setLoading(true);
         try {
             setFile(selectedFile);
@@ -50,12 +51,7 @@ export const DragDrop: React.FC<DragDropProps> = ({
             )
         ) : (
             <Dropzone
-                onDrop={(files) => {
-                    const newFile = files[0];
-                    if (newFile) {
-                        handleFileSelection(newFile);
-                    }
-                }}
+                onDrop={(files) => handleFileUpload(files[0] || null)}
                 onReject={() => { console.error('Invalid file type or size') }}
                 maxSize={1000 * 1024 ** 2}
                 accept={[acceptedType]}

@@ -31,6 +31,7 @@
     "@vectopus/atlas-icons-react": "^0.0.10",
     "@xyflow/react": "^12.5.2",
     "chart.js": "^4.4.9",
+    "chartjs-plugin-annotation": "^3.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "deck.gl": "^9.1.0",

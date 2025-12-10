@@ -29,10 +29,17 @@ export const stylesPDF = StyleSheet.create({
         backgroundColor: '#ffffff',
         fontFamily: 'Helvetica',
     },
+
     header: {
-        marginBottom: 20,
+        marginBottom: 10,
         borderBottom: '2 solid #1B9AAA',
         paddingBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    titleContainer: {
+        flexDirection: "column"
     },
     title: {
         fontSize: 28,
@@ -44,6 +51,10 @@ export const stylesPDF = StyleSheet.create({
         fontSize: 12,
         color: '#666666',
         marginBottom: 20,
+    },
+    logo: {
+        width: 100,       // adjust as needed
+        margin: 0
     },
     sectionTitle: {
         fontSize: 18,
@@ -78,10 +89,6 @@ export const stylesPDF = StyleSheet.create({
         fontSize: 11,
         width: '60%',
         color: '#666666',
-    },
-    table: {
-        marginTop: 10,
-        marginBottom: 20,
     },
     tableHeader: {
         flexDirection: 'row',
@@ -138,4 +145,53 @@ export const stylesPDF = StyleSheet.create({
         fontSize: 9,
         color: '#999999',
     },
+    // Summary table
+    table: {
+        display: "flex",
+        flexDirection: "row",
+        borderWidth: 1,
+        borderColor: "#000",
+        marginTop: 12,
+        width: "100%"
+    },
+    tableColumn: {
+        flexDirection: "column",
+        borderBottomWidth: 1,
+        borderColor: "#000",
+        width: "100%"
+    },
+
+    headerCell: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderBottom: 1,
+        fontWeight: "bold",
+        borderColor: "#000",
+        textAlign: "center",
+        fontSize: 11,
+        borderRight: 1,
+        height: 18,
+        backgroundColor: "#1B9AAA",
+        color: "white"
+    },
+    cell: {
+        fontSize: 10,
+        height: 18,
+        borderRightWidth: 1,
+        borderColor: "#000",
+        flexGrow: 1,
+        textAlign: "center",
+        alignItems: "center"
+    },
+    listParams: {
+        flexDirection: "column",
+        gap: 10,
+    },
+    paramContainer: {
+        flexDirection: "column",
+    },
+    paramName: {
+        backgroundColor: "#1B9AAA",
+        color: "white"
+    }
 });

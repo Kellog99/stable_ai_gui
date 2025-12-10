@@ -11,6 +11,8 @@ import {
     LineElement,
 } from 'chart.js';
 
+import { Scatter } from 'react-chartjs-2';
+
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
@@ -28,9 +30,9 @@ ChartJS.register(
 );
 
 interface BenchmarkTableProps {
-    modelName?: string;                                    
-    benchmark: { [key: string]: BenchmarkDataProps };     
-    data: metricsProps;                                   
+    modelName?: string;
+    benchmark: BenchmarkDataProps[];
+    data: metricsProps;
 }
 
 const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
@@ -38,73 +40,39 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     benchmark,
     data
 }) => {
-
     const availableBenchmarkingMetrics = useMemo(() =>
         Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
             !key.endsWith("_rank")),
         [data]
     );
 
-    const [benchmarkData, setBenchmarkData] = useState<Array<{
-        name: string;
-        param: number;
-        task: string;
-        metrics: { [key: string]: number };
-    }>>([]);
-
-    useEffect(() => {
-        const out = Object.entries(benchmark).map(([id, benchmarkProps]) => ({
-            name: benchmarkProps.name,
-            param: benchmarkProps.param,
-            task: benchmarkProps.task,
-            metrics: availableBenchmarkingMetrics.reduce((acc, metricKey) => {
-                if (benchmarkProps.metrics[metricKey] !== undefined) {
-                    acc[metricKey] = benchmarkProps.metrics[metricKey];
-                }
-                return acc;
-            }, {} as { [key: string]: number })
-        }));
-
-        setBenchmarkData(out);
-    }, [benchmark, availableBenchmarkingMetrics]);
-
-
     const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
-
+    // by default it set the selected metric as the first of the list of available metrics
     useEffect(() => {
         if (availableBenchmarkingMetrics.length > 0) {
             setSelectedBenchmark(availableBenchmarkingMetrics[0]);
         }
     }, [availableBenchmarkingMetrics]);
 
-    
+
     const [sortedData, setSortedData] = useState<[string, number][]>([]);
     const [chartBenchmarkData, setChartBenchmarkData] = useState<{ [key: string]: number }[]>([]);
     const [chartValueData, setChartValueData] = useState<{ [key: string]: number }[]>([]);
 
+    // Updating chart and sorted data when selectedBenchmark, benchmark, or data changes
     useEffect(() => {
         if (!selectedBenchmark) return;
 
-        const flattenValue = (val: any): number[] => {
-            if (val === undefined || val === null) return [];
-            if (typeof val === 'number') return [val];
-            if (Array.isArray(val)) {
-                return val.flatMap(item => flattenValue(item));
-            }
-            return [];
-        };
-
-        const benchmarkEntries = Object.entries(benchmark);
-        const benchmarkValues = benchmarkEntries.map(([id, benchmarkProp]) =>
+        const benchmarkValues: number[] = benchmark.map((benchmarkProp: BenchmarkDataProps) =>
             benchmarkProp.metrics[selectedBenchmark] ?? 0
         );
 
-        const dataValue = flattenValue(data[selectedBenchmark as keyof metricsProps]);
+        const dataValue = [data[selectedBenchmark as keyof metricsProps]];
 
 
         if (benchmarkValues.length > 0) {
-            let benchmarkChartData = benchmarkEntries.map(([id, benchmarkProp], index) => ({
-                params: benchmarkProp.param,
+            let benchmarkChartData = benchmark.map((benchmarkProp, index) => ({
+                params: benchmarkProp.info.parameters,
                 [selectedBenchmark]: benchmarkValues[index],
             }));
 
@@ -130,8 +98,8 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
         const combined: [string, number][] = [];
 
-        benchmarkEntries.forEach(([id, benchmarkProp], index) => {
-            combined.push([benchmarkProp.name, benchmarkValues[index]]);
+        benchmark.map((bench, index) => {
+            combined.push([bench.info.name, benchmarkValues[index]]);
         });
 
         combined.sort((a, b) => b[1] - a[1]);
@@ -182,7 +150,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                             display: true,
                             content: referenceLabel,
                             position: 'start',
-                            color: 'rgba(239, 68, 68, 0.8)', 
+                            color: 'rgba(239, 68, 68, 0.8)',
                             backgroundColor: 'transparent',
                             yAdjust: -10,
                         },
@@ -238,7 +206,10 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
             <div className='results-grid'>
                 {/* Scatter plot */}
-            
+                <div style={{ width: '100%', height: 400 }}>
+                    <Scatter data={chartData} options={options as any} />
+                </div>
+
                 <div className="leaderboard">
                     <div className="leaderboard-title">
                         <Trophy size={"var(--icon-size)"} color='yellow' />
