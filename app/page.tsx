@@ -1,104 +1,114 @@
-// Usage in a page or layout
-// Page.js (or App.js)
-//import HomePage from "./pages/home/HomePage";
-
 "use client";
-import classes from './page.module.css';
-import DatasetBT from '../app/components/server/DatasetBT';
-import SearchBar from '../app/components/client/SearchBar';
+import TaskButton from '@/components/client/buttons/TaskButton';
+import useStore from '@/store/nnTrustStore';
+import styles from '@/styles/HomePage.module.css';
+import { Database, Upload } from 'lucide-react';
+import { DatasetRepository } from './components/client/DatasetsRepoLoad';
+import FileDropZone from './components/client/FileDropZone';
+import { ModelRepository } from './components/client/ModelRepository';
+import { ModalUploadDataset } from './components/client/upload/ModalUploadDataset';
+import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
+import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
 import DatasetsLoader from './functionalities/DatasetsLoader';
-import { Box, Button, Center, Divider, Flex, Loader, Modal, Stack, Text } from "@mantine/core";
-import { useEffect, useState } from 'react';
-import { InfoCircle, UploadArrowTray } from "@vectopus/atlas-icons-react";
-import useStore from './store/dsStore';
-import UploadModal from './components/client/UploadModal';
-import { useDisclosure } from '@mantine/hooks';
+import { getModels } from './functionalities/NNTrustBackendUtils';
+import { AvailableTasks } from './components/layout/config';
+import { uploadDataset_check, uploaderDataset, uploadModel, uploadModel_check } from './properties/urlsNNTrust';
 
-/*
-export const metadata = {
-  title: "Data Quality Framework",
-  description: "",
-};
-*/
+const HomePage: React.FC = ({ }) => {
+  const setModels = useStore((state) => state.setModels)
+  const setDatasets = useStore((state) => state.setDatasets)
 
-/*
-export default async function HomePage ( props: { searchParams: Promise<{ query: string }> } )
-{
-  const { searchParams } = props;
+  const datasetSections = [
+    {
+      id: "repository",
+      title: "Dataset Repository",
+      Icon: Database,
+      child: DatasetRepository
+    }
+    /*{
+      id: "selection",
+      title: "Upload Dataset",
+      Icon: Upload,
+      child: () => <DragDrop
+        config={{
+          name: "dataset",
+          fileType: 'zip',
+          accept: 'application/zip',
+          formFieldName: "folder_zip",
+          description: 'Make sure your zip contains raw data and a json config file.',
+          uploadUrlCheck: uploadDataset_check,
+          uploadUrl: uploaderDataset,
+          refreshFunction: DatasetsLoader,
+          setRefreshData: setDatasets
+        }}
+        infoModal={<ModalUploadDataset />} />
+    }*/
+  ];
 
-  const { query } = await searchParams;
-  const datasets = await DatasetsLoader()
+  const modelSections = [
+    {
+      id: "modrepository",
+      title: "Model Repository",
+      Icon: Database,
+      child: ModelRepository
+    }
+    /*{
+      id: "model",
+      title: "Upload Model",
+      Icon: Upload,
+      child: () => <DragDrop
+        config={{
+          name: "model",
+          fileType: 'zip',
+          accept: 'application/zip',
+          formFieldName: "file",
+          description: 'Make sure your zip contains raw data and a json config file.',
+          uploadUrlCheck: uploadModel_check,
+          uploadUrl: uploadModel,
+          refreshFunction: getModels,
+          setRefreshData: setModels
 
-  console.log( "Server Response:", datasets )
+        }}
+        infoModal={<ModalUploadModel />} />
+    }*/
+  ];
 
+  const listOfSections = [datasetSections, modelSections];
+  
   return (
-    <>
-      <SearchBar />
-      <DatasetBT query={ query } datasets={ datasets } />
-    </>
+    <div className={styles.homecontainer}>
+      <div className={styles.filegrid}>
+        {listOfSections.map((dropElement, index) => (
+          <FileDropZone
+            key={index}
+            sections={dropElement}
+            defaultActiveSection={dropElement[0].id}
+          />
+        ))}
+
+      </div>
+
+      <div className={styles.task}>
+        <div className={styles.sectionheader}>
+          <h2 className={styles.sectiontitle}>
+            Analysis Tasks
+          </h2>
+          <p className={styles.sectionsubtitle}>
+            Select an analysis task to begin
+          </p>
+        </div>
+
+        <div className={styles.filegrid}>
+          {
+            AvailableTasks.map((task) =>
+              <TaskButton
+                key={ task.title }
+                { ...task } /> )
+          }
+        </div>
+      </div>
+    </div>
   );
 }
-*/
 
-export default function HomePage ()
-{
-
-  //const [datasets, setData] = useState(undefined);
-  const datasets = useStore( ( state ) => ( state.datasets ) );
-  const setDatasets = useStore( ( state ) => state.setDatasets )
-  const [ isLoading, setIsLoading ] = useState<boolean>( false )
-  const [ opened, { open, close } ] = useDisclosure( false );
-
-  useEffect( () =>
-  {
-    setIsLoading( true )
-    DatasetsLoader().then( fetchedData =>
-    {
-      setDatasets( fetchedData );
-    } ).finally( () =>
-    {
-      setIsLoading( false )
-    } );
-  }, [] );
-
-
-  console.log( "Server Response:", datasets )
-  const query = useStore( ( state ) => ( state.queryDataset ) );
-
-  return (
-    <>
-      <Stack align="center" style={{ marginLeft:"150px", marginRight:"150px"}}>
-        
-          <Flex direction="row" align="center" gap="xs" style={ { width: "90%", marginBottom: "30px" } }>
-            <SearchBar />
-            <Button radius="md" onClick={ open }>
-              <Box style={ { marginRight: '6px' } }>
-                <UploadArrowTray size={ 16 } />
-              </Box>
-              <span>Upload</span>
-            </Button>
-          </Flex>
-       
-
-        <UploadModal opened={ opened } close={ close } object="dataset" />
-
-
-        { isLoading ? (
-          <Flex
-            mih={ 150 }
-            justify="center"
-            align="center"
-            direction="column"
-            wrap="wrap"
-            style={ { width: '100%' } }
-          >
-            <Text>Loading...</Text>
-            <Loader />
-          </Flex> ) :
-          (
-            <DatasetBT query={ query } datasets={ datasets } />
-          ) }
-      </Stack>
-    </>
-  );
-}
+export default HomePage

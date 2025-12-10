@@ -1,0 +1,82 @@
+.card {
+  display: grid;
+  height: 100%;
+  width: 40vw;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
+  padding: 2vw;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  text-align: justify;
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.card:disabled {
+  background: rgba(200, 200, 200, 0.5);
+  border: 1px solid rgba(200, 200, 200, 0.3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.card_header {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  gap: 15px;
+  padding: 0;
+}
+
+.card_title {
+  font-size: 1.5vw;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.card_icon {
+  width: 4vw;
+  height: 4vw;
+  color: white;
+  border-radius: 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card_icon {
+  transform: scale(1.1);
+}
+
+.card:disabled .card_icon {
+  transform: none
+}
+
+.card_description {
+  color: #6b7280;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 3vh;
+  text-align: justify;
+  font-size: clamp(0.75rem, 0.8vw, 1rem);
+}
+
+.card_link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-content: center;
+  font-weight: bold;
+  font-size: 1.2vw;
+  color: black;
+  transition: color 0.3s ease;
+}

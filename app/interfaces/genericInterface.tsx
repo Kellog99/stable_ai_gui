@@ -36,30 +36,6 @@ export default interface Dataset
   default_embedding_model?:string
 }
 
-export interface FeatureSchema
-{
-  type: string;
-  name: string;
-  depth: number;
-  model_name?: string;
-}
-
-
-export interface Configs
-{
-  metricName: string
-  featureName: string,
-  outliersMode?: string,
-  labelFeatureName?: string,
-  internalConfigs: any,
-  results: Object
-}
-
-export interface ReportMetric {
-  internalConfigs: any,
-  results: Object
-}
-
 
 export interface ModelInfo {
   name: string;
@@ -72,13 +48,20 @@ export interface ModelInfo {
   max_length: number;
 }
 
-export interface PrototypesData
-{
-    data: any,
-    label_data: number
-}
-export interface PrototypesInt
-{
-    type: string,
-    datas: PrototypesData[]
+
+export interface UploadConfig {
+  fileType: 'zip' | 'pth';
+  accept: string; //ex: ".zip" 
+  title: string; //ex: "Upload Dataset"
+  description: string; //ex: "Select a .zip file from your computer to upload"
+  uploadEndpoint: string; //where to connect the backend
+  formFieldName: string; //ex: "file_zip"
+  icon: React.ReactNode;
+  refreshFunction: () => Promise<any>; //ex: "DatasetsLoader" is the function the reloads the data with the new upload
+  setRefreshData: (data: any) => void; //ex: "setDatasets" is the variable from the store where are stored the data
+  showArrowSwitch?: boolean; //for the dataset upload
+  showModeSelect?: boolean;  //for the dataset upload
+  showTypeSelect?: boolean;  //for the dataset upload
+  showJsonConfig?: boolean;  //for the dataset upload
+  
 }

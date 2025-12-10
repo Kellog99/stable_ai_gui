@@ -1,0 +1,133 @@
+.wrapper {
+    margin-left: 4vw;
+    margin-right: 4vw;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 7px;
+    gap: 2vh;
+}
+
+.table-title {
+    font-size: 2vw;
+    font-weight: bold;
+    margin: 0 0 0.25rem 0;
+}
+
+.subtitle {
+    font-size: 1vw;
+    color: #6b7280;
+    margin: 0;
+}
+
+.scroll-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    /* Add gap between search and buttons */
+    justify-content: space-between;
+}
+
+/* Search bar */
+.search-container {
+    position: relative;
+    /* ADD THIS - needed for absolute positioning of icon */
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 0;
+    /* Remove bottom margin since scroll-header handles spacing */
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    /* Center vertically */
+    transform: translateY(-50%);
+    /* Perfect vertical centering */
+    color: #9ca3af;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    /* Prevent icon from blocking input clicks */
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    /* Increased left padding for icon */
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1vw;
+    background-color: var(--navy-500);
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8vw;
+    border-radius: var(--border-radius);
+    flex-shrink: 0;
+    /* Prevent buttons from shrinking */
+}
+
+.button {
+    border-radius: 10px;
+    width: 8vw;
+    height: 2vw;
+    font-size: 1vw;
+    font-weight: 600;
+    background-color: var(--navy-700);
+    border: none;
+    color: white;
+    transition: 0.3s ease;
+    cursor: pointer;
+    /* Add cursor pointer */
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+    transform: scale(1.05);
+}
+
+/* Scrollable container */
+.scroll-container {
+    width: 100%;
+    height: 70vh;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #e5e7eb;
+    border-radius: 1rem;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+}
+
+.scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 1rem;
+}
+
+/* Grid layout for cards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}

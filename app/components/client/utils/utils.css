@@ -1,0 +1,28 @@
+.button {
+  display: inline-flex;
+  gap: 8px;
+  width: auto; /* let button size to its content */
+  height: auto;
+  font-size: 0.8vw; /* smaller text */
+  align-items: center;
+  align-content: center;
+  border-radius: 12px; /* less rounded */
+  font-weight: 500;
+  transition: all 0.2s;
+  --sidepadding: 1vw;  /* narrower */
+  --toppadding: 0.3vw; /* shorter */
+  padding: var(--toppadding) var(--sidepadding);
+}
+
+.button.active {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.button.inactive {
+  color: #6B7280;
+  background: transparent;
+}
+
+.button.inactive:hover {
+  color: white;
+}
