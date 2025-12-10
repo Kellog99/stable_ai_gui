@@ -16,8 +16,7 @@ const TaskManagement: React.FC = () => {
     const {
         setAttackReport: setReport,
         setBenchmark,
-        benchmarkId,
-        setBenchmarkPROVA
+        benchmarkId
     } = useNNTrustStore()
 
     const [listExecutedAttacks, setListExecutedAttacks] = useState<AttackManagementProps[]>([]);
@@ -129,7 +128,7 @@ const TaskManagement: React.FC = () => {
             setReport(reportFetch);
         }
 
-       
+
         router.push("/pages/report/reportTITANN")
     }
 
