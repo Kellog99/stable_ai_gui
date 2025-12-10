@@ -238,21 +238,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
             <div className='results-grid'>
                 {/* Scatter plot */}
-                <ScatterChart
-                    h={"100%"}
-                    data={chartData}
-                    dataKey={{ x: 'params', y: selectedBenchmark }}
-                    xAxisLabel="Model's parameters"
-                    yAxisLabel={selectedBenchmark}
-                    referenceLines={[
-                        {
-                            y: data[selectedBenchmark as keyof metricsProps] as number,
-                            label: modelName ? modelName : 'Tested Model',
-                            color: 'red.7',
-                        },
-                    ]}
-                />
-
+            
                 <div className="leaderboard">
                     <div className="leaderboard-title">
                         <Trophy size={"var(--icon-size)"} color='yellow' />

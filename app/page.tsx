@@ -14,6 +14,7 @@ import { infoDataset, infoModel } from './components/client/upload/config';
 import { ButtonProps } from './interfaces/homePageInterface';
 import useStore from './store/dsStore';
 import { DatasetInfo, ModelInfo } from './interfaces/NNInterfaces';
+import { dataset_upload, uploadModel } from './properties/urlsNNTrust';
 
 
 export const title = "Stable-AI"
@@ -66,7 +67,7 @@ export default function HomePage() {
         Icon={Brain}
         acceptedType={"zip"}
         description={'Make sure your zip contains raw data and a json config file.'}
-        onFileSelect={() => { }} />,
+        onFileSelect={(file) => {uploadZip(file,"model")}} />,
     },
     {
       id: "repository",
@@ -83,6 +84,20 @@ export default function HomePage() {
     }
   ]
 
+  async function uploadZip(file : any, mode : String){
+    const formData = new FormData();
+    formData.append("file", file);
+    const body = formData;
+    const url = mode==="model" ? uploadModel : dataset_upload
+    const response = await fetch(url, {
+        method: 'POST',
+        body,
+    });
+    if (response.ok) {
+      console.log("Uploaded zip correctly.")
+    }
+  }
+
   // Dataset selection's buttons
   const btnDataset: ButtonProps[] = [
     {
@@ -94,7 +109,7 @@ export default function HomePage() {
         Icon={Database}
         acceptedType={"zip"}
         description={'Make sure your zip contains raw data and a json config file.'}
-        onFileSelect={() => { }}
+        onFileSelect={(file) => {uploadZip(file,"dataset")}}
       />,
     },
     {

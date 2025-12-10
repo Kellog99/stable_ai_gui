@@ -30,24 +30,24 @@ export const DragDrop: React.FC<DragDropProps> = ({
         setLoading(true);
         try {
             setFile(selectedFile);
-            onFileSelect(selectedFile);
+            onFileSelect(selectedFile); 
         } catch (error) {
             console.error('Error handling file:', error);
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
-
         file ? (
-            <div className="dropzone loaded">
+            loading ? (
+                <Loader />
+            ) : (
+                <div className="dropzone loaded">
                     <CheckCircleIcon
                         size={"calc(var(--icon-size) * 2)"}
                         color="var(--affermative)" />
-                    <span >{file?.name}</span>
-            </div>
-
+                    <span>{file?.name}</span>
+                </div>
+            )
         ) : (
             <Dropzone
                 onDrop={(files) => {

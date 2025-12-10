@@ -42,7 +42,19 @@ const TaskManagement: React.FC = () => {
                 throw new Error(`Failed to get jobs ids from the backend: ${response.status}`);
             }
 
-            const listAttacks: AttackManagementProps[] = await response.json();
+            const rawAttacks = await response.json();
+
+            const statusMap: Record<string, AttackManagementProps["status"]> = {
+                in_progress: "In Progress",
+                completed: "Completed",
+                created: "Pending",
+                closed: "Closed"
+            };
+
+            const listAttacks: AttackManagementProps[] = rawAttacks.map((item: any) => ({
+                ...item,
+                status: statusMap[item.status] ?? "Pending"  // fallback if unknown
+            }));
             console.log("Fetched attacks:", listAttacks);
             setListExecutedAttacks(listAttacks);
         } catch (error) {
@@ -51,7 +63,7 @@ const TaskManagement: React.FC = () => {
     };
 
     useEffect(() => {
-        const timer = setInterval(handleRefresh, 3000);
+        const timer = setInterval(handleRefresh, 1000);
         return () => clearInterval(timer);
     }, [benchmarkId]);
 

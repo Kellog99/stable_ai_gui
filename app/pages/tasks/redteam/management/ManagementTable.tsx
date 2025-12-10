@@ -98,7 +98,9 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                                             <td>
                                                 {job.status === "In Progress" ?
                                                     <Progress value={job.progress} color='blue' animated />
-                                                    :
+                                                    : job.status === "Completed" && job.progress !== 100 ?
+                                                        <Progress value={job.progress} color='red' />
+                                                        :
                                                     <div className={`status-badge ${getStatusColor(job.status)}`}>
                                                         {getStatusIcon(job.status)}
                                                         <span>{job.status}</span>
