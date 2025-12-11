@@ -1,4 +1,4 @@
-const host = "localhost"
+const host = process.env.API_HOST || "localhost";
 
 export const uploadModel_check = `http://${host}:8082/model/upload/check`
 export const uploadModel = `http://${host}:8082/model/upload`
