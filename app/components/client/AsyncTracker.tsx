@@ -32,8 +32,9 @@ export default function AsyncTaskTracker({ action, startEndpoint, startParams, s
   const [message, setMessage] = useState('');
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const datasetUsed = useStore((state) => state.datasetUsed);
-  const setData = useStore((state) => state.setData);
+  const datasetUsed = useStore((state) => state.dataset);
+  const setDataset = useStore((state) => state.setDataset);
+  //const setData = useStore((state) => state.setData);
 
   const setActionResult = useActionStore((state) => state.setActionResult);
   
@@ -105,7 +106,7 @@ export default function AsyncTaskTracker({ action, startEndpoint, startParams, s
         DatasetsLoader().then(fetchedData => {
           const result = fetchedData.find((obj : Dataset) => obj.name === datasetUsed?.name);
           setDatasets(fetchedData);
-          setData(result)
+          setDataset(result)
 
         })
 

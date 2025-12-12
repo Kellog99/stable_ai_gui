@@ -26,8 +26,8 @@ export const DragDrop: React.FC<DragDropProps> = ({
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleFileUpload = async (selectedFile: File | null) => {
-        console.log(file)
+    const handleFileUpload = async (selectedFile: File) => {
+        console.log("file inside fucntion", selectedFile)
         setLoading(true);
         try {
             setFile(selectedFile);
@@ -51,7 +51,13 @@ export const DragDrop: React.FC<DragDropProps> = ({
 
         ) : (
             <Dropzone
-                onDrop={(files) => handleFileUpload(files[0] || null)}
+                onDrop={(files) => {
+                    const newFile = files[0];
+                    console.log("new file ??", newFile)
+                    if (newFile) {
+                        handleFileUpload(newFile);
+                    }
+                }}
                 onReject={() => { console.error('Invalid file type or size') }}
                 maxSize={1000 * 1024 ** 2}
                 accept={[acceptedType]}

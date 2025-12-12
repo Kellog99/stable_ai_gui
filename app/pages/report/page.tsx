@@ -15,12 +15,13 @@ import { DQReportProps, infoProps, ReportAttacksProps } from "@/interfaces/repor
 import { ReportProps } from "@/functionalities/reportInterfaces";
 import useStore from "@/store/dsStore";
 import { useRouter } from "next/navigation";
-import { getListModelsReport, uploadRepo } from "@/properties/urlsNNTrust";
+import { getListDatasetsReport, getListModelsReport, uploadRepo } from "@/properties/urlsNNTrust";
+import { getAllDQReports } from "@/functionalities/BackendUtils";
 
 export default function ReportPage() {
 
   const [listAttacksReport, setListAttacksReport] = useState<ReportAttacksProps[]>([])
-  // const [listDatasetsReport, setListDatasetsReport] = useState<DQReportProps[]>([])
+  const [listDatasetsReport, setListDatasetsReport] = useState<DQReportProps[]>([])
 
   const {
     attackReport,
@@ -34,18 +35,19 @@ export default function ReportPage() {
 
 
   // ################## Reports' list ##################
+  //useEffect(() => {
+  //  getReports(getListModelsReport)
+  //    .then(setListAttacksReport)
+  //    .catch(err => console.error("Failed to load attacks:", err));
+  //}, [setListAttacksReport]);
+
   useEffect(() => {
-    getReports(getListModelsReport)
-      .then(setListAttacksReport)
+    getAllDQReports()
+      .then(setListDatasetsReport)
       .catch(err => console.error("Failed to load attacks:", err));
-  }, [setListAttacksReport]);
+  }, []);
 
-  // useEffect(() => {
-  //   getReports(getListDatasetsReport)
-  //     .then(setListDatasetsReport)
-  //     .catch(err => console.error("Failed to load attacks:", err));
-  // }, [setListDatasetsReport]);
-
+  console.log("listDatasetsReport ", listDatasetsReport)
 
   // ################# router ################# 
   const router = useRouter()
@@ -88,21 +90,21 @@ export default function ReportPage() {
           setListAttacksReport(listAttacksReport.filter(reportContained => reportContained.id !== report?.id))
         }} />,
     },
-    // {
-    //   id: "repoDatasetReport",
-    //   name: "Repository Dataset",
-    //   Icon: HardDrive,
-    //   child: <FileRepository
-    //     elements={listDatasetsReport}
-    //     selectHandle={(dataset: DQReportProps) => {
-    //       setReport(dataset);
-    //       router.push("./reportDQ")
-    //     }}
-    //     activeId={report?.id}
-    //     handleDelete={(report) => {
-    //       setListDatasetsReport(listDatasetsReport.filter(datasetContained => datasetContained.id !== report.id))
-    //     }} />,
-    // },
+    {
+      id: "repoDatasetReport",
+      name: "Repository Dataset",
+      Icon: HardDrive,
+      child: <FileRepository
+        elements={listDatasetsReport}
+        selectHandle={(report: DQReportProps) => {
+          setReport(report);
+          router.push("/pages/report/reportDQ")
+        }}
+        activeId={report?.id}
+        handleDelete={(report) => {
+          setListDatasetsReport(listDatasetsReport.filter(datasetContained => datasetContained.id !== report.id))
+        }} />,
+    },
   ]
 
   return (

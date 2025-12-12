@@ -1,11 +1,13 @@
-import { HardDrive, Trash, Trash2Icon } from "lucide-react";
+import { HardDrive, Trash2Icon } from "lucide-react";
 import "./FileRepository.css"
 import React from "react";
 import { DatasetInfo, ModelInfo } from "@/interfaces/NNInterfaces";
+import { DQReportProps } from "@/interfaces/reportInterfaces";
 
 export interface RepositoryCardProps {
     config: ModelInfo | DatasetInfo,
     notShow?: string[],
+    show?: Object,
     activeId?: string,
     handleClick: () => void,
     handleDelete: () => void,
@@ -21,17 +23,43 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
     handleClick,
     handleDelete
 }) => {
-    console.log(config)
+
+    function reconstructReport(report: DQReportProps) {
+        const output: Record<string, number | string> = {
+            name: report.dataset.name
+        };
+
+        for (const metric of report.metrics) {
+            const results = metric.results
+            const key: string =
+                results.name === "accuracy" ? results.mode! : results.name;
+
+            output[key] = results.score.toFixed(2);
+        }
+
+        return output;
+    }
+
+
+    function normalizeConfig(config: unknown) {
+        if ((config as any).tool === "dq") {
+            return reconstructReport(config as DQReportProps);
+        }
+        return config;
+    }
+
+    const configToShow = normalizeConfig(config) as ModelInfo | DatasetInfo;
+
     return (
         <div
-            className={`${activeId === config.id ? "card active" : "card"}`}
+            className={`${activeId === configToShow.id ? "card active" : "card"}`}
             onClick={handleClick}>
             <div className="card-header">
                 <div className="card-title">
                     {
-                        config.image ? <img src={config.image} alt={config.name} /> : <HardDrive size={"calc(var(--icon-size) /2)"} />
+                        configToShow.image ? <img src={configToShow.image} alt={configToShow.name} /> : <HardDrive size={"calc(var(--icon-size) /2)"} />
                     }
-                    <p className="title">{config.name}</p>
+                    <p className="title">{configToShow.name}</p>
                 </div>
                 <button
                     onClick={(e) => {
@@ -43,7 +71,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
                 </button>
             </div>
             <div className="card-content">
-                {Object.entries(config).map(([key, value]) => (
+                {Object.entries(configToShow).map(([key, value]) => (
                     value && !notShow.includes(key) ?
                         <p key={key} className="card-element"><b>{key}</b>: {value}</p>
                         : null

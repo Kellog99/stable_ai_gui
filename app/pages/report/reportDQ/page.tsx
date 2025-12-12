@@ -10,8 +10,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Box, Button, Flex, Group, Paper, ScrollArea, Stack, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { InfoCircle } from "@vectopus/atlas-icons-react";
-import { CheckCircle, MoveDown, MoveUp } from "lucide-react";
+import { CheckCircle, Download, IdCardLanyard, MoveDown, MoveUp } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import classes from './page.module.css';
 
 import '@mantine/charts/styles.css';
 
@@ -20,20 +21,22 @@ import { BarChartCustom } from "@/components/client/BarChart";
 import { MetricResume } from "@/components/client/metrics/displayer/MetricResume";
 import { labelColorMapType } from "@/properties/static";
 import { DQReportProps } from "@/interfaces/reportInterfaces";
+import HeaderPageTask from "@/components/client/utils/HeaderPageTask";
 
 export default function Report() {
 
-    //const report = useStore((state) => state.report)
-    //const setReport = useStore((state) => state.setReport)
+    const report = useStore((state) => state.report) as DQReportProps
+    const setReport = useStore((state) => state.setReport)
 
-    const report = useStore((state) => state.reportFromBE) as DQReportProps
-    const setReport = useStore((state) => state.setReportFromBE)
+    //const report = useStore((state) => state.reportFromBE) as DQReportProps
+    //const setReport = useStore((state) => state.setReportFromBE)
 
     console.log("REPORT IN PAGE", report)
 
     const [features, setFeatures] = useState<FeatureSchema[]>([])
     const [connections, setConnections] = useState<[string, string][]>([])
-    const datasetUsed = useStore((state) => state.datasetUsed)
+    //const datasetUsed = useStore((state) => state.dataset)
+    const datasetUsed = report.dataset
     const [descriptions, setDescriptions] = useState<string[]>([])
 
     const [outIndexes, setOutIndexes] = useState<number[]>([])
@@ -42,8 +45,8 @@ export default function Report() {
     const labelProtoData = useStore((state) => state.labelProtoData)
     const protoType = datasetUsed?.prototype.type
 
-    const labelToSamples = useStore((state) => state.labelToSamples)
-
+    //const labelToSamples = useStore((state) => state.labelToSamples)
+    const labelToSamples:any[] = []
     const [reportOpen, { open, close }] = useDisclosure(false);
 
     const labelDict = useStore((state) => state.labelDict)
@@ -169,99 +172,103 @@ export default function Report() {
             metrics: newReport
         };
         setReport(updatedReport);
-        
+
     };
 
     const handleCancelOut = (indexes: number[]) => {
         const newReport = report.metrics.filter((_, index) => !indexes.includes(index));
-        
+
         const updatedReport = {
             ...report,
             metrics: newReport
         };
-        
+
         setReport(updatedReport);
         setShowAccuracyCard(false)
     };
 
     return (
-        <div style={{marginTop: '20px'}}>
-            <Flex direction="row" justify="space-between" pb="md">
-                <span style={{ display: 'flex', alignItems: 'center', gap: "8px" }}>
-                    <Title order={2}>Report Brief</Title>
-                    <Tooltip
-                        multiline
-                        w={220}
-                        withArrow
-                        transitionProps={{ duration: 200 }}
-                        label="Here you can adjust your final report: you can eventually eliminate some sections and metrics or also re-order them">
-                        <InfoCircle size={17} color="white" />
-                    </Tooltip>
-                </span>
-                <Flex direction="row" gap="sm">
-                    <Button
-                        radius="lg"
-                        onClick={open}
-                        disabled={report.metrics.length === 0}
-                    >
-                        Show PDF Preview
-                    </Button>
+        <div style={{ marginTop: '20px' }}>
+            <HeaderPageTask
+                Icon={IdCardLanyard}
+                title="Quality Report"
+                descrition="Here you can adjust your final report: you can eventually eliminate some sections and metrics or also re-order them"
+                buttonprops={{
+                    description: "Show PDF Preview",
+                    isDisabled: false,
+                    handleClick: open,
+                    Icon: Download
+                }}
+            />
+            <PDFPreviewModal opened={reportOpen} close={close} />
 
-                    <PDFPreviewModal opened={reportOpen} close={close} />
-                </Flex>
-            </Flex>
             <Flex direction="column" gap="md" justify="center" align="flex-start">
                 {showOverview ? (
                     <>
-                        <Box style={{ border: '1px solid #e0e0e0', borderRadius: 4, padding: "15px" }} mb="md">
-                            <span style={{ display: 'flex', alignItems: 'center', gap: "8px" }}>
-                                <Title order={3}>Overview Dataset</Title>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <span
+                                style={{
+                                    display: "flex",
+                                    alignItems: "flex-end",
+                                    gap: "8px",
+                                }}
+                            >
+
+                                <h2 style={{ color: "white", marginBottom: 0 }}>Overview</h2>
+
                                 <Tooltip
                                     multiline
                                     withArrow
                                     transitionProps={{ duration: 200 }}
-                                    label="Eliminate section from report">
+                                    label="Eliminate section from report"
+                                >
                                     <Button
                                         variant="transparent"
                                         radius="xl"
                                         size="xs"
                                         onMouseDown={(e) => e.stopPropagation()}
-                                        onClick={() => { setShowOverview(false) }}
+                                        onClick={() => setShowOverview(false)}
                                         style={{
                                             transition: "background-color 0.2s ease",
+                                            marginTop: "2px", // pushes it down to match text baseline
                                         }}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#FCA5A5"} // Lighter red
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#FCA5A5")}
+                                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                                     >
                                         <FontAwesomeIcon icon={faTrashCan} />
                                     </Button>
                                 </Tooltip>
                             </span>
-                            <SchemaShower
-                                features={features}
-                                connections={connections}
-                                labelColorMap={labelColorMapType}
-                                clickable={false}
-                            />
+                            <div className={classes.datasetDivider}></div>
+                        </div>
 
-                            <Box style={{ marginBottom: '70px' }}>
-                                <Text>
-                                    <span style={{ fontWeight: 600 }}>
-                                        {datasetUsed?.name || ""}
-                                    </span>{" "}
-                                    is a dataset for {datasetUsed?.task || ""}.
-                                    {datasetUsed?.n_classes ? (
-                                        <> {" "} It has {datasetUsed?.n_classes || ""} classes and {datasetUsed?.n_samples} samples.{" "}</>
-                                    ) : (
-                                        <>It has {datasetUsed?.n_samples}{" "}</>
-                                    )}
-                                    {descriptions?.map((description, index) => (
-                                        <span key={index}>{description} </span>
-                                    ))}
-                                </Text>
-                            </Box>
 
-                            {/*
+
+                        <SchemaShower
+                            features={features}
+                            connections={connections}
+                            labelColorMap={labelColorMapType}
+                            clickable={false}
+                        />
+
+                        <Box style={{ marginBottom: '70px' }}>
+                            <Text>
+                                <span style={{ fontWeight: 600 }}>
+                                    {datasetUsed?.name || ""}
+                                </span>{" "}
+                                is a dataset for {datasetUsed?.task || ""}.
+                                {datasetUsed?.n_classes ? (
+                                    <> {" "} It has {datasetUsed?.n_classes || ""} classes and {datasetUsed?.n_samples} samples.{" "}</>
+                                ) : (
+                                    <>It has {datasetUsed?.n_samples}{" "}</>
+                                )}
+                                {descriptions?.map((description, index) => (
+                                    <span key={index}>{description} </span>
+                                ))}
+                            </Text>
+                        </Box>
+
+                        {/*
                             <Title order={4} mb="sm">Prototypes Preview</Title>
                             <ScrollArea >
                                 {prototypesData ? (<Flex
@@ -281,27 +288,27 @@ export default function Report() {
                             </ScrollArea>
                             */}
 
-                            {labelToSamples.length > 0 ? (
-                                <>
-                                    <Title order={4} mt="md" mb="md">Graph Section</Title>
-                                    <div style={{ width: '1000px', margin: '20px auto' }}>
+                        {labelToSamples.length > 0 ? (
+                            <>
+                                <Title order={4} mt="md" mb="md">Graph Section</Title>
+                                <div style={{ width: '1000px', margin: '20px auto' }}>
 
-                                        <Box
-                                            style={{
-                                                marginLeft: "30px",
-                                                marginRight: "30px",
-                                                overflowX: 'auto',
-                                                overflowY: 'hidden',
-                                                maxWidth: '100%',
-                                            }}
-                                        >
-                                            <BarChartCustom
-                                                data={labelToSamples}
-                                                keyL="labels" />
-                                        </Box>
-                                    </div>
-                                </>) : null}
-                        </Box>
+                                    <Box
+                                        style={{
+                                            marginLeft: "30px",
+                                            marginRight: "30px",
+                                            overflowX: 'auto',
+                                            overflowY: 'hidden',
+                                            maxWidth: '100%',
+                                        }}
+                                    >
+                                        <BarChartCustom
+                                            data={labelToSamples}
+                                            keyL="labels" />
+                                    </Box>
+                                </div>
+                            </>) : null}
+
                     </>) : (
                     <>
                         <Button
@@ -311,138 +318,139 @@ export default function Report() {
                         </Button>
                     </>
                 )}
-                <Box style={{ border: '1px solid #e0e0e0', borderRadius: 4, padding: "15px" }} mt="md">
-                    <span style={{ display: 'flex', alignItems: 'center', gap: "8px", marginBottom: "8px" }} >
-                        <Title order={3}>Metrics</Title>
-                    </span>
-                    <>
-                        {report.metrics.map((metric, index) => {
-                            if (metric.results.name === "accuracy") {
 
-                                const firstAccuracyIndex = report.metrics.findIndex(m => m.results.name === "accuracy");
-                                if (index !== firstAccuracyIndex) {
-                                    return null;
-                                }
+                <span style={{ display: 'flex', flexDirection:"column", alignItems: 'left',justifyContent:"left", marginBottom: "8px" }} >
+                    <h2 style={{ color: "white", marginBottom: 0 }}>Metrics</h2>
+                    <div className={classes.datasetDivider}></div>
+                </span>
+                <>
+                    {report.metrics.map((metric, index) => {
+                        if (metric.results.name === "accuracy") {
 
-                                if (!showAccuracyCard) return null;
+                            const firstAccuracyIndex = report.metrics.findIndex(m => m.results.name === "accuracy");
+                            if (index !== firstAccuracyIndex) {
+                                return null;
+                            }
 
-                                const accuracyMetrics = report.metrics.filter(m => m.results.name === "accuracy");
-                                const accuracyIndexes = report.metrics
-                                    .map((m, i) => ({ metric: m, index: i }))
-                                    .filter(({ metric }) => metric.results.name === "accuracy")
-                                    .map(({ index }) => index);
-                                return (
-                                    <Flex key={`accuracy-block-${index}`} direction="row" align="center" justify="flex-start">
-                                        <Paper
-                                            shadow="sm"
-                                            p="lg"
-                                            radius="md"
-                                            withBorder
-                                            style={{
-                                                background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
-                                                border: '1px solid #e9ecef',
-                                                transition: 'all 0.2s ease',
-                                                marginBottom: "8px"
-                                            }}
-                                            className="hover:shadow-lg hover:scale-[1.01] cursor-pointer"
-                                        >
-                                            <Stack gap="md">
-                                                <Group justify="space-between" align="flex-start">
-                                                    <Group gap="sm" align="center" mb="sm">
-                                                        <CheckCircle size={20} style={{ color: '#228be6' }} />
-                                                        <Text fw={700} size="lg" c="dark.7">Accuracy</Text>
-                                                    </Group>
+                            if (!showAccuracyCard) return null;
+
+                            const accuracyMetrics = report.metrics.filter(m => m.results.name === "accuracy");
+                            const accuracyIndexes = report.metrics
+                                .map((m, i) => ({ metric: m, index: i }))
+                                .filter(({ metric }) => metric.results.name === "accuracy")
+                                .map(({ index }) => index);
+                            return (
+                                <Flex key={`accuracy-block-${index}`} direction="row" align="center" justify="flex-start">
+                                    <Paper
+                                        shadow="sm"
+                                        p="lg"
+                                        radius="md"
+                                        withBorder
+                                        style={{
+                                            background: 'linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%)',
+                                            border: '1px solid #e9ecef',
+                                            transition: 'all 0.2s ease',
+                                            marginBottom: "8px"
+                                        }}
+                                        className="hover:shadow-lg hover:scale-[1.01] cursor-pointer"
+                                    >
+                                        <Stack gap="md">
+                                            <Group justify="space-between" align="flex-start">
+                                                <Group gap="sm" align="center" mb="sm">
+                                                    <CheckCircle size={20} style={{ color: '#228be6' }} />
+                                                    <Text fw={700} size="lg" c="dark.7">Accuracy</Text>
                                                 </Group>
-                                            </Stack>
+                                            </Group>
+                                        </Stack>
 
-                                            {/* Render all accuracy metrics */}
-                                            {accuracyMetrics.map((accuracyMetric, accuracyIndex) => (
-                                                <MetricResume
-                                                    key={`accuracy-metric-${accuracyIndex}`}
-                                                    metric={accuracyMetric as any}
-                                                    index={report.metrics.findIndex(m => m === accuracyMetric)}
-                                                    outIndexes={outIndexes}
-                                                />
-                                            ))}
-                                        </Paper>
+                                        {/* Render all accuracy metrics */}
+                                        {accuracyMetrics.map((accuracyMetric, accuracyIndex) => (
+                                            <MetricResume
+                                                key={`accuracy-metric-${accuracyIndex}`}
+                                                metric={accuracyMetric as any}
+                                                index={report.metrics.findIndex(m => m === accuracyMetric)}
+                                                outIndexes={outIndexes}
+                                            />
+                                        ))}
+                                    </Paper>
 
-                                        {firstAccuracyIndex > 0 && (
-                                            <Tooltip
-                                                multiline
-                                                withArrow
-                                                transitionProps={{ duration: 200 }}
-                                                label="Move the metric up">
-                                                <Button
-                                                    variant="transparent"
-                                                    radius="xl"
-                                                    size="xs"
-                                                    onClick={() => handleMoveOutUp(accuracyIndexes)}
-                                                    style={{
-                                                        transition: "background-color 0.2s ease",
-                                                    }}
-                                                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#a5d8ff")}
-                                                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                                                >
-                                                    <MoveUp size={14} />
-                                                </Button>
-                                            </Tooltip>
-                                        )}
-
-                                        {accuracyIndexes[accuracyIndexes.length - 1] < report.metrics.length - 1 && (
-                                            <Tooltip
-                                                multiline
-                                                withArrow
-                                                transitionProps={{ duration: 200 }}
-                                                label="Move the metric down">
-                                                <Button
-                                                    variant="transparent"
-                                                    radius="xl"
-                                                    size="xs"
-                                                    onClick={() => handleMoveOutDown(accuracyIndexes)}
-                                                    style={{
-                                                        transition: "background-color 0.2s ease",
-                                                    }}
-                                                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#a5d8ff"}
-                                                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                                                >
-                                                    <MoveDown size={14} />
-                                                </Button>
-                                            </Tooltip>
-                                        )}
-
+                                    {firstAccuracyIndex > 0 && (
                                         <Tooltip
                                             multiline
                                             withArrow
                                             transitionProps={{ duration: 200 }}
-                                            label="Eliminate metric from report">
+                                            label="Move the metric up">
                                             <Button
                                                 variant="transparent"
                                                 radius="xl"
                                                 size="xs"
-                                                onClick={() => handleCancelOut(accuracyIndexes)}
+                                                onClick={() => handleMoveOutUp(accuracyIndexes)}
                                                 style={{
                                                     transition: "background-color 0.2s ease",
                                                 }}
-                                                disabled={report.metrics.length === accuracyIndexes.length}
-                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#a5d8ff")}
+                                                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                                             >
-                                                <FontAwesomeIcon icon={faTrashCan} />
+                                                <MoveUp size={14} />
                                             </Button>
                                         </Tooltip>
-                                    </Flex>
-                                );
-                            } else {
-                                return (
-                                    <MetricResume
-                                        key={`other-${index}`}
-                                        metric={metric as any}
-                                        index={index}
-                                        outIndexes={outIndexes} />
-                                );
-                            }
-                        })}
-                    </>
-                </Box>
+                                    )}
+
+                                    {accuracyIndexes[accuracyIndexes.length - 1] < report.metrics.length - 1 && (
+                                        <Tooltip
+                                            multiline
+                                            withArrow
+                                            transitionProps={{ duration: 200 }}
+                                            label="Move the metric down">
+                                            <Button
+                                                variant="transparent"
+                                                radius="xl"
+                                                size="xs"
+                                                onClick={() => handleMoveOutDown(accuracyIndexes)}
+                                                style={{
+                                                    transition: "background-color 0.2s ease",
+                                                }}
+                                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#a5d8ff"}
+                                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                            >
+                                                <MoveDown size={14} />
+                                            </Button>
+                                        </Tooltip>
+                                    )}
+
+                                    <Tooltip
+                                        multiline
+                                        withArrow
+                                        transitionProps={{ duration: 200 }}
+                                        label="Eliminate metric from report">
+                                        <Button
+                                            variant="transparent"
+                                            radius="xl"
+                                            size="xs"
+                                            onClick={() => handleCancelOut(accuracyIndexes)}
+                                            style={{
+                                                transition: "background-color 0.2s ease",
+                                            }}
+                                            disabled={report.metrics.length === accuracyIndexes.length}
+                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                                        >
+                                            <FontAwesomeIcon icon={faTrashCan} />
+                                        </Button>
+                                    </Tooltip>
+                                </Flex>
+                            );
+                        } else {
+                            return (
+                                <MetricResume
+                                    key={`other-${index}`}
+                                    metric={metric as any}
+                                    index={index}
+                                    outIndexes={outIndexes} />
+                            );
+                        }
+                    })}
+                </>
+
             </Flex>
         </div>
     )

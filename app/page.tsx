@@ -16,6 +16,7 @@ import useStore from './store/dsStore';
 import { DatasetInfo, ModelInfo } from './interfaces/NNInterfaces';
 import { list } from 'postcss';
 import DatasetsLoader from './functionalities/DatasetsLoader';
+import { set } from 'lodash';
 
 
 export const title = "Stable-AI"
@@ -34,12 +35,14 @@ export default function HomePage() {
 
   const [listModels, setListModels] = useState<ModelInfo[]>([])
   const [listDatasets, setListDataset] = useState<DatasetInfo[]>([])
+  const [loadingDS, setLoadingDS] = useState<boolean>(false)
+  const [loadingMS, setloadingMS] = useState<boolean>(false)
 
   // ################## Attacks' list ##################
   useEffect(() => {
     getMetricsList()
       .then(setMetrics)
-      .catch(err => console.error("Failed to load attacks:", err));
+      .catch(err => console.error("Failed to load metrics:", err));
   }, [setAttacks]);
 
   useEffect(() => {
@@ -50,21 +53,23 @@ export default function HomePage() {
 
   // ################## Models' list ################## 
   useEffect(() => {
+    setloadingMS(true);
     getModelsList()
       .then(setListModels)
-      .catch(err => console.error("Failed to load attacks:", err));
+      .catch(err => console.error("Failed to load models:", err))
+      .finally(() => setloadingMS(false));
   }, [setListModels]);
 
   // ################## Datasets' list ################## 
   useEffect(() => {
+    setLoadingDS(true);
     DatasetsLoader().then(fetchedData => {
-      console.log("fectehd vecchio", fetchedData)
+    
       setListDataset(fetchedData)
-    }).catch (err => console.error("Failed to load attacks:", err));
+    }).catch (err => console.error("Failed to load datasets:", err))
+    .finally(() => setLoadingDS(false));
   }, [setListDataset]);
   
-  console.log("list models", listModels)
-  console.log("list datasets", listDatasets)
   // Model selection's buttons
   const btnModel: ButtonProps[] = [
     {
@@ -91,6 +96,7 @@ export default function HomePage() {
           }
         }
         }
+        loading={loadingMS}
         activeId={model?.id}
         handleDelete={(model) => {
           setListModels(listModels.filter(modelContained => modelContained.id !== (model as ModelInfo).id))
@@ -126,6 +132,7 @@ export default function HomePage() {
           }
         }}
         activeId={dataset?.id}
+        loading={loadingDS}
         handleDelete={(dataset) => {
           setListDataset(listDatasets.filter(datasetContained => datasetContained.id !== (dataset as DatasetInfo).id))
         }} />,
@@ -141,7 +148,7 @@ export default function HomePage() {
           Welcome to {title}
         </h1>
         <p className={styles.home_subtitle}>
-          Upload the <b>Dataset</b> or the <b>Model</b> in the space below or upload them from the appropriate <b>Repository</b> to conduct a quality and vulnerability analysis.
+          Upload the <b>Dataset</b> or the <b>Model</b> in the space below or choose one of them from the appropriate <b>Repository</b> to conduct a quality and vulnerability analysis.
         </p>
       </div>
 

@@ -37,6 +37,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  cursor: pointer;
 }
 
 
@@ -44,6 +45,7 @@
   color: white;
   font-weight: 600;
   font-size: 1.5rem;
+  cursor: pointer;
 }
 
 .nav-button {

@@ -1,5 +1,5 @@
 import { useForm } from "@mantine/form";
-import useStore from '../../../../store/dsStore';
+import useStore from '@/store/dsStore';
 import { useState } from "react";
 import { Box, Button, Center, Flex, NumberInput, Slider, Text } from "@mantine/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -56,7 +56,7 @@ export default function IForestConfig() {
                         {...form.getInputProps('n_epochs')}
                         styles={{
                             label:{
-                                color:"white"
+                                color:"#374151"
                             }
                         }}
                     />
@@ -64,13 +64,14 @@ export default function IForestConfig() {
                     <Flex
                         direction="column"
                         gap="xs">
-                        <Text size="sm" style={{ marginBottom: 0 }}>Contamination</Text>
+                        <Text size="sm" c="#374151" style={{ marginBottom: 0 }}>Contamination</Text>
                         <Slider
                             size="sm"
                             defaultValue={0.1}
                             min={0}
                             max={1}
                             step={0.01}
+                            color="#e5e7eb"
                             marks={[
                                 { value: 0, label: '0' },
                                 { value: 1, label: '1' },
@@ -82,7 +83,7 @@ export default function IForestConfig() {
                 </Flex>
             </Box>
             <Center>
-                <Button type="submit" mt="md">
+                <Button type="submit" mt="md" color="#3b82f6">
                     {clicked ? (<>
                         <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
                         <span>Configs modified</span></>)

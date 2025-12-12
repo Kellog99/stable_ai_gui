@@ -49,9 +49,16 @@ export interface BenchmarkDataProps {
     metrics: { [key: string | number]: number[] }
 }
 
+export interface MetricsProps {
+    internalConfigs: any;
+    results: any;
+}
+
+
 export interface DQReportProps {
-    id: string;
+    id?: string;
     tool: string
     dataset: Dataset;
-    metrics: Object[];
+    metrics: MetricsProps[];
 }
+

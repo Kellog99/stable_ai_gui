@@ -7,6 +7,7 @@ import { DatasetInfo, ModelInfo } from '@/interfaces/NNInterfaces';
 interface FileRepositoryProps {
     elements: any[],
     activeId?: string,
+    loading?: boolean,
     handleDelete: (model: any) => void,
     selectHandle: (model: any) => void,
 }
@@ -15,10 +16,13 @@ interface FileRepositoryProps {
 const FileRepository: React.FC<FileRepositoryProps> = ({
     elements,
     activeId,
+    loading,
     selectHandle,
     handleDelete,
 }) => {
     console.log("elements ", elements[0])
+
+
     return (
         <div className='repository-container'>
             {elements.length > 0 ?
@@ -30,13 +34,17 @@ const FileRepository: React.FC<FileRepositoryProps> = ({
                         handleClick={() => selectHandle(element)}
                         handleDelete={() => handleDelete(element)}
                     />
-                )) :
-                <div className='container-warning'>
+                )) : loading ? <div className='container-warning'>
                     <div className='warning'>
-                        <TriangleAlert size={"var(--icon-size)"} fill='var(--warning)' />
-                        <p>File not found</p>
+                        <p>Loading...</p>
                     </div>
-                </div>
+                </div> :
+                    <div className='container-warning'>
+                        <div className='warning'>
+                            <TriangleAlert size={"var(--icon-size)"} fill='var(--warning)' />
+                            <p>File not found</p>
+                        </div>
+                    </div>
             }
         </div>
     )

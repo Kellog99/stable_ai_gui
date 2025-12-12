@@ -1,10 +1,10 @@
 import { useForm } from "@mantine/form";
-import useStore from '../../../../store/dsStore';
+import useStore from '@/store/dsStore';
 import { useState } from "react";
 import { Box, Button, Center, Flex, Slider, Text } from "@mantine/core";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-faCheck
+    faCheck
 } from '@fortawesome/free-solid-svg-icons';
 
 
@@ -37,12 +37,13 @@ export default function MahalanobisConfig() {
                 <Flex
                     direction="column"
                     gap="xs">
-                    <Text size="sm" style={{ marginBottom: 0 }}>Threshold</Text>
+                    <Text size="sm" c="#374151" style={{ marginBottom: 0}}>Threshold</Text>
                     <Slider
                         size="sm"
                         defaultValue={97.5}
                         min={0}
                         max={100}
+                        color="#e5e7eb"
                         marks={[
                             { value: 0, label: '0' },
                             { value: 100, label: '100' },
@@ -53,7 +54,7 @@ export default function MahalanobisConfig() {
             </Box>
 
             <Center>
-                <Button type="submit" mt="md">
+                <Button type="submit" mt="md" color="#3b82f6">
                     {clicked ? (<>
                         <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
                         <span>Configs modified</span></>)

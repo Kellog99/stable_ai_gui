@@ -59,6 +59,7 @@
 
 .card.active {
     background-color: rgb(193, 193, 250);
+    cursor: pointer
 }
 
 .card-header {

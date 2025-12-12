@@ -245,8 +245,10 @@ export async function saveMetricToReport(datasetName: string, metrics: Object[])
   });
 
   if (response.status === 200) {
+    console.log("metric correclty saved to report on the backend side")
     return true;
   } else if (response.status === 404) {
+    console.log("metric not saved to report on the backend side, with error 404")
     return false;
   } else {
     const errorText = await response.text(); // optional: log/debug response body

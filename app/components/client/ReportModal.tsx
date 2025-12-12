@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { InfoCircle } from "@vectopus/atlas-icons-react";
 import useStore from "@/store/dsStore";
 import {report_post} from "@/properties/urls";
+import { DQReportProps } from "@/interfaces/reportInterfaces";
 
 interface PDFPreviewModalProps {
     opened: boolean;
@@ -13,8 +14,8 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
     const [pdfData, setPdfData] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const datasetName = useStore( ( state ) => state.datasetUsed?.name)
-    const report = useStore((state) => state.report)
+    const datasetName = useStore( ( state ) => state.dataset?.name)
+    const report = useStore((state) => state.report) as DQReportProps
     const showOverview = useStore((state) => state.showOverview)
     
     const fetchPDFData = async () => {
@@ -29,7 +30,7 @@ export default function PDFPreviewModal({ opened, close }: PDFPreviewModalProps)
             const response = await fetch(url , {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify( report.map(item => item.results))
+                body: JSON.stringify( report.metrics.map(item => item.results))
               } );
             if (!response.ok) {
                 throw new Error('Failed to fetch PDF');

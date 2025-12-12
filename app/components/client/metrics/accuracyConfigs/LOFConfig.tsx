@@ -45,7 +45,7 @@ export default function LOFConfig() {
                         {...form.getInputProps('k')}
                         styles={{
                             label:{
-                                color:"white"
+                                color:"#374151"
                             }
                         }}
                     />
@@ -53,12 +53,13 @@ export default function LOFConfig() {
                     <Flex
                         direction="column"
                         gap="xs">
-                        <Text size="sm" style={{ marginBottom: 0 }}>Contamination</Text>
+                        <Text size="sm" c="#374151" style={{ marginBottom: 0 }}>Contamination</Text>
                         <Slider
                             size="sm"
                             defaultValue={0.1}
                             min={0}
                             max={1}
+                            color="#e5e7eb"
                             step={0.01}
                             marks={[
                                 { value: 0, label: '0' },
@@ -72,7 +73,7 @@ export default function LOFConfig() {
                 </Flex>
             </Box>
             <Center>
-                <Button type="submit" mt="md">
+                <Button type="submit" mt="md" color="#3b82f6">
                     {clicked ? (<>
                         <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
                         <span>Configs modified</span></>)
