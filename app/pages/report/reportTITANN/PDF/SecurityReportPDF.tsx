@@ -154,23 +154,72 @@ const SecurityReportPDF: React.FC<SecurityReportPDFProps> = ({
                     which vulnerability has been tested, and on the right, its criticality is displayed.
                 </Text>
 
-                <View style={stylesPDF.table}>
-                    {Object.entries(vulnerabilityTable).map(([metric, values]) => (
-                        <View key={metric} style={stylesPDF.tableColumn}>
-                            <View style={stylesPDF.headerCell}>
-                                <Text>{metric}</Text>
-                            </View>
-                            {values.map((value, index) => (
-                                <View key={index} style={stylesPDF.cell}>
-                                    <Text>{!["name", "imagemean", "imagevariance"].includes(metric) ?
-                                        value :
-                                        value.toFixed(3)}</Text>
-                                </View>
-                            ))}
+{/* Main table without image_mean and image_var */}
+<View style={stylesPDF.table}>
+    {Object.entries(vulnerabilityTable)
+        .filter(([metric]) => !['imagemean', 'imagevariance'].includes(metric))
+        .map(([metric, values]) => (
+            <View key={metric} style={stylesPDF.tableColumn}>
+                <View style={stylesPDF.headerCell}>
+                    <Text>{metric}</Text>
+                </View>
+                {values.map((value, index) => (
+                    <View key={index} style={stylesPDF.cell}>
+                        <Text>
+                            {typeof value === 'number'
+                                ? value.toFixed(2)
+                                : value}
+                        </Text>
+                    </View>
+                ))}
+            </View>
+        ))}
+</View>
+
+
+
+{/* Separate table for image_mean and image_var */}
+{(vulnerabilityTable.imagemean || vulnerabilityTable.imagevariance) && (
+    <View style={stylesPDF.table}>
+        {/* Name column (replicated) */}
+        {vulnerabilityTable.name && (
+            <View key="name" style={stylesPDF.tableColumn}>
+                <View style={stylesPDF.headerCell}>
+                    <Text>name</Text>
+                </View>
+                {vulnerabilityTable.name.map((value, index) => (
+                    <View key={index} style={stylesPDF.cell}>
+                        <Text>{value}</Text>
+                    </View>
+                ))}
+            </View>
+        )}
+
+        {/* image_mean and image_var columns */}
+        {Object.entries(vulnerabilityTable)
+            .filter(([metric]) => ['imagemean', 'imagevariance'].includes(metric))
+            .map(([metric, values]) => (
+                <View key={metric} style={stylesPDF.tableColumn}>
+                    <View style={stylesPDF.headerCell}>
+                        <Text>{metric}</Text>
+                    </View>
+                    {values.map((value, index) => (
+                        <View key={index} style={stylesPDF.cell}>
+                            <Text>
+                                {typeof value === 'number'
+                                    ? value.toFixed(2)
+                                    : Array.isArray(value)
+                                    ? value.map(v =>
+                                        typeof v === 'number' ? v.toFixed(2) : v
+                                      ).join(', ')
+                                    : value}
+                            </Text>
                         </View>
                     ))}
                 </View>
-
+            ))}
+    </View>
+)}
                 <Text style={stylesPDF.footer} fixed>
                     Security Report - Page 2
                 </Text>

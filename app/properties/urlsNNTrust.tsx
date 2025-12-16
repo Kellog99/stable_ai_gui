@@ -1,5 +1,5 @@
 const host = "localhost"
-const port = 8000
+const port = 8082
 
 const scaffholding = "/home/andrea/Desktop/TITANN"
 const reportsModelPath = `/home/andrea/Desktop/TITANN/model`
