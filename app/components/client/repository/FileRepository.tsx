@@ -20,8 +20,6 @@ const FileRepository: React.FC<FileRepositoryProps> = ({
     selectHandle,
     handleDelete,
 }) => {
-    console.log("elements ", elements[0])
-
 
     return (
         <div className='repository-container'>

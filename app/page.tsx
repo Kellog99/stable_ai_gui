@@ -17,6 +17,7 @@ import { DatasetInfo, ModelInfo } from './interfaces/NNInterfaces';
 import { list } from 'postcss';
 import DatasetsLoader from './functionalities/DatasetsLoader';
 import { set } from 'lodash';
+import { upload_post } from './properties/urls';
 
 
 export const title = "Stable-AI"
@@ -29,7 +30,7 @@ export default function HomePage() {
     model,
     setAttacks,
     setModel,
-    setMetrics, 
+    setMetrics,
   } = useNNTrustStore()
   const { dataset, setDataset } = useStore()
 
@@ -37,6 +38,7 @@ export default function HomePage() {
   const [listDatasets, setListDataset] = useState<DatasetInfo[]>([])
   const [loadingDS, setLoadingDS] = useState<boolean>(false)
   const [loadingMS, setloadingMS] = useState<boolean>(false)
+  const [file, setFile] = useState<File | null>(null);
 
   // ################## Attacks' list ##################
   useEffect(() => {
@@ -64,12 +66,52 @@ export default function HomePage() {
   useEffect(() => {
     setLoadingDS(true);
     DatasetsLoader().then(fetchedData => {
-    
+
       setListDataset(fetchedData)
-    }).catch (err => console.error("Failed to load datasets:", err))
-    .finally(() => setLoadingDS(false));
+    }).catch(err => console.error("Failed to load datasets:", err))
+      .finally(() => setLoadingDS(false));
   }, [setListDataset]);
-  
+
+
+  const handleDatasetUpload = async (selectedFile: File) => {
+    if (!selectedFile) {
+      console.log("No file Selected")
+      return;
+    }
+
+    let body: BodyInit;
+    let headers: HeadersInit = {};
+
+    try {
+
+      const formData = new FormData();
+      formData.append("folder_zip", selectedFile);
+      body = formData;
+
+      const response = await fetch(upload_post, {
+        method: 'POST',
+        headers,
+        body,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setFile(data);
+      } else {
+        console.log("Something went wrong:", data.message);
+      }
+
+    } catch (error) {
+      console.error('Error uploading:', error);
+    } finally {
+      DatasetsLoader().then(fetchedData => {
+        setListDataset(fetchedData)
+      }).catch(err => console.error("Failed to load datasets:", err))
+    }
+  };
+
+
   // Model selection's buttons
   const btnModel: ButtonProps[] = [
     {
@@ -116,7 +158,7 @@ export default function HomePage() {
         Icon={Database}
         acceptedType={"zip"}
         description={'Make sure your zip contains raw data and a json config file.'}
-        onFileUpload={() => { }}
+        onFileUpload={(file) => { handleDatasetUpload(file as File); }}
       />,
     },
     {
