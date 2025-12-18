@@ -42,7 +42,6 @@ export interface AppState {
   reportFiles: LoadedFile[];
 }
 
-export type TaskType = 'benchmark' | 'one-image-attack' | 'analysis';
 
 export interface ButtonProps {
   id: string,
@@ -51,8 +50,6 @@ export interface ButtonProps {
   currentPage: string;
   onClickHandle: ReactEventHandler
 }
-
-
 
 export interface ParametersProps {
   id: string
@@ -79,11 +76,4 @@ export interface ParametersWindowProps {
   onClose: () => void,
   parameters: ParametersProps[],
   handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
-}
-
-export interface AttackManagementProps {
-  id: number;
-  name: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'closed';
-  progress: number
 }

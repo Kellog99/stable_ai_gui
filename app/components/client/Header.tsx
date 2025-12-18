@@ -4,13 +4,10 @@ import { CheckCircle, Circle, Shield } from 'lucide-react';
 import '@/styles/Header.css';
 import { useRouter } from 'next/navigation';
 import { title } from '@/page';
-
-import useNNTrustStore from '@/store/nnTrustStore';
 import useStore from '@/store/dsStore';
 
 const Header = () => {
 
-  const { model } = useNNTrustStore()
   const { dataset } = useStore()
   const router = useRouter()
   return (
@@ -27,20 +24,6 @@ const Header = () => {
       </div>
 
       <div className="header-status">
-        <div className="status-indicator">
-          {model?.name ? (
-            <>
-              <CheckCircle size={"calc(var(--icon-size) / 1.5)"} color="var(--affermative)" />
-              <span>{model?.name}</span>
-            </>
-          ) :
-            <>
-              <Circle size={"calc(var(--icon-size) / 1.5)"} color="var(--warning)" />
-              <span>No Model</span>
-            </>
-          }
-        </div>
-        <div className="status-divider"></div>
         <div className="status-indicator">
           {dataset ? (
             <>
@@ -59,6 +42,5 @@ const Header = () => {
     </header>
   );
 }
-
 
 export default Header;

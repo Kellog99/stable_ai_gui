@@ -1,3 +1,5 @@
+import { Info } from "./homePageInterface";
+
 export interface FeatureDTO
 {
   type: string;
@@ -34,7 +36,6 @@ export default interface Dataset
   bboxes_per_sample?: number[];
   default_embedding_model?:string
 }
-
 
 export interface FeatureSchema
 {

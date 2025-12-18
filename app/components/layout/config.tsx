@@ -1,6 +1,4 @@
 import {
-    ChartLine,
-    TestTube,
     SquareActivity,
     Ruler,
     Image,
@@ -13,7 +11,6 @@ import {
     Crop,
     Database,
     LucideIcon,
-    Info,
     FileText
 } from "lucide-react";
 
@@ -118,26 +115,6 @@ export const sections: { [key: string]: NavigationSection[] } = {
                 ],
             },
         ],
-    "Red Teaming Tool": [
-        {
-            id: 'home',
-            title: 'Benchmark',
-            href: '/pages/tasks/redteam/benchmark',
-            Icon: ChartLine,
-        },
-        {
-            id: 'test',
-            title: 'Test',
-            href: '/pages/tasks/redteam/test',
-            Icon: TestTube,
-        },
-        {
-            id: 'management',
-            title: 'Jobs Info',
-            href: '/pages/tasks/redteam/management',
-            Icon: Info,
-        },
-    ],
     "Report": [
         {
             id: "report",

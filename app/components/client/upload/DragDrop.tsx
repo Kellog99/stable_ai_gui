@@ -11,7 +11,7 @@ export interface DragDropProps {
     Icon: LucideIcon;
     acceptedType: string;
     description?: string;
-    onFileUpload: (file: File | null) => void;
+    onFileUpload: (file: File) => Promise<void>;
     disabled?: boolean;
 }
 
@@ -27,11 +27,10 @@ export const DragDrop: React.FC<DragDropProps> = ({
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleFileUpload = async (selectedFile: File) => {
-        console.log("file inside fucntion", selectedFile)
         setLoading(true);
         try {
             setFile(selectedFile);
-            onFileSelect(selectedFile);
+            await onFileSelect(selectedFile);
         } catch (error) {
             console.error('Error handling file:', error);
         } finally {

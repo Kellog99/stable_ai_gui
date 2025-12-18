@@ -1,11 +1,11 @@
 import { HardDrive, Trash2Icon } from "lucide-react";
 import "./FileRepository.css"
 import React from "react";
-import { DatasetInfo, ModelInfo } from "@/interfaces/NNInterfaces";
+import { DatasetInfo} from "@/interfaces/NNInterfaces";
 import { DQReportProps } from "@/interfaces/reportInterfaces";
 
 export interface RepositoryCardProps {
-    config: ModelInfo | DatasetInfo,
+    config: DatasetInfo,
     notShow?: string[],
     show?: Object,
     activeId?: string,
@@ -48,7 +48,7 @@ const RepositoryCard: React.FC<RepositoryCardProps> = ({
         return config;
     }
 
-    const configToShow = normalizeConfig(config) as ModelInfo | DatasetInfo;
+    const configToShow = normalizeConfig(config) as  DatasetInfo;
 
     return (
         <div

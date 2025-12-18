@@ -20,19 +20,6 @@ export interface metricsProps {
     wobbliness?: number;
 }
 
-export interface attacksProps {
-    name: string,
-    risk: number,
-    accuracy?: number,
-    precision?: number,
-    f1score?: number,
-    misclassification?: number,
-    power?: number,
-    num_queries?: number,
-    robustness?: number,
-    confusionmatrix?: number[][]
-}
-
 export interface ReportProps {
     prototype: string;
     id: string,
@@ -40,20 +27,8 @@ export interface ReportProps {
     tool: string;
     info: infoProps;
     metrics: metricsProps;
-    attacks: { [key: string]: attacksProps }
 }
 
-// ##################### Benchmark Data #####################
-// This interface refears to a single model-dataset 
-// Hence the whole dataset of past results is given by a list of BenchmarkDataProps
-export interface BenchmarkDataProps {
-    name: string
-    param: number
-    task: string
-    metrics: { [key: string | number]: number }
-}
-
-// ##################### Data Quality Report #####################
 export interface DQReportProps {
     id?: string;
     tool: string;

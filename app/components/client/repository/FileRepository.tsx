@@ -2,7 +2,7 @@ import React from 'react'
 import RepositoryCard from './Card';
 import { TriangleAlert } from 'lucide-react';
 import './FileRepository.css'
-import { DatasetInfo, ModelInfo } from '@/interfaces/NNInterfaces';
+import { DatasetInfo} from '@/interfaces/NNInterfaces';
 
 interface FileRepositoryProps {
     elements: any[],
@@ -12,7 +12,6 @@ interface FileRepositoryProps {
     selectHandle: (model: any) => void,
 }
 
-// This component has the role to create the card associated to the model or dataset repository
 const FileRepository: React.FC<FileRepositoryProps> = ({
     elements,
     activeId,
@@ -24,7 +23,7 @@ const FileRepository: React.FC<FileRepositoryProps> = ({
     return (
         <div className='repository-container'>
             {elements.length > 0 ?
-                elements.map((element: ModelInfo | DatasetInfo) => (
+                elements.map((element: DatasetInfo) => (
                     <RepositoryCard
                         key={element.id}
                         config={element}
