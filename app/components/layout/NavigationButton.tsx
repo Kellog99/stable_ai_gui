@@ -1,17 +1,15 @@
-import { NavigationSection } from "./config";
-import { useState } from "react";
-import React from "react";
-import './Navbar.css'
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import Link from "next/link";
+import { NavigationSection } from "./config";
+import { usePathname, useRouter } from "next/navigation";
+import "./Navbar.css";
 
-
-// Move NavigationButton outside to prevent recreation on every render
 interface NavigationButtonProps extends NavigationSection {
-    isActive: boolean
-    activeLink: string;
     setActiveLink: (id: string) => void;
-    isClosed: boolean;
+    isClosed: boolean;   // Whether the NavBar is collapsed
+    isDisabled?: boolean; // Whether the button is disabled
 }
 
 const NavigationButton: React.FC<NavigationButtonProps> = ({
@@ -20,62 +18,77 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
     Icon,
     href,
     items,
-    isActive,
-    activeLink,
     setActiveLink,
-    isClosed
+    isClosed,
+    isDisabled = false,
 }) => {
-    const [seeActions, setSeeActions] = useState<boolean>(false);
+    const pathname = usePathname();
+    const router = useRouter();
+
+    const [expanded, setExpanded] = useState<boolean>(true); // all visible by default
+    const [isActive, setIsActive] = useState<boolean>(pathname === href);
+
+    useEffect(() => {
+        setIsActive(pathname === href);
+    }, [pathname, href]);
+
+    const hasChildren = !!items && items.length > 0;
+    // Every time I explode the lateral navbar, the children are shown
+    useEffect(() => {
+        setExpanded(!isClosed)
+    }, [isClosed])
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+
+        if (isDisabled) return; // safeguard
+        if (hasChildren) setExpanded((prev) => !prev)
+        if (href) {
+            router.push(href);
+            setActiveLink(id);
+        }
+    };
+
     return (
-        <li>
-            <Link
-                onClick={(e) => {
-                    if (!isActive) {
-                        e.preventDefault();
-                        return;
-                    }
-                    if (items && items.length > 0) {
-                        e.preventDefault();
-                        setSeeActions(!seeActions);
-                    }
-                    setActiveLink(id);
-                }}
-                href={href && isActive ? href : "#"}
-                className={`${isActive ? activeLink === id ? 'nav-link active' : 'nav-link' : 'disabled'}`}
-                aria-current={activeLink === id ? 'page' : undefined}
-                aria-expanded={items && items.length > 0 ? seeActions : undefined}
+        <div className="flex flex-col w-full">
+            <button
+                onClick={handleClick}
+                disabled={isDisabled}
+                className={`nav-item flex items-center justify-between w-full py-2 px-3 rounded-md transition-all
+          ${isActive ? "active" : ""}
+          ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
             >
-                <div className="nav-text"
-                    style={{ gap: `${!isClosed ? '1vw' : '0px'}` }}>
-                    <Icon size={25} aria-hidden="true" />
-                    {!isClosed && (<span>{title}</span>)}
+                <div
+                    className="nav-item-content flex items-center"
+                    style={{ gap: isClosed ? "0px" : "1vw" }}
+                >
+                    <Icon size={22} aria-hidden="true" />
+                    {!isClosed && <span>{title}</span>}
                 </div>
-                {items && items.length > 0 && (
-                    seeActions ?
-                        <ChevronUp aria-hidden="true" />
-                        : <ChevronDown aria-hidden="true" />
+
+                {!isClosed && hasChildren && (
+                    isClosed ? (
+                        <ChevronUp size={18} />
+                    ) : (
+                        <ChevronDown size={18} />
+                    )
                 )}
-            </Link>
-            {items && items.length > 0 && seeActions && (
-                <ul role="menu"
-                    className="nav-links">
-                    {items.map((item) => (
+            </button>
+
+            {/* Sub-items */}
+            {!isClosed && hasChildren && expanded && (
+                <div className="sub-items">
+                    {items!.map((item) => (
                         <NavigationButton
                             key={item.id}
-                            id={item.id}
-                            title={item.title}
-                            Icon={item.Icon}
-                            href={item.href}
-                            items={item.items}
-                            activeLink={activeLink}
+                            {...item}
                             setActiveLink={setActiveLink}
                             isClosed={isClosed}
-                            isActive={item.requiresEmbeddings ? item.requiresEmbeddings : false}
+                            isDisabled={item.requiresEmbeddings === false}
                         />
                     ))}
-                </ul>
+                </div>
             )}
-        </li>
+        </div>
     );
 };
 

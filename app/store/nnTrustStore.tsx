@@ -1,132 +1,82 @@
-import Dataset from "@/interfaces/genericInterface";
-import { ModelSpecs, RegisterObjectProps } from "@/interfaces/NNInterfaces";
-import { BenchmarkDataProps, ReportProps } from "@/interfaces/reportInterfaces";
+import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { BenchmarkDataProps, ReportAttacksProps } from "@/interfaces/reportInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export interface AttackManagementProps {
-  id: string;
-  name: string;
-  status: string;
-  progress: number
-}
-
 interface AppState {
-  datasets: Dataset[] | null;
-  datasetUsed: Dataset | null;
-  queryDataset: string | '';
-  models: ModelSpecs[] | null;
-  modelName: string | null;
+  model: ModelInfo | null;
+  listModels: ModelInfo[];
+
   attacks: { [key: string]: RegisterObjectProps };
   metrics: { [key: string]: RegisterObjectProps };
 
   selectedAttacks: { [key: string]: RegisterObjectProps };
-  selectedMetrics: { [key: string]: RegisterObjectProps };
 
+  benchmarkId: string | number | null;
+  benchmark: { [key: string]: BenchmarkDataProps } | null;
 
-
-  testAttack: RegisterObjectProps | null; // this variable saves the attack to test on the Test Page
-  executedAttacks: AttackManagementProps[];
+  testAttack: RegisterObjectProps | null;
   loading: boolean;
   error: string | null;
-
-  // report
-  report: ReportProps | null;
-  benchmark: { [key: string]: BenchmarkDataProps } | null;
+  attackReport: ReportAttacksProps | null;
   vulnerabilitySelected: string | null;
 
-  benchmarkID: string;
 
-  setData: (datasetUsed: Dataset | null) => void;
-  setDatasets: (datasets: Dataset[] | null) => void;
-  setQueryDataset: (queryDataset: string) => void;
-  setModels: (models: ModelSpecs[] | null) => void;
-  setModelName: (modelName: string | null) => void;
-  setAttacks: (attaks: { [key: string]: RegisterObjectProps }) => void;
+  setModel: (models: ModelInfo | null) => void;
+  setListModels: (listModels: ModelInfo[]) => void;
+  setAttacks: (attacks: { [key: string]: RegisterObjectProps }) => void;
   setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
-  setSelectedAttacks: (selectedAttack: { [key: string]: RegisterObjectProps }) => void;
-  setSelectedMetrics: (selectedMetrics: { [key: string]: RegisterObjectProps }) => void;
+  setSelectedAttackList: (selectedAttacks: { [key: string]: RegisterObjectProps }) => void
+  setBenchmarkId: (benchmarkId: string | number | null) => void;
   setMap: (
     map: { [key: string]: RegisterObjectProps },
     name: 'attacks' | 'metrics' | 'selectedAttacks' | 'selectedMetrics'
   ) => void;
-  setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => void;
-  setReport: (report: ReportProps) => void;
-  setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => void;
-  setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
+  setAttackReport: (attackReport: ReportAttacksProps) => void;
+  setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps }) => void;
 
-  setBenchmarkID: (benchmarkID: string) => void;
+  setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
 }
 
 const useNNTrustStore = create<AppState>()(
   persist(
     (set) => ({
-      datasets: null,
-      datasetUsed: null,
-      queryDataset: "",
-      models: null,
-      modelName: null,
-
+      model: null,
+      listModels: [],
       attacks: {},
       metrics: {},
       selectedAttacks: {},
-      selectedMetrics: {},
-
-      executedAttacks: [{
-        id: "",
-        name: "",
-        status: "",
-        progress: 0
-      }],
-
+      benchmarkId: null,
       testAttack: null,
-
       loading: false,
       error: null,
-
-      report: null,
+      attackReport: null,
       benchmark: null,
+      benchmarkPROVA: [],
       vulnerabilitySelected: null,
 
-      benchmarkID: "",
-
-      setData: (datasetUsed) => set({ datasetUsed }),
-      setDatasets: (datasets: Dataset[] | null) => set({ datasets }),
-      setQueryDataset: (queryDataset: string) => set({ queryDataset }),
-      setModels: (models) => set({ models }),
-      setModelName: (modelName) => set({ modelName }),
-
+      setModel: (models) => set({ model: models }),
+      setListModels: (listModels) => set({ listModels }),
       setAttacks: (attacks) => set({ attacks }),
       setMetrics: (metrics) => set({ metrics }),
-      setSelectedAttacks: (selectedAttacks) => set({ selectedAttacks }),
-      setSelectedMetrics: (selectedMetrics) => set({ selectedMetrics }),
-
+      setSelectedAttackList: (selectedAttacks) => set({ selectedAttacks }),
+      setBenchmarkId: (benchmarkId) => set({ benchmarkId }),
       setMap: (map, name) => set({ [name]: map }),
-      setExecutedAttacks: (executedAttacks: AttackManagementProps[]) => set({ executedAttacks }),
-
-      setReport: (report: ReportProps) => set({ report }),
-      setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps; }) => set({ benchmark }),
-      setVulnerabilitySelected: (vulnerabilitySelected: string) => set({ vulnerabilitySelected }),
-      setBenchmarkID: (benchmarkID: string) => set({ benchmarkID }),
+      setAttackReport: (attackReport) => set({ attackReport }),
+      setBenchmark: (benchmark) => set({ benchmark }),
+      setVulnerabilitySelected: (vulnerabilitySelected) => set({ vulnerabilitySelected }),
     }),
-
     {
       name: "app-storage-models",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
-        datasets: state.datasets,
-        datasetUsed: state.datasetUsed,
-        models: state.models,
-        modelName: state.modelName,
+        model: state.model,
         attacks: state.attacks,
         metrics: state.metrics,
-        selectedAttacks: state.selectedAttacks,
-        report: state.report,
+        attackReport: state.attackReport,
         benchmark: state.benchmark,
-        vulnerabilitySelected: state.vulnerabilitySelected,
-        executedAttacks: state.executedAttacks,
-        benchmarkID: state.benchmarkID
-        // Don't persist loading and error states
+        benchmarkId: state.benchmarkId,
+        selectedAttacks: state.selectedAttacks
       }),
     }
   )

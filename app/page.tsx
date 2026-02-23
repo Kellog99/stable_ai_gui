@@ -1,114 +1,184 @@
-"use client";
-import TaskButton from '@/components/client/buttons/TaskButton';
-import useStore from '@/store/nnTrustStore';
+"use client"
+
+import FileDropZone from '@/components/client/upload/FileDropZone';
 import styles from '@/styles/HomePage.module.css';
-import { Database, Upload } from 'lucide-react';
-import { DatasetRepository } from './components/client/DatasetsRepoLoad';
-import FileDropZone from './components/client/FileDropZone';
-import { ModelRepository } from './components/client/ModelRepository';
-import { ModalUploadDataset } from './components/client/upload/ModalUploadDataset';
-import { ModalUploadModel } from './components/client/upload/ModalUploadModel';
-import { DragDrop } from './components/client/upload/UploaderUnifiedDragDrop';
-import DatasetsLoader from './functionalities/DatasetsLoader';
-import { getModels } from './functionalities/NNTrustBackendUtils';
-import { AvailableTasks } from './components/layout/config';
-import { uploadDataset_check, uploaderDataset, uploadModel, uploadModel_check } from './properties/urlsNNTrust';
+import { useEffect, useState } from 'react';
 
-const HomePage: React.FC = ({ }) => {
-  const setModels = useStore((state) => state.setModels)
-  const setDatasets = useStore((state) => state.setDatasets)
+// Configuration file for creating the HomePage Drag and Drop components
+import { getAttacksList, getDatasetsList, getMetricsList, getModelsList } from './functionalities/NNTrustBackendUtils';
+import useNNTrustStore from '@/store/nnTrustStore';
+import FileRepository from './components/client/repository/FileRepository';
+import { DragDrop } from './components/client/upload/DragDrop';
+import { Brain, Database, DatabaseIcon, HardDrive, Upload } from 'lucide-react';
+import { infoDataset, infoModel } from './components/client/upload/config';
+import { ButtonProps } from './interfaces/homePageInterface';
+import useStore from './store/dsStore';
+import { DatasetInfo, ModelInfo } from './interfaces/NNInterfaces';
+import { dataset_upload, uploadModel } from './properties/urlsNNTrust';
 
-  const datasetSections = [
+
+export const title = "Stable-AI"
+
+export default function HomePage() {
+
+  // At this level It is asked for the list of all the attacks
+  // const setAttacks = useStore((state) => state.setAttacks)
+  const {
+    model,
+    setAttacks,
+    setModel,
+    setMetrics,
+  } = useNNTrustStore()
+  const { dataset, setDataset } = useStore()
+
+  const [listModels, setListModels] = useState<ModelInfo[]>([])
+  const [listDatasets, setListDataset] = useState<DatasetInfo[]>([])
+
+  // ################## Attacks' list ##################
+  useEffect(() => {
+    getMetricsList()
+      .then(setMetrics)
+      .catch(err => console.error("Failed to load attacks:", err));
+  }, [setAttacks]);
+
+  useEffect(() => {
+    getAttacksList()
+      .then(setAttacks)
+      .catch(err => console.error("Failed to load attacks:", err));
+  }, [setAttacks]);
+
+  // ################## Models' list ################## 
+  useEffect(() => {
+    getModelsList()
+      .then(setListModels)
+      .catch(err => console.error("Failed to load attacks:", err));
+  }, [setListModels]);
+
+  // ################## Datasets' list ################## 
+  useEffect(() => {
+    getDatasetsList()
+      .then(setListDataset)
+      .catch(err => console.error("Failed to load attacks:", err));
+  }, [setListDataset]);
+
+
+
+  // Model selection's buttons
+  const btnModel: ButtonProps[] = [
+    {
+      id: "model",
+      name: "Upload model",
+      Icon: Upload,
+      child: <DragDrop
+        name={"Load your Model"}
+        Icon={Brain}
+        acceptedType={"zip"}
+        description={'Make sure your zip contains raw data and a json config file.'}
+        onFileSelect={(file) => { uploadZip(file, "model") }} />,
+    },
     {
       id: "repository",
-      title: "Dataset Repository",
-      Icon: Database,
-      child: DatasetRepository
-    }
-    /*{
-      id: "selection",
-      title: "Upload Dataset",
-      Icon: Upload,
-      child: () => <DragDrop
-        config={{
-          name: "dataset",
-          fileType: 'zip',
-          accept: 'application/zip',
-          formFieldName: "folder_zip",
-          description: 'Make sure your zip contains raw data and a json config file.',
-          uploadUrlCheck: uploadDataset_check,
-          uploadUrl: uploaderDataset,
-          refreshFunction: DatasetsLoader,
-          setRefreshData: setDatasets
+      name: "Model Repository",
+      Icon: HardDrive,
+      child: <FileRepository
+        elements={listModels}
+        selectHandle={(selectedModel: ModelInfo | null) => {
+          if (selectedModel) {
+            if (!model) { setModel(selectedModel) }
+            else { setModel(selectedModel && selectedModel.id === model.id ? null : selectedModel) }
+          }
+        }
+        }
+        activeId={model?.id}
+        handleDelete={(model) => {
+          setListModels(listModels.filter(modelContained => modelContained.id !== (model as ModelInfo).id))
         }}
-        infoModal={<ModalUploadDataset />} />
-    }*/
-  ];
+      />,
+    }
+  ]
 
-  const modelSections = [
+  async function uploadZip(file: any, mode: String) {
+    const formData = new FormData();
+    formData.append("file", file);
+    const body = formData;
+    const url = mode === "model" ? uploadModel : dataset_upload
+    const response = await fetch(url, {
+      method: 'POST',
+      body,
+    });
+    if (response.ok) {
+      console.log("Uploaded zip correctly.")
+    }
+  }
+
+  // Dataset selection's buttons
+  const btnDataset: ButtonProps[] = [
     {
-      id: "modrepository",
-      title: "Model Repository",
-      Icon: Database,
-      child: ModelRepository
-    }
-    /*{
-      id: "model",
-      title: "Upload Model",
+      id: "dataset",
+      name: "Upload dataset",
       Icon: Upload,
-      child: () => <DragDrop
-        config={{
-          name: "model",
-          fileType: 'zip',
-          accept: 'application/zip',
-          formFieldName: "file",
-          description: 'Make sure your zip contains raw data and a json config file.',
-          uploadUrlCheck: uploadModel_check,
-          uploadUrl: uploadModel,
-          refreshFunction: getModels,
-          setRefreshData: setModels
-
+      child: <DragDrop
+        name={"Load your Dataset"}
+        Icon={Database}
+        acceptedType={"zip"}
+        description={'Make sure your zip contains raw data and a json config file.'}
+        onFileSelect={(file) => { uploadZip(file, "dataset") }}
+      />,
+    },
+    {
+      id: "repository",
+      Icon: HardDrive,
+      name: "Dataset Repository",
+      child: <FileRepository
+        elements={listDatasets}
+        selectHandle={(selectDataset: DatasetInfo | null) => {
+          if (selectDataset) {
+            if (!dataset) setDataset(selectDataset)
+            else { setDataset(selectDataset && selectDataset.id === dataset.id ? null : selectDataset) }
+          }
         }}
-        infoModal={<ModalUploadModel />} />
-    }*/
-  ];
+        activeId={dataset?.id}
+        handleDelete={(dataset) => {
+          setListDataset(listDatasets.filter(datasetContained => datasetContained.id !== (dataset as DatasetInfo).id))
+        }} />,
+    }
+  ]
 
-  const listOfSections = [datasetSections, modelSections];
-  
+
+
   return (
-    <div className={styles.homecontainer}>
-      <div className={styles.filegrid}>
-        {listOfSections.map((dropElement, index) => (
-          <FileDropZone
-            key={index}
-            sections={dropElement}
-            defaultActiveSection={dropElement[0].id}
-          />
-        ))}
-
+    <div className={styles.home_page}>
+      <div className={styles.home_header}>
+        <h1 className={styles.home_title}>
+          Welcome to {title}
+        </h1>
+        <p className={styles.home_subtitle}>
+          Upload the <b>Dataset</b> or the <b>Model</b> in the space below or upload them from the appropriate <b>Repository</b> to conduct a quality and vulnerability analysis.
+        </p>
       </div>
 
-      <div className={styles.task}>
-        <div className={styles.sectionheader}>
-          <h2 className={styles.sectiontitle}>
-            Analysis Tasks
-          </h2>
-          <p className={styles.sectionsubtitle}>
-            Select an analysis task to begin
-          </p>
-        </div>
+      <div className={styles.upload_container}>
+        {/* Model selection */}
+        <FileDropZone
+          key={"model_loader"}
+          id={'model_loader'}
+          title="Model"
+          description="Drag and drop your model or choose an existing model."
+          Icon={Brain}
+          fileDropInformation={infoModel}
+          buttons={btnModel}
+        />
 
-        <div className={styles.filegrid}>
-          {
-            AvailableTasks.map((task) =>
-              <TaskButton
-                key={ task.title }
-                { ...task } /> )
-          }
-        </div>
+        {/* Dataset selection */}
+        <FileDropZone
+          id="dataset_loader"
+          title="Dataset"
+          description="Load your dataset or choose an existing dataset."
+          Icon={DatabaseIcon}
+          fileDropInformation={infoDataset}
+          buttons={btnDataset}
+        />
       </div>
     </div>
   );
 }
-
-export default HomePage

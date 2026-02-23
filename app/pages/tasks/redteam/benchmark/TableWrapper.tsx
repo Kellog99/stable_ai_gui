@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import OptionCard from '@/components/client/redtool/OptionCard';
+import OptionCard from '@/components/redtool/OptionCard';
 import './TableWrapper.css';
 import { LucideIcon, Search } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
-import useNNStore from '@/store/nnTrustStore';
+
 
 interface TableWrapperProps {
+    title: string,
     elements: { [key: string]: RegisterObjectProps };
     selectedElement: { [key: string]: RegisterObjectProps };
     Icon: LucideIcon
@@ -14,12 +15,14 @@ interface TableWrapperProps {
 }
 
 const TableWrapper: React.FC<TableWrapperProps> = ({
+    title,
     elements,
     selectedElement,
     handleSelection,
     handleParametersChange,
     Icon
 }) => {
+    console.log("elements = ", elements)
     // Type guard to check if element is AttackProps
     const getTags = (element: RegisterObjectProps) => {
         const tags = []
@@ -41,67 +44,64 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
         ));
     }, [query, elements]);
 
-
-   
-    const model = useNNStore((state) => state.models);
-    const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
-    //const setSelectedMetrics = useNNStore((state) => state.setSelectedMetrics);
-
-    let modifiedSelectedElement = { ...selectedElement };
-    if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
-        delete modifiedSelectedElement.confusionmatrix;
-        
-    }
-
     return (
         <div className="wrapper">
-
             <div className="header">
-                <div>
-                    <h2 className="table-title">Elements</h2>
-                    <p className="subtitle">
-                        Selected: {Object.keys(modifiedSelectedElement).length} / {Object.keys(elements).length}
-                    </p>
+                <h2 className="table-title">{title}</h2>
+                <p className="subtitle">
+                    Selected: {selectedElement ? Object.keys(selectedElement).length : 0} / {Object.keys(elements).length}
+                </p>
+            </div>
+            <div className='scroll-header'>
+                {/* Search bar */}
+                <div className="search-container">
+                    <Search size={"calc(var(--icon-size) * 0.8)"} color='gray' className="search-icon" />
+                    <input
+                        type="text"
+                        placeholder="Search"
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="search-input"
+                    />
                 </div>
-                <div className='scroll-header'>
-                    {/* Search bar */}
-                    <div className="search-container">
-                        <Search size={34} className="search-icon" />
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            onChange={(e) => setQuery(e.target.value)}
-                            className="search-input"
-                        />
-                    </div>
-                    <div className='buttons-container'>
-                        <button
-                            className="button"
-                            onClick={() => { handleSelection("all") }}
-                        > Select All </button>
-                        <button
-                            className="button"
-                            onClick={() => { handleSelection("none") }}> Deselect All </button>
-                    </div>
+                <div className='buttons-container'>
+                    <button
+                        className="button"
+                        onClick={() => { handleSelection("all") }}
+                    > Select All </button>
+                    <button
+                        className="button"
+                        onClick={() => { handleSelection("none") }}> Deselect All </button>
                 </div>
             </div>
-
-            <div className="scroll-container">
-                <div className="card-grid">
-                    {Object.entries(filteredItems).map(([id, element]) => (
-                        <OptionCard
-                            key={id}
-                            name={element.name}
-                            tags={getTags(element)}
-                            description={element.description}
-                            parameters={element.parameters}
-                            isSelected={id in selectedElement}
-                            onSelect={() => handleSelection(element.id)}
-                            Icon={Icon}
-                            handleParametersChange={(parameters: number[]) => { handleParametersChange(id, parameters) }} />
-                    ))}
+            {Object.entries(filteredItems).length > 0 ?
+                <div className="scroll-container">
+                    <div className="card-grid">
+                        {Object.entries(filteredItems).map(([id, element]) => (
+                            <OptionCard
+                                key={id}
+                                name={element.name}
+                                tags={getTags(element) || []}
+                                description={element.description}
+                                parameters={element.parameters}
+                                isSelected={id in selectedElement}
+                                onSelect={() => handleSelection(element.id)}
+                                Icon={Icon}
+                                handleParametersChange={(parameters: number[]) => { handleParametersChange(id, parameters) }} />
+                        ))}
+                    </div>
                 </div>
-            </div>
+                : <div className='scroll-text'>
+                    {
+                        Object.entries(filteredItems).length > 0 ?
+                            <p>
+                                No element with <b>{query}</b> inside.
+                            </p> :
+                            <p>
+                                No elements have been passed.
+                            </p>
+                    }
+                </div>
+            }
         </div>
     );
 }

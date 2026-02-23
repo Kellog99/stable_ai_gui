@@ -1,11 +1,12 @@
-import useStore from '@/store/nnTrustStore';
+import { useThumbnailWS } from '@/functionalities/useThumbnailWS';
+import useStore from '@/store/dsStore';
 import { Badge, Card, CardSection, Grid, GridCol, Group, Text } from '@mantine/core';
 import React from 'react';
-import Dataset from "@/interfaces/genericInterface";
-import { image_type, text_type } from "@/properties/types";
-import { AlertCust } from '@/components/client/AlertCustom';
+import Dataset from "../../interfaces/genericInterface";
+import { image_type, text_type } from "../../properties/types";
+import { AlertCust } from '../client/AlertCustom';
 import classes from './DatasetBT.module.css';
-import TextDisplayer from "@/components/server/TextDisplayer";
+import TextDisplayer from "./TextDisplayer";
 
 interface DatasetBTProps {
   query?: string;
@@ -13,7 +14,6 @@ interface DatasetBTProps {
 }
 
 export default function DatasetBT({ query, datasets }: DatasetBTProps) {
-  console.log("datasets", datasets)
   const datasetName = useStore((state) => state.datasetUsed)?.name;
   const setDatasetUsed = useStore((state) => state.setData);
 
@@ -24,11 +24,41 @@ export default function DatasetBT({ query, datasets }: DatasetBTProps) {
     )
     : datasets || [];
 
+  const imageDatas = filteredDatasets
+    .filter(ds => ds.prototype.type === image_type)
+    .map(ds => ds.prototype.datas[0]);
+
+  const { thumbnails, connectionStatus, requestThumbnail } = useThumbnailWS(
+    image_type,
+    imageDatas
+  );
 
   if (!datasets) return null;
 
   const handleClick = (dataset: Dataset) => {
     setDatasetUsed(datasetName === dataset.name ? null : dataset);
+  };
+
+  const DatasetItem = ({ dataset }: { dataset: Dataset }) => {
+    const path = dataset.prototype.datas[0];
+    React.useEffect(() => {
+      requestThumbnail(path);
+    }, [path]);
+
+    return (
+      <img
+        src={thumbnails.get(path)}
+        alt={dataset.name}
+        className={classes.ImageDisplayer}
+        style={{
+          width: "100%",
+          height: "192px",
+          objectFit: "contain",
+          backgroundColor: "#f7f7f7",
+          display: "block",
+        }}
+      />
+    );
   };
 
   return (
@@ -44,18 +74,7 @@ export default function DatasetBT({ query, datasets }: DatasetBTProps) {
               >
                 <CardSection className={classes.cardsection}>
                   {dataset.prototype.type === image_type ? (
-                    <img
-                      src={`data:image/jpeg;base64,${dataset.prototype.datas[0]}`}
-                      alt={dataset.name}
-                      className={classes.ImageDisplayer}
-                      style={{
-                        width: "100%",
-                        height: "192px",
-                        objectFit: "contain",
-                        backgroundColor: "#f7f7f7",
-                        display: "block",
-                      }}
-                    />
+                    <DatasetItem dataset={dataset} />
                   ) : dataset.prototype.type === text_type ? (
                     <TextDisplayer
                       className={classes.TextDisplayer}
@@ -68,7 +87,7 @@ export default function DatasetBT({ query, datasets }: DatasetBTProps) {
                   <Text fw={700} size="lg" c="#334155">{dataset.name}</Text>
                   <Badge color="#334155">{dataset.task}</Badge>
                 </Group>
-                {/*<Text size="sm" c="dimmed">{dataset.n_samples} samples</Text>*/}
+                <Text size="sm" c="dimmed">{dataset.n_samples} samples</Text>
               </Card>
             </GridCol>
           ))

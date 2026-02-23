@@ -1,116 +1,115 @@
-.navbar-container {
-    height: auto-fill;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    transition: width 0.3s ease;
-    border-radius: 1vw;
-    background-color: var(--navy-700);
-    padding: 1vw;
-    gap: 1vw;
+.container-nav {
+  display: grid;
+  grid-template-rows: 50px 1fr 80px;
+  height: calc(100vh - var(--header-height));
+  max-height: 100vh;
+  position: relative;
 }
 
-.burger-button {
-    background: var(--navy-600);
-    border: none;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+
+.nav-header {
+  display: flex;
+  align-items: center;
+  color: white;
+  gap: 15px;
+  padding: 0 20px;
 }
 
-.burger-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.05);
+.nav-section {
+  overflow-y: auto;
+  /* make this part scrollable vertically */
+  overflow-x: hidden;
+  /* disable horizontal scroll */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 10px 0 20px;
+  /* inner spacing, consistent with header/footer */
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  scroll-behavior: smooth;
 }
 
-.nav-content {
-    margin-top: 100px;
-    padding: 0 20px;
+.nav-section::-webkit-scrollbar {
+  width: 6px;
 }
 
-.nav-links {
-    list-style: none;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 12px;
+.nav-section::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
 }
 
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
-    color: rgba(255, 255, 255, 0.9);
-    text-decoration: none;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    justify-content: space-between;
-    background-color: var(--navy-600);
-
+.nav-section::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.4);
 }
 
-.nav-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #3b82f6 );
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
+.container-nav>div:last-child {
+  padding: 0 20px;
+  /* footer padding */
 }
 
-.nav-link:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(4px);
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgb(156, 163, 175);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
 }
 
-.nav-link:hover::before {
-    transform: scaleY(1);
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.disabled {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
-    color: rgba(255, 255, 255, 0.9);
-    background-color: gray;
-    text-decoration: none;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    justify-content: space-between;
-    cursor: not-allowed;
+.nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  color: rgb(209, 213, 219);
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  justify-content: space-between;
 }
 
-.nav-link.active {
-    width: 100%;
-    background: var(--navy-800);
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  transform: translateX(2px);
 }
 
-.nav-link.active::before {
-    transform: scaleY(1);
+.nav-item-content {
+  display: flex;
 }
 
-.nav-text {
-    font-size: 16px;
-    font-weight: 500;
-    white-space: nowrap;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    align-content: center;
+.nav-item.active {
+  background: rgba(59, 130, 246, 0.15);
+  color: rgb(96, 165, 250);
+  box-shadow: inset 3px 0 0 rgb(59, 130, 246);
+}
+
+.nav-item.collapsed {
+  justify-content: center;
+}
+
+.sub-items {
+  margin-left: 15px;
+  border-left: 1px solid darkgray;
+}
+
+.nav-profile {
+  height: 100%;
+  display: flex;
+  background-color: var(--bg);
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  border-radius: var(--border-radius);
 }

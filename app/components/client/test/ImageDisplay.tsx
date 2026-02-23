@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, X } from 'lucide-react';
 import './test.css';
 import { Loader } from '@mantine/core';
@@ -6,43 +6,39 @@ import { Loader } from '@mantine/core';
 interface ImageDisplayProps {
   title?: string;
   placeholder: string;
-  footer?: string;
-  imageUrl?: string;
+  imageUrl?: string           // image to display whenever it is passed.
+  loader: boolean             // tells wheter the component must act as an image loader or just displayer
   handleUpload?: (file: string | null) => void;
-  loader: boolean;
-  is_loading?: boolean;
 }
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   title,
-  footer,
-  imageUrl,
   handleUpload,
   placeholder,
-  loader = false,
-  is_loading = false
+  imageUrl,
+  loader
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loadedImage, setLoadedImage] = useState<string | null>(null);
 
-  const handleImageContainerClick = () => {
-    if (loader && fileInputRef.current && !loadedImage) {
-      fileInputRef.current.click();
+  useEffect(() => {
+    if (imageUrl) {
+      setLoadedImage(imageUrl)
     }
-  };
+  }, [imageUrl])
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleFileChange = (file: File | undefined) => {
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setLoadedImage(result);
+      reader.onload = () => {
+        const base64String = reader.result as string; // Now it's a string!
+        setLoadedImage(base64String);
         if (handleUpload) {
-          handleUpload(result)
+          handleUpload(base64String)
         }
       };
       reader.readAsDataURL(file);
+
     }
   };
 
@@ -57,65 +53,43 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
     }
   };
 
-  const displayImage = loadedImage || imageUrl;
-  console.log("image display", displayImage)
-  console.log("loaded image", loadedImage)
-
   return (
     <div className="image-wrapper">
-      {title && (<h3 className="image-title">{title}</h3>)}
-      <div
-        className="image"
-        onClick={handleImageContainerClick}
-        style={{ cursor: loader && !loadedImage ? 'pointer' : 'default', position: 'relative' }}
-      >
-        {displayImage ? (
-          <>
-            {is_loading ?
-              (<div className="image-placeholder">
-                <Loader className="image-icon" />
-                <p className="image-text">Executing attack...</p>
-              </div>) : (
-                <img
-                  src={displayImage}
-                  alt={`Loaded image`}
-                  className="image-img"
-                />
-              )}
-            {loadedImage && (
-              <button
-                onClick={handleDeleteImage}
-                className='delete-button'
-                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'}
-              >
-                <X size={20} color="white" />
-              </button>
-            )}
-          </>
-        ) : (
-          <div className="image-placeholder">
-            {is_loading ?
-              (<div className="image-placeholder">
-                <Loader className="image-icon" />
-                <p className="image-text">Executing attack...</p>
-              </div>) :(<><Image className="image-icon" />
-            <p className="image-text">{placeholder}</p></>)}
-          </div>
-        )}
-        {loader && (
+      <h3 className="image-title">
+        {title ? title : " "}
+      </h3>
+      {loadedImage || !loader ? (
+        <div className="image-container">
+          <img
+            className='image'
+            src={loadedImage ? loadedImage : undefined}
+            alt={`Waiting for an image to be displayed`}
+          />
+          {loader && (
+            <button
+              onClick={handleDeleteImage}
+              className='delete-button'
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(0, 0, 0, 0.6)'}
+            >
+              <X size={20} color="white" />
+            </button>)}
+        </div>
+      ) : (
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="image-container loader">
+          <Image size={"calc(2 * var(--icon-size))"} />
+          {placeholder}
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/png,image/jpeg,image/jpg"
-            onChange={handleFileChange}
-            style={{ display: 'none' }}
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleFileChange(e.target.files?.[0])}
           />
-        )}
-      </div>
-      {
-        footer && (<p style={{ color: 'grey' }}>{footer}</p>)
-      }
+        </div>
+      )}
     </div>
   );
 };

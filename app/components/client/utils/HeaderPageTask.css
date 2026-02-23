@@ -1,0 +1,52 @@
+/* This is the part in case there exists a button to click*/
+.container-header {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+}
+
+/* This contain the Icon and the component with title and the description */
+.container-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 180px;
+    gap: 40px;
+    color: rgb(187, 184, 184);
+}
+
+
+.header-button {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    height: 25px;
+    width: 220px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    justify-content: space-between;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    border: none;
+    background-color: var(--bg);
+    color: white;
+}
+
+.header-button svg {
+    transition: all 0.4s ease;
+}
+
+.header-button:hover:not(.disabled) {
+    background-color: var(--bg-light);
+}
+
+.header-button:hover:not(.disabled) svg {
+    transform: translateX(5px);
+}
+
+.header-button.disabled {
+    opacity: 0.6;
+}

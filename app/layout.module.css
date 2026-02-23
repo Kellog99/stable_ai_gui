@@ -1,35 +1,42 @@
-.customNavbar {
-  background-color: transparent;
-  border: none;
-  padding: 16px;
-  width: 250px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 100vh;
-  z-index: 100;
+.dashboard {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
-.navbarContent {
-  background-color: rgba(62, 129, 236, 0.2);
-  border-radius: 12px;
-  height: 100%;
-  padding-top: 80px;
+.dashboard_layout {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  max-height: 100%;
+}
+
+.dashboard_main {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
+}
+
+.dashboard-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-main::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.dashboard-main::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 4px;
+}
+
+.dashboard-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
 }
 
 .mainContainer {
   height: 100%;
   width: 100%;
-}
-
-.mainContainer.collapsed {
-  padding-left: 130px;
-}
-
-
-/* Hide navbar on small screens */
-@media (max-width: 768px) {
-  .customNavbar {
-    display: none;
-  }
 }
