@@ -44,7 +44,10 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-window" onClick={(e) => e.stopPropagation()}>
+            <div
+                className="modal-window"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Header */}
                 <div className="modal-header">
                     <h2 className="modal-title">
@@ -59,15 +62,15 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                 {/* Settings Content */}
                 <div className="modal-content">
                     {parameters.map((param, index) => (
-                        <div key={`${param.label}-${index}`} className="form-group">
+                        <div key={`${param.name}-${index}`} className="form-group">
                             <label className="form-label">
-                                {param.label}
+                                {param.name}
                                 <span style={{
                                     float: 'right',
                                     fontWeight: 'bold',
                                     color: '#3b82f6'
                                 }}>
-                                    {values[index]?.toFixed(2) ?? param.default}
+                                    {values[index]?.toFixed(4) ?? param.default}
                                 </span>
                             </label>
                             {param.description && (
@@ -84,7 +87,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                 type="range"
                                 min={param.min}
                                 max={param.max}
-                                step={(param.max - param.min) / 100}
+                                step={param.step}
                                 value={values[index] ?? param.default}
                                 onChange={(e) => handleChange(index, parseFloat(e.target.value))}
                                 className="form-slider"

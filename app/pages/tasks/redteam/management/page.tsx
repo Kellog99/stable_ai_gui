@@ -2,103 +2,108 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { ArrowDownUp, CircleArrowRight, Search } from 'lucide-react';
-import { HoverCard, Progress } from '@mantine/core';
+import { AppWindowIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { BenchmarkDataProps, ReportProps } from '@/interfaces/reportInterfaces';
-import useStore from '@/store/nnTrustStore';
-import { benchmarkFetch_get, getJobsProgress, reportFetch_get } from '@/properties/urlsNNTrust';
-import OpenPdfButton from '@/components/client/PDFViewer';
+import { BenchmarkDataProps, ReportAttacksProps } from '@/interfaces/reportInterfaces';
+import { benchmarkFetch_get, jobProgress_get, reportFetch_get } from '@/properties/urlsNNTrust';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
+import ManagementTable from './ManagementTable';
+import { getStatusIcon } from './utils';
+import { AttackManagementProps } from '@/interfaces/NNInterfaces';
+import useStore from '@/store/dsStore';
 
 const TaskManagement: React.FC = () => {
-    const { setReport, setBenchmark, executedAttacks, setExecutedAttacks } = useNNTrustStore()
-    const datasetName = useStore((state) => state.datasetUsed)?.name
-    const [attackArray, setAttackArray] = useState<any[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
-    const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({
-        key: null,
-        direction: 'asc'
-    });
+    const {
+        setAttackReport: setReport,
+        setBenchmark,
+        benchmarkId
+    } = useNNTrustStore()
 
-    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [listExecutedAttacks, setListExecutedAttacks] = useState<AttackManagementProps[]>([]);
+    const [description, setDescription] = useState<string>('');
+    const datasetName = useStore((state) => state.dataset)?.name
 
-    const benchmarkID = useNNTrustStore((state) => state.benchmarkID)
-    console.log("id from management", benchmarkID)
-
-
-    console.log("in benchmark ", executedAttacks)
-
-    useEffect(() => {
-        const attacksArray = Array.from(executedAttacks);
-        setAttackArray(attacksArray);
-    }, [executedAttacks]);
-
-    const handleSort = (key: string) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
+    // getting the advancement status from the job, starting from the id
+    const handleRefresh = async () => {
+        if (!benchmarkId) {
+            console.log("No benchmark ID available");
+            return;
         }
-        setSortConfig({ key, direction });
+
+        try {
+            const response = await fetch(`${jobProgress_get}?id=${encodeURIComponent(benchmarkId)}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to get jobs ids from the backend: ${response.status}`);
+            }
+
+
+            const listAttacks: AttackManagementProps[] = await response.json();
+            setListExecutedAttacks(listAttacks);
+        } catch (error) {
+            console.error("Error fetching job progress:", error);
+        }
     };
 
-    const filteredAndSortedJobs = useMemo(() => {
-        let filtered = attackArray.filter(job => {
-            const jobName = typeof job === 'string' ? job : (job?.name || '');
-            const jobStatus = typeof job === 'string' ? '' : (job?.status || '');
-            const jobId = typeof job === 'string' ? job : (job?.id || '');
+    useEffect(() => {
+        const timer = setInterval(handleRefresh, 1000);
+        return () => clearInterval(timer);
+    }, [benchmarkId]);
 
-            const matchesSearch =
-                jobName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                jobId.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-                jobStatus.toLowerCase().includes(searchTerm.toLowerCase());
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
 
-            const matchesStatus = statusFilter === 'All' || jobStatus === statusFilter;
+    const [attackStates, setAttackStates] = useState<{ [key: string]: number }>({})
+    const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
-            return matchesSearch && matchesStatus;
+
+
+    useEffect(() => {
+        const status = {
+            "Completed": 0,
+            "In Progress": 0,
+            "Pending": 0,
+            "Closed": 0
+        };
+
+        const statusMap: Record<string, keyof typeof status> = {
+            "completed": "Completed",
+            "in_progress": "In Progress",
+            "pending": "Pending",
+            "closed": "Closed",
+        };
+
+        listExecutedAttacks.forEach((job: AttackManagementProps) => {
+            const normalized = job.status.toLowerCase(); // ensure lowercase
+            const key = statusMap[normalized]; // find matching frontend key
+
+            if (key) {
+                status[key] += 1;
+            }
         });
 
-        if (sortConfig.key) {
-            filtered.sort((a, b) => {
-                let aValue, bValue;
+        setAttackStates(status);
 
-                if (typeof a === 'string' && typeof b === 'string') {
-                    aValue = a;
-                    bValue = b;
-                } else {
-                    aValue = a?.[sortConfig.key!] || '';
-                    bValue = b?.[sortConfig.key!] || '';
-                }
-
-                if (sortConfig.key === 'id') {
-                    const aNum = Number(aValue);
-                    const bNum = Number(bValue);
-                    if (!isNaN(aNum) && !isNaN(bNum)) {
-                        return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
-                    }
-                }
-
-                if (aValue < bValue) {
-                    return sortConfig.direction === 'asc' ? -1 : 1;
-                }
-                if (aValue > bValue) {
-                    return sortConfig.direction === 'asc' ? 1 : -1;
-                }
-                return 0;
-            });
+        let notFinished = 0;
+        if (listExecutedAttacks.length > 0) {
+            notFinished = status["Pending"] + status["In Progress"];
+            if (notFinished > 0) {
+                setDescription(`It remains ${notFinished} attackto be finished.`);
+            } else {
+                setDescription("All jobs completed.");
+            }
+        } else {
+            setDescription("No jobs have been executed");
         }
 
-        return filtered;
-    }, [attackArray, searchTerm, statusFilter, sortConfig]);
-
-    const [atkFinished, setAtkFinished] = useState<number>(0)
-    useEffect(() => { setAtkFinished(executedAttacks.filter(job => job.status === "completed").length) }, [executedAttacks])
-
-    console.log("atk finished =", atkFinished)
-
-    const isDisabled = () => {
-        return false
-    }
+        // the report button is disabled if there are still jobs that are pending or in progress to be finished
+        setIsDisabled((notFinished > 0 && listExecutedAttacks.length > 0) || listExecutedAttacks.length === 0);
+    }, [listExecutedAttacks]);
 
     const router = useRouter()
 
@@ -117,176 +122,51 @@ const TaskManagement: React.FC = () => {
                 return undefined; // Explicitly return undefined on error
             }
         }
-
-        const reportFetch = await fetchResult<ReportProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkID)}`);
-        console.log("REPORT PROPS", reportFetch)
+        // fetching the report
+        const reportFetch = await fetchResult<ReportAttacksProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId as string)}`);
         if (reportFetch) {
             setReport(reportFetch);
         }
 
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
-        if (benchmarkFetch) {
-            console.log("saving = ", benchmarkFetch)
-            setBenchmark(benchmarkFetch);
-        }
+
         router.push("/pages/report/reportTITANN")
     }
 
-
-
-    const pollProgress = async () => {
-        try {
-            const url = `${getJobsProgress}?id=${encodeURIComponent(benchmarkID)}`;
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch progress: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            console.log("management ==", data);
-
-            setExecutedAttacks(data);
-
-        } catch (err: any) {
-            console.error("ERROR:", err);
-        }
-    };
-
-    const startPolling = () => {
-        if (!intervalRef.current) {
-            pollProgress(); 
-            intervalRef.current = setInterval(pollProgress, 3000);
-        }
-    };
-
-    useEffect(() => {
-        if (!benchmarkID) return;
-        startPolling();
-
-    }, [benchmarkID]);
-
-
     return (
-        <div className="container">
-            <div className='management-header'>
-                <div>
-                    <h1>Job Status Management</h1>
-                    <p style={{ color: "lightgray" }}>Number of finished tested vulnearbilities {atkFinished}/{executedAttacks.length}</p>
+        <div className="container-pages">
+            {/* Header Part */}
+            <HeaderPageTask
+                Icon={AppWindowIcon}
+                title="Job Status Management"
+                descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
+                buttonprops={{
+                    description: "Vulnerability Report",
+                    isDisabled: isDisabled,
+                    disabledDescription: description,
+                    handleClick: handleClickReport
+                }}
+            />
+
+            {/* Status Summary Cards */}
+            <>
+                <h3 style={{ margin: 0, padding: 0, color: "white" }}>Overview Jobs:</h3>
+                <div className="container-cards">
+                    {Object.entries(attackStates).map(([status, value]) => (
+                        <div key={status} className="card-summary">
+                            {getStatusIcon(status)}
+                            <div>
+                                <div style={{ fontSize: "0.8rem" }}>{status}:</div>
+                                <span style={{ fontSize: "1.4rem", fontWeight: 700 }}>{value ? value : 0}</span>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-
-                <HoverCard
-                    width={170}
-                    shadow="md"
-                    disabled={!isDisabled()}>
-                    <div>
-                    <OpenPdfButton
-                        param1={benchmarkID}
-                        param2={"True"}
-                        />
-                    </div>
-                    <HoverCard.Dropdown>
-                        <p style={{ fontSize: "0.7rem" }}>
-                            This button is currently disabled. Because {executedAttacks.length === 0 ? "there are no vulnearbilities scheduled." : `${executedAttacks.length - atkFinished} vulnearbily(s) remains to be finished.`}
-                        </p>
-                    </HoverCard.Dropdown>
-                </HoverCard>
-
-
-            </div>
-            <div className="filters">
-                <div className="search-wrapper">
-                    <Search className="search-icon" />
-                    <input
-                        type="text"
-                        id="searchInput"
-                        placeholder="Search jobs..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <div className='filter'>
-                    <div>Filter by:</div>
-                    <select
-                        className='selectionButton'
-                        id="statusFilter"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                    >
-                        <option value="All">All Statuses</option>
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-            </div>
-            <div className="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>
-                                <button onClick={() => handleSort('id')}>
-                                    ID <ArrowDownUp />
-                                </button>
-                            </th>
-                            <th>
-                                <button onClick={() => handleSort('name')}>
-                                    Attack Name <ArrowDownUp />
-                                </button>
-                            </th>
-                            <th>
-                                <button onClick={() => handleSort('status')}>
-                                    Status <ArrowDownUp />
-                                </button>
-                            </th>
-                            <th>
-                                Progress
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredAndSortedJobs.length === 0 ? (
-                            <tr>
-                                <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
-                                    No jobs found
-                                </td>
-                            </tr>
-                        ) : (
-                            filteredAndSortedJobs.map((job, index) => {
-                                const jobId = typeof job === 'string' ? job : (job?.id || index);
-                                const jobName = typeof job === 'string' ? job : (job?.name || 'N/A');
-                                const jobStatus = typeof job === 'string' ? 'N/A' : (job?.status || 'N/A');
-
-                                return (
-                                    <tr key={`${jobId}-${index}`}>
-                                        <td>
-                                            {jobId}
-                                        </td>
-                                        <td style={{ fontWeight: "bold" }}>
-                                            {jobName}
-                                        </td>
-                                        <td>
-                                            <p>{jobStatus}</p>
-                                        </td>
-                                        <td>
-                                            {(() => {
-                                                if (job.progress === 100 && job.status === "completed") {
-                                                    return <Progress value={job.progress} color="green" />;
-                                                } else if (job.progress !== 100 && job.status !== "completed") {
-                                                    return <Progress value={job.progress} color="blue" animated />;
-                                                } else if (job.progress !== 100 && job.status === "completed") {
-                                                    return <Progress value={job.progress} color="red" />;
-                                                }
-                                            })()}
-
-                                        </td>
-
-                                    </tr>
-                                );
-                            })
-                        )}
-                    </tbody>
-                </table>
+            </>
+            {/* Table Management */}
+            <div>
+                <h3 style={{ color: 'white' }}>Info Vulnerabilities</h3>
+                <ManagementTable jobs={listExecutedAttacks}
+                />
             </div>
         </div>
     );

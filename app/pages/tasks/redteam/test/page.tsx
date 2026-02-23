@@ -1,19 +1,22 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Book, Bug, Camera, ChevronDown, ChevronUp, Glasses, Play, Settings2, Shield, TestTubeIcon, TrendingUp } from 'lucide-react';
+import { Bug, ChartCandlestick, InfoIcon, Play, Settings, Shield } from 'lucide-react';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
-import { ParameterControls } from '@/components/client/test/ParameterControls';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
-import { AdvanceResult, AttackResult } from '@/interfaces/testInterfaces';
+import { SingleAttackProps } from '@/interfaces/testInterfaces';
 import styles from '@/styles/Test.module.css';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
-import { startAttack } from '@/properties/urlsNNTrust';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
+import { Modal } from '@mantine/core';
+import ParametersWindow from '@/components/redtool/Parameters';
+import ModalButton from './ModalButton';
+import { startSingleAttack } from '@/properties/urlsNNTrust';
 
 function Test() {
 
-    const { attacks } = useNNTrustStore()
+    const { attacks, model } = useNNTrustStore()
     const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps | undefined>()
     useEffect(() => {
         if (Object.keys(attacks).length > 0) {
@@ -23,243 +26,248 @@ function Test() {
 
 
     const [uploadedFile, setUploadedFile] = useState<string | null>(null);
-    const [advanceOption, setAdvanceOption] = useState<boolean>(false)
-    const [seeResults, setSeeResults] = useState<boolean>(false)
-    
-    const [origImg, setOrigImg] = useState<string[] | null>(null)
-    const [advImg, setAdvImg] = useState<string[] | null>(null)
+    const [advImg, setAdvImg] = useState<string | null>(null)
+    const [advPred, setAdvPred] = useState<string>("")
     const [advPert, setAdvPert] = useState<string | null>(null)
+    const [pred, setPred] = useState<string>("")
 
-    const [atkResult, setAtkResult] = useState<AdvanceResult | undefined>();
+    const [atkResult, setAtkResult] = useState<{ [key: string]: number } | undefined>(undefined);
+    const [atkConf, setAtkConf] = useState<{ [key: string]: number[] } | undefined>(undefined);
+
     const [clicked, setClicked] = useState<Boolean>(false);
-    const [loading, setLoading] = useState<Boolean>(false)
 
-    const modelName = useNNTrustStore((state) => state.modelName)
-
-    const handleChange = (index: number, value: number) => {
+    const handleChange = (value: number[]) => {
         setSelectedAttack(prev => {
             if (!prev || !prev.parameters) return prev
 
-            const newParameters = prev.parameters.map((param, i) =>
-                i === index ? { ...param, ['default']: value } : param
-            )
+            const newParameters = prev.parameters.map((param, i) => ({
+                ...param,
+                default: value[i]
+            }))
+
             return { ...prev, parameters: newParameters }
         })
     }
 
     const handleClick = async () => {
-        if (!loading) {
+        // At this moment there could be one click at the time
+        // If an attack has been executed then the button will not be available untill the attack finishes its process. 
+        if (!clicked && uploadedFile && model) {
             setClicked(true);
             try {
-                setLoading(true);
-                console.log(selectedAttack)
-                const response = await fetch(startAttack, {
+                console.log("the route is ", startSingleAttack)
+
+                const response = await fetch(startSingleAttack, {
                     method: "POST",
                     body: JSON.stringify({
-                        "image": uploadedFile?.split(",")[1],
+                        "image": uploadedFile.split(",")[1],
                         "attack": selectedAttack,
-                        "model_name": modelName
+                        "model_name": !model.id ? model.name : undefined
                     }),
                     headers: {
-                        'Content-type': 'application/json'
+                        'Content-Type': 'application/json'
                     }
                 });
 
-                const data: AttackResult = await response.json();
-                
+                console.log('Status:', response.status);
+                const data: SingleAttackProps = await response.json();
+                console.log('Response:', data);
+
                 if (!response.ok) {
+
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
                 // the attack has been done and it has to handle the results
-                setOrigImg([uploadedFile!, data.original_prediction])
-                setAdvImg([data.x_adv, data.adversarial_prediction])
+                setAdvImg(data.x_adv)
+                setAdvPred(data.adversarial_prediction)
                 setAdvPert(data.adv_perturbation)
-                console.log(data.executionTime)
-                console.log(data.ssim)
-                setAtkResult({
-                    "confidence": data.confidence,
-                    "ssim": data.advance_metrics.ssim,
-                    "executionTime": data.advance_metrics.executionTime,
-                })
+                setPred(data.original_prediction)
+
+                console.log("pert=", data.adv_perturbation)
+
+                setAtkResult({ ...data.advance_metrics })
+                setAtkConf(data.confidence)
+
             } catch (error) {
                 console.error('ERROR:', error);
             } finally {
-                setLoading(false);
                 setClicked(false);
             }
         }
     };
 
+    // Variables for the Info's and Setting's modal
+    const [infoModalOpened, setInfoModalOpened] = useState(false);
+    const [infoResults, setInfoResults] = useState(false);
+    const [openSettings, setOpenSettings] = useState(false);
 
     return (
-        <div className={styles.test}>
+        <div className="container-pages">
             {/* Header */}
-            <div className={styles.header}>
-                <Shield className={styles.header_icon} />
-                <div className={styles.header_content}>
-                    <h1>Testing Lab</h1>
-                    <p>Test on the loaded model single attack for a specific image.</p>
-                </div>
-            </div>
+            <HeaderPageTask
+                Icon={Shield}
+                title="Testing Lab"
+                descrition="Test on the loaded model single attack for a specific image."
 
-            <div className={styles.test_components}>
-                {/* Left Column - Controls */}
-                <div className={styles.main}>
-                    <div className={styles.section}>
-                        <Camera size={'3vw'} color='#FF7F7F' />
-                        <p>
-                            Image Selection
-                        </p>
-                    </div>
-                    <ImageDisplay
-                        placeholder='Load an PNG or a JPG file.'
-                        footer='Here it is shown the selected image.'
-                        loader={true}
-                        handleUpload={(file: string | null) => setUploadedFile(file)}
+            />
+            {/* Selection of the attacks */}
+            <div className={styles.section}>
+                <div className={styles.section_title}>
+                    <Bug size={'calc(var(--icon-size) * 1.5)'} color='red' />
+                    <p>
+                        Vulnerability selection
+                    </p>
+                </div>
+                <label style={{ color: 'grey' }}>
+                    Choose the vulnerability to test:
+                </label>
+
+                <select
+                    className={styles.attack_selection}
+                    onChange={(e) => {
+                        setSelectedAttack(attacks[e.target.value])
+                    }}>
+                    {Object.entries(attacks).map(([id, attack]) => (
+                        <option
+                            key={id}
+                            value={attack.id}
+                        >
+                            {attack.name.charAt(0).toUpperCase() + attack.name.slice(1)}
+                        </option>
+                    ))}
+                </select>
+
+                <div className={styles.buttons_container}>
+                    {/* Execute button */}
+                    <ModalButton
+                        Icon={Play}
+                        background="#10b981"
+                        disabled={!uploadedFile}
+                        hoverDescription='Click the button to execute the attack.'
+                        handleClick={handleClick}
                     />
 
-                    {/* Selection of the attacks */}
-                    <>
-                        <div className={styles.section}>
-                            <Bug size={'3vw'} color='#FF7F7F' />
-                            <p>
-                                Vulnerability selection
-                            </p>
-                        </div>
-                        <div className="mb-6">
-                            <label style={{ color: 'grey' }}>
-                                Choose the vulnerability to test:
-                            </label>
-                            <div className="relative">
-                                <select
-                                    className='attack-selection'
-                                    onChange={(e) => {
-                                        setSelectedAttack(attacks[e.target.value])
-                                    }}>
-                                    {Object.entries(attacks).map(([id, attack]) => (
-                                        <option
-                                            key={id}
-                                            value={attack.id}
-                                        >
-                                            {attack.name.charAt(0).toUpperCase() + attack.name.slice(1)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </>
-                    <div style={{ fontSize: "1vw" }}>
-                        <div className={styles.infoSection}>
-                            <Book size={'2vw'} color='#FF7F7F' />
-                            <h3>Info</h3>
-                        </div>
-                        <p style={{ color: "gray" }}>
-                            <b>Knowledge: </b>{selectedAttack?.knowledge}
-                        </p>
-                        <p style={{ color: "gray" }}>
-                            <b>Description: </b>{selectedAttack?.description}
-                        </p>
-                    </div>
-                    <div className={styles.advance_option}>
-                        <div className={styles.section}>
-                            <TestTubeIcon size={'3vw'} color='#FF7F7F' />
-                            <p>
-                                Advance Settings
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => setAdvanceOption(!advanceOption)}
-                            className={styles.option_button}>
-                            <Settings2 size={27} color='gray' />
-                        </button>
-                    </div>
-                    {
-                        advanceOption && (
-                            selectedAttack && selectedAttack.parameters!.length > 0 ?
-                                <ParameterControls
-                                    handleChange={handleChange}
-                                    parameters={selectedAttack?.parameters} />
-                                : <p style={{ color: 'gray' }}>No parameters available for custom settings.</p>
+                    {/* Info button */}
+                    <ModalButton
+                        Icon={InfoIcon}
+                        background="#3b82f6"
+                        disabled={false}
+                        hoverDescription='View information and help documentation.'
+                        handleClick={() => setInfoModalOpened(true)}
+                    />
 
-                        )
-                    }
-                    <button
-                        disabled={!uploadedFile}
-                        className={`${styles.execute_button} ${uploadedFile ? styles.active : styles.inactive}`}
-                        onClick={handleClick}
-                    >
-                        {clicked ? (<p>Executing...</p>) :
-                            (<>
-                                <Play size={'3vw'} />
-                                <p>Execute attack</p>
-                            </>
-                            )}
-                    </button>
-                </div>
+                    {/* Attack settings button */}
+                    <ModalButton
+                        Icon={Settings}
+                        background="#6366f1"
+                        disabled={false}
+                        hoverDescription='Configure settings and preferences.'
+                        handleClick={() => setOpenSettings(true)}
+                    />
 
-                {/* Right Column - Results */}
-                <div className={styles.results_column}>
-                    <div className={styles.section}>
-                        <Glasses size={'3vw'} color='#FF7F7F' />
-                        <p>
-                            See the Results
-                        </p>
-                    </div>
-                    <div className={styles.image_grid}>
-                        
-                        <ImageDisplay
-                            title="Original Image"
-                            placeholder="No image loaded"
-                            imageUrl={origImg ? origImg[0] : undefined}
-                            footer={origImg ? origImg[1] : undefined}
-                            loader={false}
-                            is_loading={clicked.valueOf()}
-                        />
+                    {/* Attack settings button */}
+                    <ModalButton
+                        Icon={ChartCandlestick}
+                        background="#f59e0b"
+                        disabled={false}
+                        hoverDescription='View attack results and analytics.'
+                        handleClick={() => setInfoResults(true)}
+                    />
 
-                        <ImageDisplay
-                            title="Adversarial Perturbation"
-                            placeholder="No image loaded"
-                            imageUrl={advPert ? "data:image/jpeg;base64," + advPert : undefined}
-                            loader={false}
-                            is_loading={clicked.valueOf()}
-                        />
-
-                        <ImageDisplay
-                            title="Adversarial Example"
-                            placeholder="No image loaded"
-                            imageUrl={advImg ? "data:image/jpeg;base64," + advImg[0] : undefined}
-                            footer={advImg ? advImg[1] : undefined}
-                            loader={false}
-                            is_loading={clicked.valueOf()}
-
-                        />
-                    </div>
-                    <div className={styles.section}>
-                        <TrendingUp size={'3vw'} color='#FF7F7F' />
-                        <p>
-                            More Results
-                        </p>
-                        <button
-                            className={styles.option_button}
-                            onClick={() => setSeeResults(!seeResults)}>
-                            {
-                                seeResults ? <ChevronUp /> : <ChevronDown />
+                    {/* Info Modal */}
+                    <Modal
+                        opened={infoModalOpened}
+                        onClose={() => setInfoModalOpened(false)}
+                        title="Information"
+                        styles={{
+                            title: {
+                                color: 'black',
+                                fontWeight: "bold",
                             }
-                        </button>
-                    </div>
+                        }}
+                        centered>
+                        <div style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            fontSize: "0.8rem"
+                        }}>
+                            <p>These are the main informations about the attack that have been selected:</p>
+                            <span >
+                                <b>Knowledge: </b>{selectedAttack?.knowledge}
+                            </span>
+                            <span>
+                                <b>Description: </b>{selectedAttack?.description}
+                            </span>
+                        </div>
+                    </Modal>
+
+                    {/* Results Modal */}
+                    <Modal
+                        opened={infoResults}
+                        onClose={() => setInfoResults(false)}
+                        title="Information"
+                        styles={{
+                            title: {
+                                color: 'black',
+                                fontWeight: "bold",
+                            }
+                        }}
+                        size="auto"
+                        centered>
+                        <AttackVisualization
+                            prediction={{ original: pred, adversarial: advPred }}
+                            confidence={atkConf}
+                            results={atkResult} />
+                    </Modal>
+
+                    {/* Settings Modal */}
+
                     {
-                        seeResults ?
-                            <AttackVisualization
-                                results={atkResult} />
-                            : null
+                        selectedAttack ?
+                            selectedAttack.parameters ?
+                                selectedAttack.parameters?.length > 0 ?
+                                    <ParametersWindow
+                                        isOpen={openSettings}
+                                        parameters={selectedAttack?.parameters}
+                                        onClose={() => { setOpenSettings(false) }}
+                                        handleParametersChange={handleChange}
+
+                                    />
+                                    : <p style={{ color: 'gray' }}>There are no parameters to set.</p>
+                                : <p style={{ color: 'gray' }}>No parameters have been defined.</p>
+
+                            : <p style={{ color: 'gray' }}>No parameters available for custom settings.</p>
                     }
-
-
                 </div>
             </div>
-        </div>
+            <div className={styles.image_displayer}>
+                <ImageDisplay
+                    title="Original Image"
+                    placeholder='Load an PNG or a JPG file.'
+                    handleUpload={(file: string | null) => setUploadedFile(file)}
+                    loader={true}
+                />
+
+                <ImageDisplay
+                    title="Adversarial Perturbation"
+                    placeholder="No image loaded"
+                    imageUrl={advPert ? "data:image/jpeg;base64," + advPert : undefined}
+                    loader={false}
+
+                />
+
+                <ImageDisplay
+                    title="Adversarial Example"
+                    placeholder="No image loaded"
+                    imageUrl={advImg ? "data:image/jpeg;base64," + advImg : undefined}
+                    loader={false}
+
+                />
+            </div>
+        </div >
     );
 }
+
 
 export default Test;

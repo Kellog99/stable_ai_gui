@@ -1,93 +1,41 @@
-.test {
+.image_displayer {
   display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.header {
-  display: flex;
-  padding: 1.5rem;
-  align-items: center;
-  gap: 2vw;
-}
-
-.header_icon {
-  width: 4vw;
-  height: 4vw;
-  color: #ef4444;
-  padding: 0;
-}
-
-.header_content {
-  color: white;
-  display: flex;
-  align-items: center;
-  display: inline;
-}
-
-.test_components {
-  display: grid;
-  width: 100%;
-  grid-template-columns: 1fr 2fr;
-  column-gap: 4vw;
-}
-
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: 1vw;
+  flex-direction: row;
+  height: 600px;
+  gap: 40px;
 }
 
 .section {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section_title {
+  display: flex;
   flex-direction: row;
-  width: 100%;
   color: white;
   align-items: center;
-  gap: 1vw;
+  gap: 30px;
   font-weight: 900;
 }
 
-.infoSection {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1vw;
-  color: white;
-}
-
-.execute_button {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  height: 5vw;
-  font-weight: 900;
-  padding: 0.75rem 1rem;
-  border-radius: 1.5vw;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  transition: background-color 0.2s;
+.attack_selection {
+  width: 250px;
+  height: 45px;
+  background-color: var(--bg);
   border: none;
+  border-radius: var(--border-radius);
+  padding: 10px;
+  color: lightgray;
+  font-weight: bold;
 }
 
-.execute_button.inactive {
-  cursor: not-allowed;
-}
-
-.execute_button.active {
-  color: black;
-  cursor: pointer;
-}
-
-.active:hover {
-  background-color: #88A2AA;
-  color: white;
-}
-
-.button_icon {
-  width: 1.25rem;
-  height: 1.25rem;
+.buttons_container {
+  display: flex;
+  flex-direction: row;
+  width: 250px;
+  justify-content: space-between;
 }
 
 
@@ -104,34 +52,12 @@
 .results_column {
   display: flex;
   flex-direction: column;
+  gap: 40px;
 }
 
 .image_grid {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   column-gap: 2vw;
-}
-
-
-.advance_option {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: white;
-}
-
-.option_button {
-  height: 100%;
-  width: 100;
-  background-color: transparent;
-  align-items: center;
-  align-self: center;
-  border-color: transparent;
-  transform: translate(0, 2px);
-
-}
-
-.option_button:hover {
-  transform: translate(0, 4px);
 }

@@ -1,102 +1,64 @@
-"use client";
+"use client"
 
-import useStore from '@/store/nnTrustStore';
+import { CheckCircle, Circle, Shield } from 'lucide-react';
+import '@/styles/Header.css';
+import { useRouter } from 'next/navigation';
+import { title } from '@/page';
+
 import useNNTrustStore from '@/store/nnTrustStore';
-import { Brain, Database, FileText, Home, LucideIcon, Option } from 'lucide-react';
-import styles from '@/styles/Header.module.css';
-
-import { useRouter } from "next/navigation";
-import { useState } from 'react';
-
-
-// available buttons to display on the head bar
-interface HeaderButtonProps {
-  id: string,
-  Icon: LucideIcon,
-  href: string,
-  name: string
-}
-
-const btns: HeaderButtonProps[] = [
-  {
-    id: 'HomePage',
-    Icon: Home,
-    href: "/",
-    name: "home"
-  },
-  //{
-  //  id: 'ReportPage',
-  //  Icon: FileText,
-  //  href: "/pages/report",
-  //  name: "report"
-  //}
-]
-type Option = typeof btns[number]['id'];
-const possiblePages: Option[] = btns.map((btn) => btn.id);
-
+import useStore from '@/store/dsStore';
 
 const Header = () => {
-  const [page, setPage] = useState<string>(possiblePages[0])
-  const datasetName = useStore((state) => state.datasetUsed)?.name;
-  const modelName = useNNTrustStore((state) => state.modelName);
 
-  const router = useRouter();
-
-
+  const { model } = useNNTrustStore()
+  const { dataset } = useStore()
+  const router = useRouter()
   return (
-    <div className={styles.container}>
-      <div className={styles.buttons}>
-        <div
-          className={styles.slider}
-          style={{
-            transform: `translateX(${btns.findIndex(b => b.id === page) * 100}%)`,
-            width: `${100 / btns.length}%`
-          }}
-        />
-        {btns.map((btnprops) => (
-          <button
-            key={btnprops.id}
-            className={`${styles.button} ${page === btnprops.id ? styles.active : ''}`}
-            onClick={() => {
-              setPage(btnprops.id);
-              router.push(btnprops.href);
-            }}
-          >
-            <btnprops.Icon />
-            {btnprops.name.charAt(0).toUpperCase() + btnprops.name.slice(1)}
-          </button>
-        ))}
+    <header className="app-header">
+      <div className="header-nav">
+        <button
+          onClick={() => router.push("/")}
+          className="sidebar-brand">
+          <div className="brand-icon">
+            <Shield size={25} className="text-white" />
+          </div>
+          <span className="brand-name">{title}</span>
+        </button>
       </div>
 
-      {/* Title */}
-      <div className={styles.title}>
-        <p>TITANN
-        </p>
-         <p>Tool for Inspection and Trustworthiness Assesment of Neural Networks</p>
-        <img
-          src="/logo_leonardo.png"
-          alt="logo"
-          className={styles.logo}
-        />
-      </div>
-
-      {/* Status indicator */}
-      <div className={styles.indicators}>
-        <div className={`${styles.item} ${modelName ? styles.loaded : ''}`}>
-          <Brain />
-          <span>
-            {modelName ? modelName.slice(0, 10) + (modelName.length > 10 ? '…' : '') : 'No model'}
-          </span>
+      <div className="header-status">
+        <div className="status-indicator">
+          {model?.name ? (
+            <>
+              <CheckCircle size={"calc(var(--icon-size) / 1.5)"} color="var(--affermative)" />
+              <span>{model?.name}</span>
+            </>
+          ) :
+            <>
+              <Circle size={"calc(var(--icon-size) / 1.5)"} color="var(--warning)" />
+              <span>No Model</span>
+            </>
+          }
         </div>
-        <div className={`${styles.item} ${datasetName ? styles.loaded : ''}`}>
-          <Database />
-          <span>
-            {datasetName || 'No dataset'}
-          </span>
-        </div >
-      </div >
-    </div >
+        <div className="status-divider"></div>
+        <div className="status-indicator">
+          {dataset ? (
+            <>
+              <CheckCircle size={"calc(var(--icon-size) / 1.5)"} color="var(--affermative)" />
+              <span>{dataset.name}</span>
+            </>
+          ) :
+            <>
+              <Circle size={"calc(var(--icon-size) / 1.5)"} color="var(--warning)" />
+              <span>No Dataset</span>
+            </>
+          }
+
+        </div>
+      </div>
+    </header>
   );
 }
 
-export default Header
+
+export default Header;

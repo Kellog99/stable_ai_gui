@@ -21,8 +21,6 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 100%;
     max-width: 28rem;
-    max-height: 100vh;
-    overflow-y: auto;
 }
 
 /* Modal Header */
@@ -60,7 +58,9 @@
 
 /* Modal Content */
 .modal-content {
+    max-height: 500px;
     padding: 1.5rem;
+    overflow-y: scroll;
 }
 
 /* Form Groups */
@@ -194,7 +194,6 @@
     }
 
     .modal-header,
-    .modal-content,
     .modal-footer {
         padding: 1rem;
     }

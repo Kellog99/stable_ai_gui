@@ -1,4 +1,7 @@
-interface infoProps {
+import Dataset from "./genericInterface";
+
+export interface infoProps {
+    id: string;
     name: string;
     parameters: number;
     task: string
@@ -31,18 +34,24 @@ export interface attacksProps {
     confusionmatrix?: number[][]
 }
 
-export interface ReportProps {
-    prototype: string;
-    dataset: string;
-    tool: string;
+//  Interface for the report page
+export interface ReportAttacksProps {
     info: infoProps;
     metrics: metricsProps;
     attacks: { [key: string]: attacksProps }
 }
 
+// Interface associated for retriving the values in the report.
 export interface BenchmarkDataProps {
     name: string
     param: number
     task: string
-    metrics: { [key: string | number]: number }
+    metrics: { [key: string | number]: number[] }
+}
+
+export interface DQReportProps {
+    id: string;
+    tool: string
+    dataset: Dataset;
+    metrics: Object[];
 }

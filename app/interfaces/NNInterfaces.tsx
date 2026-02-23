@@ -1,21 +1,17 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
-export interface ModelSpecs {
-  name: string;
-  task: string;
-  num_classes: number;
-  pretrained: boolean;
-  type: string;
+import { Info } from "./homePageInterface";
+
+// Model's information
+export interface ModelInfo extends Info {
+  dataset: string,                  // Dataset where the model had been optimized on 
+  parameters: number | null,        // Number of the models' parameters
 }
 
-export interface Task {
-  Icon: LucideIcon,
-  title: string,
-  description: string,
-  footer: string,
-  color: string,
-  href: string          // reprenset the page to navigate to
+export interface DatasetInfo extends Info {
+  num_samples: number,              // Number of the dataset' samples
 }
+
 
 export interface LoadedFile {
   name: string;
@@ -40,19 +36,11 @@ export interface ButtonProps {
   onClickHandle: ReactEventHandler
 }
 
-export interface FileDropZoneProps {
-  id: string,
-  title: string;
-  Icon: LucideIcon;
-  acceptedTypes: string[];
-  description: string;
-  isLoaded?: boolean;
-  loadedFileName?: string;
-}
+
 
 export interface ParametersProps {
+  id: string
   name: string
-  label: string
   min: number
   max: number
   step: number
@@ -77,3 +65,9 @@ export interface ParametersWindowProps {
   handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
 }
 
+export interface AttackManagementProps {
+  id: number;
+  name: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'closed';
+  progress: number
+}
