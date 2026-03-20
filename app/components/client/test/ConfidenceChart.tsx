@@ -1,6 +1,5 @@
 import { LineChart } from '@mantine/charts';
 import React from 'react'
-import '@mantine/charts/styles.css'; // Add this import
 
 interface ConfidenceChartProps {
     confidence?: { [key: string]: { [key: number]: number } },
