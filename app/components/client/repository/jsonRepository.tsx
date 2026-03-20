@@ -2,8 +2,8 @@ import { DQReportProps } from "@/functionalities/reportInterfaces";
 import "./JsonRepository.css"
 import React, { useEffect, useState } from "react";
 import ReportCard from "./ReportCard";
-import { getAllDQReports } from "@/functionalities/BackendUtils";
-import { getReports } from "@/functionalities/NNTrustBackendUtils";
+import { getAllDQReports } from "@/functionalities/DQServices/BackendUtils";
+import { getReports } from "@/functionalities/TITANNServices/get_info";
 import { AlertCust } from "../AlertCustom";
 
 

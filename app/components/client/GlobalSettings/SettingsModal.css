@@ -1,0 +1,46 @@
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 40vh;
+    max-height: 600px;
+    width: 100%;
+    padding: 10px;
+    gap: 13px;
+}
+
+.settings-text {
+    margin: 0;
+    color: lightgray;
+    padding-bottom: 10px;
+    border-bottom: 1px solid lightgray;
+    font-size: 0.9rem;
+}
+
+.settings-button {
+    width: 100px;
+    border-radius: var(--border-radius);
+    border: none;
+    font-weight: 500;
+    color: black;
+}
+
+.settings-button.close {
+    background-color: rgb(220, 53, 69);
+    color: white;
+}
+
+.close:active {
+    background-color: rgb(176, 42, 55);
+}
+
+.settings-button.save {
+    background-color: rgb(34, 139, 34);
+    width: 100px;
+    color: white;
+}
+
+.save:active {
+    background-color: rgb(27, 111, 27);
+}

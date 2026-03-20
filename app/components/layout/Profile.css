@@ -1,0 +1,23 @@
+.profile-container {
+    height: 100%;
+    display: flex;
+    gap: 10px;
+    background-color: var(--bg);
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    color: darkgray;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    border: none;
+}
+
+.profile-container:hover {
+    filter: brightness(1.15);
+    /* 85% brightness = darker */
+}
+
+.profile-container:active {
+    filter: brightness(0.85);
+    color: lightgray;
+}

@@ -1,5 +1,5 @@
-import { useThumbnailWS } from "@/functionalities/useThumbnailWS";
-import { ReportAttacksProps } from "@/interfaces/reportInterfaces";
+import { useThumbnailWS } from "@/functionalities/DQServices/useThumbnailWS";
+import { ModelReportProps } from "@/interfaces/reportInterfaces";
 import { DQReportProps } from "@/functionalities/reportInterfaces";
 import { image_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 interface ReportCardProps {
-    reportNN?: ReportAttacksProps;
+    reportNN?: ModelReportProps;
     reportDQ?: DQReportProps;
 }
 
@@ -35,7 +35,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
     const handleClick = () => {
         if (reportNN) {
-            setReport(reportNN as ReportAttacksProps)
+            setReport(reportNN as ModelReportProps)
             router.push("/pages/report/reportTITANN")
         } else if (reportDQ) {
             console.log("REPORTDQ CLICK", reportDQ)

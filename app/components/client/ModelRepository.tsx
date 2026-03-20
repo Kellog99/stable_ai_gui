@@ -1,6 +1,6 @@
 "use client"
 
-import { getModels } from "@/functionalities/NNTrustBackendUtils";
+import { getModels } from "@/functionalities/TITANNServices/get_info";
 import useStore from "@/store/nnTrustStore";
 import styles from "@/styles/ModelCard.module.css";
 import { useEffect } from "react";

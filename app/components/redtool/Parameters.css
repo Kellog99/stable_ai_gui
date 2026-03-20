@@ -1,79 +1,31 @@
-/* Modal Overlay */
-.modal-overlay {
-    position: fixed;
-    pointer-events: auto;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    z-index: 50;
-}
-
-/* Modal Window */
-.modal-window {
-    background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    width: 100%;
-    max-width: 28rem;
-}
-
-/* Modal Header */
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.modal-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-}
-
-.close-button {
-    color: #9ca3af;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-    transition: color 0.2s ease;
-}
-
-.close-button:hover {
-    color: #4b5563;
-}
-
-/* Modal Content */
-.modal-content {
-    max-height: 500px;
-    padding: 1.5rem;
-    overflow-y: scroll;
-}
-
 /* Form Groups */
+.parameters-container {
+    display: flex;
+    max-height: 500px;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
 .form-group {
-    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(224, 224, 224, 0.4);
+    border-radius: 10px;
+    padding: 10px;
 }
 
 .form-label {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     font-size: 0.875rem;
     font-weight: 500;
     color: #374151;
-    margin-bottom: 0.5rem;
 }
 
 /* Range Sliders */
@@ -121,70 +73,78 @@
     transform: translateX(1.5rem);
 }
 
-/* Modal Footer */
+/*########################### Modal Footer ###########################*/
 .modal-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    background-color: #f9fafb;
-    border-bottom-left-radius: 0.75rem;
-    border-bottom-right-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+    border-top: 1px solid #dee2e6;
+    gap: 1rem;
 }
 
 .button-group {
     display: flex;
+    gap: 0.75rem;
+}
+
+.footer-button {
+    height: 45px;
+    aspect-ratio: 2.14;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-weight: bold;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
     gap: 0.5rem;
 }
 
-.reset-button {
-    padding: 0.5rem 1rem;
-    color: #4b5563;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: color 0.2s ease;
-    font-size: 0.875rem;
+.footer-button.reset {
+    background-color: transparent;
+    color: #6c757d;
+    border: 1px solid transparent;
 }
 
-.reset-button:hover {
-    color: #1f2937;
+.footer-button.reset:hover {
+    background-color: #f1f3f5;
 }
 
-.cancel-button {
-    padding: 0.5rem 1rem;
-    color: #4b5563;
-    background: white;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.875rem;
+.footer-button.cancel {
+    background-color: #fff;
+    color: #495057;
+    border: 1px solid #dee2e6;
 }
 
-.cancel-button:hover {
-    color: #1f2937;
-    background-color: #f9fafb;
+.footer-button.cancel:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
 }
 
-.save-button {
-    padding: 0 0.5rem;
-    background-color: #2563eb;
+.footer-button.save {
+    background-color: #228be6;
     color: white;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 0.875rem;
-    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-.save-button:hover {
-    background-color: #1d4ed8;
+.footer-button.save:hover {
+    background-color: #1c7ed6;
 }
 
+.footer-button.save.saving {
+    background-color: #10b981 !important;
+    /* Green color */
+    transform: scale(0.95);
+}
 
+/* Optional: Add a smooth transition back */
+.footer-button.save:not(.saving) {
+    transition: background-color 0.3s ease 0.3s, transform 0.1s ease;
+}
 
 /* Responsive Design */
 @media (max-width: 640px) {

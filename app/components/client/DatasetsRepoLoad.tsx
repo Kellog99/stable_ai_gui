@@ -1,5 +1,5 @@
 "use client"
-import DatasetsLoader from "@/functionalities/DatasetsLoader";
+import DatasetsLoader from "@/functionalities/DQServices/DatasetsLoader";
 import useStore from "@/store/dsStore";
 import { Loader, Text } from "@mantine/core";
 import { useEffect, useState } from "react";

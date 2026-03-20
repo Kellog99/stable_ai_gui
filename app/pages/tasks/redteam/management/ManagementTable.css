@@ -93,7 +93,6 @@ select:focus {
     font-weight: 800;
     text-align: left;
     padding: 4px 0 4px 4px;
-    /* Reduced padding */
     border-bottom: 1px solid #e5e7eb
 }
 

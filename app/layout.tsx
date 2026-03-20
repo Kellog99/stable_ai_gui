@@ -6,6 +6,7 @@ import Header from "./components/client/Header";
 import Navbar from './components/layout/Navbar';
 import "./globals.css";
 import "@mantine/core/styles.css";
+import '@mantine/charts/styles.css';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -1,18 +1,17 @@
 "use client"
-import { UserRound } from 'lucide-react';
 import './Navbar.css';
-import { sections } from './config';
+import { NavigationSection, sections } from './config';
 import NavigationButton from './NavigationButton';
-import { useState } from 'react';
 import { Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import Profile from './Profile';
 
 export default function Navbar() {
-    const [activeLink, setActiveLink] = useState<string>("")
     const [opened, { toggle }] = useDisclosure(true);
+
+
     return (
-        <div className='container-nav'
-            style={{ width: `${opened ? "300px" : "120px"}` }}>
+        <div className='container-nav'>
             <div className='nav-header'>
                 <Burger
                     size={20}
@@ -24,32 +23,27 @@ export default function Navbar() {
                     "Menu" : null}
             </div>
             <div className="nav-section">
-                {Object.entries(sections).map(([sectionName, elements]) => (
-                    <div key={sectionName}>
-                        <h3 className="section-title">{sectionName}</h3>
-                        <div className="nav-items">
-                            {elements.map((element) => (
-                                <NavigationButton
-                                    key={element.id}
-                                    id={element.id}
-                                    title={element.title}
-                                    href={element.href}
-                                    Icon={element.Icon}
-                                    items={element.items}
-                                    setActiveLink={setActiveLink}
-                                    requiresEmbeddings={false}
-                                    isDisabled={false}
-                                    isClosed={!opened} />
-                            ))}
+                {Object.entries(sections).map(
+                    ([sectionName, elements]: [string, NavigationSection[]]) => (
+                        <div key={sectionName}>
+                            <h3 className="section-title">{sectionName}</h3>
+                            <div className="nav-items">
+                                {elements.map((element) => (
+                                    <NavigationButton
+                                        id={element.id}
+                                        title={element.title}
+                                        href={element.href}
+                                        Icon={element.Icon}
+                                        items={element.items}
+                                        requiresEmbeddings={false}
+                                        isDisabled={false}
+                                        isClosed={!opened} />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
             </div>
-            <div className='nav-profile'>
-                <UserRound size={"var(--icon-size)"} />
-                {opened ?
-                    "User Info" : null}
-            </div>
+            <Profile isOpen={opened} />
         </div>
     );
 }

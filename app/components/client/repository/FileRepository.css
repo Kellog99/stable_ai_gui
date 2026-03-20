@@ -1,98 +1,69 @@
-.repository-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    /* Changed from center */
-    align-content: flex-start;
-    /* Changed from center - this is the key fix */
-    justify-content: center;
-    height: 100%;
+.table-wrapper {
     width: 100%;
+    height: 270px;
+    overflow: auto;
+    position: relative;
+    background-color: color-mix(in hsl,
+            var(--bg-dark) 50%,
+            var(--bg) 50%);
+    border-radius: var(--border-radius);
+}
+
+.repository-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     background-color: var(--bg-light);
-    border-radius: var(--border-radius);
-    overflow-y: scroll;
-    overflow-x: hidden;
-    gap: 10px;
-    padding: 17px;
-    /* Add padding to prevent items touching edges */
-}
-
-.container-warning {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    align-content: center;
-    align-items: center;
-    justify-content: center;
-}
-
-.warning {
-    width: 180px;
-    aspect-ratio: 3.14;
-    border-radius: var(--border-radius);
-    display: flex;
-    flex-direction: row;
-    background-color: rgb(253, 253, 152);
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    gap: 10px;
     font-weight: bold;
+    color: white;
+    letter-spacing: 0.03em;
 }
 
-/* ################# Card style ################# */
-
-.card {
-    display: flex;
-    flex-direction: column;
-    border-radius: var(--border-radius);
-    align-items: center;
-    align-content: center;
-    height: 170px;
-    width: 220px;
-    padding: 20px 15px 20px 15px;
-    gap: 10px;
-    border: none;
-    background-color: lightgray;
+.table-header th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card.active {
-    background-color: rgb(193, 193, 250);
+.table-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: white;
+    font-weight: 500;
 }
 
-.card-header {
+.table-row:hover {
+    background-color: color-mix(in hsl,
+            var(--bg) 70%,
+            var(--bg-light) 30%);
+}
+
+.table-row.selected {
+    background-color: #3f5873ff;
+}
+
+.table-row.selected:hover {
+    background-color: #3f5873ff;
+}
+
+.table-row td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.name-container {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    font-size: 0.8rem;
-    font-weight: bold;
-    gap: 10px;
-    padding-bottom: 4px;
-    width: 100%;
-    min-height: 10px;
-    border-bottom: 1px solid gray;
+    gap: 5px;
 }
 
-.card-title {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-.title {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-    flex: 1;
-    min-width: 0;
-}
-
-.card-btn-delete {
+.table-btn {
     padding: 0px;
     display: flex;
     flex-direction: row;
@@ -103,32 +74,23 @@
     width: 30px;
     height: 30px;
     border-radius: var(--border-radius);
-
 }
 
-.card-btn-delete:hover {
-    background-color: rgb(255, 195, 195);
+.table-btn.delete {
+    color: red;
 }
 
-.card-content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    max-height: 400px;
-    /* or whatever height you need */
-    align-items: flex-start;
-    text-align: left;
-    overflow-y: auto;
-    /* only show scrollbar when needed */
-    overflow-x: hidden;
-    color: black;
-    gap: 4px;
-    margin: 0;
+.table-btn.info {
+    color: yellow;
 }
 
-.card-element {
-    margin: 0;
-    height: fit-content;
-    width: 100%;
-    font-size: 0.6rem;
+.info:hover {
+    background-color: rgba(173, 173, 24, 0.825);
+}
+
+.info-table th:first-child,
+.info-table td:first-child {
+    background-color: #f1f3f5;
+    font-weight: bold;
+    width: 150px;
 }

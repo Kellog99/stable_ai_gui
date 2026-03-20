@@ -10,44 +10,48 @@ import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import SecurityReportPDF from './PDF/SecurityReportPDF';
 import { pdf } from '@react-pdf/renderer';
 import InfoTable from './InfoTable';
-import { getBenchmarkList } from '@/functionalities/NNTrustBackendUtils';
+import { getBenchmarkList } from '@/functionalities/TITANNServices/get_benchmarks';
 import { BenchmarkDataProps } from '@/interfaces/reportInterfaces';
+import useBackendVariablesStore from '@/store/globalStore';
 
 
 const SecurityReport = () => {
-
-    const { attackReport: report } = useNNTrustStore()
+    const { hostname, port } = useBackendVariablesStore()
+    const { modelReport } = useNNTrustStore()
 
     const [modelInfo, setModelInfo] = useState<{ [key: string]: string | number }>({})
     const [modelMetrics, setModelMetric] = useState<{ [key: string]: string | number }>({})
     const [benchmark, setBenchmark] = useState<BenchmarkDataProps[]>([])
+
     useEffect(() => {
-        if (report) {
+        if (modelReport) {
             setModelInfo(Object.fromEntries(
-                Object.entries(report.info).filter(([key]) => !['id', 'image'].includes(key))
+                Object.entries(modelReport.info).filter(([key]) => !['id', 'image'].includes(key))
             ))
             setModelMetric(
                 Object.fromEntries(
-                    Object.entries(report.metrics).filter(([key]) => !['id', 'confusion_matrix'].includes(key))
+                    Object.entries(modelReport.metrics).filter(([key]) => !['id', 'confusion_matrix'].includes(key))
                 ))
         }
 
         //####################### benchmarking list #######################
-        getBenchmarkList()
+        getBenchmarkList(hostname, port)
             .then(setBenchmark)
             .catch(err => console.error("Failed to load attacks:", err));
         //################################################################# 
-    }, [report])
+    }, [modelReport, hostname, port])
+    console.log("benchmark = ", benchmark)
 
-    const reportRef = useRef<HTMLDivElement>(null);
     //####################### PDF GENERATION #######################
+    const reportRef = useRef<HTMLDivElement>(null);
+
     const handleDownloadPDF = async () => {
         try {
             // Generate PDF blob
-            if (report && benchmark) {
+            if (modelReport && benchmark) {
                 const blob = await pdf(
                     <SecurityReportPDF
-                        report={report}
+                        report={modelReport}
                         benchmark={benchmark}
                     />
                 ).toBlob();
@@ -56,7 +60,7 @@ const SecurityReport = () => {
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `Security_Report_${report.info?.name}_${new Date().toISOString().split('T')[0]}.pdf`;
+                link.download = `Security_Report_${modelReport.info?.name}_${new Date().toISOString().split('T')[0]}.pdf`;
 
                 // Trigger download
                 document.body.appendChild(link);
@@ -78,7 +82,7 @@ const SecurityReport = () => {
     //##############################################################
 
     //  Handling the case where no report is loaded
-    if (!report) return <div className="error">No data are lodaded</div>;
+    if (!modelReport) return <div className="error">No data are lodaded</div>;
 
     return (
         <div className='report-container'>
@@ -108,7 +112,7 @@ const SecurityReport = () => {
                     </div>
                     <InfoTable
                         props={modelInfo}
-                        title={`Model ${report.info.name}'s information`}
+                        title={`Model ${modelReport.info.name}'s information`}
                     />
                 </div>
 
@@ -139,8 +143,8 @@ const SecurityReport = () => {
                 </p>
 
                 <BenchmarkTable
-                    modelName={report.info.name}
-                    data={report.metrics}
+                    modelName={modelReport.info.name}
+                    data={modelReport.metrics}
                     benchmark={benchmark ? benchmark : []} />
             </div>
 
@@ -155,7 +159,7 @@ const SecurityReport = () => {
                     Here are all the vulnerabilities that were tested on the model. The center column indicates which vulnerability has been tested, and on the right, its criticality is displayed.
                 </p>
 
-                <AttackTable data={report.attacks} />
+                <AttackTable data={modelReport.attacks} />
             </div >
         </div >
     );

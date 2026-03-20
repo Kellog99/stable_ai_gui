@@ -1,15 +1,5 @@
 import Dataset from "./genericInterface";
-
-export interface infoProps {
-    id: string;
-    name: string;
-    parameters: number;
-    task: string
-    dataset: string
-    classes: number;
-    dimensionality: number[];
-
-}
+import { ModelInfo } from "./homePageInterface";
 
 export interface metricsProps {
     params: number;
@@ -35,8 +25,8 @@ export interface attacksProps {
 }
 
 //  Interface for the report page
-export interface ReportAttacksProps {
-    info: infoProps;
+export interface ModelReportProps {
+    info: ModelInfo;
     metrics: metricsProps;
     attacks: { [key: string]: attacksProps }
 }

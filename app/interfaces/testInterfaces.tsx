@@ -1,3 +1,6 @@
+import { ModelInfo } from "./homePageInterface";
+import { RegisterObjectProps } from "./NNInterfaces";
+
 export interface AttackConfig {
   epsilon: number;
   iterations: number;
@@ -5,14 +8,17 @@ export interface AttackConfig {
   targetClass?: number;
   confidence?: number;
 }
-
+export interface SingleAttackInput {
+  image: string,
+  attack: RegisterObjectProps,
+  model: ModelInfo
+}
 export interface SingleAttackProps {
-  x: string;
   adv_perturbation: string;
   x_adv: string;
   original_prediction: string;
   adversarial_prediction: string;
-  confidence: {[key:string]: number[]},
+  confidence: { [key: string]: number[] },
   advance_metrics: { [key: string]: number }
 }
 

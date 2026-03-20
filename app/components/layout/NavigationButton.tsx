@@ -1,24 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { NavigationSection } from "./config";
 import { usePathname, useRouter } from "next/navigation";
-import "./Navbar.css";
+import "./NavigationButton.css";
 
 interface NavigationButtonProps extends NavigationSection {
-    setActiveLink: (id: string) => void;
     isClosed: boolean;   // Whether the NavBar is collapsed
     isDisabled?: boolean; // Whether the button is disabled
 }
 
 const NavigationButton: React.FC<NavigationButtonProps> = ({
-    id,
     title,
     Icon,
     href,
     items,
-    setActiveLink,
     isClosed,
     isDisabled = false,
 }) => {
@@ -26,62 +23,72 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
     const router = useRouter();
 
     const [expanded, setExpanded] = useState<boolean>(true); // all visible by default
-    const [isActive, setIsActive] = useState<boolean>(pathname === href);
 
-    useEffect(() => {
-        setIsActive(pathname === href);
-    }, [pathname, href]);
+    // This constant allow to tells whethe a component has children
+    const hasChildren = useMemo(
+        () => !!items && items.length > 0,
+        [items]
+    );
 
-    const hasChildren = !!items && items.length > 0;
+    // Check if this route or any child route is active
+    const isActive = useMemo(() => {
+        if (pathname === href) return true;
+        if (hasChildren && items) {
+            return items.some(item => pathname === item.href);
+        }
+        return false;
+    }, [pathname, href, hasChildren, items]);
+
     // Every time I explode the lateral navbar, the children are shown
     useEffect(() => {
         setExpanded(!isClosed)
     }, [isClosed])
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+
+    const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
 
-        if (isDisabled) return; // safeguard
-        if (hasChildren) setExpanded((prev) => !prev)
+        if (isDisabled) return;
+
+        // Toggle expansion if has children
+        if (hasChildren) {
+            setExpanded((prev) => !prev);
+        }
+
+        // Navigate if href exists
         if (href) {
             router.push(href);
-            setActiveLink(id);
         }
-    };
+    }, [isDisabled, hasChildren, href, router]);
 
+    const ChevronIcon = expanded ? ChevronUp : ChevronDown;
     return (
-        <div className="flex flex-col w-full">
+        <div className="nav-button-container">
             <button
                 onClick={handleClick}
                 disabled={isDisabled}
-                className={`nav-item flex items-center justify-between w-full py-2 px-3 rounded-md transition-all
-          ${isActive ? "active" : ""}
-          ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                className={`nav-item ${isActive ? "active" : ""}`}
             >
-                <div
-                    className="nav-item-content flex items-center"
-                    style={{ gap: isClosed ? "0px" : "1vw" }}
-                >
-                    <Icon size={22} aria-hidden="true" />
-                    {!isClosed && <span>{title}</span>}
+                <div className={`nav-item-content ${isClosed ? "collapsed" : ""}`}>
+
+                    <Icon
+                        size={22}
+                        aria-hidden="true"
+                    />
+                    {!isClosed && <div className="button-name">{title}</div>}
                 </div>
 
                 {!isClosed && hasChildren && (
-                    isClosed ? (
-                        <ChevronUp size={18} />
-                    ) : (
-                        <ChevronDown size={18} />
-                    )
+                    <ChevronIcon size={18} aria-label={expanded ? "Collapse" : "Expand"} />
                 )}
             </button>
 
             {/* Sub-items */}
             {!isClosed && hasChildren && expanded && (
-                <div className="sub-items">
+                <div className="sub-items" role="group">
                     {items!.map((item) => (
                         <NavigationButton
                             key={item.id}
                             {...item}
-                            setActiveLink={setActiveLink}
                             isClosed={isClosed}
                             isDisabled={item.requiresEmbeddings === false}
                         />

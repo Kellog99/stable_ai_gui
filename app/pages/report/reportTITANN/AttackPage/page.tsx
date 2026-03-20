@@ -10,7 +10,7 @@ const AttackPage = () => {
     const atkId = searchParams.get('atkId');
     console.log("atkId = ", atkId)
 
-    const { attackReport } = useNNTrustStore();
+    const { modelReport: attackReport } = useNNTrustStore();
     const [attack, setAttack] = useState<attacksProps | null>(null);
     const [usedParams, setUsedParams] = useState<any>(null)
 

@@ -1,7 +1,7 @@
 "use server";
 import fs from 'fs';
 import path from 'path';
-import { dataset_get, datasets_get, save_get } from '../properties/urls';
+import { dataset_get, datasets_get, save_get } from '../../properties/urls';
 import { revalidatePath } from "next/cache";
 import fsPromises from "node:fs/promises";
 

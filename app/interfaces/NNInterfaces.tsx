@@ -1,16 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
-import { Info } from "./homePageInterface";
+import { ModelInfo } from "./homePageInterface";
 
-// Model's information
-export interface ModelInfo extends Info {
-  dataset: string,                  // Dataset where the model had been optimized on 
-  parameters: number | null,        // Number of the models' parameters
-}
-
-export interface DatasetInfo extends Info {
-  num_samples: number,              // Number of the dataset' samples
-}
 
 
 export interface LoadedFile {

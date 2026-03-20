@@ -1,4 +1,4 @@
-import { useThumbnailWS } from '@/functionalities/useThumbnailWS';
+import { useThumbnailWS } from '@/functionalities/DQServices/useThumbnailWS';
 import useStore from '@/store/dsStore';
 import { Badge, Card, CardSection, Grid, GridCol, Group, Text } from '@mantine/core';
 import React from 'react';

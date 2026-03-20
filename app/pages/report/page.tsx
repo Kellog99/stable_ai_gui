@@ -6,46 +6,41 @@ import { File, HardDrive, Upload } from "lucide-react";
 import { infoModel } from "@/components/client/upload/config";
 
 import { DragDrop } from "@/components/client/upload/DragDrop";
-import { ButtonProps } from "@/interfaces/homePageInterface";
+import { ButtonProps, InfoProps, ModelInfo } from "@/interfaces/homePageInterface";
 import { useEffect, useState } from "react";
-import { getReports, uploadReport } from "@/functionalities/NNTrustBackendUtils";
+import { getCoreElements } from "@/functionalities/TITANNServices/get_info";
 import FileRepository from "@/components/client/repository/FileRepository";
 import useNNTrustStore from "@/store/nnTrustStore";
-import { DQReportProps, infoProps, ReportAttacksProps } from "@/interfaces/reportInterfaces";
-import { ReportProps } from "@/functionalities/reportInterfaces";
-import useStore from "@/store/dsStore";
+import { ModelReportProps } from "@/interfaces/reportInterfaces";
 import { useRouter } from "next/navigation";
-import { getListModelsReport, uploadRepo } from "@/properties/urlsNNTrust";
+import useBackendVariablesStore from "@/store/globalStore";
 
 export default function ReportPage() {
 
-  const [listAttacksReport, setListAttacksReport] = useState<ReportAttacksProps[]>([])
-  // const [listDatasetsReport, setListDatasetsReport] = useState<DQReportProps[]>([])
+  const [listAttacksReport, setListAttacksReport] = useState<ModelReportProps[]>([])
 
   const {
-    attackReport,
+    hostname,
+    port
+  } = useBackendVariablesStore()
+
+  const {
+    modelReport: attackReport,
     setAttackReport,
   } = useNNTrustStore()
-
-  const {
-    report,
-    setReport,
-  } = useStore()
 
 
   // ################## Reports' list ##################
   useEffect(() => {
-    getReports(getListModelsReport)
-      .then(setListAttacksReport)
-      .catch(err => console.error("Failed to load attacks:", err));
-  }, [setListAttacksReport]);
-
-  // useEffect(() => {
-  //   getReports(getListDatasetsReport)
-  //     .then(setListDatasetsReport)
-  //     .catch(err => console.error("Failed to load attacks:", err));
-  // }, [setListDatasetsReport]);
-
+    getCoreElements(
+      hostname,
+      port,
+      "path_model_report_repo",
+      "report.json"
+    )
+      .then((modelReportList) => setListAttacksReport(modelReportList as ModelReportProps[]))
+  }, [setListAttacksReport, hostname, port]);
+  console.log(listAttacksReport)
 
   // ################# router ################# 
   const router = useRouter()
@@ -63,9 +58,10 @@ export default function ReportPage() {
         description={'Upload the JSON file related to the report.'}
         onFileUpload={(file: File | null) => {
           if (file) {
-            uploadReport(uploadRepo, file)
-              .then(setAttackReport)
-              .then(() => router.push("/pages/report/reportTITANN"))
+            console.log(file)
+            // uploadReport(file)
+            //   .then(setAttackReport)
+            //   .then(() => router.push("/pages/report/reportTITANN"))
           }
         }}
       />,
@@ -75,34 +71,20 @@ export default function ReportPage() {
       name: "Repository Model",
       Icon: HardDrive,
       child: <FileRepository
-        elements={listAttacksReport.map(element => element.info)}
-        selectHandle={(report: infoProps) => {
-          const selectedReport: ReportAttacksProps | undefined = listAttacksReport.find(value => value.info.id === report.id)
+        elements={listAttacksReport.map((attackReport) => attackReport.info)}
+        selectHandle={(report) => {
+          const selectedReport: ModelReportProps | undefined = listAttacksReport.find(value => value.info.id === (report as InfoProps).id)
           if (selectedReport) {
             setAttackReport(selectedReport)
             router.push("/pages/report/reportTITANN")
           }
         }}
         activeId={attackReport?.info.id}
-        handleDelete={(report: ReportProps) => {
-          setListAttacksReport(listAttacksReport.filter(reportContained => reportContained.id !== report?.id))
+        handleDelete={(report) => {
+          const reportId: string = (report as ModelInfo).id
+          setListAttacksReport(listAttacksReport.filter(reportContained => (reportContained as ModelReportProps).info.id !== reportId))
         }} />,
-    },
-    // {
-    //   id: "repoDatasetReport",
-    //   name: "Repository Dataset",
-    //   Icon: HardDrive,
-    //   child: <FileRepository
-    //     elements={listDatasetsReport}
-    //     selectHandle={(dataset: DQReportProps) => {
-    //       setReport(dataset);
-    //       router.push("./reportDQ")
-    //     }}
-    //     activeId={report?.id}
-    //     handleDelete={(report) => {
-    //       setListDatasetsReport(listDatasetsReport.filter(datasetContained => datasetContained.id !== report.id))
-    //     }} />,
-    // },
+    }
   ]
 
   return (

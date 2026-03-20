@@ -8,23 +8,29 @@ import { Settings, Ruler, BrickWallFireIcon, Info, ChevronRight } from 'lucide-r
 import useNNTrustStore from '@/store/nnTrustStore';
 import { Group, Modal } from '@mantine/core';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import { startJob } from '@/properties/urlsNNTrust';
 import useStore from '@/store/dsStore';
+import useBackendVariablesStore from '@/store/globalStore';
+
+
 const Benchmark: React.FC = () => {
+  // ######################## stored Variables ########################
+  const {
+    hostname,
+    port,
+  } = useBackendVariablesStore()
 
   const {
+    model,
     attacks,
     metrics,
+    setSelectedAttackList,
     setBenchmarkId
   } = useNNTrustStore()
 
+  // ##################################################################
+
   const [selectedAttacks, setSelectedAttacks] = useState<{ [key: string]: RegisterObjectProps }>({})
   const [selectedMetrics, setSelectedMetrics] = useState<{ [key: string]: RegisterObjectProps }>({})
-
-  const {
-    model,                    //model to use in the benchmark
-    setSelectedAttackList     //variable for setting the list of attacks that have been executed
-  } = useNNTrustStore();
 
   const numClasses = model?.num_classes as number
 
@@ -122,7 +128,7 @@ const Benchmark: React.FC = () => {
       setExecuteBenchmark(false);
       setSelectedAttackList(selectedAttacks);
 
-      const response = await fetch(startJob, {
+      const response = await fetch(`http://${hostname}:${port}/test/single_attack`, {
         method: "POST",
         body: JSON.stringify(benchmarkDatas),
         headers: {

@@ -7,7 +7,7 @@ import { Badge, Card, CardSection, CloseButton, Group, Modal, Text } from "@mant
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FixedSizeGrid, GridChildComponentProps } from "react-window";
 
-import { useThumbnailWS } from "@/functionalities/useThumbnailWS";
+import { useThumbnailWS } from "@/functionalities/DQServices/useThumbnailWS";
 
 
 interface FeatureCardProps {

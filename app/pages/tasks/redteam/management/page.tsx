@@ -4,8 +4,7 @@ import './TaskManagement.css'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { AppWindowIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { BenchmarkDataProps, ReportAttacksProps } from '@/interfaces/reportInterfaces';
-import { benchmarkFetch_get, jobProgress_get, reportFetch_get } from '@/properties/urlsNNTrust';
+import { BenchmarkDataProps, ModelReportProps } from '@/interfaces/reportInterfaces';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import ManagementTable from './ManagementTable';
 import { getStatusIcon } from './utils';
@@ -123,12 +122,18 @@ const TaskManagement: React.FC = () => {
             }
         }
         // fetching the report
-        const reportFetch = await fetchResult<ReportAttacksProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId as string)}`);
+        const reportFetch = await fetchResult<ModelReportProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId as string)}`);
         if (reportFetch) {
             setReport(reportFetch);
         }
 
-
+        // fetching the benchmark
+        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
+        if (benchmarkFetch) {
+            console.log("benchmark fetch", benchmarkFetch)
+            //setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
+            setBenchmarkPROVA(benchmarkFetch)
+        }
         router.push("/pages/report/reportTITANN")
     }
 

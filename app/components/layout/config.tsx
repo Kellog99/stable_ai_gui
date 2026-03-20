@@ -1,17 +1,6 @@
 import {
     ChartLine,
     TestTube,
-    SquareActivity,
-    Ruler,
-    Image,
-    ChartScatter,
-    Bot,
-    BookCopy,
-    ShieldX,
-    CircleCheck,
-    Eraser,
-    Crop,
-    Database,
     LucideIcon,
     Info,
     FileText
@@ -118,7 +107,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
                 ],
             },
         ],*/
-    "Red Teaming Tool": [
+    "Red Teaming": [
         {
             id: 'home',
             title: 'Benchmark',

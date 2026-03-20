@@ -1,9 +1,13 @@
 import React from 'react';
-import { LineChart } from '@mantine/charts';
-import './test.css';
+
+import './AttackVisualization.css';
+import { Table, TableData } from '@mantine/core';
+import ConfidenceChart from './ConfidenceChart';
+import '@mantine/charts/styles.css'; // Add this import
+
 
 interface AttackVisualizationProps {
-  confidence?: { [key: string]: number[] }
+  confidence?: { [key: string]: { [key: number]: number } }
   results?: { [key: string]: number }
   prediction?: { adversarial: string, original: string }
 }
@@ -13,7 +17,9 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
   results,
   prediction
 }) => {
-  const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+
+
+  // ############# PRE ATTACK #############
   if (!results || !confidence || !prediction) {
     return (
       <div className="empty-state">
@@ -26,24 +32,31 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
       </div>
     );
   }
+  // ######################################
 
-  const chartData = Object.values(confidence)[0]?.map((_, stepIndex) => {
-    const point: any = { step: stepIndex };
-    Object.entries(confidence).forEach(([key, series]) => {
-      point[key] = parseFloat(series[stepIndex].toFixed(3));
-    });
-    return point;
-  }) || [];
 
-  const series = Object.keys(confidence).map((key, index) => ({
-    name: key,
-    color: colors[index % colors.length]
-  }));
+  // ###################### Metric Table ######################
+  const metricTableData: TableData = {
+    caption: 'Computed Metrics',
+    head: ['Metric', 'Score'],
+    body: results ? Object.entries(results).map(([key, value]) => { return [key, value.toFixed(3)] }) : []
+  };
+  // ##########################################################
+
+
 
   return (
     <div className="statistics-container">
       <div>
         <h3 className="card-title">Prediction</h3>
+        <span style={{ fontSize: "0.9rem" }}>
+          {
+            prediction.original !== prediction.adversarial ?
+              "The attack has successfully evade the model prediction"
+              : "The attack could not fool the model."
+          }
+        </span>
+
         <div className='card-predictions' style={{
           backgroundColor: `${prediction.original !== prediction.adversarial ? "lightgreen" : "rgb(255, 121, 121)"}`,
           border: `2px solid ${prediction.original !== prediction.adversarial ? "green" : "red"}`
@@ -52,75 +65,32 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
           <span> Original prediction: {prediction.original}</span>
           <span> Adversarial prediction: {prediction.adversarial}</span>
         </div>
-        <span style={{fontSize:"0.9rem"}}>{prediction.original !== prediction.adversarial ? "The attack has successfully evade the model prediction" : "The attack could not fool the model."}</span>
       </div>
+
+
       {/* Statistics Table */}
       <div>
         <h3 className="card-title">Statistics</h3>
-        <span style={{ fontSize: "0.8rem" }}>This table shows some metrics regarding the executed attack.</span>
+        <span style={{ fontSize: "0.9rem" }}>This table shows some metrics regarding the executed attack.</span>
+
+        <Table
+          styles={{
+            table: {
+              background: "white"
+            },
+            thead: {
+              background: "#a9afbb"
+            }
+          }}
+          striped
+          highlightOnHover
+          data={metricTableData}
+        />
+
       </div>
-      <table className="stats-table">
-        <thead>
-          <tr>
-            <th>Metric</th>
-            <th>Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(results).map(([metric, value], index) => (
-            <tr key={metric} className={index % 2 === 0 ? 'even-row' : 'odd-row'}>
-              <td className="metric-name">{metric}</td>
-              <td className="metric-value">
-                {typeof value === 'number' ? value.toFixed(4) : value}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
       {/* Confidence Chart */}
-      {
-        confidence['adversarial'].length > 0 && confidence['original'].length > 0 ?
-          <>
-            <div>
-              <h3 className="card-title">Confidence Chart</h3>
-              <span style={{ fontSize: "0.8rem" }}>
-                The following graph shows the trend in confidence for the original class and the opposing class.        </span>
-            </div>
-            <div className="chart-wrapper">
-              <LineChart
-                h={500}
-                w={800}
-                data={chartData}
-                withLegend
-                legendProps={{
-                  verticalAlign: 'bottom',
-                  layout: 'horizontal',
-                  height: 60,
-                  align: 'center'
-                }}
-                styles={{
-                  legend: {
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: '16px',
-                    paddingTop: '32px',
-                    fontSize: '0.875rem',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center'
-                  }
-                }}
-                dataKey="step"
-                xAxisLabel="Iteration Step"
-                yAxisLabel="Model Confidence"
-                series={series}
-                curveType="monotone"
-                strokeWidth={2}
-                gridAxis="xy"
-              />
-            </div>
-          </>
-          : null}
+      <ConfidenceChart confidence={confidence} />
     </div>
   );
 };

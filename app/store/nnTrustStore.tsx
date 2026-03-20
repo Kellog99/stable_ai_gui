@@ -1,5 +1,6 @@
-import { ModelInfo, RegisterObjectProps } from "@/interfaces/NNInterfaces";
-import { BenchmarkDataProps, ReportAttacksProps } from "@/interfaces/reportInterfaces";
+import { ModelInfo } from "@/interfaces/homePageInterface";
+import { RegisterObjectProps } from "@/interfaces/NNInterfaces";
+import { BenchmarkDataProps, ModelReportProps } from "@/interfaces/reportInterfaces";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -18,7 +19,7 @@ interface AppState {
   testAttack: RegisterObjectProps | null;
   loading: boolean;
   error: string | null;
-  attackReport: ReportAttacksProps | null;
+  modelReport: ModelReportProps | null;
   vulnerabilitySelected: string | null;
 
 
@@ -32,7 +33,7 @@ interface AppState {
     map: { [key: string]: RegisterObjectProps },
     name: 'attacks' | 'metrics' | 'selectedAttacks' | 'selectedMetrics'
   ) => void;
-  setAttackReport: (attackReport: ReportAttacksProps) => void;
+  setAttackReport: (attackReport: ModelReportProps) => void;
   setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps }) => void;
 
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
@@ -50,7 +51,7 @@ const useNNTrustStore = create<AppState>()(
       testAttack: null,
       loading: false,
       error: null,
-      attackReport: null,
+      modelReport: null,
       benchmark: null,
       benchmarkPROVA: [],
       vulnerabilitySelected: null,
@@ -62,7 +63,7 @@ const useNNTrustStore = create<AppState>()(
       setSelectedAttackList: (selectedAttacks) => set({ selectedAttacks }),
       setBenchmarkId: (benchmarkId) => set({ benchmarkId }),
       setMap: (map, name) => set({ [name]: map }),
-      setAttackReport: (attackReport) => set({ attackReport }),
+      setAttackReport: (attackReport) => set({ modelReport: attackReport }),
       setBenchmark: (benchmark) => set({ benchmark }),
       setVulnerabilitySelected: (vulnerabilitySelected) => set({ vulnerabilitySelected }),
     }),
@@ -73,7 +74,7 @@ const useNNTrustStore = create<AppState>()(
         model: state.model,
         attacks: state.attacks,
         metrics: state.metrics,
-        attackReport: state.attackReport,
+        attackReport: state.modelReport,
         benchmark: state.benchmark,
         benchmarkId: state.benchmarkId,
         selectedAttacks: state.selectedAttacks

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Document, Page, Text, View, Image } from '@react-pdf/renderer';
-import { attacksProps, BenchmarkDataProps, ReportAttacksProps } from '@/interfaces/reportInterfaces';
+import { attacksProps, BenchmarkDataProps, ModelReportProps } from '@/interfaces/reportInterfaces';
 import { getRiskColor, getRiskLevel, stylesPDF } from './SecurityReportStyle';
 import useNNTrustStore from '@/store/nnTrustStore';
 import { ParametersProps, RegisterObjectProps } from '@/interfaces/NNInterfaces';
 
 
 interface SecurityReportPDFProps {
-    report: ReportAttacksProps,
+    report: ModelReportProps,
     benchmark: BenchmarkDataProps[]
 
 }
