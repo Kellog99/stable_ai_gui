@@ -3,7 +3,8 @@ import {
     TestTube,
     LucideIcon,
     Info,
-    FileText
+    FileText,
+    HatGlasses
 } from "lucide-react";
 
 
@@ -109,16 +110,22 @@ export const sections: { [key: string]: NavigationSection[] } = {
         ],*/
     "Red Teaming": [
         {
-            id: 'home',
-            title: 'Benchmark',
-            href: '/pages/tasks/redteam/benchmark',
-            Icon: ChartLine,
-        },
-        {
             id: 'test',
             title: 'Test',
             href: '/pages/tasks/redteam/test',
             Icon: TestTube,
+        },
+        {
+            id: 'privacy',
+            title: 'Privacy',
+            href: '/pages/tasks/redteam/privacy',
+            Icon: HatGlasses,
+        },
+        {
+            id: 'bench',
+            title: 'Benchmark',
+            href: '/pages/tasks/redteam/benchmark',
+            Icon: ChartLine,
         },
         {
             id: 'management',

@@ -1,8 +1,5 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
-import { ModelInfo } from "./homePageInterface";
-
-
 
 export interface LoadedFile {
   name: string;
@@ -26,8 +23,6 @@ export interface ButtonProps {
   currentPage: string;
   onClickHandle: ReactEventHandler
 }
-
-
 
 export interface ParametersProps {
   id: string

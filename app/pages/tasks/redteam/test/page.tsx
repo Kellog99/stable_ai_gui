@@ -10,7 +10,7 @@ import useNNTrustStore from '@/store/nnTrustStore';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import useBackendVariablesStore from '@/store/globalStore';
 import VulnerabilitySelection from '@/components/client/test/VulnerabilitySelection';
-import '@mantine/charts/styles.css'; // Add this import
+import '@mantine/charts/styles.css';
 
 function Test() {
     // ######################## stored Variables ########################
