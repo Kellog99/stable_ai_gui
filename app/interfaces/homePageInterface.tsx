@@ -17,6 +17,7 @@ export interface InfoProps {
 export interface ModelInfo extends InfoProps {
     dataset: string,                  // Dataset where the model had been optimized on 
     parameters: number | null,        // Number of the models' parameters
+    type?: "llm" | "cv"               // Type of model that is used
 }
 
 export interface DatasetInfo extends InfoProps {

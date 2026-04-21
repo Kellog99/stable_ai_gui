@@ -28,6 +28,9 @@
   --title: Stable AI;
   --header-height: 100px;
   --card-width: 350px;
+
+  --pc-width: 450px;
+  --pc-height: 350px;
 }
 
 html,
