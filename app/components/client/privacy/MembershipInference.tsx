@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
-import { Shield, Play, Upload, X, AlertCircle } from 'lucide-react';
+import { Shield, Play, Upload, X, AlertCircle, Settings } from 'lucide-react';
 import "./MembershipInference.css";
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
+import AttackCard from './AtkCard';
 
 export interface LoadedModel {
     type: 'llm' | 'vision';
@@ -22,7 +23,7 @@ const MembershipInference: React.FC<MembershipInferenceProps> = ({
 }) => {
     console.log(results)
 
-    const [variantId, setVariantId] = useState(listAttacks[0].id);
+    const [selectedAtk, setSelectedAtk] = useState(listAttacks[0].id);
     const [params, setParams] = useState<Record<string, unknown>>({});
     const [textInput, setTextInput] = useState('');
     const [imageFile, setImageFile] = useState<string | null>(null);
@@ -52,16 +53,17 @@ const MembershipInference: React.FC<MembershipInferenceProps> = ({
                     <h3 className='component-title'>Attack</h3>
                     <div className="variant-grid">
                         {listAttacks.map(v => (
-                            <button
-                                key={v.id}
-                                onClick={() => {
-                                    setVariantId(v.id)
+                            <AttackCard
+                                id={v.id}
+                                title={v.name}
+                                isActive={selectedAtk === v.id}
+                                parameters={v.parameters}
+                                description={v.description}
+                                handleClick={() => setSelectedAtk(v.id)}
+                                handleParametersChange={function (parameters: number[]): void {
+                                    throw new Error('Function not implemented.');
                                 }}
-                                className={`variant-button ${variantId === v.id ? 'active' : ''}`}
-                            >
-                                <div className="variant-name">{v.name}</div>
-                                <div className="variant-description">{v.description}</div>
-                            </button>
+                            />
                         ))}
                     </div>
                 </div>
@@ -109,17 +111,14 @@ const MembershipInference: React.FC<MembershipInferenceProps> = ({
 
                 {/* output */}
                 <div className="metrics-display">
-                    <h3 className="component-title">Results</h3>
-                    <div className="metrics-container">
+                    <h3 className="component-title">Attack Results</h3>
+                    <div className="variant-grid">
                         {results ?
                             Object.entries(results).map(([metric, value]: [string, number]) => (
-                                <div
-                                    key={metric}
-                                    className="metric-card"
-                                >
-                                    <div className="metric-label">{metric}</div>
-                                    {value.toFixed(3)}
-                                </div>
+                                <MetricCard
+                                    name={metric}
+                                    value={value}
+                                />
                             )) :
                             "No Results"
                         }
@@ -127,26 +126,27 @@ const MembershipInference: React.FC<MembershipInferenceProps> = ({
                 </div>
 
             </div>
-            <button
-                disabled={running || !hasInput}
-                className="run-button"
-            >
-                {running ? (
-                    <>
-                        <div className="spinner" />
-                        Running attack...
-                    </>
-                ) : (
-                    <>
-                        <Play className="play-icon" />
-                        Run Attack
-                    </>
-                )}
-            </button>
-
 
         </div>
     );
+}
+
+interface MetricCardProps {
+    name: string,
+    value: number
+}
+const MetricCard: React.FC<MetricCardProps> = ({
+    name, value
+}) => {
+    return (
+        <div
+            key={name}
+            className="metric-card"
+        >
+            <div className="metric-label">{name}:</div>
+            {value.toFixed(3)}
+        </div>
+    )
 }
 
 export default MembershipInference;

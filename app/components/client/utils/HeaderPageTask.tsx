@@ -17,7 +17,12 @@ export interface HeaderPageTaskProps {
     descrition?: string,
     buttonprops?: ButtonsProps
 }
-
+/**
+* @param Icon: this is the icon to show as the representative
+* @param title: title to show
+* @param description: description of the page 
+* @param buttonprops: these are all the attributes for the button 
+*/
 const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
     Icon,
     title,
@@ -28,10 +33,10 @@ const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
     return (
         <div className='container-header'>
             <div className='container-title'>
-                <Icon size={"calc(var(--icon-size) * 4)"} color='red' />
+                <Icon size={"calc(var(--icon-size) * 3)"} color='red' />
                 <div>
-                    <h1 style={{ margin: "0", fontSize: "2.5rem" }}>{title}</h1>
-                    {descrition && (<p style={{ color: "lightgray", margin: 0 }}>{descrition}</p>)}
+                    <h1 style={{ margin: "0", fontSize: "2.1rem" }}>{title}</h1>
+                    {descrition && (<p style={{ color: "lightgray", margin: 0, fontSize:"0.8rem" }}>{descrition}</p>)}
                 </div>
             </div>
             {

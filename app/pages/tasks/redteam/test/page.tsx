@@ -104,9 +104,7 @@ function Test() {
                     }
                 });
 
-                console.log('Status:', response.status);
                 const data: SingleAttackProps = await response.json();
-                console.log('Response:', data);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);

@@ -1,16 +1,24 @@
-import { CheckCheck, CheckCircleIcon, CheckIcon, Save, Settings, TimerReset, Trash } from 'lucide-react';
+import { CheckCircleIcon, Save, Settings, TimerReset, Trash } from 'lucide-react';
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
 import { Group, Modal, NumberInput, Stack } from '@mantine/core';
 
+/**
+ * Processes a user's subscription.
+ * @param isOpen - It is a flag that tells whether the windows is open or not.
+ * @param parameters - The unique identifier for the selected tier.
+ * @param onClose - It is the function that handles the closing of the ModalWindow
+ * @param handleParametersChange - It handles the change of the attack's parameters
+*/
 interface ParametersWindowProps {
     isOpen: boolean;
     parameters?: ParametersProps[];
     onClose: () => void;
     handleParametersChange: (parameters: number[]) => void;
 }
-// This component handles the Modal windows associated with the specification of the attack's parameters
+// This component handles the attack's parameters Modal windows
+// It allows to modify and update the parameters for a specific attack
 const ParametersWindow: React.FC<ParametersWindowProps> = ({
     isOpen,
     parameters,

@@ -9,6 +9,7 @@ import PropertyInference from '@/components/client/privacy/PropertyInference';
 import ModelInversion from '@/components/client/privacy/ModelInversion';
 import MembershipInference from '@/components/client/privacy/MembershipInference';
 import useNNTrustStore from '@/store/nnTrustStore';
+import { Loader } from '@mantine/core';
 
 function Privacy() {
 
@@ -18,7 +19,7 @@ function Privacy() {
     } = useNNTrustStore()
 
     const [test, setTest] = useState<string>("memb_inf")
-
+    const [isRunning, setIsRussing] = useState<boolean>(false)
 
     const [uploadedFile, setUploadedFile] = useState<string>()
 
@@ -32,6 +33,11 @@ function Privacy() {
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    //  This function handles the backend request for executing an attack
+    const handleClick = async () => {
+
     }
 
 
@@ -70,8 +76,8 @@ function Privacy() {
             {/* Header */}
             <HeaderPageTask
                 Icon={HatGlasses}
-                title="Testing Lab"
-                descrition="See whether a specific model has some privacy vulnerabilities."
+                title="Privacy Lab"
+                descrition="Test whether a specific model has specific privacy vulnerabilities."
             />
             <div className='privacy-container'>
                 <div className='btn-container'>
@@ -96,6 +102,29 @@ function Privacy() {
                 </div>
                 {pages[test]}
             </div>
+
+            <button
+                disabled={!isRunning}
+                className="execute-btn"
+                onClick={handleClick}
+            >
+                {isRunning ? (
+                    <>
+                        <Loader
+                            color='blue'
+                            size={22}
+                            type="dots"
+                        />
+                        Running attack
+                    </>
+                ) : (
+                    <>
+                        <Play size={22} />
+                        Run Attack
+                    </>
+                )}
+            </button>
+
         </div>
     );
 }

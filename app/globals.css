@@ -59,8 +59,7 @@ h2 {
 .container-pages {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding-bottom: 160px;
+  margin: 0;
 }
 
 @layer base {

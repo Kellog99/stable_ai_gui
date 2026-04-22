@@ -1,0 +1,72 @@
+.atk-card {
+    height: 65px;
+    aspect-ratio: 3.14;
+    align-content: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgb(51, 65, 85);
+    background-color: rgba(30, 41, 59, 0.3);
+    color: rgb(203, 213, 225);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.atk-card:hover {
+    border-color: rgb(138, 149, 163);
+    transform: translateY(-2px);
+}
+
+.atk-card.active {
+    border-color: rgba(6, 182, 212, 0.4);
+    background-color: rgba(6, 182, 212, 0.1);
+    color: rgb(224, 242, 254);
+}
+
+.card-header {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    font-size: 0.6rem;
+    font-weight: 600;
+    margin-bottom: 0.125rem;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+    color: lightgray;
+}
+
+.header-name {
+    display: flex;
+    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-settings-btn {
+    display: flex;
+    align-content: center;
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    border-color: transparent;
+    color: lightcoral;
+    transition: all 0.2s;
+}
+
+.card-settings-btn:hover {
+    transform: translateY(-2px);
+    background-color: rgba(6, 182, 212, 0.08);
+    border-radius: 100%;
+}
+
+.title-scroll {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    width: 120px;
+    height: 100%; /* Or set a specific height like 40px */
+    overflow-x: hidden; /* No horizontal scroll */
+    overflow-y: auto; /* Vertical scroll */
+    white-space: normal; /* Allow text to wrap */
+}
