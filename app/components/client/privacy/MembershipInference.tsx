@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
-import { Shield, Play, Upload, X, AlertCircle, Settings } from 'lucide-react';
+import { Shield, Upload, X } from 'lucide-react';
 import "./MembershipInference.css";
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
-import AttackCard from './AtkCard';
+import VulnerabilitySelection from '../utils/VulnerabilitySelection';
+import useNNTrustStore from '@/store/nnTrustStore';
 
 export interface LoadedModel {
     type: 'llm' | 'vision';
@@ -12,18 +13,26 @@ export interface LoadedModel {
 
 interface MembershipInferenceProps {
     type: "llm" | "cv";
-    listAttacks: RegisterObjectProps[];
     results?: { [key: string]: number };
 }
 
 const MembershipInference: React.FC<MembershipInferenceProps> = ({
     type,
-    listAttacks,
     results
 }) => {
+    const {
+        attacks,
+        model
+    } = useNNTrustStore()
+
+    // With this is possible to filter only the attacks that are related to
+    //  membership inference, so we can pass only those to the VulnerabilitySelection component
+    const privacyAttacks: { [key: string]: RegisterObjectProps } = Object.fromEntries(
+        Object.entries(attacks).filter(([_, attack]) => attack.task === "membership_inference")
+    );
     console.log(results)
 
-    const [selectedAtk, setSelectedAtk] = useState(listAttacks[0].id);
+    const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>(Object.values(privacyAttacks)[0]);
     const [params, setParams] = useState<Record<string, unknown>>({});
     const [textInput, setTextInput] = useState('');
     const [imageFile, setImageFile] = useState<string | null>(null);
@@ -48,25 +57,22 @@ const MembershipInference: React.FC<MembershipInferenceProps> = ({
 
             <div className='components-container'>
 
-                {/* Attack selection */}
-                <div className='attack-container'>
-                    <h3 className='component-title'>Attack</h3>
-                    <div className="variant-grid">
-                        {listAttacks.map(v => (
-                            <AttackCard
-                                id={v.id}
-                                title={v.name}
-                                isActive={selectedAtk === v.id}
-                                parameters={v.parameters}
-                                description={v.description}
-                                handleClick={() => setSelectedAtk(v.id)}
-                                handleParametersChange={function (parameters: number[]): void {
-                                    throw new Error('Function not implemented.');
-                                }}
-                            />
-                        ))}
-                    </div>
-                </div>
+                <VulnerabilitySelection
+                    attacks={privacyAttacks}
+                    // isReady={!!(uploadedFile && model && selectedAttack) && !isAttacking}
+                    isReady={true}
+                    selectedAttack={selectedAttack}
+                    attackResults={{
+                        prediction: undefined,
+                        confidence: undefined,
+                        metrics: undefined
+                    }} handlePostRequest={function (): void {
+                        throw new Error('Function not implemented.');
+                    }} handleChange={function (value: number[]): void {
+                        throw new Error('Function not implemented.');
+                    }} handleSelection={function (e: React.ChangeEvent<HTMLSelectElement>): void {
+                        throw new Error('Function not implemented.');
+                    }} />
 
                 {/* Input */}
                 <div className='input-container'>

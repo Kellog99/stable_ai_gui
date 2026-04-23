@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import './AtkCard.css';
-import { InfoIcon, Settings } from 'lucide-react';
+import { Circle, InfoIcon, Settings } from 'lucide-react';
 import ParametersWindow from '@/components/redtool/Parameters';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
-import { HoverCard, Tooltip } from '@mantine/core';
+import { Tooltip } from '@mantine/core';
 
 /**
  * Processes a user's subscription.
@@ -18,6 +18,7 @@ export interface AttackCardProps {
     id: string,
     title: string,
     description: string,
+    knowledge?: string,
     isActive: boolean,
     parameters: ParametersProps[],
     handleClick: () => void;
@@ -29,6 +30,7 @@ const AttackCard: React.FC<AttackCardProps> = ({
     title,
     isActive,
     description,
+    knowledge,
     parameters,
     handleClick,
     handleParametersChange
@@ -45,7 +47,6 @@ const AttackCard: React.FC<AttackCardProps> = ({
         e.stopPropagation();
         setIsClicked(true);
     }
-
     return (
         <div
             key={id}
@@ -60,15 +61,23 @@ const AttackCard: React.FC<AttackCardProps> = ({
                     >
                         <Settings size={20} />
                     </button>
+                    {knowledge && (
+                        <Circle
+                            size={12}
+                            color={"transparent"}
+                            fill={knowledge}
+                        />
+                    )}
                     <div className='title-scroll'>
                         {title}
                     </div>
+
                 </div>
                 <Tooltip
                     multiline
                     w={220}
                     withArrow
-                    style={{fontSize:"0.6rem"}}
+                    style={{ fontSize: "0.6rem" }}
                     label={description}
                 >
                     <InfoIcon size={20} color="#e8fa42ce" />

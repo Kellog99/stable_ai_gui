@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
-import { Loader, Center } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import './ImageDisplay.css';
 
 interface ImageDisplayProps {
@@ -44,16 +44,18 @@ export const ImageDisplay: React.FC<ImageDisplayProps> = ({
             }
           }}
         >
-          {isLoading ? (
-            <Center style={{ width: '100%', height: '100%' }}>
+          {
+            isLoading ? (
               <Loader />
-            </Center>
-          ) : (
-            <>
-              <ImageIcon size={"calc(2 * var(--icon-size))"} />
-              {placeholder}
-            </>
-          )}
+            ) : (
+              <>
+                <ImageIcon size={"calc(2 * var(--icon-size))"} />
+                <div className="image-placeholder">
+                  {placeholder}
+                </div>
+              </>
+            )
+          }
 
           <input
             ref={fileInputRef}

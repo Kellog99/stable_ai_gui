@@ -14,9 +14,9 @@ import { Loader } from '@mantine/core';
 function Privacy() {
 
     const {
-        attacks,
         model
     } = useNNTrustStore()
+
 
     const [test, setTest] = useState<string>("memb_inf")
     const [isRunning, setIsRussing] = useState<boolean>(false)
@@ -42,29 +42,11 @@ function Privacy() {
 
 
 
-    function simulateResults(): {} {
-        const base = Math.random() * 0.2;
-        const acc = 0.6 + base + Math.random() * 0.1;
-        const auc = 0.55 + base + Math.random() * 0.15;
-        const adv = acc - 0.5;
-        const prec = 0.58 + Math.random() * 0.2;
-        const rec = 0.55 + Math.random() * 0.2;
-        const f1 = (2 * prec * rec) / (prec + rec);
-        return {
-            'Attack Accuracy': acc,
-            'AUC-ROC': auc,
-            'Advantage': adv,
-            'Precision': prec,
-            'Recall': rec,
-            'F1-Score': f1,
-        }
-    }
     const type = model && model.type ? model.type : "cv"
     const pages: { [key: string]: ReactElement } = {
         "memb_inf": <MembershipInference
-            listAttacks={Object.values(attacks)}
             type={"llm"}
-            results={simulateResults()}
+            results={undefined}
         />,
         "prop_inference": <PropertyInference key="prop_inference" />,
         "mod_inversion": <ModelInversion key="mod_inversion" />
@@ -102,29 +84,6 @@ function Privacy() {
                 </div>
                 {pages[test]}
             </div>
-
-            <button
-                disabled={!isRunning}
-                className="execute-btn"
-                onClick={handleClick}
-            >
-                {isRunning ? (
-                    <>
-                        <Loader
-                            color='blue'
-                            size={22}
-                            type="dots"
-                        />
-                        Running attack
-                    </>
-                ) : (
-                    <>
-                        <Play size={22} />
-                        Run Attack
-                    </>
-                )}
-            </button>
-
         </div>
     );
 }

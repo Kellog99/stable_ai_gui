@@ -4,7 +4,10 @@ import {
     LucideIcon,
     Info,
     FileText,
-    HatGlasses
+    HatGlasses,
+    LockKeyholeOpenIcon,
+    Home,
+    Fence
 } from "lucide-react";
 
 
@@ -108,19 +111,43 @@ export const sections: { [key: string]: NavigationSection[] } = {
                 ],
             },
         ],*/
+    "Home": [
+        {
+            id: 'home',
+            title: 'Homepage',
+            href: '',
+            Icon: Home,
+        }
+    ],
     "Red Teaming": [
         {
             id: 'test',
             title: 'Test',
             href: '/pages/tasks/redteam/test',
             Icon: TestTube,
+            items: [
+                {
+                    id: 'evasion',
+                    title: 'Evasion',
+                    href: '/pages/tasks/redteam/test/evasion',
+                    Icon: LockKeyholeOpenIcon,
+                },
+                {
+                    id: 'privacy',
+                    title: 'Privacy',
+                    href: '/pages/tasks/redteam/test/privacy',
+                    Icon: HatGlasses,
+                },
+                {
+                    id: 'jailbraking',
+                    title: 'Jailbrake',
+                    href: '/pages/tasks/redteam/test/jailbrake',
+                    Icon: Fence,
+                },
+
+            ]
         },
-        {
-            id: 'privacy',
-            title: 'Privacy',
-            href: '/pages/tasks/redteam/privacy',
-            Icon: HatGlasses,
-        },
+
         {
             id: 'bench',
             title: 'Benchmark',

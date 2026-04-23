@@ -1,13 +1,12 @@
 import { LucideIcon } from 'lucide-react'
 import React, { useState } from 'react'
-import { HoverCard, Text, Modal } from '@mantine/core';
+import { Modal } from '@mantine/core';
 import './ModalButton.css';
+import { Tooltip } from '@mantine/core';
 
 export interface ModalButtonProps {
     disabled: boolean,
-    background: string,
     Icon: LucideIcon,
-    hoverDescription: string,
     children?: React.ReactNode,
     modalTitle?: string,
     handleClick?: () => void,
@@ -15,9 +14,7 @@ export interface ModalButtonProps {
 
 const ModalButton: React.FC<ModalButtonProps> = ({
     disabled,
-    background,
     Icon,
-    hoverDescription,
     children,
     modalTitle,
     handleClick,
@@ -27,28 +24,34 @@ const ModalButton: React.FC<ModalButtonProps> = ({
 
     return (
         <>
-            <HoverCard width={280} shadow="md">
-                <HoverCard.Target>
-                    <div>
-                        <button
-                            onClick={handleClick ? handleClick : () => setIsOpen(true)}
-                            disabled={disabled}
-                            style={{
-                                background: background,
-                                cursor: disabled ? 'not-allowed' : 'pointer'
-                            }}
-                            className="modal_button"
-                        >
-                            <Icon />
-                        </button>
-                    </div>
-                </HoverCard.Target>
-                <HoverCard.Dropdown>
-                    <Text size="sm" c="black">
-                        {hoverDescription}
-                    </Text>
-                </HoverCard.Dropdown>
-            </HoverCard>
+            <Tooltip
+                multiline
+                w={180}
+                label={"Click this button to see further results' information."}
+                withArrow
+                position="top"
+                color="dark"
+                styles={{
+                    tooltip: {
+                        fontSize: '0.55rem',
+                        borderRadius: '8px', // or '12px', '0.7rem', etc.
+                    }
+                }}
+
+            >
+                <button
+                    onClick={handleClick ? handleClick : () => setIsOpen(true)}
+                    disabled={disabled}
+                    style={{
+                        cursor: disabled ? 'not-allowed' : 'pointer'
+                    }}
+                    className="modal_button"
+                >
+                    <Icon />
+                </button>
+
+            </Tooltip>
+
 
             <Modal
                 opened={isOpen}
