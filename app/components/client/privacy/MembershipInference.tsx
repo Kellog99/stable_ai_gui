@@ -141,7 +141,7 @@ interface MetricCardProps {
     name: string,
     value: number
 }
-const MetricCard: React.FC<MetricCardProps> = ({
+export const MetricCard: React.FC<MetricCardProps> = ({
     name, value
 }) => {
     return (

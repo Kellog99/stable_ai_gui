@@ -7,7 +7,18 @@ import {
     HatGlasses,
     LockKeyholeOpenIcon,
     Home,
-    Fence
+    Fence,
+    BookCopy,
+    Bot,
+    ChartScatter,
+    CircleCheck,
+    Crop,
+    Database,
+    Eraser,
+    Ruler,
+    ShieldX,
+    SquareActivity,
+    Camera
 } from "lucide-react";
 
 
@@ -22,7 +33,15 @@ export interface NavigationSection {
 
 
 export const sections: { [key: string]: NavigationSection[] } = {
-    /*"Data Quality":
+    "Home": [
+        {
+            id: 'home',
+            title: 'Homepage',
+            href: '/',
+            Icon: Home,
+        }
+    ],
+    "Data Quality":
         [
             {
                 id: "dataset",
@@ -33,7 +52,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
             {
                 id: 'visualization',
                 title: 'Visualization',
-                Icon: Image,
+                Icon: Camera,
                 items: [
                     {
                         id: 'embeddings',
@@ -110,15 +129,8 @@ export const sections: { [key: string]: NavigationSection[] } = {
                     },
                 ],
             },
-        ],*/
-    "Home": [
-        {
-            id: 'home',
-            title: 'Homepage',
-            href: '',
-            Icon: Home,
-        }
-    ],
+        ],
+
     "Red Teaming": [
         {
             id: 'test',
