@@ -2,7 +2,7 @@ import { CheckCircleIcon, Save, Settings, TimerReset, Trash } from 'lucide-react
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
-import { Group, Modal, NumberInput, Stack } from '@mantine/core';
+import { Group, Modal, NumberInput, Select, Slider } from '@mantine/core';
 
 /**
  * Processes a user's subscription.
@@ -15,7 +15,7 @@ interface ParametersWindowProps {
     isOpen: boolean;
     parameters?: ParametersProps[];
     onClose: () => void;
-    handleParametersChange: (parameters: number[]) => void;
+    handleParametersChange: (parameters: any[]) => void;
 }
 // This component handles the attack's parameters Modal windows
 // It allows to modify and update the parameters for a specific attack
@@ -27,17 +27,18 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
 }) => {
 
-    const [values, setValues] = useState<number[]>([]);
-    const [defaultParameters, setDefaultParameters] = useState<number[]>([]);
+    const [values, setValues] = useState<(number | string)[]>([]);
+    const [defaultParameters, setDefaultParameters] = useState<(number | string)[]>([]);
 
     // Update values when parameters change or modal opens
     useEffect(() => {
         if (isOpen && parameters && parameters.length > 0) {
-            const def = parameters.map(p => {
-                if (p.default != null) return p.default;
+            const def = parameters.map((p) => {
+                if (p.kind === "enum") return typeof p.default === "string" ? p.default : p.options?.[0] ?? "";
+                if (typeof p.default === "number") return p.default;
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
-                return 1;
+                return 0;
             });
             setValues(def)
             setDefaultParameters(def)
@@ -46,7 +47,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
     }, [isOpen, parameters]);
 
 
-    const handleChange = (index: number, newValue: number) => {
+    const handleChange = (index: number, newValue: number | string) => {
         const newValues = [...values];
         newValues[index] = newValue;
         setValues(newValues);
@@ -63,11 +64,8 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
     const handleSaveClick = () => {
         setIsSaving(true);
         handleParametersChange(values);
-
-        // Reset after animation
-        setTimeout(() => {
-            setIsSaving(false);
-        }, 600); // Duration should match CSS transition
+        onClose();
+        setTimeout(() => setIsSaving(false), 300);
     };
     return (
         <Modal
@@ -104,20 +102,6 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                             >
                                 <div className="form-label">
                                     <p>{param.name}</p>
-
-                                    <NumberInput
-                                        variant="filled"
-                                        size='xs'
-                                        w={100}
-                                        min={param.min}
-                                        max={param.max}
-                                        step={param.step}
-                                        allowDecimal={!Number.isInteger(parameters[index].step)}
-                                        allowNegative={param.min < 0}
-                                        radius="md"
-                                        value={values[index]}
-                                        onChange={(e) => handleChange(index, e as number)}
-                                    />
                                 </div>
                                 {param.description && (
                                     <p style={{
@@ -129,15 +113,51 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                         {param.description}
                                     </p>
                                 )}
-                                <input
-                                    type="range"
-                                    min={param.min}
-                                    max={param.max}
-                                    step={param.step}
-                                    value={values[index] ?? param.default * 10}
-                                    onChange={(e) => handleChange(index, parseFloat(e.target.value))}
-                                    className="form-slider"
-                                />
+                                {param.kind === "enum" ? (
+                                    <Select
+                                        size="xs"
+                                        variant="filled"
+                                        radius="md"
+                                        data={(param.options ?? []).map((option) => ({ value: option, label: option }))}
+                                        value={typeof values[index] === "string" ? values[index] as string : null}
+                                        onChange={(value) => value && handleChange(index, value)}
+                                    />
+                                ) : (
+                                    <>
+                                        {param.id === "property_target_ratio" ? (
+                                            <Slider
+                                                min={param.min ?? 0}
+                                                max={param.max ?? 1}
+                                                step={0.05}
+                                                value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                                onChange={(value) => handleChange(index, value)}
+                                            />
+                                        ) : (
+                                            <>
+                                                <NumberInput
+                                                    variant="filled"
+                                                    size='xs'
+                                                    w={100}
+                                                    min={param.min}
+                                                    max={param.max}
+                                                    step={param.step}
+                                                    allowDecimal={!Number.isInteger(param.step ?? 1)}
+                                                    allowNegative={(param.min ?? 0) < 0}
+                                                    radius="md"
+                                                    value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                                    onChange={(value) => handleChange(index, Number(value) || 0)}
+                                                />
+                                                <Slider
+                                                    min={param.min ?? 0}
+                                                    max={param.max ?? 1}
+                                                    step={param.step ?? 0.01}
+                                                    value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                                    onChange={(value) => handleChange(index, value)}
+                                                />
+                                            </>
+                                        )}
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>

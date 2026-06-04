@@ -1,4 +1,4 @@
-import { DQReportProps } from "@/functionalities/reportInterfaces";
+import { DQReportProps } from "@/interfaces/reportInterfaces";
 import "./JsonRepository.css"
 import React, { useEffect, useState } from "react";
 import ReportCard from "./ReportCard";
@@ -21,7 +21,6 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
             const fetchDQReport = async () => {
                 try {
                     const DQreports = await getAllDQReports();
-                    console.log("reports from the backend", DQreports);
                     setDQReports(DQreports);
 
                 } catch (error) {
@@ -34,7 +33,6 @@ export const JsonRepository: React.FC<JsonRepositoryProps> = ({ tool }) => {
             const fetchNNReport = async () => {
                 try {
                     const NNreports = await getReports();
-                    console.log("reports from the backend", NNreports);
                     setNNReports(NNreports);
 
                 } catch (error) {

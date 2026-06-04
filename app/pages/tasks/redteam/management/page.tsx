@@ -5,6 +5,7 @@ import useNNTrustStore from '@/store/nnTrustStore'
 import { AppWindowIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ModelReportProps } from '@/interfaces/reportInterfaces';
+import { benchmarkFetch_get, jobProgress_get, reportFetch_get } from '@/properties/urlsNNTrust';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import ManagementTable from './ManagementTable';
 import { getStatusIcon } from './utils';
@@ -25,7 +26,6 @@ const TaskManagement: React.FC = () => {
     // getting the advancement status from the job, starting from the id
     const handleRefresh = async () => {
         if (!benchmarkId) {
-            console.log("No benchmark ID available");
             return;
         }
 
@@ -117,7 +117,7 @@ const TaskManagement: React.FC = () => {
                 const json: T = await response.json();
                 return json;
             } catch (err) {
-                console.log(err instanceof Error ? err.message : "An error occurred");
+                console.error(err instanceof Error ? err.message : "An error occurred");
                 return undefined; // Explicitly return undefined on error
             }
         }
@@ -130,9 +130,7 @@ const TaskManagement: React.FC = () => {
         // fetching the benchmark
         const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
         if (benchmarkFetch) {
-            console.log("benchmark fetch", benchmarkFetch)
-            //setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
-            setBenchmarkPROVA(benchmarkFetch)
+            setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
         }
         router.push("/pages/report/reportTITANN")
     }

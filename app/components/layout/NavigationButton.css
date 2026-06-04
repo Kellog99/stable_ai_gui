@@ -19,11 +19,12 @@
     justify-content: space-between;
 }
 
-.nav-item:hover:not(:disabled) {
+.nav-item:hover:not(:disabled):not(.disabled) {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.nav-item:disabled {
+.nav-item:disabled,
+.nav-item.disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -41,7 +42,7 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-    .nav-item:hover:not(:disabled) {
+    .nav-item:hover:not(:disabled):not(.disabled) {
         background-color: rgba(255, 255, 255, 0.1);
     }
 

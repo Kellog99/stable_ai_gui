@@ -22,7 +22,7 @@ export interface AttackCardProps {
     isActive: boolean,
     parameters: ParametersProps[],
     handleClick: () => void;
-    handleParametersChange: (parameters: number[]) => void;
+    handleParametersChange: (parameters: (number | string)[]) => void;
 }
 
 const AttackCard: React.FC<AttackCardProps> = ({
@@ -45,6 +45,7 @@ const AttackCard: React.FC<AttackCardProps> = ({
 
     const handleSettingsClick = (e: React.MouseEvent) => {
         e.stopPropagation();
+        handleClick();
         setIsClicked(true);
     }
     return (

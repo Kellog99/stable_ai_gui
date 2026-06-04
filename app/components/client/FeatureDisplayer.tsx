@@ -277,7 +277,6 @@ export default function FeatureDisplayer({
                 }
             }
             if (initialIndices.length > 0) {
-                console.log("initials,", initialIndices)
                 requestThumbnails(initialIndices);
             }
         }

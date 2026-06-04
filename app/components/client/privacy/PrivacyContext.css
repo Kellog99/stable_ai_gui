@@ -1,0 +1,20 @@
+.privacy-context-card {
+    width: var(--pc-width);
+    max-height: var(--pc-height);
+    border-left: 2px solid var(--mantine-color-violet-6);
+    background-color: rgba(15, 23, 42, 0.5);
+}
+
+.privacy-context-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.privacy-context-label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: rgb(203, 213, 225);
+}

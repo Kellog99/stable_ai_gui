@@ -27,11 +27,13 @@ export interface ButtonProps {
 export interface ParametersProps {
   id: string
   name: string
-  min: number
-  max: number
-  step: number
-  default: number
+  min?: number
+  max?: number
+  step?: number
+  default: number | string
   description: string
+  kind?: 'number' | 'enum'
+  options?: string[]
 }
 
 export interface RegisterObjectProps {
@@ -39,6 +41,8 @@ export interface RegisterObjectProps {
   name: string,
   description: string
   task?: string
+  objective?: string
+  privacy_type?: string
   knowledge?: string
   parameters?: ParametersProps[]
 }

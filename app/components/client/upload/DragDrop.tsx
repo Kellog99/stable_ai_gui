@@ -27,7 +27,6 @@ export const DragDrop: React.FC<DragDropProps> = ({
     const [loading, setLoading] = useState<boolean>(false);
 
     const onUpload = async (selectedFile: File | null) => {
-        console.log(file)
         setLoading(true);
         try {
             setFile(selectedFile);

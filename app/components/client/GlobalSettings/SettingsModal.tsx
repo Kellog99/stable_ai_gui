@@ -25,9 +25,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     useEffect(() => {
         getServerConfiguration(hostname, port)
             .then(setGlobalParameters)
-            .then(() => { })
+            .catch((err) => console.error("Failed to load server configuration:", err));
     }, [hostname, port]);
-    console.log("global parameters = ", globalParameters)
 
 
     /** Update any field in globalParameters */
@@ -57,7 +56,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     }, [hostname, port])
     // ################################################################
 
-    console.log("globalParameters = ", globalParameters)
     return (
         <Modal
             opened={isOpen}
@@ -98,8 +96,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 {
                     Object.entries(pathConfigs).map(([key, config]: [string, ServerConfigDescritpion]) => {
                         const value = globalParameters?.[key as keyof ServerConfig] ?? "";
-                        console.log(`config key = ${key}, value = ${value}`)
-
                         return (
                             <TextInput
                                 key={key}
@@ -120,12 +116,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                     }
                                     if (isValid || config.type !== "number") {
                                         if (key === "host") {
-                                            setPort(newValue)
+                                            setHostname(newValue);
+                                        } else if (key === "port") {
+                                            setPort(newValue);
+                                        } else {
+                                            updateField(key, newValue);
                                         }
-                                        if (key === "port") {
-                                            setHostname(newValue)
-                                        }
-                                        updateField(key, newValue);
                                     }
 
                                 }}

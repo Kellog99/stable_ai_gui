@@ -22,7 +22,6 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
     handleParametersChange,
     Icon
 }) => {
-    console.log("elements = ", elements)
     // Type guard to check if element is AttackProps
     const getTags = (element: RegisterObjectProps) => {
         const tags = []

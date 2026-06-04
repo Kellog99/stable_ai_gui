@@ -1,6 +1,6 @@
 import { useThumbnailWS } from "@/functionalities/DQServices/useThumbnailWS";
 import { ModelReportProps } from "@/interfaces/reportInterfaces";
-import { DQReportProps } from "@/functionalities/reportInterfaces";
+import { DQReportProps } from "@/interfaces/reportInterfaces";
 import { image_type } from "@/properties/types";
 import useStore from "@/store/dsStore";
 import useNNTrustStore from "@/store/nnTrustStore";
@@ -26,7 +26,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
     const imageDatas = reportNN?.prototype || reportDQ?.dataset.prototype.datas[0];
 
 
-    const { thumbnails, connectionStatus, requestThumbnail } = useThumbnailWS(
+    const { thumbnails, requestThumbnail } = useThumbnailWS(
         image_type,
         imageDatas as string
     );
@@ -38,7 +38,6 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
             setReport(reportNN as ModelReportProps)
             router.push("/pages/report/reportTITANN")
         } else if (reportDQ) {
-            console.log("REPORTDQ CLICK", reportDQ)
             setReportFromBE(reportDQ as DQReportProps)
             router.push("/pages/report/reportDQ")
         }

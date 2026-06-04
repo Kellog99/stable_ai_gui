@@ -13,18 +13,15 @@ export function useThumbnailWS ( featureType: string, featureData: string[] | st
 
     // Normalize featureData to always be an array internally
     const normalizedData = Array.isArray( featureData ) ? featureData : [ featureData ];
-    console.log( "connection status", connectionStatus )
     useEffect( () =>
     {
         if ( featureType !== image_type ) return;
 
         const ws = new WebSocket( wsUrl );
-        console.log( "ws", ws )
         ws.binaryType = "arraybuffer";
         wsRef.current = ws;
 
         if ( ws.readyState === WebSocket.OPEN ) {
-            console.log("already connected")
             setConnectionStatus( "connected" );
         } else {
             setConnectionStatus( "connecting" );
@@ -72,7 +69,6 @@ export function useThumbnailWS ( featureType: string, featureData: string[] | st
 
             pathsToSend.forEach( ( p ) => requestedPaths.current.add( p ) );
             wsRef.current.send( JSON.stringify( { type: "request_images", paths: pathsToSend } ) );
-            console.log( `📩 Requested ${pathsToSend.length} thumbnails` );
         },
         [ normalizedData ]
     );
@@ -85,7 +81,6 @@ export function useThumbnailWS ( featureType: string, featureData: string[] | st
 
         requestedPaths.current.add( path );
         wsRef.current.send( JSON.stringify( { type: "request_images", paths: [ path ] } ) );
-        console.log( `📩 Requested thumbnail for ${path}` );
     }, [] );
 
     return { thumbnails, connectionStatus, requestThumbnails, requestThumbnail };

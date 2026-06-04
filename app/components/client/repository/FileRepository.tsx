@@ -19,7 +19,6 @@ const Repository: React.FC<RepositoryProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const [info, setInfo] = useState<ModelInfo | DatasetInfo | undefined>(undefined)
-    console.log("elements = ", elements)
 
     const activeModal: TableData = {
         body: info ? Object.entries(info)

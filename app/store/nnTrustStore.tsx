@@ -56,7 +56,6 @@ const useNNTrustStore = create<AppState>()(
       error: null,
       modelReport: null,
       benchmark: null,
-      benchmarkPROVA: [],
       vulnerabilitySelected: null,
 
       setModel: (models) => set({ model: models }),

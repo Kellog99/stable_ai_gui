@@ -4,22 +4,6 @@ import { completeness_start, completenessOK_get, data_get, duplicates_start, get
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-export async function postIndexes(url: string, indexes: number[]) {
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' }, // binary content type
-    body: JSON.stringify(indexes),
-  });
-
-}
-
-export async function getIndexes(url: string, indexes: number[]) {
-
-  const response = await fetch(url);
-
-}
-
 //async function getData(datasetName: string, featureName: string, labelFeatureName: string) {
 export default async function getData(datasetName: string, featureName: string, show_uq: boolean, labelFeatureName?: string, label?: string[], modelUsed?: string, queries?: string[]) {
 
@@ -177,7 +161,6 @@ export async function copyFiles(sourceFolder: string, newFolderName?: string) {
     // Copy folder and contents recursively
     await fs.cp(absoluteSourcePath, destinationPathWithFolder, { recursive: true });
 
-    console.log(`Successfully copied ${folderName} to ${destinationPathWithFolder}`);
     return { success: true, message: `Successfully copied folder to ${destinationPathWithFolder}` };
   } catch (error) {
     console.error('Error copying folder:', error);

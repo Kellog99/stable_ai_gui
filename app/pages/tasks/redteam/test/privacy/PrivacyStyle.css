@@ -12,7 +12,7 @@
 
 .btn {
     padding: 14px 32px;
-    width: 250px;
+    min-width: 210px;
     text-transform: uppercase;
     color: white;
     font-weight: bold;

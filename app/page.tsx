@@ -78,8 +78,8 @@ export default function HomePage() {
       "info.json"
     )
       .then((listDatasets) => setListDataset(listDatasets as DatasetInfo[]))
-      .catch(err => console.error("Failed to load attacks:", err));
-  }, [setListDataset]);
+      .catch(err => console.error("Failed to load datasets:", err));
+  }, [hostname, port, setListDataset]);
 
 
   // ################## Selection handler ##################

@@ -40,7 +40,6 @@ const SecurityReport = () => {
             .catch(err => console.error("Failed to load attacks:", err));
         //################################################################# 
     }, [modelReport, hostname, port])
-    console.log("benchmark = ", benchmark)
 
     //####################### PDF GENERATION #######################
     const reportRef = useRef<HTMLDivElement>(null);
@@ -69,10 +68,6 @@ const SecurityReport = () => {
                 // Cleanup
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
-                // Create URL and open PDF in a new tab
-                // const url = URL.createObjectURL(blob);
-                // window.open(url, "_blank");
-                console.log('PDF downloaded successfully');
             }
         } catch (error) {
             console.error('Error generating PDF:', error);

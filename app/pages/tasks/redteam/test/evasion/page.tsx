@@ -96,8 +96,6 @@ function Test() {
                     model: model
                 }
 
-                console.log(input)
-
                 const response = await fetch(`http://${hostname}:${port}/test/single_attack`, {
                     method: "POST",
                     body: JSON.stringify(input),
@@ -170,8 +168,7 @@ function Test() {
                         isReady={!!(uploadedFile && model && selectedAttack) && !isAttacking}
                         selectedAttack={selectedAttack}
                         attackResults={attackResults}
-                        handleSelection={(e) => {
-                            const attackId = e.target.value
+                        handleSelection={(attackId) => {
                             setSelectedAttack(attacks[attackId])
                         }}
                         handleChange={handleChange}

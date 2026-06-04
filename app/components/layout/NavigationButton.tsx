@@ -58,10 +58,18 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
     }
     return (
         <div className="nav-button-container">
-            <button
-                onClick={() => handleClick(href, id)}
-                disabled={isDisabled}
-                className={`nav-item ${isActive(id) ? "active" : ""}`}
+            <div
+                onClick={() => !isDisabled && handleClick(href, id)}
+                className={`nav-item ${isActive(id) ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+                style={{ cursor: isDisabled ? "not-allowed" : "pointer" }}
+                role="button"
+                tabIndex={isDisabled ? -1 : 0}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        if (!isDisabled) handleClick(href, id);
+                    }
+                }}
             >
                 <div className={`nav-item-content ${isClosed ? "collapsed" : ""}`}>
 
@@ -75,13 +83,17 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
 
                 {hasChildren && (
                     <button
-                        onClick={() => setExpanded((prev) => !prev)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setExpanded((prev) => !prev);
+                        }}
                         className="expand-button"
+                        type="button"
                     >
                         {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                     </button>
                 )}
-            </button>
+            </div>
 
             {/* Sub-items */}
             {hasChildren && expanded && (
