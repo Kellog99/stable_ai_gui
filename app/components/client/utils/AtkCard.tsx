@@ -17,8 +17,6 @@ import { Tooltip } from '@mantine/core';
 export interface AttackCardProps {
     id: string,
     title: string,
-    description: string,
-    knowledge?: string,
     isActive: boolean,
     parameters: ParametersProps[],
     handleClick: () => void;
@@ -29,19 +27,11 @@ const AttackCard: React.FC<AttackCardProps> = ({
     id,
     title,
     isActive,
-    description,
-    knowledge,
     parameters,
     handleClick,
     handleParametersChange
 }) => {
     const [isClicked, setIsClicked] = useState<boolean>(false)
-    const [showDescription, setShowDescription] = useState<boolean>(false)
-
-    const handleInfoClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setShowDescription(!showDescription);
-    }
 
     const handleSettingsClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -52,7 +42,7 @@ const AttackCard: React.FC<AttackCardProps> = ({
         <div
             key={id}
             onClick={handleClick}
-            className={`atk-card ${isActive ? 'active' : ''} ${showDescription ? 'expanded' : ''}`}
+            className={`atk-card ${isActive ? 'active' : ''}`}
         >
             <div className="card-header">
                 <div className='header-name'>
@@ -62,32 +52,13 @@ const AttackCard: React.FC<AttackCardProps> = ({
                     >
                         <Settings size={20} />
                     </button>
-                    {knowledge && (
-                        <Circle
-                            size={12}
-                            color={"transparent"}
-                            fill={knowledge}
-                        />
-                    )}
+
                     <div className='title-scroll'>
                         {title}
                     </div>
 
                 </div>
-                <Tooltip
-                    multiline
-                    w={220}
-                    withArrow
-                    style={{ fontSize: "0.6rem" }}
-                    label={description}
-                >
-                    <InfoIcon size={20} color="#e8fa42ce" />
-                </Tooltip>
             </div>
-
-            {showDescription && (
-                <div className="card-description">{description}</div>
-            )}
 
             <ParametersWindow
                 isOpen={isClicked}

@@ -1,6 +1,6 @@
 .atk-card {
-    height: 40px;
-    aspect-ratio: 5;
+    height: 120px;
+    aspect-ratio: 1;
     align-content: center;
     padding: 0.2rem 0.6rem 0.2rem 0.2rem;
     border-radius: 0.5rem;
@@ -26,7 +26,7 @@
     display: flex;
     height: 100%;
     width: 100%;
-    font-size: 0.5rem;
+    font-size: 0.6rem;
     font-weight: 600;
     margin-bottom: 0.125rem;
     align-content: center;
@@ -64,19 +64,12 @@
     display: flex;
     align-content: center;
     align-items: center;
-    width: 110px;
-    height: 100%;
-    gap: 6px;
-    /* Or set a specific height like 40px */
     overflow-x: hidden;
-    /* No horizontal scroll */
     overflow-y: auto;
-    /* Vertical scroll */
     white-space: normal;
-    /* Allow text to wrap */
 }
 
-.atk-knowledge{
+.atk-knowledge {
     width: 10px;
     height: 10px;
     border-radius: 50%;
@@ -86,6 +79,7 @@
 .atk-knowledge.white {
     background-color: lightgray;
 }
+
 .atk-knowledge.black {
     background-color: black;
 }

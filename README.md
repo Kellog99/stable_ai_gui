@@ -1,6 +1,12 @@
 # Trustworty GUI
 This repository represent the Application for testing the worthyness of a dataset and a Deep Learning model.
 
+## Initialization 
+If this is the first time this project is run, then run the following code for installing all the `npm` modules:
+```bash
+npm install
+```
+
 ## Organization
 The files' organization for this application follows this organization:
 

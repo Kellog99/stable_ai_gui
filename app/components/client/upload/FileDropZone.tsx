@@ -4,6 +4,12 @@ import './FileDropZone.css';
 import { FileDropZoneProps } from '@/interfaces/homePageInterface';
 import { InfoLoader } from './InfoLoader';
 
+
+/* 
+    This component handles two functionalities:
+    1) the upload of the dataset/model
+    2) the selection of the dataset/model 
+*/
 const FileDropZone: React.FC<FileDropZoneProps> = ({
     id,
     title,

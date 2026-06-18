@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChartCandlestick, Download, Shield, X } from 'lucide-react';
 import { ImageDisplay } from '@/components/client/test/ImageDisplay';
-import { SingleAttackProps, SingleAttackInput } from '@/interfaces/testInterfaces';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
@@ -13,18 +12,17 @@ import '@mantine/charts/styles.css';
 import styles from '@/styles/Evasion.module.css';
 import ModalButton from '@/components/client/test/ModalButton';
 import { AttackVisualization } from '@/components/client/test/AttackVisualization';
+import { handlePostRequest } from './handle_execution';
 
+export interface AttackResults {
+    prediction?: { original: string; adversarial: string };
+    confidence?: { [key: string]: number[] };
+    metrics?: { [key: string]: number };
+}
 function Test() {
     // ######################## stored Variables ########################
-    const {
-        hostname,
-        port,
-    } = useBackendVariablesStore()
-
-    const {
-        attacks,
-        model
-    } = useNNTrustStore()
+    const { hostname, port } = useBackendVariablesStore()
+    const { attacks, model } = useNNTrustStore()
     // ##################################################################
 
     const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>()
@@ -69,69 +67,7 @@ function Test() {
 
     const [isAttacking, setIsAttacking] = useState<boolean>(false)
     // Attack results (stored locally in this component)
-    const [attackResults, setAttackResults] = useState<{
-        prediction?: { original: string; adversarial: string };
-        confidence?: { [key: string]: number[] };
-        metrics?: { [key: string]: number };
-    }>({});
-
-    //  handle the variables for the post request
-    const handlePostRequest = async () => {
-        // At this moment there could be one click at the time
-        // If an attack has been executed then the button will not be available untill the attack finishes its process. 
-        if (!!(uploadedFile && model && selectedAttack && !isAttacking)) {
-            setAdvImg(null)
-            setAdvPert(null)
-            setIsAttacking(true);
-
-            try {
-                // Extract base64 data safely
-                const base64Image = uploadedFile.includes(",")
-                    ? uploadedFile.split(",")[1]
-                    : uploadedFile;
-
-                const input: SingleAttackInput = {
-                    attack: selectedAttack,
-                    image: base64Image,
-                    model: model
-                }
-
-                const response = await fetch(`http://${hostname}:${port}/test/single_attack`, {
-                    method: "POST",
-                    body: JSON.stringify(input),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data: SingleAttackProps = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                setAdvImg(data.x_adv)
-                setAdvPert(data.adv_perturbation)
-
-                // Store results locally for the visualization modal
-                setAttackResults({
-                    prediction: {
-                        original: data.original_prediction,
-                        adversarial: data.adversarial_prediction,
-                    },
-                    confidence: data.confidence,
-                    metrics: data.advance_metrics,
-                });
-
-            } catch (error) {
-                console.error('ERROR:', error);
-            } finally {
-                // it ends the loading animation
-                setIsAttacking(false)
-            }
-
-        }
-    };
+    const [attackResults, setAttackResults] = useState<AttackResults>({});
 
     return (
         <div className="container-pages">
@@ -143,40 +79,24 @@ function Test() {
 
             />
             <div className={styles.image_displayer}>
-                <div className={styles.selection_container}>
-                    {/* Selection of the attacks */}
-
-                    <ImageDisplay
-                        title="Select the target image"
-                        placeholder='Load an PNG or a JPG file.'
-                        imageUrl={uploadedFile}
-                        handleUpload={handleUploadFile}
-                        actionButton={
-                            <button
-                                onClick={() => { setUploadedFile(undefined) }}
-                                className={styles.action_button}
-                            >
-                                <X
-                                    size={20}
-                                    color="white"
-                                />
-                            </button>
-                        }
-                    />
-                    <VulnerabilitySelection
-                        attacks={attacks}
-                        isReady={!!(uploadedFile && model && selectedAttack) && !isAttacking}
-                        selectedAttack={selectedAttack}
-                        attackResults={attackResults}
-                        handleSelection={(attackId) => {
-                            setSelectedAttack(attacks[attackId])
-                        }}
-                        handleChange={handleChange}
-                        handlePostRequest={handlePostRequest}
-                    />
-
-
-                </div>
+                {/* Selection of the attacks */}
+                <ImageDisplay
+                    title="Select the target image"
+                    placeholder='Load an PNG or a JPG file.'
+                    imageUrl={uploadedFile}
+                    handleUpload={handleUploadFile}
+                    actionButton={
+                        <button
+                            onClick={() => { setUploadedFile(undefined) }}
+                            className={styles.action_button}
+                        >
+                            <X
+                                size={20}
+                                color="white"
+                            />
+                        </button>
+                    }
+                />
                 {/* Results */}
                 <div className={styles.results_container}>
                     <div className={styles.results_header}>
@@ -233,7 +153,33 @@ function Test() {
                         />
                     </div>
                 </div>
+
             </div>
+            <div className={styles.vulnerability_selection}>
+                <VulnerabilitySelection
+                    attacks={attacks}
+                    isReady={!!(uploadedFile && model && selectedAttack) && !isAttacking}
+                    selectedAttack={selectedAttack}
+                    attackResults={attackResults}
+                    handleSelection={(attackId) => {
+                        setSelectedAttack(attacks[attackId])
+                    }}
+                    handleChange={handleChange}
+                    handlePostRequest={() =>
+                        handlePostRequest({
+                            url: `http://${hostname}:${port}/test/single_attack`,
+                            file: uploadedFile,
+                            model: model,
+                            attack: selectedAttack,
+                            isAttacking: isAttacking,
+                            setAdvImg: setAdvImg,
+                            setAdvPert: setAdvPert,
+                            setAttackResults: setAttackResults,
+                            setIsAttacking: setIsAttacking
+                        })}
+                />
+            </div>
+
         </div >
     );
 }

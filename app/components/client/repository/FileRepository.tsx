@@ -10,7 +10,9 @@ interface RepositoryProps {
     handleDelete: (elem: ModelInfo | DatasetInfo) => void;
     selectHandle: (element: ModelInfo | DatasetInfo) => void;
 }
-
+/*
+This component handles the model or the dataset repository
+*/
 const Repository: React.FC<RepositoryProps> = ({
     activeId,
     elements,
@@ -31,6 +33,7 @@ const Repository: React.FC<RepositoryProps> = ({
                 <thead className="table-header">
                     <tr>
                         <th>Name</th>
+                        <th>Task</th>
                         <th>Created</th>
                         <th>Delete</th>
                     </tr>
@@ -57,6 +60,7 @@ const Repository: React.FC<RepositoryProps> = ({
                                     {elem.name}
                                 </div>
                             </td>
+                            <td>{elem.task ? elem.task : "Unknown"}</td>
                             <td>{elem.date ? elem.date : "Not registered"}</td>
                             <td>
                                 <button
@@ -73,6 +77,7 @@ const Repository: React.FC<RepositoryProps> = ({
                     ))}
                 </tbody>
             </table>
+
             <Modal
                 opened={isOpen}
                 onClose={() => setIsOpen(false)}

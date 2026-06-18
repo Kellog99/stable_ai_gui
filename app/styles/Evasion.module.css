@@ -72,3 +72,12 @@
   max-width: 400px;
   /* Prevents images from becoming too large */
 }
+
+.vulnerability_selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-content: center;
+  margin-left: 3vw;
+  margin-right: 3vw;
+}
