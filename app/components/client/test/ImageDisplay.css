@@ -16,8 +16,7 @@
 
 .image-container {
     position: relative;
-    width: 100%;
-    min-height: 200px;
+    height: clamp(400px, 100%, 900px);
     aspect-ratio: 1 / 1.167;
     border-radius: 0.8rem;
     border: 2px dashed #d1d5db;
@@ -39,10 +38,19 @@
     display: block;
 }
 
-.loader:hover {
-    background-color: var(--bg);
-    color: white;
+/* Upload area: only add interactive styles when uploads are enabled */
+.upload-area--interactive {
     cursor: pointer;
+}
+
+.upload-area--interactive:hover {
+    background-color: var(--bg, #1a1a1a);
+    color: white;
+}
+
+.upload-area--interactive:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
 }
 
 .image-placeholder {
@@ -53,4 +61,5 @@
     max-width: 70px;
     font-size: 0.6rem;
     text-align: center;
+    margin: 0;
 }

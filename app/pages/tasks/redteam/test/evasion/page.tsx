@@ -70,7 +70,7 @@ function Test() {
     const [attackResults, setAttackResults] = useState<AttackResults>({});
 
     return (
-        <div className="container-pages">
+        <div className={styles.evasion_page}>
             {/* Header */}
             <HeaderPageTask
                 Icon={Shield}
@@ -78,106 +78,104 @@ function Test() {
                 descrition="Test on the loaded model single attack for a specific image."
 
             />
-            <div className={styles.image_displayer}>
+            <div className={styles.grid_container}>
                 {/* Selection of the attacks */}
-                <ImageDisplay
-                    title="Select the target image"
-                    placeholder='Load an PNG or a JPG file.'
-                    imageUrl={uploadedFile}
-                    handleUpload={handleUploadFile}
-                    actionButton={
-                        <button
-                            onClick={() => { setUploadedFile(undefined) }}
-                            className={styles.action_button}
-                        >
-                            <X
-                                size={20}
-                                color="white"
-                            />
-                        </button>
-                    }
-                />
-                {/* Results */}
-                <div className={styles.results_container}>
-                    <div className={styles.results_header}>
-                        <ModalButton
-                            Icon={ChartCandlestick}
-                            disabled={false}
-                            modalTitle='Attack Result'
-                            children={
-                                <AttackVisualization
-                                    prediction={attackResults.prediction}
-                                    confidence={attackResults.confidence}
-                                    results={attackResults.metrics} />
-                            }
-                        />
-                        Results
-                    </div>
-                    <div className={styles.results_description}>
-                        <ImageDisplay
-                            title="Adversarial Perturbation"
-                            placeholder="No image loaded"
-                            isLoading={isAttacking}
-                            imageUrl={advPert ? "data:image/jpeg;base64," + advPert : undefined}
-                        />
-
-                        <ImageDisplay
-                            title="Adversarial Example"
-                            placeholder="No image loaded"
-                            isLoading={isAttacking}
-                            imageUrl={advImg ? "data:image/jpeg;base64," + advImg : undefined}
-                            actionButton={
-                                <button
-                                    onClick={() => {
-                                        if (advImg) {
-                                            const mimeType = "image/png"; // or image/jpeg
-                                            const dataUrl = `data:${mimeType};base64,${advImg}`;
-
-                                            const link = document.createElement("a");
-                                            link.href = dataUrl;
-                                            link.download = "image.png";
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        }
-                                    }}
-                                    className={styles.action_button}
-                                >
-                                    <Download
-                                        size={20}
-                                        color="white"
-                                    />
-                                </button>
-                            }
-
-                        />
-                    </div>
+                <div className={styles.inline_item}>
+                    <ImageDisplay
+                        title="Select the target image"
+                        placeholder='Load an PNG or a JPG file.'
+                        imageSrc={uploadedFile}
+                        handleUpload={handleUploadFile}
+                        actionButton={
+                            <button
+                                onClick={() => { setUploadedFile(undefined) }}
+                                className={styles.action_button}
+                            >
+                                <X
+                                    size={20}
+                                    color="white"
+                                />
+                            </button>
+                        }
+                    />
                 </div>
+                {/* Results */}
+                <div className={styles.inline_item}>
+                    <ImageDisplay
+                        title="Adversarial Perturbation"
+                        placeholder="No image loaded"
+                        isLoading={isAttacking}
+                        imageSrc={advPert ? "data:image/jpeg;base64," + advPert : undefined}
+                    />
 
-            </div>
-            <div className={styles.vulnerability_selection}>
-                <VulnerabilitySelection
-                    attacks={attacks}
-                    isReady={!!(uploadedFile && model && selectedAttack) && !isAttacking}
-                    selectedAttack={selectedAttack}
-                    attackResults={attackResults}
-                    handleSelection={(attackId) => {
-                        setSelectedAttack(attacks[attackId])
-                    }}
-                    handleChange={handleChange}
-                    handlePostRequest={() =>
-                        handlePostRequest({
-                            url: `http://${hostname}:${port}/test/single_attack`,
-                            file: uploadedFile,
-                            model: model,
-                            attack: selectedAttack,
-                            isAttacking: isAttacking,
-                            setAdvImg: setAdvImg,
-                            setAdvPert: setAdvPert,
-                            setAttackResults: setAttackResults,
-                            setIsAttacking: setIsAttacking
-                        })}
-                />
+                </div>
+                <div className={styles.inline_item}>
+                    <ImageDisplay
+                        title="Adversarial Example"
+                        placeholder="No image loaded"
+                        isLoading={isAttacking}
+                        imageSrc={advImg ? "data:image/jpeg;base64," + advImg : undefined}
+                        actionButton={
+                            <button
+                                onClick={() => {
+                                    if (advImg) {
+                                        const mimeType = "image/png"; // or image/jpeg
+                                        const dataUrl = `data:${mimeType};base64,${advImg}`;
+
+                                        const link = document.createElement("a");
+                                        link.href = dataUrl;
+                                        link.download = "image.png";
+                                        document.body.appendChild(link);
+                                        link.click();
+                                        document.body.removeChild(link);
+                                    }
+                                }}
+                                className={styles.action_button}
+                            >
+                                <Download
+                                    size={20}
+                                    color="white"
+                                />
+                            </button>
+                        }
+
+                    />
+                </div>
+                {/* <ModalButton
+                Icon={ChartCandlestick}
+                disabled={false}
+                modalTitle='Attack Result'
+                children={
+                    <AttackVisualization
+                        prediction={attackResults.prediction}
+                        confidence={attackResults.confidence}
+                        results={attackResults.metrics} />
+                }
+            /> */}
+                <div className={styles.bottom_item}>
+                    <VulnerabilitySelection
+                        attacks={attacks}
+                        isReady={!!(uploadedFile && model && selectedAttack) && !isAttacking}
+                        selectedAttack={selectedAttack}
+                        attackResults={attackResults}
+                        handleSelection={(attackId) => {
+                            setSelectedAttack(attacks[attackId])
+                        }}
+                        handleChange={handleChange}
+                        handlePostRequest={() =>
+                            handlePostRequest({
+                                url: `http://${hostname}:${port}/test/single_attack`,
+                                file: uploadedFile,
+                                model: model,
+                                attack: selectedAttack,
+                                isAttacking: isAttacking,
+                                setAdvImg: setAdvImg,
+                                setAdvPert: setAdvPert,
+                                setAttackResults: setAttackResults,
+                                setIsAttacking: setIsAttacking
+                            })}
+                    />
+                </div>
             </div>
 
         </div >

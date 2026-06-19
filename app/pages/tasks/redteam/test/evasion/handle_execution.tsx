@@ -47,7 +47,7 @@ export async function handlePostRequest({
                 image: base64Image,
                 model: model
             }
-
+            console.log(input)
             const response = await fetch(url, {
                 method: "POST",
                 body: JSON.stringify(input),
@@ -56,11 +56,15 @@ export async function handlePostRequest({
                 }
             });
 
-            const data: SingleAttackProps = await response.json();
-
             if (!response.ok) {
+                const errorDetail = await response.json();
+                console.error('Server validation error:', JSON.stringify(errorDetail, null, 2));
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+
+            const data: SingleAttackProps = await response.json();
+
+
 
             setAdvImg(data.x_adv)
             setAdvPert(data.adv_perturbation)

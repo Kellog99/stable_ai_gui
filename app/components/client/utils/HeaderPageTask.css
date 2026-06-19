@@ -5,6 +5,7 @@
     align-content: center;
     justify-content: space-between;
     margin-bottom: 0;
+    height: var(--page-title-height);
 }
 
 /* This contain the Icon and the component with title and the description */

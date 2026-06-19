@@ -6,62 +6,75 @@ import './ImageDisplay.css';
 interface ImageDisplayProps {
   title?: string;
   placeholder: string;
-  imageUrl?: string;  //this variable has the base64 encoding of an image
+  /** Accepts a URL or a base64-encoded data URI */
+  imageSrc?: string;
   isLoading?: boolean;
   actionButton?: React.ReactNode;
+  /** If omitted, the upload area is rendered as non-interactive */
   handleUpload?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({
   title,
   placeholder,
-  imageUrl,
+  imageSrc,
   actionButton,
   isLoading = false,
-  handleUpload,
+  handleUpload
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isUploadable = !!handleUpload && !isLoading;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isUploadable && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      fileInputRef.current?.click();
+    }
+  };
+
   return (
     <div className="image-wrapper">
-      <h3 className="image-title">{title ?? " "}</h3>
+      {title && (
+        <h3 className="image-title">{title}</h3>
+      )}
 
-      {imageUrl ? (
+      {imageSrc ? (
         <div className="image-container">
           <img
             className="image"
-            src={imageUrl}
-            alt="Displayed content"
+            src={imageSrc}
           />
           {actionButton}
         </div>
       ) : (
         <div
-          className="image-container loader"
+          className={`image-container upload-area${isUploadable ? ' upload-area--interactive' : ''}`}
+          role={isUploadable ? 'button' : undefined}
+          tabIndex={isUploadable ? 0 : undefined}
+          aria-label={isUploadable ? placeholder : undefined}
+          aria-busy={isLoading}
           onClick={() => {
-            if (!isLoading) {
-              fileInputRef.current?.click();
-            }
+            if (isUploadable) fileInputRef.current?.click();
           }}
+          onKeyDown={handleKeyDown}
         >
-          {
-            isLoading ? (
-              <Loader />
-            ) : (
-              <>
-                <ImageIcon size={"calc(2 * var(--icon-size))"} />
-                <div className="image-placeholder">
-                  {placeholder}
-                </div>
-              </>
-            )
-          }
+          {isLoading ? (
+            <Loader aria-label="Loading" />
+          ) : (
+            <>
+              <ImageIcon size="calc(2 * var(--icon-size))" aria-hidden="true" />
+              <p className="image-placeholder">{placeholder}</p>
+            </>
+          )}
 
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
             style={{ display: 'none' }}
+            aria-hidden="true"
+            tabIndex={-1}
             onChange={handleUpload}
           />
         </div>

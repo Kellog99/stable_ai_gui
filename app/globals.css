@@ -26,7 +26,10 @@
   --error: red;
   --icon-size: 30px;
   --title: Stable AI;
-  --header-height: 100px;
+
+  --header-height: 80px;
+  --page-title-height: 120px;
+
   --card-width: 350px;
 
   --pc-width: 450px;
