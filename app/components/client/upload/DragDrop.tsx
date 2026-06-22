@@ -1,5 +1,5 @@
 "use client"
-import './FileDropZone.css';
+import './DragDrop.css';
 import { Group, Loader } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { IconX } from '@tabler/icons-react';

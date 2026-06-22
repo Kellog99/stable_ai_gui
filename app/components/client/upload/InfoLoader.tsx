@@ -2,7 +2,7 @@ import { Code, Divider, Modal, Table, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { InfoIcon } from "lucide-react";
 import { InfoUploader } from "@/interfaces/homePageInterface";
-import "./FileDropZone.css"
+import "./InfoLoader.css"
 interface InfoLoaderProps {
     config: InfoUploader
 }

@@ -99,10 +99,6 @@ export default function HomePage() {
     };
   };
 
-  // Usage:
-  const handleModelSelection = createToggleHandler(setModel, model);
-  const handleDatasetSelection = createToggleHandler(setDataset, dataset);
-
   // ################## Deletion handler ##################
   const createDeletionHandler = <T extends ModelInfo | DatasetInfo>(
     setter: React.Dispatch<React.SetStateAction<T[]>>,
@@ -117,69 +113,6 @@ export default function HomePage() {
       }
     };
   };
-
-  // Usage:
-  const handleModelDeletion = createDeletionHandler(setListModels, listModels);
-  const handleDatasetDeletion = createDeletionHandler(setListDataset, listDatasets);
-
-  // ##################### Model Section #####################
-  const btnModel: ButtonProps[] = [
-    {
-      id: "model",
-      name: "Upload model",
-      Icon: Upload,
-      child: <DragDrop
-        name={"Load your Model"}
-        Icon={Brain}
-        acceptedType={"zip"}
-        description={'Make sure your zip contains raw data and a json config file.'}
-        handleFileUpload={(file: File | null) => { uploadZip(hostname, port, "path_model_repo", file) }} />,
-    },
-    {
-      id: "repository",
-      name: "Model Repository",
-      Icon: HardDrive,
-      child: <FileRepository
-        elements={listModels}
-        activeId={model?.id}
-        selectHandle={handleModelSelection}
-        handleDelete={handleModelDeletion}
-      />,
-    }
-  ]
-  // #########################################################
-
-
-  // ##################### Dataset Section #####################
-
-  const btnDataset: ButtonProps[] = [
-    {
-      id: "dataset",
-      name: "Upload dataset",
-      Icon: Upload,
-      child: <DragDrop
-        name={"Load your Dataset"}
-        Icon={Database}
-        acceptedType={"zip"}
-        description={'Make sure your zip contains raw data and a json config file.'}
-        handleFileUpload={(file: File | null) => { uploadZip(hostname, port, "path_ds_repo", file) }}
-      />,
-    },
-    {
-      id: "repository",
-      Icon: HardDrive,
-      name: "Dataset Repository",
-      child: <FileRepository
-        elements={listDatasets}
-        activeId={dataset?.id}
-        selectHandle={handleDatasetSelection}
-        handleDelete={handleDatasetDeletion} />,
-    }
-  ]
-
-  // ###########################################################
-
-
   return (
     <div className={styles.home_page}>
       <div className={styles.home_header}>
@@ -198,9 +131,12 @@ export default function HomePage() {
           id={'model_loader'}
           title="Model"
           description="Drag and drop your model or choose an existing model."
+          elements={listModels}
           Icon={Brain}
           fileDropInformation={infoModel}
-          buttons={btnModel}
+          handleSelection={createToggleHandler(setModel, model)}
+          handleDeletion={createDeletionHandler(setListModels, listModels)}
+          handleFileUpload={(file: File | null) => { uploadZip(hostname, port, "path_model_repo", file) }}
         />
 
         {/* Dataset selection */}
@@ -208,9 +144,12 @@ export default function HomePage() {
           id="dataset_loader"
           title="Dataset"
           description="Load your dataset or choose an existing dataset."
+          elements={listDatasets}
           Icon={DatabaseIcon}
           fileDropInformation={infoDataset}
-          buttons={btnDataset}
+          handleSelection={createToggleHandler(setDataset, dataset)}
+          handleDeletion={createDeletionHandler(setListDataset, listDatasets)}
+          handleFileUpload={(file: File | null) => { uploadZip(hostname, port, "path_ds_repo", file) }}
         />
       </div>
     </div>

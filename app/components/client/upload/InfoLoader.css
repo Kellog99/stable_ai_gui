@@ -1,0 +1,23 @@
+.info-container {
+  background-color: transparent;
+  border-radius: 8px;
+  height: 30px;
+  width: 30px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  /* <-- enables flexbox */
+  align-items: center;
+  /* <-- vertical center */
+  justify-content: center;
+  /* <-- horizontal center */
+  margin-bottom: 12px;
+  margin-left: -10px;
+  border: none;
+  transition: all 0.2s ease;
+
+}
+
+.info-container:hover {
+  transform: scale(1.2);
+}

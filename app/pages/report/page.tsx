@@ -70,7 +70,7 @@ export default function ReportPage() {
       Icon: HardDrive,
       child: <FileRepository
         elements={listAttacksReport.map((attackReport) => attackReport.info)}
-        selectHandle={(report) => {
+        handleSelection={(report) => {
           const selectedReport: ModelReportProps | undefined = listAttacksReport.find(value => value.info.id === (report as InfoProps).id)
           if (selectedReport) {
             setAttackReport(selectedReport)
