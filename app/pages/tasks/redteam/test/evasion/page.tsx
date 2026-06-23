@@ -45,8 +45,6 @@ function Test() {
     });
     const [showResults, setShowResults] = useState<boolean>(false);
 
-
-
     useEffect(() => {
         if (attacks && Object.keys(attacks).length > 0) {
             setSelectedAttack(Object.values(attacks)[0])
@@ -170,24 +168,11 @@ function Test() {
                     <div className={styles.bottom_item}>
                         <VulnerabilitySelection
                             attacks={attacks}
-                            isReady={!!(uploadedFile && model && selectedAttack) && !isAttacking}
                             selectedAttack={selectedAttack}
                             handleSelection={(attackId) => {
                                 setSelectedAttack(attacks[attackId])
                             }}
                             handleChange={(value: (string | number)[]) => handleChange(value as number[])}
-                            handlePostRequest={() =>
-                                handlePostRequest({
-                                    url: `http://${hostname}:${port}/test/single_attack`,
-                                    file: uploadedFile,
-                                    model: model,
-                                    attack: selectedAttack,
-                                    isAttacking: isAttacking,
-                                    setAdvImg: setAdvImg,
-                                    setAdvPert: setAdvPert,
-                                    setAttackResults: setAttackResults,
-                                    setIsAttacking: setIsAttacking
-                                })}
                         />
                     </div>
                     <div className={styles.exec_container}>

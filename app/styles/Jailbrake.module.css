@@ -1,0 +1,80 @@
+.jailbraking_page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat_container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: calc(100vh - var(--header-height) - var(--page-title-height));
+    padding-left: 10vw;
+    padding-right: 10vw;
+    padding-bottom: 2vh;
+}
+
+.prompt_container {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+}
+
+.attack {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: color-mix(in hsl,
+            var(--bg-dark) 20%,
+            var(--bg) 80%);
+    ;
+    padding: 15px;
+    border-radius: 20px;
+}
+
+.results_container {
+    height: 100%;
+}
+
+.input_style {
+    width: 100%;
+    background-color: transparent;
+    border-radius: 20px;
+    background-color: color-mix(in hsl,
+            var(--bg-dark) 50%,
+            var(--bg) 50%);
+    color: lightgray;
+    font-size: 0.85rem;
+    padding-left: 10px;
+}
+
+.execute_button {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border-radius: 100%;
+    width: 45px;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-light);
+    border: 1px solid lightgray;
+    transition: background-color 0.2s;
+}
+
+.execute_button:focus {
+    opacity: 0.7;
+}
+
+.chat_box {
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+    padding: 7px;
+    width: 20vw;
+    max-width: 500px;
+    min-width: 200px;
+    color: lightgray;
+    font-size: 0.80rem;
+    min-height: 35px;
+}
