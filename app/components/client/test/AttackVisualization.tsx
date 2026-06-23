@@ -3,7 +3,7 @@ import React from 'react';
 import './AttackVisualization.css';
 import { Table, TableData } from '@mantine/core';
 import ConfidenceChart from './ConfidenceChart';
-import '@mantine/charts/styles.css'; // Add this import
+import '@mantine/charts/styles.css';
 
 
 interface AttackVisualizationProps {
@@ -35,16 +35,6 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
   // ######################################
 
 
-  // ###################### Metric Table ######################
-  const metricTableData: TableData = {
-    caption: 'Computed Metrics',
-    head: ['Metric', 'Score'],
-    body: results ? Object.entries(results).map(([key, value]) => { return [key, value.toFixed(3)] }) : []
-  };
-  // ##########################################################
-
-
-
   return (
     <div className="statistics-container">
       <div>
@@ -57,41 +47,46 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = ({
           }
         </span>
 
-        <div className='card-predictions' style={{
-          backgroundColor: `${prediction.original !== prediction.adversarial ? "lightgreen" : "rgb(255, 121, 121)"}`,
-          border: `2px solid ${prediction.original !== prediction.adversarial ? "green" : "red"}`
-
-        }}>
-          <span> Original prediction: {prediction.original}</span>
-          <span> Adversarial prediction: {prediction.adversarial}</span>
+        <div className={`card-predictions ${prediction.original !== prediction.adversarial ? "evasion" : ""}`}>
+          <span> Original prediction: <b>{prediction.original}</b></span>
+          <span> Adversarial prediction: <b>{prediction.adversarial}</b></span>
         </div>
       </div>
 
 
       {/* Statistics Table */}
-      <div>
-        <h3 className="card-title">Statistics</h3>
-        <span style={{ fontSize: "0.9rem" }}>This table shows some metrics regarding the executed attack.</span>
-
-        <Table
-          styles={{
-            table: {
-              background: "white"
-            },
-            thead: {
-              background: "#a9afbb"
-            }
-          }}
-          striped
-          highlightOnHover
-          data={metricTableData}
-        />
+      <div className='statistics_container'>
+        <div>
+          <h3 className="card-title">Statistics</h3>
+          <span style={{ fontSize: "0.9rem" }}>This table shows some metrics regarding the executed attack.</span>
+        </div>
+        <table className='metric_table'>
+          <thead style={{ background: 'var(--bg)' }}>
+            <tr>
+              <th>Metric</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results
+              ? Object.entries(results).map(([key, value]) => (
+                <tr key={key}>
+                  <td> <b>{key}</b></td>
+                  <td >{value.toFixed(3)}</td>
+                </tr>
+              ))
+              : null}
+          </tbody>
+          <caption className='table_caption' >
+            Computed Metrics
+          </caption>
+        </table>
 
       </div>
 
       {/* Confidence Chart */}
       <ConfidenceChart confidence={confidence} />
-    </div>
+    </div >
   );
 };
 

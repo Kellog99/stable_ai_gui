@@ -29,14 +29,6 @@ export function OptionCard({
 
   const [openSettings, setIsExpanded] = useState(false);
 
-  const model = useNNStore((state) => state.models);
-  const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
-
-  let isCM = false;
-  if (numClasses > 100 && name == "confusionmatrix") {
-    isCM = true;
-  }
-
   return (
     <>
       <div className="attack-card">
@@ -60,7 +52,7 @@ export function OptionCard({
             <input
               type="checkbox"
               onChange={onSelect}
-              checked={isSelected && !isCM}
+              checked={isSelected}
             />
             <span className="checkmark">
               <Check className="check-icon" size={15} strokeWidth={3} />

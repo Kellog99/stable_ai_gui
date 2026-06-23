@@ -1,4 +1,4 @@
-import { CheckCircleIcon, Save, Settings, TimerReset, Trash } from 'lucide-react';
+import { CheckCircleIcon, RefreshCw, Save, Settings, TimerReset, Trash, X } from 'lucide-react';
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
@@ -28,45 +28,49 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 }) => {
 
     const [values, setValues] = useState<(number | string)[]>([]);
-    const [defaultParameters, setDefaultParameters] = useState<(number | string)[]>([]);
+    const [defaultValues, setDefaultValues] = useState<(number | string)[]>([]);
+    const [isSaved, setIsSaved] = useState(false);
 
-    // Update values when parameters change or modal opens
     useEffect(() => {
         if (isOpen && parameters && parameters.length > 0) {
-            const def = parameters.map((p) => {
-                if (p.kind === "enum") return typeof p.default === "string" ? p.default : p.options?.[0] ?? "";
-                if (typeof p.default === "number") return p.default;
+            const defaults = parameters.map((p) => {
+                if (p.kind === 'enum') return typeof p.default === 'string' ? p.default : (p.options?.[0] ?? '');
+                if (typeof p.default === 'number') return p.default;
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
                 return 0;
             });
-            setValues(def)
-            setDefaultParameters(def)
-
+            setValues(defaults);
+            setDefaultValues(defaults);
+            setIsSaved(false);
         }
     }, [isOpen, parameters]);
 
 
     const handleChange = (index: number, newValue: number | string) => {
-        const newValues = [...values];
-        newValues[index] = newValue;
-        setValues(newValues);
+        setValues((prev) => {
+            const next = [...prev];
+            next[index] = newValue;
+            return next;
+        });
     };
 
-    const handleReset = () => {
-        setValues(defaultParameters);
-    };
+    const handleReset = () => setValues(defaultValues);
 
-
-    // This is for showing that the save button has been clicked
-    const [isSaving, setIsSaving] = useState(false);
-
-    const handleSaveClick = () => {
-        setIsSaving(true);
+    const handleSave = () => {
         handleParametersChange(values);
-        onClose();
-        setTimeout(() => setIsSaving(false), 300);
+        setIsSaved(true);
+        setTimeout(() => {
+            setIsSaved(false);
+            onClose();
+        }, 600);
     };
+
+
+    const toNumber = (v: number | string): number =>
+        typeof v === 'number' ? v : Number(v) || 0;
+
+
     return (
         <Modal
             opened={isOpen}
@@ -164,24 +168,20 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
                     {/* Footer */}
                     <div className="modal-footer">
-                        <button
-                            className="footer-button reset"
-                            onClick={handleReset}
-                        >
-                            <TimerReset size={22} /> Reset
+                        <button className="btn btn-ghost" onClick={handleReset}>
+                            <RefreshCw size={15} /> Reset
                         </button>
-                        <div className="button-group">
-                            <button
-                                onClick={onClose}
-                                className="footer-button delete"
-                            >
-                                <Trash size={22} /> Cancel
+                        <div className="btn-group">
+                            <button className="btn btn-outline" onClick={onClose}>
+                                <X size={15} /> Cancel
                             </button>
                             <button
-                                onClick={handleSaveClick}
-                                className={`footer-button save ${isSaving ? 'saving' : ''}`}
+                                className={`btn btn-primary ${isSaved ? 'btn-saved' : ''}`}
+                                onClick={handleSave}
+                                disabled={isSaved}
                             >
-                                {isSaving ? <CheckCircleIcon size={22} /> : <Save size={22} />} Save
+                                {isSaved ? <CheckCircleIcon size={15} /> : <Save size={15} />}
+                                {isSaved ? 'Saved' : 'Save'}
                             </button>
                         </div>
                     </div>
