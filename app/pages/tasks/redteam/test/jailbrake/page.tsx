@@ -3,11 +3,12 @@ import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styles from '@/styles/Jailbrake.module.css'
 import { Send, Shield, Unlink } from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
-import { Loader } from '@mantine/core';
+import MessageThread from '@/components/client/jailbraking/MessageThread';
+import { BubbleInterface, JailbreakAttackOutput } from '@/interfaces/testInterfaces';
 
 const Jailbraking = () => {
     // ######################## stored Variables ########################
@@ -15,12 +16,11 @@ const Jailbraking = () => {
     const { attacks, model } = useNNTrustStore()
     // ##################################################################
 
-    const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>()
-    const [isAttacking, setIsAttacking] = useState<boolean>(false)
+    const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>(Object.values(attacks)[0])
 
     const nlpAttacks = useMemo(() => {
         return Object.fromEntries(Object.entries(attacks).filter(([id, atk]: [string, RegisterObjectProps]) => {
-            atk.task && ["jailbraking", "prompt_injection"].includes(atk.task)
+            return atk.objective && ["jailbraking", "prompt_injection"].includes(atk.objective)
         }))
     }, [attacks])
     useEffect(() => {
@@ -29,7 +29,15 @@ const Jailbraking = () => {
         }
     }, [attacks])
 
-    const [prompt, setPrompt] = useState<string>();
+    const [prompt, setPrompt] = useState<string>("");
+    const [goal, setGoal] = useState<string>("");
+    const [conversationChat, setConversationChat] = useState<BubbleInterface[][]>([]);
+    const [modelResponse, setModelResponse] = useState<string>("");
+
+    //  This variable is for handling the possibility to do the attack
+    const isActive = useMemo(() => {
+        return !!(model && prompt && prompt !== "" && selectedAttack)
+    }, [model, prompt])
 
     const handleChange = (value: number[]) => {
         setSelectedAttack(prev => {
@@ -45,13 +53,43 @@ const Jailbraking = () => {
     }
     const [isClicked, setIsClicked] = useState<boolean>(false)
     const [adversarialPrompt, setAdversarialPrompt] = useState<string>()
-    const handleSubmit = () => {
-        // Qua ci starebbe la post function al backend per eseguire l'attacco
-        const prompt_adv = "There was ididis iasdofia sdofaoi asdoifjaosdb adswoifha ol"
 
-        setAdversarialPrompt(prompt_adv)
+    //  this function handles the submission of the prompt and sets the goal and adversarial prompt
+    const handleSubmit = async () => {
+        if (isActive) {
 
-        setIsClicked(false)
+            setIsClicked(true)
+            setGoal(prompt)
+
+
+            const response = await fetch(`http://${hostname}:${port}/test/jailbreaking`, {
+                method: "POST",
+                body: JSON.stringify({
+                    "input": prompt,
+                    "model": model,
+                    "attack": selectedAttack
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorDetail = await response.json();
+                console.error('Server validation error:', JSON.stringify(errorDetail, null, 2));
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data: JailbreakAttackOutput = await response.json();
+
+
+            // Qua ci starebbe la post function al backend per eseguire l'attacco
+
+            setAdversarialPrompt(data.adversarial_prompt)
+            setConversationChat(data.conversations)
+            setModelResponse(data.model_response)
+            setIsClicked(false)
+        }
     }
 
     return (
@@ -67,34 +105,35 @@ const Jailbraking = () => {
                 <div className={styles.attack}>
                     <div className={styles.results_container}>
                         {
-                            adversarialPrompt ?
-                                <div>
-                                    <div className={styles.chat_box}>
-                                        {prompt}
-                                    </div>
-                                    <Loader color="blue" size="xl" type="dots" />
-                                    <div className={styles.chat_box}>
-                                        {adversarialPrompt}
-                                    </div>
-
-                                </div>
-                                : null
+                            adversarialPrompt && goal &&
+                            (<MessageThread
+                                goal={goal}
+                                isClicked={isClicked}
+                                adversarialPrompt={adversarialPrompt}
+                                conversationChat={conversationChat}
+                                modelResponse={modelResponse}
+                            />)
                         }
                     </div>
 
                     <div className={styles.prompt_container}>
                         <input
                             type="text"
+                            defaultValue={prompt}
                             value={prompt}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && isActive) {
+                                    handleSubmit();
+                                }
+                            }}
                             onChange={(e) => { setPrompt(e.target.value) }}
                             className={styles.input_style}
                             placeholder="Insert the goal of the attack."
                         />
                         <button
-                            className={styles.execute_button}
-                            disabled={isClicked}
+                            className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
+                            disabled={isClicked && !isActive}
                             onClick={() => {
-                                setIsClicked(true);
                                 handleSubmit()
                             }
                             }

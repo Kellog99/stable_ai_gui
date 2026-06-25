@@ -1,0 +1,68 @@
+/* Base bubble styles (from the first snippet) */
+.bubble {
+  max-width: 75%;
+  padding: 9px 13px;
+  border-radius: 18;
+  font-size: 14;
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.bubble.is-me {
+  background: #378ADD;
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  align-self: flex-end;
+}
+
+.bubble.is-not-me {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  color: var(--color-text-primary);
+  border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+
+/* Time Style */
+.time-style {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.time-style.is-me {
+  align-self: flex-end;
+  padding-left: 0;
+  padding-right: 4px;
+}
+
+.time-style.is-not-me {
+  align-self: flex-start;
+  padding-left: 4px;
+  padding-right: 0;
+}
+
+/* Detail Bubble */
+.detail-bubble {
+  max-width: 75%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 2px;
+}
+
+.detail-bubble.is-me {
+  align-self: flex-end;
+  background: #0C447C;
+  color: #B5D4F4;
+  border: none;
+}
+
+.detail-bubble.is-not-me {
+  align-self: flex-start;
+  background: var(--color-background-tertiary);
+  color: var(--color-text-secondary);
+  border: 0.5px solid var(--color-border-tertiary);
+}

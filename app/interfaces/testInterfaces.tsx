@@ -27,10 +27,17 @@ export interface AttackStats {
   executionTime: number;
 }
 
-export type AttackType =
-  | 'fgsm'
-  | 'pgd'
-  | 'cw'
-  | 'deepfool'
-  | 'jsma';
 
+
+export interface BubbleInterface {
+  sender: "user" | "model";
+  msg: string;
+  score?: number;
+}
+
+export interface JailbreakAttackOutput {
+  adversarial_prompt: string;
+  conversations: BubbleInterface[][];
+  model_response: string;
+  advance_metrics: { [key: string]: number };
+}
