@@ -4,7 +4,7 @@
     height: 100%;
 }
 
-.chat_container {
+.body {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -12,6 +12,7 @@
     padding-left: 10vw;
     padding-right: 10vw;
     padding-bottom: 2vh;
+    overflow:auto ;
 }
 
 .prompt_container {
@@ -31,11 +32,6 @@
     padding: 15px;
     border-radius: 20px;
 }
-
-.results_container {
-    height: 100%;
-}
-
 .input_style {
     width: 100%;
     background-color: transparent;

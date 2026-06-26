@@ -1,60 +1,47 @@
 .screen {
-  background: var(--color-background-secondary);
-  border-radius: var(--border-radius-lg);
-  border: 0.5px solid var(--color-border-tertiary);
-  padding: 0;
-  overflow: hidden;
-  max-width: 420px;
-  margin: 1rem auto;
-  font-family: var(--font-sans);
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: scroll;
 }
 
-.top_bar {
-  background: var(--color-background-primary);
-  border-bottom: 0.5px solid var(--color-border-tertiary);
-  padding: 12px 16px;
+
+
+.button_container {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  justify-content: flex-end;
   gap: 10px;
 }
 
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #EEEDFE;
-  color: #3C3489;
+.button_container button {
   display: flex;
+  height: 30px;
+  width: fit-content;
   align-items: center;
+  align-content: center;
   justify-content: center;
-  font-size: 13px;
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.contact-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--color-text-primary);
+  background-color: color-mix(in hsl, var(--bg) 60%, var(--bg-light) 40%);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  border: none;
   margin: 0;
+  padding: 0 6px;
+  cursor: pointer;
 }
 
-.contact_sub {
-  font-size: 12px;
-  color: var(--color-text-tertiary);
-  margin: 0;
+.button_container button:hover {
+  background-color: color-mix(in hsl, var(--bg) 40%, var(--bg-light) 60%);
 }
 
-.feed {
-  padding: 16px 12px;
+.button_container button:focus {
+  opacity: 0.6;
+}
+
+.button_div {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.date_stamp {
-  text-align: center;
-  font-size: 11px;
-  color: var(--color-text-tertiary);
-  margin: 4px 0 8px;
+  width: 60%;
+  justify-content: center;
 }

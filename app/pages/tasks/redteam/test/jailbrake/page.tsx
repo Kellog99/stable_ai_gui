@@ -20,7 +20,7 @@ const Jailbraking = () => {
 
     const nlpAttacks = useMemo(() => {
         return Object.fromEntries(Object.entries(attacks).filter(([id, atk]: [string, RegisterObjectProps]) => {
-            return atk.objective && ["jailbraking", "prompt_injection"].includes(atk.objective)
+            return true//atk.objective && ["jailbraking", "prompt_injection"].includes(atk.objective)
         }))
     }, [attacks])
     useEffect(() => {
@@ -30,9 +30,6 @@ const Jailbraking = () => {
     }, [attacks])
 
     const [prompt, setPrompt] = useState<string>("");
-    const [goal, setGoal] = useState<string>("");
-    const [conversationChat, setConversationChat] = useState<BubbleInterface[][]>([]);
-    const [modelResponse, setModelResponse] = useState<string>("");
 
     //  This variable is for handling the possibility to do the attack
     const isActive = useMemo(() => {
@@ -51,6 +48,10 @@ const Jailbraking = () => {
             return { ...prev, parameters: newParameters }
         })
     }
+
+    const [goal, setGoal] = useState<string>();
+    const [conversationChat, setConversationChat] = useState<BubbleInterface[][] | undefined>([]);
+    const [modelResponse, setModelResponse] = useState<string | undefined>("");
     const [isClicked, setIsClicked] = useState<boolean>(false)
     const [adversarialPrompt, setAdversarialPrompt] = useState<string>()
 
@@ -60,6 +61,11 @@ const Jailbraking = () => {
 
             setIsClicked(true)
             setGoal(prompt)
+
+            // these variables are for the deleting the previouse states
+            setAdversarialPrompt(undefined)
+            setConversationChat(undefined)
+            setModelResponse(undefined)
 
 
             const response = await fetch(`http://${hostname}:${port}/test/jailbreaking`, {
@@ -101,57 +107,44 @@ const Jailbraking = () => {
                 descrition="Test on the loaded model, single attacks for a specific prompt."
 
             />
-            <div className={styles.chat_container}>
-                <div className={styles.attack}>
-                    <div className={styles.results_container}>
-                        {
-                            adversarialPrompt && goal &&
-                            (<MessageThread
-                                goal={goal}
-                                isClicked={isClicked}
-                                adversarialPrompt={adversarialPrompt}
-                                conversationChat={conversationChat}
-                                modelResponse={modelResponse}
-                            />)
-                        }
-                    </div>
+            <div className={styles.body}>
+                <MessageThread
+                    goal={goal}
+                    adversarialPrompt={adversarialPrompt}
+                    conversationChat={conversationChat}
+                    modelResponse={modelResponse}
+                />
 
-                    <div className={styles.prompt_container}>
-                        <input
-                            type="text"
-                            defaultValue={prompt}
-                            value={prompt}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && isActive) {
-                                    handleSubmit();
-                                }
-                            }}
-                            onChange={(e) => { setPrompt(e.target.value) }}
-                            className={styles.input_style}
-                            placeholder="Insert the goal of the attack."
-                        />
-                        <button
-                            className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
-                            disabled={isClicked && !isActive}
-                            onClick={() => {
-                                handleSubmit()
+                <div className={styles.prompt_container}>
+                    <input
+                        type="text"
+                        defaultValue={prompt}
+                        value={prompt}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && isActive) {
+                                handleSubmit();
                             }
-                            }
-                        >
-                            <Send size={24} />
-                        </button>
-                    </div>
-                </div>
-                <div className={styles.bottom_item}>
-                    <VulnerabilitySelection
-                        attacks={nlpAttacks}
-                        selectedAttack={selectedAttack}
-                        handleSelection={(attackId) => {
-                            setSelectedAttack(attacks[attackId])
                         }}
-                        handleChange={(value: (string | number)[]) => handleChange(value as number[])}
+                        onChange={(e) => { setPrompt(e.target.value) }}
+                        className={styles.input_style}
+                        placeholder="Insert the goal of the attack."
                     />
+                    <button
+                        className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
+                        disabled={isClicked && !isActive}
+                        onClick={handleSubmit}
+                    >
+                        <Send size={24} />
+                    </button>
                 </div>
+                <VulnerabilitySelection
+                    attacks={nlpAttacks}
+                    selectedAttack={selectedAttack}
+                    handleSelection={(attackId) => {
+                        setSelectedAttack(attacks[attackId])
+                    }}
+                    handleChange={(value: (string | number)[]) => handleChange(value as number[])}
+                />
             </div>
         </div>
 
