@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Bubble from "./Bubble";
 import { Loader, Skeleton, Tooltip } from "@mantine/core";
 import { BubbleInterface } from "@/interfaces/testInterfaces";
@@ -21,6 +21,13 @@ export default function MessageThread({
 
 
     const [expanded, setExpanded] = useState<boolean>(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) return <div className="screen" />;
     if (!goal) return <div className="screen" />
     return (
         <div className="screen">

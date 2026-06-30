@@ -19,8 +19,8 @@ const Jailbraking = () => {
     const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>(Object.values(attacks)[0])
 
     const nlpAttacks = useMemo(() => {
-        return Object.fromEntries(Object.entries(attacks).filter(([id, atk]: [string, RegisterObjectProps]) => {
-            return true//atk.objective && ["jailbraking", "prompt_injection"].includes(atk.objective)
+        return Object.fromEntries(Object.entries(attacks).filter(([_, atk]: [string, RegisterObjectProps]) => {
+            return atk.objective && ["jailbreak", "jailbraking", "prompt_injection"].includes(atk.objective.toLowerCase())
         }))
     }, [attacks])
     useEffect(() => {
@@ -29,12 +29,19 @@ const Jailbraking = () => {
         }
     }, [attacks])
 
-    const [prompt, setPrompt] = useState<string>("");
+    const [prompt, setPrompt] = useState<string>(() => {
+        if (typeof window !== 'undefined') return localStorage.getItem('jailbreak_prompt') || "";
+        return "";
+    });
+
+    useEffect(() => {
+        localStorage.setItem('jailbreak_prompt', prompt);
+    }, [prompt]);
 
     //  This variable is for handling the possibility to do the attack
     const isActive = useMemo(() => {
         return !!(model && prompt && prompt !== "" && selectedAttack)
-    }, [model, prompt])
+    }, [model, prompt, selectedAttack])
 
     const handleChange = (value: number[]) => {
         setSelectedAttack(prev => {
@@ -73,7 +80,8 @@ const Jailbraking = () => {
                 body: JSON.stringify({
                     "input": prompt,
                     "model": model,
-                    "attack": selectedAttack
+                    "attack": selectedAttack,
+                    "task_type": "nlp"
                 }),
                 headers: {
                     'Content-Type': 'application/json'
@@ -118,7 +126,6 @@ const Jailbraking = () => {
                 <div className={styles.prompt_container}>
                     <input
                         type="text"
-                        defaultValue={prompt}
                         value={prompt}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && isActive) {
