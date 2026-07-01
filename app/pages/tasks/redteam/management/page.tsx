@@ -1,20 +1,20 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import './TaskManagement.css'
+import React, { useEffect, useState } from 'react'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { AppWindowIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BenchmarkDataProps, ModelReportProps } from '@/interfaces/reportInterfaces';
 import { benchmarkFetch_get, jobProgress_get, reportFetch_get } from '@/properties/urlsNNTrust';
-import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import ManagementTable from './ManagementTable';
-import { getStatusIcon } from './utils';
 import { AttackManagementProps } from '@/interfaces/NNInterfaces';
+import { getStatusIcon } from '@/components/client/management/utils';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
+import ManagementTable from '@/components/client/management/ManagementTable';
 import useStore from '@/store/dsStore';
+import '@/components/client/management/ManagementTable.css';
 
 const TaskManagement: React.FC = () => {
     const {
-        setAttackReport: setReport,
+        setAttackReport,
         setBenchmark,
         benchmarkId
     } = useNNTrustStore()
@@ -54,9 +54,6 @@ const TaskManagement: React.FC = () => {
         return () => clearInterval(timer);
     }, [benchmarkId]);
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
-
     const [attackStates, setAttackStates] = useState<{ [key: string]: number }>({})
     const [isDisabled, setIsDisabled] = useState<boolean>(false)
 
@@ -78,9 +75,8 @@ const TaskManagement: React.FC = () => {
         };
 
         listExecutedAttacks.forEach((job: AttackManagementProps) => {
-            const normalized = job.status.toLowerCase(); // ensure lowercase
-            const key = statusMap[normalized]; // find matching frontend key
-
+            const normalized = job.status.toLowerCase();
+            const key = statusMap[normalized];
             if (key) {
                 status[key] += 1;
             }
@@ -124,13 +120,13 @@ const TaskManagement: React.FC = () => {
         // fetching the report
         const reportFetch = await fetchResult<ModelReportProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId as string)}`);
         if (reportFetch) {
-            setReport(reportFetch);
+            setAttackReport(reportFetch);
         }
 
         // fetching the benchmark
         const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
         if (benchmarkFetch) {
-            setBenchmark({ [benchmarkId.toString()]: benchmarkFetch });
+            setBenchmark({ [benchmarkId!.toString()]: benchmarkFetch });
         }
         router.push("/pages/report/reportTITANN")
     }

@@ -1,8 +1,8 @@
 import { AttackManagementProps } from '@/interfaces/NNInterfaces';
 import { Progress } from '@mantine/core';
-import { ArrowDownUp, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import './ManagementTable.css';
+import './TaskManagement.css';
 import { getStatusIcon, getStatusColor, statuses } from './utils';
 interface ManagementTableProps {
     jobs: AttackManagementProps[]

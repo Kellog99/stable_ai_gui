@@ -1,7 +1,6 @@
 .evasion_page {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .content_container {
@@ -11,6 +10,7 @@
 
 .grid_container {
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: 4.5fr 2fr 0.4fr;
   gap: 10px;

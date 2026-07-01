@@ -2,14 +2,15 @@
 
 import React, { useEffect, useState } from 'react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
-import './Benchmark.css';
-import TableWrapper from "./TableWrapper"
-import { Settings, Ruler, BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
-import useNNTrustStore from '@/store/nnTrustStore';
+import TableWrapper from "@/components/client/benchamark/TableWrapper"
+import { BrickWallFireIcon, Info, ChevronRight } from 'lucide-react';
 import { Group, Modal } from '@mantine/core';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import useStore from '@/store/dsStore';
 import useBackendVariablesStore from '@/store/globalStore';
+
+import useNNTrustStore from '@/store/nnTrustStore';
+import styles from '@/styles/Benchmark.module.css';
 
 
 const Benchmark: React.FC = () => {
@@ -136,7 +137,6 @@ const Benchmark: React.FC = () => {
         }
       });
       const id = await response.json();
-      console.log("id:", id)
       setBenchmarkId(id)
 
       setIsCLicked(true)
@@ -151,7 +151,8 @@ const Benchmark: React.FC = () => {
 
 
   return (
-    <div>
+    <div
+      className={styles.page}>
       {/* Header */}
       <HeaderPageTask
         Icon={BrickWallFireIcon}
@@ -166,7 +167,7 @@ const Benchmark: React.FC = () => {
       />
       <Modal
         opened={isClicked}
-        className='alert-message'
+        className={styles.allert_message}
         onClose={() => setIsCLicked(false)}
         withCloseButton={false}
         styles={{
@@ -195,7 +196,7 @@ const Benchmark: React.FC = () => {
 
         <button
           onClick={() => window.location.href = "/pages/tasks/redteam/management"}
-          className="allert-button"
+          className={styles.allert_button}
         >
           Go to Management Table <ChevronRight size={"var(--icon-size)"} />
         </button>
@@ -220,7 +221,6 @@ const Benchmark: React.FC = () => {
             selectedAttacks
           )
         }}
-        Icon={Settings}
       />
 
       {/* Metrics Selection */}
@@ -234,7 +234,6 @@ const Benchmark: React.FC = () => {
           setSelectedMetrics,
           metrics
         )}
-        Icon={Ruler}
         handleParametersChange={(id: string, parameters: number[]) => {
           handleParametersChange(id,
             parameters,

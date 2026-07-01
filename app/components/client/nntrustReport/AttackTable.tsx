@@ -1,5 +1,5 @@
 import React from 'react'
-import { SemiCircleProgress, Text } from "@mantine/core";
+import { SemiCircleProgress } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import './AttackTable.css';
 import { attacksProps } from '@/interfaces/reportInterfaces';

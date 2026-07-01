@@ -33,8 +33,8 @@ function Test() {
             adversarial: "dog"
         },
         confidence: {
-            "cat": Array.from({length: 10}, (_, i) => Math.cos(i/10)),
-            "dog": Array.from({length: 10}, (_, i) => Math.cos((i+2)/10)),
+            "cat": Array.from({ length: 10 }, (_, i) => Math.cos(i / 10)),
+            "dog": Array.from({ length: 10 }, (_, i) => Math.cos((i + 2) / 10)),
         },
         metrics: {
             "perturbation_norm": 0.024,

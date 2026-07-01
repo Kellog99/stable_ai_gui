@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import './AtkCard.css';
-import { Circle, InfoIcon, Settings } from 'lucide-react';
-import ParametersWindow from '@/components/redtool/Parameters';
+import { Info, Settings2 } from 'lucide-react';
+import ParametersWindow from '@/components/client/redtool/Parameters';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { Tooltip } from '@mantine/core';
 
@@ -17,6 +17,8 @@ import { Tooltip } from '@mantine/core';
 export interface AttackCardProps {
     id: string,
     title: string,
+    description: string,
+    knowledge?: string,
     isActive: boolean,
     parameters: ParametersProps[],
     handleClick: () => void;
@@ -27,6 +29,8 @@ const AttackCard: React.FC<AttackCardProps> = ({
     id,
     title,
     isActive,
+    description,
+    knowledge,
     parameters,
     handleClick,
     handleParametersChange
@@ -41,32 +45,47 @@ const AttackCard: React.FC<AttackCardProps> = ({
     return (
         <div
             key={id}
+            role='button'
             onClick={handleClick}
             className={`atk-card ${isActive ? 'active' : ''}`}
         >
-            <div className="card-header">
-                <div className='header-name'>
-                    <button
-                        className='card-settings-btn'
-                        onClick={handleSettingsClick}
-                    >
-                        <Settings size={20} />
-                    </button>
-
-                    <div className='title-scroll'>
-                        {title}
-                    </div>
-
-                </div>
+            <div
+                className='title_container'
+                style={{ justifyContent: `${knowledge ? "space-between" : "center"}` }}>
+                {title}
+                {knowledge && (<div className='knowledge_container'>{knowledge}</div>)}
             </div>
-
+            <div className="icons_container">
+                <Tooltip
+                    multiline
+                    key={id}
+                    w={220}
+                    withArrow
+                    transitionProps={{ duration: 200 }}
+                    label={description}
+                    style={{
+                        fontSize: "0.6rem",
+                        backgroundColor: "darkgray",
+                        borderRadius: "12px",
+                        color: "black"
+                    }}
+                >
+                    <Info size={20} className='info_icon' />
+                </Tooltip>
+                <button
+                    className='card-settings-btn'
+                    onClick={handleSettingsClick}
+                >
+                    <Settings2 size={20} />
+                </button>
+            </div>
             <ParametersWindow
                 isOpen={isClicked}
                 parameters={parameters}
                 onClose={() => setIsClicked(false)}
                 handleParametersChange={handleParametersChange}
             />
-        </div>
+        </div >
     )
 }
 

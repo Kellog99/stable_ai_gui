@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import OptionCard from '@/components/redtool/OptionCard';
 import './TableWrapper.css';
 import { LucideIcon, Search } from 'lucide-react';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
+import AttackCard from '../utils/AtkCard';
 
 
 interface TableWrapperProps {
     title: string,
     elements: { [key: string]: RegisterObjectProps };
     selectedElement: { [key: string]: RegisterObjectProps };
-    Icon: LucideIcon
     handleSelection: (id: string) => void;
     handleParametersChange: (id: string, parameters: number[]) => void;
 }
@@ -20,23 +19,12 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
     selectedElement,
     handleSelection,
     handleParametersChange,
-    Icon
 }) => {
-    // Type guard to check if element is AttackProps
-    const getTags = (element: RegisterObjectProps) => {
-        const tags = []
-        if (typeof element.task !== 'undefined') {
-            tags.push(element.task)
-        }
-        if (typeof element.knowledge !== 'undefined') {
-            tags.push(element.knowledge)
-        }
-        return tags.length > 0 ? tags : undefined
-    };
+  
     const [query, setQuery] = useState("");
     const filteredItems = useMemo(() => {
         return Object.fromEntries(Object.entries(elements).filter(
-            ([key, value]) =>
+            ([_, value]) =>
                 query === "" ||
                 value.name.toLowerCase().includes(query.toLowerCase()) ||
                 value.description.toLowerCase().includes(query.toLowerCase())
@@ -54,7 +42,9 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
             <div className='scroll-header'>
                 {/* Search bar */}
                 <div className="search-container">
-                    <Search size={"calc(var(--icon-size) * 0.8)"} color='gray' className="search-icon" />
+                    <Search
+                        size={"calc(var(--icon-size) * 0.8)"}
+                        className="search-icon" />
                     <input
                         type="text"
                         placeholder="Search"
@@ -73,21 +63,23 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 </div>
             </div>
             {Object.entries(filteredItems).length > 0 ?
-                <div className="scroll-container">
-                    <div className="card-grid">
-                        {Object.entries(filteredItems).map(([id, element]) => (
-                            <OptionCard
+                <div className="card-grid">
+                    {
+                        Object.entries(filteredItems).map(([id, atk]: [string, RegisterObjectProps]) => (
+
+                            <AttackCard
                                 key={id}
-                                name={element.name}
-                                tags={getTags(element) || []}
-                                description={element.description}
-                                parameters={element.parameters}
-                                isSelected={id in selectedElement}
-                                onSelect={() => handleSelection(element.id)}
-                                Icon={Icon}
-                                handleParametersChange={(parameters: number[]) => { handleParametersChange(id, parameters) }} />
-                        ))}
-                    </div>
+                                id={id}
+                                title={atk.name}
+                                description={atk.description}
+                                knowledge={atk.knowledge}
+                                isActive={Object.keys(selectedElement).includes(id)}
+                                parameters={atk.parameters ? atk.parameters : []}
+                                handleClick={() => handleSelection(atk.id)}
+                                handleParametersChange={(parameters: (number | string)[]) => { handleParametersChange(id, parameters as number[]) }}
+                            />
+                        ))
+                    }
                 </div>
                 : <div className='scroll-text'>
                     {

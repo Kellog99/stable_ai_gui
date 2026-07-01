@@ -1,18 +1,20 @@
-.btn-open {
-  width: 4vw;
-  height: 100%;
-  aspect-ratio: 1;
-  background-color: transparent;
-  border: transparent;
+.page {
+  display: grid;
+  grid-template-rows: var(--page-title-height) 1fr 1fr;
+  height: calc(100vh - var(--header-height));
+  min-height: 0;
 }
-
-.alert-message {
+.page > * {
+  min-height: 0;    /* the crucial fix — overrides default min-height: auto */
+  overflow: auto;   /* scroll inside the row instead of pushing the page taller */
+}
+.allert_message {
   width: 500px;
   aspect-ratio: 1.6;
   background-color: var(--bg);
 }
 
-.allert-button {
+.allert_button {
   display: flex;
   align-items: center;
   align-content: center;
@@ -28,20 +30,20 @@
   border: none;
 }
 
-.allert-button svg {
+.allert_button svg {
   transition: all 0.4s ease;
 }
 
-.allert-button:hover:not(.disabled) {
+.allert_button:hover:not(.disabled) {
   background-color: white;
   color: black;
 }
 
-.allert-button:hover:not(.disabled) svg {
+.allert_button:hover:not(.disabled) svg {
   transform: translateX(5px);
 }
 
-.message-body {
+.message_body {
   height: 15vw;
   display: flex;
   flex-direction: column;

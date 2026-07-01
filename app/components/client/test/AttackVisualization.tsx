@@ -1,7 +1,6 @@
 import React from 'react';
 
 import './AttackVisualization.css';
-import { Table, TableData } from '@mantine/core';
 import ConfidenceChart from './ConfidenceChart';
 import '@mantine/charts/styles.css';
 

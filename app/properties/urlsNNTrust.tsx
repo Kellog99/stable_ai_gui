@@ -1,7 +1,6 @@
 const host = "localhost"
 const port = 8082
 
-const scaffholding = "/home/andrea/Desktop/TITANN"
 const reportsModelPath = `/home/andrea/Desktop/TITANN/model`
 const reportsDatasetPath = `/home/andrea/Desktop/TITANN/dataset`
 const outputRepo = "/home/andrea/Desktop/TITANN/model"
@@ -40,6 +39,7 @@ export const dataset_upload = `http://${host}:${port}/dataset/upload`
 export const start_job = `http://${host}:${port}/job/start`
 export const jobsId_get = `http://${host}:${port}/job/getJobsId`
 
+// this is for retriving the status of all the jobs in the background
 export const jobProgress_get = `http://${host}:${port}/job/getJobs`
 
 export const wsUrl = `ws://${host}:${port}`
