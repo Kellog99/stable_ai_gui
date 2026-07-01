@@ -1,0 +1,13 @@
+.privacy-visualization-container {
+    width: 820px;
+    max-width: 92vw;
+}
+
+.privacy-metric-card {
+    background-color: white;
+    padding: 0.75rem;
+}
+
+.property-result-card {
+    background-color: #f8fafc;
+}

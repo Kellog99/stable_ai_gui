@@ -1,109 +1,127 @@
-import React, { useState } from "react";
-import { Info, Trash2 } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { Trash2 } from "lucide-react";
 import "./FileRepository.css";
-import { Modal, Table, TableData } from "@mantine/core";
 import { DatasetInfo, ModelInfo } from "@/interfaces/homePageInterface";
+import { TaskType } from "@/interfaces/NNInterfaces";
+import InfoButton from "./InfoButton";
 
 interface RepositoryProps {
-    activeId: string | undefined,
+    activeId: string | undefined;
     elements: ModelInfo[] | DatasetInfo[];
     handleDelete: (elem: ModelInfo | DatasetInfo) => void;
-    selectHandle: (element: ModelInfo | DatasetInfo) => void;
+    handleSelection: (element: ModelInfo | DatasetInfo) => void;
 }
 
 const Repository: React.FC<RepositoryProps> = ({
     activeId,
     elements,
     handleDelete,
-    selectHandle,
+    handleSelection,
 }) => {
-    const [isOpen, setIsOpen] = useState<boolean>(false)
-    const [info, setInfo] = useState<ModelInfo | DatasetInfo | undefined>(undefined)
-    console.log("elements = ", elements)
+    // This variable is for keeping, locally, track of the selected element
+    const [selectedElement, setSelectedElement] = useState<string>("")
 
-    const activeModal: TableData = {
-        body: info ? Object.entries(info)
-            .filter(([key, value]) => !["id", "name"].includes(key) && value)
-            .map(([key, value]) => { return [key.replace("_", " "), value] }) : []
-    }
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [taskFilter, setTaskFilter] = useState<TaskType | 'all'>('all');
+
+    // Derive unique task options from the elements themselves
+    const taskOptions = useMemo<Array<TaskType | 'all'>>(() => {
+        const tasks = elements
+            .map((e) => e.task)
+            .filter((t): t is TaskType => Boolean(t));
+        return ['all', ...Array.from(new Set(tasks))];
+    }, [elements]);
+
+    // Derive filtered list — no useEffect or redundant state needed
+    const filteredElements = useMemo(() => {
+        return elements.filter((elem) => {
+            const matchesSearch = elem.name
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase());
+
+            const matchesTask =
+                taskFilter === 'all' ||
+                (elem.task ?? '').toLowerCase() === taskFilter.toLowerCase();
+
+            return matchesSearch && matchesTask;
+        });
+    }, [elements, searchQuery, taskFilter]);
+
+
+
     return (
-        <div className="table-wrapper">
-            <table className="repository-table">
-                <thead className="table-header">
-                    <tr>
-                        <th>Name</th>
-                        <th>Created</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {elements.map((elem: ModelInfo | DatasetInfo) => (
-                        <tr
-                            key={elem.id}
-                            className={`table-row ${activeId && activeId === elem.id ? 'selected' : ''}`}
-                            onClick={() => selectHandle(elem)}
-                        >
-                            <td>
-                                <div className="name-container">
+        <div className="file_repository_container">
+            <div className="filters">
+                <input
+                    type="text"
+                    className="search-input"
+                    placeholder={`Search elements...`}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <select
+                    className="task-select"
+                    value={taskFilter}
+                    onChange={(e) => setTaskFilter(e.target.value as TaskType | 'all')}
+                >
+                    {taskOptions.map((t) => (
+                        <option key={t} value={t}>
+                            {t === 'all'
+                                ? 'All Tasks'
+                                : t.charAt(0).toUpperCase() + t.slice(1)}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <div className="table-wrapper">
+                <table className="repository-table">
+                    <thead className="table-header">
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Task</th>
+                            <th>Created</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredElements.map((elem: ModelInfo | DatasetInfo) => (
+                            <tr
+                                key={elem.id}
+                                className={`table-row ${selectedElement === elem.id ? 'selected' : ''}`}
+                                onClick={() => {
+                                    handleSelection(elem)
+                                    setSelectedElement(elem.id)
+                                }}
+                            >
+                                <td>
+                                    <InfoButton info={elem} />
+                                </td>
+                                <td>
+                                    <div className="name-container">{elem.name}</div>
+                                </td>
+                                <td>
+                                    <div className={`container_task ${elem.task ?? 'unknown'}`}>
+                                        {elem.task ?? "Unknown"}
+                                    </div>
+                                </td>
+                                <td>{elem.date ?? "Not registered"}</td>
+                                <td>
                                     <button
-                                        className="table-btn info"
+                                        className="table-btn delete"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setInfo(elem);
-                                            setIsOpen(true);
+                                            handleDelete(elem);
                                         }}
                                     >
-                                        <Info size={18} />
+                                        <Trash2 size={18} color="red" />
                                     </button>
-                                    {elem.name}
-                                </div>
-                            </td>
-                            <td>{elem.date ? elem.date : "Not registered"}</td>
-                            <td>
-                                <button
-                                    className="table-btn delete"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete(elem);
-                                    }}
-                                >
-                                    <Trash2 size={18} color="red" />
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <Modal
-                opened={isOpen}
-                onClose={() => setIsOpen(false)}
-                centered
-                size="auto"
-                title="File Information"
-                styles={{
-                    title: {
-                        color: 'black',
-                        fontWeight: 'bold',
-                        fontSize: "1.2rem"
-                    }
-                }}
-            >
-                {info ?
-                    <>
-                        <p style={{ marginBottom: "10px", fontSize: "0.9rem" }}>
-                            Here below it is possible to read advance information for the file <b>{info?.name}</b>.
-                        </p>
-                        <Table
-                            w={"500px"}
-                            variant="vertical"
-                            layout="fixed"
-                            withTableBorder
-                            data={activeModal}
-                            className="info-table"
-                        />
-                    </> :
-                    <p>"No more info to display"</p>}
-            </Modal>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     );

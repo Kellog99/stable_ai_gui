@@ -17,7 +17,7 @@ const useBackendVariablesStore = create<AppState>()(
       setPort: (port) => set({ port }),
     }),
     {
-      name: "app-storage-models",
+      name: "app-storage-global",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         port: state.port,

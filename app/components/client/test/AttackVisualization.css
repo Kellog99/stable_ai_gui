@@ -1,13 +1,17 @@
 .statistics-container {
     display: flex;
     flex-direction: column;
-    gap: 24px;
     width: 100%;
-    padding-left: 10px;
-    padding-right: 10px;
+    height: 100%;
+    color: lightgray;
+    font-size: 0.725rem;
+    gap: 24px;
+    padding: 15px;
+    background-color: color-mix(in hsl,
+            var(--bg-dark) 60%,
+            var(--bg) 40%);
 }
 
-/* Empty State */
 .empty-state {
     display: flex;
     align-items: center;
@@ -39,9 +43,9 @@
 
 
 .card-title {
-    font-size: 1.0rem;
+    font-size: 1.2rem;
     font-weight: 600;
-    color: #111827;
+    color: white;
     margin: 0;
 }
 
@@ -53,6 +57,13 @@
     border-radius: var(--border-radius);
     font-size: 0.8rem;
     background-color: rgb(255, 121, 121);
+    border: 2px solid red;
+    color: black;
+}
+
+.card-predictions.evasion {
+    background-color: lightgreen;
+    border: 2px solid green;
 }
 
 /* Table Styles */
@@ -150,4 +161,25 @@
     .empty-state {
         padding: 32px 16px;
     }
+}
+
+.statistics_container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.metric_table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-light);
+    align-content: center;
+    align-items: center;
+}
+
+.table_caption {
+    caption-side: bottom;
+    padding: 8px;
+    color: var(--text-muted)
 }

@@ -1,5 +1,5 @@
 "use client"
-import './FileDropZone.css';
+import './DragDrop.css';
 import { Group, Loader } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { IconX } from '@tabler/icons-react';
@@ -27,7 +27,6 @@ export const DragDrop: React.FC<DragDropProps> = ({
     const [loading, setLoading] = useState<boolean>(false);
 
     const onUpload = async (selectedFile: File | null) => {
-        console.log(file)
         setLoading(true);
         try {
             setFile(selectedFile);

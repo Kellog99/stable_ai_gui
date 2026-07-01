@@ -5,6 +5,7 @@
     align-content: center;
     justify-content: space-between;
     margin-bottom: 0;
+    height: var(--page-title-height);
 }
 
 /* This contain the Icon and the component with title and the description */
@@ -13,8 +14,8 @@
     flex-direction: row;
     align-items: center;
     width: 100%;
-    height: 180px;
-    gap: 40px;
+    height: 130px;
+    gap: 18px;
     color: rgb(187, 184, 184);
 }
 

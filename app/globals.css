@@ -26,8 +26,14 @@
   --error: red;
   --icon-size: 30px;
   --title: Stable AI;
-  --header-height: 100px;
+
+  --header-height: 80px;
+  --page-title-height: 120px;
+
   --card-width: 350px;
+
+  --pc-width: 450px;
+  --pc-height: 350px;
 }
 
 html,
@@ -56,8 +62,7 @@ h2 {
 .container-pages {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding-bottom: 160px;
+  margin: 0;
 }
 
 @layer base {

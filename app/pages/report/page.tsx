@@ -40,7 +40,6 @@ export default function ReportPage() {
     )
       .then((modelReportList) => setListAttacksReport(modelReportList as ModelReportProps[]))
   }, [setListAttacksReport, hostname, port]);
-  console.log(listAttacksReport)
 
   // ################# router ################# 
   const router = useRouter()
@@ -58,7 +57,6 @@ export default function ReportPage() {
         description={'Upload the JSON file related to the report.'}
         onFileUpload={(file: File | null) => {
           if (file) {
-            console.log(file)
             // uploadReport(file)
             //   .then(setAttackReport)
             //   .then(() => router.push("/pages/report/reportTITANN"))
@@ -72,7 +70,7 @@ export default function ReportPage() {
       Icon: HardDrive,
       child: <FileRepository
         elements={listAttacksReport.map((attackReport) => attackReport.info)}
-        selectHandle={(report) => {
+        handleSelection={(report) => {
           const selectedReport: ModelReportProps | undefined = listAttacksReport.find(value => value.info.id === (report as InfoProps).id)
           if (selectedReport) {
             setAttackReport(selectedReport)

@@ -1,0 +1,126 @@
+.wrapper {
+    width: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+/* HEADER part */
+.header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 7px;
+    width: 100%;
+}
+
+.table-title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0 0 0.25rem 0;
+}
+
+.subtitle {
+    font-size: 0.825rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* search part */
+.scroll-header {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+    max-width: 500px;
+    height: 70px;
+    align-items: stretch;
+    gap: 0.4rem;
+    margin-bottom: 15px;
+}
+
+.search-container {
+    width: 100%;
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.search-input {
+    width: 100%;
+    padding-left: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    outline: none;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--border-radius);
+}
+
+.button {
+    flex: 1;
+    /* replaces width:100% so both buttons share space evenly */
+    height: 100%;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background-color: var(--bg);
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+    transform: scale(1.05);
+}
+
+.scroll-text {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+/* Grid layout for cards */
+.card-grid {
+    width: 90%;
+    height: 100%;
+    padding: 20px;
+    min-width: max-content;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--card-width));
+    grid-template-rows: 1fr;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    border-radius: 20px;
+    background-color: color-mix(in hsl, var(--bg) 20%, var(--bg-dark) 80%);
+}

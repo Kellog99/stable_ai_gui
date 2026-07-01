@@ -1,5 +1,5 @@
 .modal_button {
-    height: 50px;
+    height: 30px;
     aspect-ratio: 1;
     display: flex;
     align-items: center;
@@ -10,4 +10,23 @@
     border: none;
     border-radius: var(--border-radius);
     color: white;
+}
+
+.modal_button.with_label {
+    aspect-ratio: auto;
+    width: auto;
+    gap: 0.45rem;
+    padding: 5px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.modal_button.with_label svg {
+    width: 14px;
+    height: 14px;
+}
+
+.tooltip{
+    color: white;
+    font-size: 0.75rem;
 }

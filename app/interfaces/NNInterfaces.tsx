@@ -1,8 +1,5 @@
 import { LucideIcon } from "lucide-react";
 import { ReactEventHandler } from "react";
-import { ModelInfo } from "./homePageInterface";
-
-
 
 export interface LoadedFile {
   name: string;
@@ -27,16 +24,16 @@ export interface ButtonProps {
   onClickHandle: ReactEventHandler
 }
 
-
-
 export interface ParametersProps {
   id: string
   name: string
-  min: number
-  max: number
-  step: number
-  default: number
+  min?: number
+  max?: number
+  step?: number
+  default: number | string
   description: string
+  kind?: 'number' | 'enum'
+  options?: string[]
 }
 
 export interface RegisterObjectProps {
@@ -44,6 +41,8 @@ export interface RegisterObjectProps {
   name: string,
   description: string
   task?: string
+  objective?: string
+  privacy_type?: string
   knowledge?: string
   parameters?: ParametersProps[]
 }

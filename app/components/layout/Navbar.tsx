@@ -5,11 +5,26 @@ import NavigationButton from './NavigationButton';
 import { Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import Profile from './Profile';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
     const [opened, { toggle }] = useDisclosure(true);
+    const [activePage, setActivePage] = useState<string>("home")
 
+    const router = useRouter();
 
+    // this function handle the click on the button
+    const handleClick = (href?: string, id?: string) => {
+        // Navigate if href exists
+        if (href && id) {
+            router.push(href);
+            setActivePage(id);
+        }
+    };
+    const isActive = (id: string) => {
+        return id === activePage;
+    }
     return (
         <div className='container-nav'>
             <div className='nav-header'>
@@ -19,8 +34,7 @@ export default function Navbar() {
                     opened={opened}
                     onClick={toggle}
                 />
-                {opened ?
-                    "Menu" : null}
+                {opened ? "Menu" : null}
             </div>
             <div className="nav-section">
                 {Object.entries(sections).map(
@@ -36,8 +50,11 @@ export default function Navbar() {
                                         Icon={element.Icon}
                                         items={element.items}
                                         requiresEmbeddings={false}
+                                        handleClick={handleClick}
+                                        isActive={isActive}
                                         isDisabled={false}
-                                        isClosed={!opened} />
+                                        isClosed={!opened}
+                                    />
                                 ))}
                             </div>
                         </div>

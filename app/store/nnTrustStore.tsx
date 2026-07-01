@@ -9,6 +9,7 @@ interface AppState {
   listModels: ModelInfo[];
 
   attacks: { [key: string]: RegisterObjectProps };
+  privacyAttacks: { [key: string]: RegisterObjectProps };
   metrics: { [key: string]: RegisterObjectProps };
 
   selectedAttacks: { [key: string]: RegisterObjectProps };
@@ -26,6 +27,7 @@ interface AppState {
   setModel: (models: ModelInfo | null) => void;
   setListModels: (listModels: ModelInfo[]) => void;
   setAttacks: (attacks: { [key: string]: RegisterObjectProps }) => void;
+  setPrivacyAttacks: (privacyAttacks: { [key: string]: RegisterObjectProps }) => void;
   setMetrics: (metrics: { [key: string]: RegisterObjectProps }) => void;
   setSelectedAttackList: (selectedAttacks: { [key: string]: RegisterObjectProps }) => void
   setBenchmarkId: (benchmarkId: string | number | null) => void;
@@ -45,6 +47,7 @@ const useNNTrustStore = create<AppState>()(
       model: null,
       listModels: [],
       attacks: {},
+      privacyAttacks: {},
       metrics: {},
       selectedAttacks: {},
       benchmarkId: null,
@@ -53,12 +56,13 @@ const useNNTrustStore = create<AppState>()(
       error: null,
       modelReport: null,
       benchmark: null,
-      benchmarkPROVA: [],
       vulnerabilitySelected: null,
 
       setModel: (models) => set({ model: models }),
       setListModels: (listModels) => set({ listModels }),
       setAttacks: (attacks) => set({ attacks }),
+      setPrivacyAttacks: (privacyAttacks) => set({ privacyAttacks }),
+
       setMetrics: (metrics) => set({ metrics }),
       setSelectedAttackList: (selectedAttacks) => set({ selectedAttacks }),
       setBenchmarkId: (benchmarkId) => set({ benchmarkId }),
@@ -73,6 +77,7 @@ const useNNTrustStore = create<AppState>()(
       partialize: (state) => ({
         model: state.model,
         attacks: state.attacks,
+        privacyAttacks: state.privacyAttacks,
         metrics: state.metrics,
         attackReport: state.modelReport,
         benchmark: state.benchmark,

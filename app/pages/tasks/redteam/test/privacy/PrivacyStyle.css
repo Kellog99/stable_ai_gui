@@ -1,0 +1,48 @@
+.privacy-container {
+    margin: 10px;
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 30px;
+    justify-content: center;
+}
+
+.btn {
+    padding: 14px 32px;
+    min-width: 210px;
+    text-transform: uppercase;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    background-color: transparent;
+    transition: all 0.7s;
+}
+
+.btn:hover {
+    border-bottom: 3px solid var(--bg-light);
+}
+
+.btn.active {
+    border-bottom: 3px solid var(--bg-light);
+}
+
+.execute-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    height: 35px;
+    width: 160px;
+    border-radius: var(--border-radius);
+    border: transparent;
+    background-color: var(--bg);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: lightgray;
+    padding: 0 15px 0 10px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}

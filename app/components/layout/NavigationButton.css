@@ -2,29 +2,29 @@
 .nav-button-container {
     display: flex;
     flex-direction: column;
-    width: 100%;
 }
 
 /* Navigation Button Base Styles */
 .nav-item {
-    width: 100%;
     display: flex;
+    width: 100%;
     align-items: center;
-    padding: 10px 20px 10px 20px;
+    padding: 8px 10px 8px 12px;
     border-radius: 0.5rem;
-    transition: all 0.2s ease;
     color: rgb(209, 213, 219);
     background: transparent;
     border: none;
-    font-size: 0.95rem;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
     justify-content: space-between;
 }
 
-.nav-item:hover:not(:disabled) {
+.nav-item:hover:not(:disabled):not(.disabled) {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
-.nav-item:disabled {
+.nav-item:disabled,
+.nav-item.disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -42,7 +42,7 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-    .nav-item:hover:not(:disabled) {
+    .nav-item:hover:not(:disabled):not(.disabled) {
         background-color: rgba(255, 255, 255, 0.1);
     }
 
@@ -60,12 +60,21 @@
 .nav-item-content {
     display: flex;
     align-items: center;
-    gap: 1vw;
+    gap: 0.750rem;
     transition: gap 0.3s ease;
 }
 
-.nav-item-content.collapsed {
-    gap: 0;
+.expand-button {
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6
+}
+
+.expand-button:hover {
+    transform: translateY(-2px)
 }
 
 .button-name {
@@ -76,9 +85,10 @@
 .sub-items {
     display: flex;
     flex-direction: column;
-    margin-left: 1.5rem;
+    margin-left: 1rem;
     margin-top: 0.25rem;
     padding-left: 0.5rem;
+    gap: 0.25rem;
     border-left: 2px solid rgba(0, 0, 0, 0.1);
 }
 
