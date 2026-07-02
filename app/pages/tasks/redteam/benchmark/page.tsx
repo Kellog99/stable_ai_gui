@@ -42,12 +42,6 @@ const Benchmark: React.FC = () => {
   const datasetName = useStore((state) => state.dataset)?.name
   const modelName = useNNTrustStore((state) => state.model)?.name
 
-  const benchmarkDatas = {
-    attacks: Object.values(selectedAttacks),
-    metrics: Object.values(modifiedSelectedElement),
-    dataset: datasetName,
-    model: modelName
-  };
 
   // Handler for the element's 
   const handleSelectionClick = (
@@ -129,9 +123,14 @@ const Benchmark: React.FC = () => {
       setExecuteBenchmark(false);
       setSelectedAttackList(selectedAttacks);
 
-      const response = await fetch(`http://${hostname}:${port}/test/single_attack`, {
+      const response = await fetch(`http://${hostname}:${port}/job/start_benchmark`, {
         method: "POST",
-        body: JSON.stringify(benchmarkDatas),
+        body: JSON.stringify({
+          model: modelName,
+          dataset: datasetName,
+          attacks: Object.values(selectedAttacks),
+          metrics: Object.values(modifiedSelectedElement),
+        }),
         headers: {
           'Content-type': 'application/json'
         }
