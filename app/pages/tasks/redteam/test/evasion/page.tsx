@@ -27,23 +27,13 @@ function Test() {
     const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>()
     const [isAttacking, setIsAttacking] = useState<boolean>(false)
     // Attack results (stored locally in this component)
-    const [attackResults, setAttackResults] = useState<AttackResults>({
-        prediction: {
-            original: "cat",
-            adversarial: "dog"
-        },
-        confidence: {
-            "cat": Array.from({length: 10}, (_, i) => Math.cos(i/10)),
-            "dog": Array.from({length: 10}, (_, i) => Math.cos((i+2)/10)),
-        },
-        metrics: {
-            "perturbation_norm": 0.024,
-            "attack_success_rate": 0.87,
-            "avg_queries": 143.5,
-            "l2_distance": 1.83
-        }
-    });
+    const [attackResults, setAttackResults] = useState<AttackResults>({});
     const [showResults, setShowResults] = useState<boolean>(false);
+
+    useEffect(() => {
+        console.log("[EvasionPage] Mounting");
+        return () => console.log("[EvasionPage] Unmounting");
+    }, []);
 
     useEffect(() => {
         if (attacks && Object.keys(attacks).length > 0) {
@@ -207,7 +197,7 @@ function Test() {
                     </div>
                 </div>
                 <div>
-                    {showResults ?
+                    {showResults && attackResults.prediction ?
                         <AttackVisualization
                             prediction={attackResults.prediction}
                             confidence={attackResults.confidence}

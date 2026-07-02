@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { ModelSpecs } from "@/interfaces/NNInterfaces";
 import styles from "@/styles/ModelCard.module.css";
 import useStore from "@/store/nnTrustStore";
@@ -14,10 +15,12 @@ export function ModelCard(model: ModelSpecs) {
         }
     }
     return (
-        <div
+        <motion.div
             className={`${styles.card} ${modelName === model.name ? styles.cardSelected : ""
                 }`}
             onClick={() => handleClick(model.name)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
         >
             <div className={styles.iconSection}>
                 <Brain className={styles.icon} />
