@@ -1,5 +1,4 @@
 import React from 'react'
-import './Report.css'
 
 export interface InfoTableProps {
     title: string

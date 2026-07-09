@@ -17,18 +17,17 @@ import useBackendVariablesStore from "@/store/globalStore";
 
 export default function ReportPage() {
 
-  const [listAttacksReport, setListAttacksReport] = useState<ModelReportProps[]>([])
-
   const {
     hostname,
     port
   } = useBackendVariablesStore()
 
   const {
-    modelReport: attackReport,
-    setAttackReport,
+    modelReport,
+    setModelReport: setAttackReport,
   } = useNNTrustStore()
 
+  const [modelsReports, setModelsReports] = useState<ModelReportProps[]>([])
 
   // ################## Reports' list ##################
   useEffect(() => {
@@ -38,64 +37,43 @@ export default function ReportPage() {
       "path_model_report_repo",
       "report.json"
     )
-      .then((modelReportList) => setListAttacksReport(modelReportList as ModelReportProps[]))
-  }, [setListAttacksReport, hostname, port]);
+      .then((modelReportList) => setModelsReports(modelReportList as ModelReportProps[]))
+  }, [setModelsReports, hostname, port]);
 
   // ################# router ################# 
   const router = useRouter()
 
-  // ################# Report's buttons ################# 
-  const btnReport: ButtonProps[] = [
-    {
-      id: "dragDropReport",
-      name: "Upload report",
-      Icon: Upload,
-      child: <DragDrop
-        name={"File"}
-        Icon={File}
-        acceptedType={"application/json"}
-        description={'Upload the JSON file related to the report.'}
-        onFileUpload={(file: File | null) => {
-          if (file) {
-            // uploadReport(file)
-            //   .then(setAttackReport)
-            //   .then(() => router.push("/pages/report/reportTITANN"))
-          }
-        }}
-      />,
-    },
-    {
-      id: "repoModelReport",
-      name: "Repository Model",
-      Icon: HardDrive,
-      child: <FileRepository
-        elements={listAttacksReport.map((attackReport) => attackReport.info)}
-        handleSelection={(report) => {
-          const selectedReport: ModelReportProps | undefined = listAttacksReport.find(value => value.info.id === (report as InfoProps).id)
-          if (selectedReport) {
-            setAttackReport(selectedReport)
-            router.push("/pages/report/reportTITANN")
-          }
-        }}
-        activeId={attackReport?.info.id}
-        handleDelete={(report) => {
-          const reportId: string = (report as ModelInfo).id
-          setListAttacksReport(listAttacksReport.filter(reportContained => (reportContained as ModelReportProps).info.id !== reportId))
-        }} />,
-    }
-  ]
+
 
   return (
     <div className={styles.test_container}>
       <div className={styles.upload_container}>
         <FileDropZone
+          key="report_loader"
           id="report_loader"
           title="Report"
+          elements={modelsReports.map((report) => report.info)}
           description="Drag and drop the JSON of the report."
           Icon={File}
           fileDropInformation={infoModel}
-          buttons={btnReport}
-        />
+          handleSelection={(report) => {
+            const selectedReport: ModelReportProps | undefined = modelsReports.find(value => value.info.id === (report as InfoProps).id);
+            if (selectedReport) {
+              setAttackReport(selectedReport);
+              router.push("/pages/report/reportTITANN");
+            }
+          }}
+          handleDeletion={(report) => {
+            const reportId: string = (report as ModelInfo).id;
+            setModelsReports(modelsReports.filter(reportContained => (reportContained as ModelReportProps).info.id !== reportId));
+          }}
+          handleFileUpload={(file: File | null) => {
+            if (file) {
+              // uploadReport(file)
+              //   .then(setAttackReport)
+              //   .then(() => router.push("/pages/report/reportTITANN"))
+            }
+          }} />
       </div>
     </div>
 

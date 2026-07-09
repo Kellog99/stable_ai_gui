@@ -20,7 +20,7 @@ export default function ReportCard({ reportNN, reportDQ }: ReportCardProps) {
 
     const setReportFromBE = useStore((state) => state.setReportFromBE)
 
-    const setReport = useNNTrustStore((state) => state.setAttackReport)
+    const setReport = useNNTrustStore((state) => state.setModelReport)
     const router = useRouter()
 
     const imageDatas = reportNN?.prototype || reportDQ?.dataset.prototype.datas[0];

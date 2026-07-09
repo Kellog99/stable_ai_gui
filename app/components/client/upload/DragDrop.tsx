@@ -30,72 +30,68 @@ export const DragDrop: React.FC<DragDropProps> = ({
         setLoading(true);
         try {
             setFile(selectedFile);
-            handleFileUpload(selectedFile);
+            await handleFileUpload(selectedFile);
         } catch (error) {
             console.error('Error handling file:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    const iconSize = 30;
+    if (file) {
+        if (loading) return <Loader />
+        return (
+            <div className="dropzone loaded">
+                <CheckCircleIcon
+                    size={"calc(var(--icon-size) * 2)"}
+                    color="var(--affermative)" />
+                <span>{file?.name}</span>
+            </div>
+        );
+    }
     return (
-        file ? (
-            loading ? (
-                <Loader />
-            ) : (
-                <div className="dropzone loaded">
-                    <CheckCircleIcon
-                        size={"calc(var(--icon-size) * 2)"}
-                        color="var(--affermative)" />
-                    <span>{file?.name}</span>
+        <Dropzone
+            className="dropzone"
+            onDrop={(files) => onUpload(files[0] || null)}
+            onReject={() => { console.error('Invalid file type or size') }}
+            maxSize={1000 * 1024 ** 2}
+            accept={[acceptedType]}
+            multiple={false}
+            disabled={disabled || loading}
+        >
+            <Dropzone.Accept>
+                <div className='container-idle'>
+                    <Upload
+                        size={iconSize}
+                        color='green'
+                    />
+                    Release to load
                 </div>
-            )
-        ) : (
-            <Dropzone
-                onDrop={(files) => onUpload(files[0] || null)}
-                onReject={() => { console.error('Invalid file type or size') }}
-                maxSize={1000 * 1024 ** 2}
-                accept={[acceptedType]}
-                multiple={false}
-                disabled={disabled || loading}
-            >
-                <Group className="dropzone">
-                    <Dropzone.Accept>
-                        <div className='container-idle'>
-                            <Upload size={"calc(2 * var(--icon-size))"} color='green' />
-                            <div style={{ alignItems: "left", width: "50%", fontSize: "0.7rem" }}>
-                                Release to load
-                            </div>
-                        </div>
-                    </Dropzone.Accept>
+            </Dropzone.Accept>
 
-                    <Dropzone.Reject>
-                        <div className='container-idle'>
-                            <IconX size={"calc(2 * var(--icon-size))"} color="#FF6961" />
-                            <div style={{ alignItems: "left", width: "50%", fontSize: "0.7rem", color: "red" }}>
-                                <span>You are trying to upload a file that is not a .{acceptedType} file!</span>
-                            </div>
-                        </div>
+            <Dropzone.Reject>
+                <div className='container-idle'>
+                    <IconX
+                        size={iconSize}
+                        color="#FF6961"
+                    />
+                    You are trying to upload a file that is not a .{acceptedType} file!
+                </div>
 
-                    </Dropzone.Reject>
+            </Dropzone.Reject>
 
-                    <Dropzone.Idle>
-                        {loading ? (
-                            <>
-                                <Loader />
-                            </>
-                        ) : (
-                            <div className='container-idle'>
-                                <div className='idle-title'>
-                                    <Icon size={"calc(2 * var(--icon-size))"} /> <h3> {name}</h3>
-                                </div>
-                                <div style={{ alignItems: "left", width: "50%", fontSize: "0.7rem" }}>
-                                    <span>Drag a .{acceptedType} file here or click to select. </span>
-                                    {description}
-                                </div>
-                            </div>
-                        )}
-                    </Dropzone.Idle>
-                </Group>
-            </Dropzone>
-        )
+            <Dropzone.Idle>
+                <div className='container-idle'>
+                    <div className='idle-title'>
+                        <Upload size={iconSize} />  {name}
+                    </div>
+                    Drag a .{acceptedType} file here or click to select.
+                    {description}
+
+                </div>
+            </Dropzone.Idle>
+        </Dropzone>
+
     );
 }

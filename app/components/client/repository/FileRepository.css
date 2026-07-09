@@ -2,22 +2,19 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    gap: 10px;
 }
 
 .filters {
     display: grid;
     grid-template-columns: 4fr 1fr;
     gap: 10px;
-    height: 1.6rem;
     font-size: 0.9rem;
     background-color: color-mix(in hsl,
             var(--bg-dark) 40%,
             var(--bg) 60%);
-    padding: 6px;
     height: fit-content;
     border-radius: calc(2*var(--border-radius));
-
+    margin-bottom: 5px;
 }
 
 .search-input {
@@ -25,13 +22,21 @@
     padding-left: 10px;
 }
 
+.task-select {
+    border-radius: calc(2*var(--border-radius));
+    padding-left: 10px;
+    background-color: color-mix(in hsl,
+            var(--bg-dark) 10%,
+            var(--bg) 90%);
+    color: white;
+    border: none;
+}
+
 .table-wrapper {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    /* Fills the parent but never grows beyond it */
     height: 100%;
-    min-height: 0;
-    /* Critical in flex/grid children — prevents blowout */
-    max-height: 100%;
     font-size: 0.750rem;
     overflow: auto;
     position: relative;
@@ -39,15 +44,17 @@
             var(--bg-dark) 50%,
             var(--bg) 50%);
     border-radius: var(--border-radius);
-
-    /* Contain the table inside this box */
-    display: flex;
-    flex-direction: column;
 }
 
 .repository-table {
     width: 100%;
     border-collapse: collapse;
+}
+
+.repository-table tr,
+.repository-table th {
+    height: 20px;
+    margin: 0;
 }
 
 .table-header {
@@ -61,14 +68,11 @@
 }
 
 .table-header th {
-    padding: 12px;
+    padding: 6px 10px 6px 10px;
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.table-header tbody {
-    height: 10px;
-}
 
 .table-row {
     cursor: pointer;
@@ -92,7 +96,7 @@
 }
 
 .table-row td {
-    padding: 12px;
+    padding: 5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -105,7 +109,6 @@
 
 .container_task {
     display: flex;
-    align-content: center;
     align-content: center;
     padding-left: 4px;
     border-radius: var(--border-radius);
@@ -137,7 +140,6 @@
 }
 
 .table-btn {
-    padding: 0px;
     display: flex;
     flex-direction: row;
     justify-content: center;

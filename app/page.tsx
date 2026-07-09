@@ -7,11 +7,8 @@ import { useEffect, useState } from 'react';
 // Configuration file for creating the HomePage Drag and Drop components
 import { getAttacksList, getMetricsList, getCoreElements } from './functionalities/TITANNServices/get_info';
 import useNNTrustStore from '@/store/nnTrustStore';
-import FileRepository from './components/client/repository/FileRepository';
-import { DragDrop } from './components/client/upload/DragDrop';
-import { Brain, Database, DatabaseIcon, HardDrive, Upload } from 'lucide-react';
+import { Brain, DatabaseIcon } from 'lucide-react';
 import { infoDataset, infoModel } from './components/client/upload/config';
-import { ButtonProps } from './interfaces/homePageInterface';
 import useStore from './store/dsStore';
 import { DatasetInfo, ModelInfo } from './interfaces/homePageInterface';
 import useBackendVariablesStore from './store/globalStore';
