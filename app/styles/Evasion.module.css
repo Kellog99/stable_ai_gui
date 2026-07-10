@@ -1,87 +1,61 @@
 .evasion_page {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
 }
 
 .content_container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .grid_container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 4.5fr 2fr 0.4fr;
+  grid-template-rows: 400px 200px;
   gap: 10px;
-  height: calc(100vh - var(--header-height) - var(--page-title-height));
+  height: auto;
   padding-left: 5vw;
   padding-right: 5vw;
   padding-bottom: 2vh;
 }
 
-.inline_item {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
 .inline_item>* {
   width: 100%;
-  height: 100%;
+  height: 350px;
   min-width: 0;
+  object-fit: contain;
 }
 
-/* The bottom component */
 .bottom_item {
   grid-column: 1 / 4;
   display: flex;
   flex-direction: column;
   align-items: center;
-  align-content: center;
-  height: 100%;
-  overflow: hidden;
-}
-
-
-.action_button {
-  position: absolute;
-  width: 35px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-  background: black;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.action_button:hover {
-  background: red;
+  justify-content: flex-start;
+  height: auto;
+  overflow: visible;
+  padding-bottom: 20px;
 }
 
 .exec_container {
-  grid-column: 1 / 4;
   display: flex;
-  width: 100%;
-  height: 100%;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 1rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 0;
+  z-index: 1000;
 }
 
 .vulnerability_button {
   display: flex;
-  width: clamp(50px, 100%, 200px);
-  height: 30px;
+  width: 100px;
+  height: 100px;
   font-weight: 900;
   background: #10b981;
   border-radius: var(--border-radius);
@@ -90,13 +64,14 @@
   transition: background-color 0.2s;
   border: none;
   cursor: pointer;
-  height: 100%;
+  font-size: 1.2rem;
+  opacity: 1;
 }
 
 
 
 .vulnerability_button.execution_button.inactive {
-  opacity: 0.6;
+  opacity: 1;
   cursor: not-allowed
 }
 
@@ -113,6 +88,6 @@
 }
 
 .results_button.inactive {
-  opacity: 0.6;
+  opacity: 1;
   cursor: not-allowed
 }

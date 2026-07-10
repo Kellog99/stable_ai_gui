@@ -57,6 +57,7 @@ const Jailbraking = () => {
     }
 
     const [goal, setGoal] = useState<string>();
+    const [fullHistory, setFullHistory] = useState<BubbleInterface[]>([]);
     const [conversationChat, setConversationChat] = useState<BubbleInterface[][] | undefined>([]);
     const [modelResponse, setModelResponse] = useState<string | undefined>("");
     const [isClicked, setIsClicked] = useState<boolean>(false)
@@ -96,12 +97,14 @@ const Jailbraking = () => {
 
             const data: JailbreakAttackOutput = await response.json();
 
-
-            // Qua ci starebbe la post function al backend per eseguire l'attacco
-
-            setAdversarialPrompt(data.adversarial_prompt)
-            setConversationChat(data.conversations)
-            setModelResponse(data.model_response)
+            setAdversarialPrompt(data.best_prompt)
+            setFullHistory(data.history.map(turn => ({ 
+                sender: turn.role === "attacker" ? "user" : "model", 
+                msg: turn.content, 
+                score: turn.score 
+            })));
+            setConversationChat(data.history.map(turn => [{ sender: turn.role === "attacker" ? "user" : "model", msg: turn.content, score: turn.score }]))
+            setModelResponse(data.best_response)
             setIsClicked(false)
         }
     }
@@ -121,6 +124,7 @@ const Jailbraking = () => {
                     adversarialPrompt={adversarialPrompt}
                     conversationChat={conversationChat}
                     modelResponse={modelResponse}
+                    fullHistory={fullHistory}
                 />
 
                 <div className={styles.prompt_container}>

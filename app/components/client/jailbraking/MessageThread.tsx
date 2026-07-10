@@ -10,16 +10,16 @@ interface MessageThreadProps {
     goal?: string;
     adversarialPrompt?: string;
     conversationChat?: BubbleInterface[][];
-    modelResponse?: string
+    modelResponse?: string;
+    fullHistory?: BubbleInterface[];
 }
 export default function MessageThread({
     goal,
     adversarialPrompt,
     conversationChat,
-    modelResponse
+    modelResponse,
+    fullHistory
 }: MessageThreadProps) {
-
-
     const [expanded, setExpanded] = useState<boolean>(false);
     const [isMounted, setIsMounted] = useState(false);
 
@@ -31,33 +31,31 @@ export default function MessageThread({
     if (!goal) return <div className="screen" />
     return (
         <div className="screen">
-            <Bubble msg={goal} user={true} loading={goal ? false : true} />
-            {!expanded ?
-                <div className='button_container'>
-                    <div className="button_div">
-                        <Tooltip label='Press to see further information'>
-                            <button onClick={() => setExpanded(true)}>
-                                <EllipsisVertical size={24} style={{ margin: 0, padding: 0 }} />
-                            </button>
-                        </Tooltip>
-                    </div>
-                </div> :
+            
+            {fullHistory && fullHistory.length > 0 && (
+                <button className="history-toggle" onClick={() => setExpanded(!expanded)}>
+                    {expanded ? "Hide Attack History" : "View Full Iteration History"}
+                </button>
+            )}
+
+            {expanded ?
                 <Conversations
                     onClick={() => { setExpanded(false) }}
-                    conversationChat={conversationChat}
-                />
+                    conversationChat={fullHistory ? [fullHistory] : []}
+                /> : 
+                <>
+                    <Bubble
+                        msg={adversarialPrompt ?? ""}
+                        user={true}
+                        loading={adversarialPrompt ? false : true}
+                    />
+                    <Bubble
+                        msg={modelResponse ?? ""}
+                        user={false}
+                        loading={modelResponse ? false : true}
+                    />
+                </>
             }
-            <Bubble
-                msg={adversarialPrompt ?? ""}
-                user={true}
-                loading={adversarialPrompt ? false : true}
-            />
-            <Bubble
-                msg={modelResponse ?? ""}
-                user={false}
-                loading={modelResponse ? false : true}
-
-            />
         </div>
     );
 }

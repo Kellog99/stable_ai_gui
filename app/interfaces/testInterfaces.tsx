@@ -36,8 +36,11 @@ export interface BubbleInterface {
 }
 
 export interface JailbreakAttackOutput {
-  adversarial_prompt: string;
-  conversations: BubbleInterface[][];
-  model_response: string;
-  advance_metrics: { [key: string]: number };
+  goal: string;
+  success: boolean;
+  best_prompt: string;
+  best_response: string;
+  best_score: number;
+  history: { role: string; content: string; score?: number }[];
+  metadata: { [key: string]: any };
 }

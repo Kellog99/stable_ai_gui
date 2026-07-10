@@ -1,9 +1,29 @@
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
 .screen {
   display: flex;
   height: 100%;
   flex-direction: column;
   gap: 10px;
-  overflow-y: scroll;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 
@@ -16,24 +36,24 @@
   gap: 10px;
 }
 
-.button_container button {
-  display: flex;
-  height: 30px;
-  width: fit-content;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
-  background-color: color-mix(in hsl, var(--bg) 60%, var(--bg-light) 40%);
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  border: none;
-  margin: 0;
-  padding: 0 6px;
-  cursor: pointer;
+.history-toggle {
+    display: flex;
+    align-self: center;
+    padding: 8px 16px;
+    margin: 10px 0;
+    background-color: transparent;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: fit-content;
+    color: #666;
 }
 
-.button_container button:hover {
-  background-color: color-mix(in hsl, var(--bg) 40%, var(--bg-light) 60%);
+.history-toggle:hover {
+    background-color: #f0f0f0;
+    border-color: #999;
 }
 
 .button_container button:focus {

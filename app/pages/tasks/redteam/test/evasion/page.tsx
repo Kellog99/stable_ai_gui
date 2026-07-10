@@ -155,7 +155,7 @@ function Test() {
                     </div>
 
 
-                    <div className={styles.bottom_item}>
+                                        <div className={styles.bottom_item}>
                         <VulnerabilitySelection
                             attacks={attacks}
                             selectedAttack={selectedAttack}
@@ -165,6 +165,7 @@ function Test() {
                             handleChange={(value: (string | number)[]) => handleChange(value as number[])}
                         />
                     </div>
+                    {/* Execution Container at the bottom of the grid */}
                     <div className={styles.exec_container}>
                         {/* Execute button */}
                         <button
@@ -196,16 +197,18 @@ function Test() {
                         </button>
                     </div>
                 </div>
-                <div>
-                    {showResults && attackResults.prediction ?
-                        <AttackVisualization
-                            prediction={attackResults.prediction}
-                            confidence={attackResults.confidence}
-                            results={attackResults.metrics} />
-                        : null}
-                </div>
             </div>
-        </div >
+            <div>
+                {showResults && attackResults.prediction ?
+                    <AttackVisualization
+                        prediction={attackResults.prediction}
+                        confidence={attackResults.confidence}
+                        results={attackResults.metrics} />
+                    : null}
+            </div>
+        </div>
+
+
     );
 }
 
