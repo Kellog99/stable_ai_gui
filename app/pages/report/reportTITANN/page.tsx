@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import styles from '@/styles/Report.module.css'
 import AttackTable from '@/components/client/nntrustReport/AttackTable';
 import BenchmarkTable from '@/components/client/nntrustReport/BenchmarkTable';
 import useNNTrustStore from '@/store/nnTrustStore';
@@ -11,6 +10,7 @@ import InfoTable from '@/components/client/report/InfoTable';
 import { getBenchmarkList } from '@/functionalities/TITANNServices/get_benchmarks';
 import { BenchmarkDataProps } from '@/interfaces/reportInterfaces';
 import useBackendVariablesStore from '@/store/globalStore';
+import styles from '@/styles/Report.module.css'
 
 
 const SecurityReport = () => {
@@ -43,15 +43,44 @@ const SecurityReport = () => {
     const reportRef = useRef<HTMLDivElement>(null);
 
     const handleDownloadPDF = async () => {
+
+        // 1. Open a blank tab immediately to bypass browser pop-up blockers
+        // const newWindow = window.open('', '_blank');
+        // if (newWindow) {
+        //     newWindow.document.title = "Loading PDF...";
+        //     newWindow.document.body.innerHTML = "Generating your PDF, please wait...";
+        // }
+        console.log(modelReport)
+
         try {
-            // Generate PDF blob
-            if (modelReport && benchmark) {
-                // Qua serve inserire la logica per generare il PDF, 
-                // tramite servizio a backend 
-            }
+            const response = await fetch(`http://${hostname}:${port}/report/generate_pdf`, {
+                method: 'POST', // or GET
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    report: modelReport,
+                    output_path: "./out"
+                })
+            });
+
+            if (!response.ok) throw new Error('PDF generation failed');
+
+            // 2. Convert response to a Blob (binary data)
+            const blob = await response.blob({ type: 'application/pdf' });
+
+            // 3. Create a temporary local URL for the blob
+            const pdfUrl = URL.createObjectURL(blob);
+
+            // 4. Redirect the already-opened tab to the PDF URL
+            // if (newWindow) {
+            //     newWindow.location.href = pdfUrl;
+            // }
         } catch (error) {
-            console.error('Error generating PDF:', error);
-            throw error;
+            console.error(error);
+            // if (newWindow) {
+            //     newWindow.document.body.innerHTML = "Failed to load PDF. Please try again.";
+            // }
         }
     };
     //##############################################################

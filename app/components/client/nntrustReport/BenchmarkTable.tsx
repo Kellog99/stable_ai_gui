@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { BenchmarkDataProps, metricsProps } from '@/interfaces/reportInterfaces';
 import {
     Chart as ChartJS,
@@ -10,16 +10,13 @@ import {
     Legend,
     LineElement,
 } from 'chart.js';
-
 import { Scatter } from 'react-chartjs-2';
-
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
 
-
-ChartJS.register(annotationPlugin);
 ChartJS.register(
+    annotationPlugin,
     ScatterController,
     PointElement,
     LineElement,
@@ -35,168 +32,136 @@ interface BenchmarkTableProps {
     data: metricsProps;
 }
 
-const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
-    modelName,
-    benchmark,
-    data
-}) => {
-    const availableBenchmarkingMetrics = useMemo(() =>
-        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
-            !key.endsWith("_rank")),
+const EXCLUDED_KEYS = new Set(['params', 'name', 'confusion_matrix', 'total benchmarks']);
+
+const getMetricValue = (data: metricsProps, key: string): number => {
+    const value = data[key as keyof metricsProps];
+    return typeof value === 'number' ? value : 0;
+};
+
+const BenchmarkTable: React.FC<BenchmarkTableProps> = ({ modelName, benchmark, data }) => {
+    const availableBenchmarkingMetrics = useMemo(
+        () =>
+            Object.keys(data).filter(
+                (key) => !EXCLUDED_KEYS.has(key) && !key.endsWith('_rank')
+            ),
         [data]
     );
 
-    const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
-    // by default it set the selected metric as the first of the list of available metrics
-    useEffect(() => {
-        if (availableBenchmarkingMetrics.length > 0) {
-            setSelectedBenchmark(availableBenchmarkingMetrics[0]);
-        }
-    }, [availableBenchmarkingMetrics]);
+    // Lazy init avoids the extra "empty" render + effect that used to set this
+    const [selectedBenchmark, setSelectedBenchmark] = useState<string>(
+        () => availableBenchmarkingMetrics[0] ?? ''
+    );
 
+    // Guard: if the metric list changes (new `data`) and current selection
+    // is no longer valid, fall back to the first available one.
+    const activeBenchmark =
+        availableBenchmarkingMetrics.includes(selectedBenchmark)
+            ? selectedBenchmark
+            : availableBenchmarkingMetrics[0] ?? '';
 
-    const [sortedData, setSortedData] = useState<[string, number][]>([]);
-    const [chartBenchmarkData, setChartBenchmarkData] = useState<{ [key: string]: number }[]>([]);
-    const [chartValueData, setChartValueData] = useState<{ [key: string]: number }[]>([]);
+    const handleSelectBenchmark = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedBenchmark(e.target.value);
+    }, []);
 
-    // Updating chart and sorted data when selectedBenchmark, benchmark, or data changes
-    useEffect(() => {
-        if (!selectedBenchmark) return;
-
-        const benchmarkValues: number[] = benchmark.map((benchmarkProp: BenchmarkDataProps) =>
-            benchmarkProp.metrics[selectedBenchmark] ?? 0
-        );
-
-        const dataValue = [data[selectedBenchmark as keyof metricsProps]];
-
-
-        if (benchmarkValues.length > 0) {
-            let benchmarkChartData = benchmark.map((benchmarkProp, index) => ({
-                params: benchmarkProp.info.parameters,
-                [selectedBenchmark]: benchmarkValues[index],
-            }));
-
-            let chartValueData: any[] = [];
-            if (dataValue.length > 0 && data.params !== undefined) {
-                chartValueData = [{
-                    params: data.params,
-                    [selectedBenchmark]: dataValue[0],
-                }];
-
-                benchmarkChartData = benchmarkChartData.filter(
-                    (entry) =>
-                        !(entry.params === data.params && entry[selectedBenchmark] === dataValue[0])
-                )
-            }
-
-            setChartBenchmarkData(benchmarkChartData);
-            setChartValueData(chartValueData);
-        } else {
-            setChartBenchmarkData([]);
-            setChartValueData([]);
+    // Single derivation pass instead of 3 states + an effect
+    const { sortedData, chartBenchmarkData, chartValueData } = useMemo(() => {
+        if (!activeBenchmark) {
+            return { sortedData: [] as [string, number][], chartBenchmarkData: [] as { params: unknown; value: number }[], chartValueData: [] as { params: unknown; value: number }[] };
         }
 
-        const combined: [string, number][] = [];
+        const benchmarkValues = benchmark.map((b) => b.metrics[activeBenchmark] ?? 0);
+        const testedValue = getMetricValue(data, activeBenchmark);
+        const hasTestedPoint = data.params !== undefined;
 
-        benchmark.map((bench, index) => {
-            combined.push([bench.info.name, benchmarkValues[index]]);
-        });
+        const benchmarkPoints = benchmark
+            .map((b, i) => ({ params: b.param, value: benchmarkValues[i] }))
+            // drop the point that duplicates the tested model, if present
+            .filter((entry) => !(hasTestedPoint && entry.params === data.params && entry.value === testedValue));
 
+        const testedPoints = hasTestedPoint
+            ? [{ params: data.params, value: testedValue }]
+            : [];
+
+        const combined: [string, number][] = benchmark.map((b, i) => [b.name, benchmarkValues[i]]);
         combined.sort((a, b) => b[1] - a[1]);
 
-        setSortedData(combined);
-    }, [selectedBenchmark, benchmark, data, modelName]);
+        return { sortedData: combined, chartBenchmarkData: benchmarkPoints, chartValueData: testedPoints };
+    }, [activeBenchmark, benchmark, data]);
 
-    const chartData = {
-        datasets: [
-            {
-                label: 'Benchmark Element',
-                data: chartBenchmarkData.map((d) => ({
-                    x: d.params,
-                    y: d[selectedBenchmark],
-                })),
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-            },
-            {
-                label: 'Tested Model',
-                data: chartValueData.map((d) => ({
-                    x: d.params,
-                    y: d[selectedBenchmark],
-                })),
-                backgroundColor: 'rgba(239, 68, 68, 0.7)',
-            },
-        ],
-    };
+    const chartData = useMemo(
+        () => ({
+            datasets: [
+                {
+                    label: 'Benchmark Element',
+                    data: chartBenchmarkData.map((d) => ({ x: d.params, y: d.value })),
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                },
+                {
+                    label: modelName || 'Tested Model',
+                    data: chartValueData.map((d) => ({ x: d.params, y: d.value })),
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                },
+            ],
+        }),
+        [chartBenchmarkData, chartValueData, modelName]
+    );
 
-
-
-    const referenceY = data[selectedBenchmark as keyof metricsProps];
+    const referenceY = activeBenchmark ? getMetricValue(data, activeBenchmark) : undefined;
     const referenceLabel = modelName || 'Tested Model';
 
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { position: 'top' as const },
-            annotation: {
-                annotations: {
-                    referenceLine: {
-                        type: 'line',
-                        yMin: referenceY,
-                        yMax: referenceY,
-                        borderColor: 'rgba(239, 68, 68, 0.8)',
-                        borderWidth: 1,
-                        label: {
-                            display: true,
-                            content: referenceLabel,
-                            position: 'start',
-                            color: 'rgba(239, 68, 68, 0.8)',
-                            backgroundColor: 'transparent',
-                            yAdjust: -10,
+    const options = useMemo(
+        () => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' as const },
+                annotation: {
+                    annotations: referenceY !== undefined
+                        ? {
+                              referenceLine: {
+                                  type: 'line' as const,
+                                  yMin: referenceY,
+                                  yMax: referenceY,
+                                  borderColor: 'rgba(239, 68, 68, 0.8)',
+                                  borderWidth: 1,
+                                  label: {
+                                      display: true,
+                                      content: referenceLabel,
+                                      position: 'start' as const,
+                                      color: 'rgba(239, 68, 68, 0.8)',
+                                      backgroundColor: 'transparent',
+                                      yAdjust: -10,
+                                  },
+                              },
+                          }
+                        : {},
+                },
+                tooltip: {
+                    callbacks: {
+                        title: () => '',
+                        label: (context: any) => {
+                            const point = context.raw;
+                            return [
+                                `Group: ${context.dataset.label ?? ''}`,
+                                `Params: ${point.x}`,
+                                `Value: ${point.y.toFixed(2)}`,
+                            ];
                         },
                     },
                 },
             },
-            tooltip: {
-                callbacks: {
-                    title: () => '',
-                    label: (context: any) => {
-                        const point = context.raw;
-                        const params = point.x;
-                        const value = point.y;
-                        const modelName = context.dataset.label || '';
-
-                        return [
-                            `Group: ${modelName}`,
-                            `Params: ${params}`,
-                            `Value: ${value.toFixed(2)}`
-                        ];
-                    },
-                },
+            scales: {
+                x: { title: { display: true, text: 'params' }, type: 'linear' as const, position: 'bottom' as const },
+                y: { title: { display: true, text: activeBenchmark } },
             },
-        },
-        scales: {
-            x: {
-                title: { display: true, text: 'params' },
-                type: 'linear' as const,
-                position: 'bottom' as const,
-            },
-            y: {
-                title: { display: true, text: selectedBenchmark },
-            },
-        },
-    };
-
-
-
+        }),
+        [referenceY, referenceLabel, activeBenchmark]
+    );
 
     return (
         <div className="benchmark-controls">
-            <select
-                value={selectedBenchmark}
-                onChange={(e) => setSelectedBenchmark(e.target.value)}
-                className="benchmark-select"
-            >
+            <select value={activeBenchmark} onChange={handleSelectBenchmark} className="benchmark-select">
                 {availableBenchmarkingMetrics.map((key) => (
                     <option key={key} value={key}>
                         {key}
@@ -204,21 +169,19 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                 ))}
             </select>
 
-            <div className='results-grid'>
-                {/* Scatter plot */}
+            <div className="results-grid">
                 <div style={{ width: '100%', height: 400 }}>
                     <Scatter data={chartData} options={options as any} />
                 </div>
 
                 <div className="leaderboard">
                     <div className="leaderboard-title">
-                        <Trophy size={"var(--icon-size)"} color='yellow' />
-                        <p>Leaderboard: {` `}
-                            {selectedBenchmark.charAt(0).toUpperCase() +
-                                selectedBenchmark.slice(1).replace(/_/g, ' ')}
+                        <Trophy size={20} color="yellow" />
+                        <p>
+                            Leaderboard:{' '}
+                            {activeBenchmark.charAt(0).toUpperCase() + activeBenchmark.slice(1).replace(/_/g, ' ')}
                         </p>
                     </div>
-                    {/* Table */}
                     <div className="table-container">
                         <table className="entries-table">
                             <thead>
@@ -230,21 +193,21 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                             </thead>
                             <tbody>
                                 {sortedData.map(([name, value], index) => (
-                                    <tr key={index} className={name === modelName ? 'highlighted' : ''}>
+                                    <tr key={`${name}-${index}`} className={name === modelName ? 'highlighted' : ''}>
                                         <td className="rank-cell">
                                             <div className="rank-circle">{index + 1}</div>
                                         </td>
                                         <td>{name}</td>
-                                        <td style={{ textAlign: "right" }}>{value.toFixed(3)}</td>
+                                        <td style={{ textAlign: 'right' }}>{value.toFixed(3)}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 
-export default BenchmarkTable;
+export default React.memo(BenchmarkTable);

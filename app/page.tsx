@@ -60,7 +60,7 @@ export default function HomePage() {
       hostname,
       port,
       "path_model_repo",
-      "info.json"
+      "model"
     )
       .then((listModels) => setListModels(listModels as ModelInfo[]))
       .catch(err => console.error("Failed to load models:", err));
@@ -72,7 +72,7 @@ export default function HomePage() {
       hostname,
       port,
       "path_ds_repo",
-      "info.json"
+      "dataset"
     )
       .then((listDatasets) => setListDataset(listDatasets as DatasetInfo[]))
       .catch(err => console.error("Failed to load datasets:", err));

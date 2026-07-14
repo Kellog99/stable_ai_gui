@@ -44,6 +44,7 @@ export default function Navbar() {
                             <div className="nav-items">
                                 {elements.map((element) => (
                                     <NavigationButton
+                                        key={`${element.id}_button`}
                                         id={element.id}
                                         title={element.title}
                                         href={element.href}

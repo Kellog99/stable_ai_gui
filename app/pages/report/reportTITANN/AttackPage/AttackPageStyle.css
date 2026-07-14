@@ -3,9 +3,22 @@
     padding: 2rem;
 }
 
+.dashboard-message {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 1.1rem;
+}
+
 .container {
     max-width: 1280px;
     margin: 0 auto;
+}
+
+.container+.container {
+    margin-top: 2rem;
 }
 
 .header {
@@ -34,20 +47,30 @@
 .metric-container {
     display: flex;
     flex-direction: column;
-    background: white;
-    border-radius: var(--border-radius);
-    width: 150px;
-    height: 70px;
+    background-color: color-mix(in hsl, var(--bg-dark) 60%, var(--bg-light) 40%);
+    color: lightgray;
+    border-radius: var(--border-radius, 8px);
+    min-width: 150px;
+    max-width: 220px;
+    min-height: 70px;
     padding: 7px;
-    gap: 5px
+    gap: 5px;
+    transition: box-shadow 0.15s ease;
+}
+
+.metric-container:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .metric-title {
     font-size: 0.8rem;
     font-weight: bold;
-    color: black;
+    color: darkgray;
     width: 100%;
     margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .metric-value {
@@ -55,4 +78,5 @@
     font-weight: bold;
     margin: 0;
     padding: 0;
+    overflow-wrap: break-word;
 }

@@ -2,14 +2,12 @@
 
 import FileDropZone from "@/components/client/upload/FileDropZone";
 import styles from '@/styles/HomePage.module.css';
-import { File, HardDrive, Upload } from "lucide-react";
+import { File } from "lucide-react";
 import { infoModel } from "@/components/client/upload/config";
 
-import { DragDrop } from "@/components/client/upload/DragDrop";
-import { ButtonProps, InfoProps, ModelInfo } from "@/interfaces/homePageInterface";
+import {  InfoProps, ModelInfo } from "@/interfaces/homePageInterface";
 import { useEffect, useState } from "react";
 import { getCoreElements } from "@/functionalities/TITANNServices/get_info";
-import FileRepository from "@/components/client/repository/FileRepository";
 import useNNTrustStore from "@/store/nnTrustStore";
 import { ModelReportProps } from "@/interfaces/reportInterfaces";
 import { useRouter } from "next/navigation";
@@ -24,7 +22,7 @@ export default function ReportPage() {
 
   const {
     modelReport,
-    setModelReport: setAttackReport,
+    setModelReport,
   } = useNNTrustStore()
 
   const [modelsReports, setModelsReports] = useState<ModelReportProps[]>([])
@@ -35,7 +33,7 @@ export default function ReportPage() {
       hostname,
       port,
       "path_model_report_repo",
-      "report.json"
+      "report_model"
     )
       .then((modelReportList) => setModelsReports(modelReportList as ModelReportProps[]))
   }, [setModelsReports, hostname, port]);
@@ -59,7 +57,7 @@ export default function ReportPage() {
           handleSelection={(report) => {
             const selectedReport: ModelReportProps | undefined = modelsReports.find(value => value.info.id === (report as InfoProps).id);
             if (selectedReport) {
-              setAttackReport(selectedReport);
+              setModelReport(selectedReport);
               router.push("/pages/report/reportTITANN");
             }
           }}

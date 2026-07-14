@@ -1,85 +1,129 @@
 'use client';
-import React, { useEffect, useState } from 'react'
-import useNNTrustStore from '@/store/nnTrustStore';
-import { attacksProps } from '@/interfaces/reportInterfaces';
-import './AttackPageStyle.css';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import useNNTrustStore from '@/store/nnTrustStore';
+import { ReportAttackProps } from '@/interfaces/reportInterfaces';
+import './AttackPageStyle.css';
+import { ParametersProps } from '@/interfaces/NNInterfaces';
+import { ChevronLeft } from 'lucide-react';
+
+const HIDDEN_METRIC_KEYS = new Set([
+    'name',
+    'id',
+    'confusion_matrix',
+    'risk',
+    'num_queries',
+    'power',
+]);
+
+const RAW_STRING_METRICS = new Set(['imagemean', 'imagevariance']);
+
+function formatMetricValue(value: unknown): string {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        return value.toFixed(2);
+    }
+    if (value === null || value === undefined) return '—';
+    return String(value);
+}
 
 const AttackPage = () => {
     const searchParams = useSearchParams();
     const atkId = searchParams.get('atkId');
-    console.log("atkId = ", atkId)
-
-    const { modelReport: attackReport } = useNNTrustStore();
-    const [attack, setAttack] = useState<attacksProps | null>(null);
-    const [usedParams, setUsedParams] = useState<any>(null)
 
     const {
-        selectedAttacks,
+        modelReport,
+        selectedAttacks
     } = useNNTrustStore();
 
-    //console.log("ATTACK!",selectedAttacks[atkId?.toLowerCase()])
-    // Wait for router to be ready and initialize attackReport
-    useEffect(() => {
-        if (attackReport && atkId) {
-            setAttack(attackReport.attacks[atkId]);
-            setUsedParams(selectedAttacks[atkId?.toLowerCase()].parameters)
-        }
-    }, [atkId, attackReport]);
+    const [attack, setAttack] = useState<ReportAttackProps | null>(null);
+    const [usedParams, setUsedParams] = useState<ParametersProps[] | null>(null);
+    const [notFound, setNotFound] = useState(false);
 
-    // Show loading state while router or data is not ready
-    if (!atkId || !attackReport || !attack) {
-        return <div>Loading...</div>;
+    useEffect(() => {
+        if (!modelReport || !atkId) return;
+
+        const matchedAttack = modelReport.attacks?.[atkId];
+
+        if (!matchedAttack) {
+            setNotFound(true);
+            return;
+        }
+
+        setNotFound(false);
+        setAttack(matchedAttack);
+        setUsedParams(modelReport.attacks[atkId].parameters);
+    }, [atkId, modelReport, selectedAttacks]);
+
+    // ################### METRICS ###################
+    const metricEntries = useMemo(() => {
+        if (!attack) return [];
+        return Object.entries(attack.metrics)
+            .filter(([key]) => key !== "confusion_matrix")
+            .map(([key, value]) => {
+                const transformedKey = key
+                    .split("_")
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ");
+
+                return [transformedKey, value];
+            });
+    }, [attack]);
+    // ##############################################
+
+
+
+    if (!atkId) {
+        return <div className="dashboard-message">No attack selected.</div>;
     }
 
-    console.log("attackReport", attack);
+    if (notFound) {
+        return <div className="dashboard-message">No data found for attack "{atkId}".</div>;
+    }
 
-    const attackMetrics = Object.keys(attackReport).filter(
-        item => !["name", "risk", "confusionmatrix"].includes(item)
-    );
-
-    console.log(attackMetrics);
+    if (!modelReport || !attack) {
+        return <div className="dashboard-message">Loading...</div>;
+    }
 
     return (
         <div className="dashboard">
+            <button
+                className='go_back'
+                onClick={() => { }}
+            >
+                <ChevronLeft size={20} />
+            </button>
             <div className="container">
                 <div className="header">
-                    <h1>Performance of {attack.name} </h1>
+                    <h1>Performance of {attack.name}</h1>
                     <p>Comprehensive metrics overview</p>
                 </div>
                 <div className="metrics-container">
-                    {Object.entries(attack).map(([metric, value]) => {
-                        if (!["name", "id", "confusion_matrix", "risk", "num_queries", "power"].includes(metric)) {
-                            return (
-                                <div className='metric-container'>
-                                    <p className='metric-title'>{metric}:</p>
-                                    <p className='metric-value'>{
-                                        ["imagemean", "imagevariance"].includes(metric) ?
-                                            value :
-                                            value.toFixed(2)}</p>
-                                </div>
-                            );
-                        }
-                        return null;
-                    })}
-                </div>
-
-            </div>
-            <div className="container">
-                <div className="header">
-                    <h1>  </h1>
-                    <p>Parameters used</p>
-                </div>
-                <div className="metrics-container">
-                    {usedParams.map((param) => (
-                        <div className='metric-container'>
-                            <p className='metric-title'>{param.id}:</p>
-                            <p className='metric-value'>{param.default.toFixed(4)}</p>
+                    {metricEntries.map(([metric, value]) => (
+                        <div className="metric-container" key={metric}>
+                            <p className="metric-title">{metric}:</p>
+                            <p className="metric-value">
+                                {RAW_STRING_METRICS.has(metric) ? String(value) : formatMetricValue(value)}
+                            </p>
                         </div>
                     ))}
                 </div>
-
             </div>
+
+            {usedParams && usedParams.length > 0 && (
+                <div className="container">
+                    <div className="header">
+                        <p>Parameters used</p>
+                    </div>
+                    <div className="metrics-container">
+                        {usedParams.map((param) => (
+                            <div className="metric-container" key={param.id}>
+                                <p className="metric-title">{param.id}:</p>
+                                <p className="metric-value">{formatMetricValue(param.default)}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
