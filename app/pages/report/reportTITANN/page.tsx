@@ -45,11 +45,11 @@ const SecurityReport = () => {
     const handleDownloadPDF = async () => {
 
         // 1. Open a blank tab immediately to bypass browser pop-up blockers
-        // const newWindow = window.open('', '_blank');
-        // if (newWindow) {
-        //     newWindow.document.title = "Loading PDF...";
-        //     newWindow.document.body.innerHTML = "Generating your PDF, please wait...";
-        // }
+        const newWindow = window.open('', '_blank');
+        if (newWindow) {
+            newWindow.document.title = "Loading PDF...";
+            newWindow.document.body.innerHTML = "Generating your PDF, please wait...";
+        }
         console.log(modelReport)
 
         try {
@@ -73,14 +73,14 @@ const SecurityReport = () => {
             const pdfUrl = URL.createObjectURL(blob);
 
             // 4. Redirect the already-opened tab to the PDF URL
-            // if (newWindow) {
-            //     newWindow.location.href = pdfUrl;
-            // }
+            if (newWindow) {
+                newWindow.location.href = pdfUrl;
+            }
         } catch (error) {
             console.error(error);
-            // if (newWindow) {
-            //     newWindow.document.body.innerHTML = "Failed to load PDF. Please try again.";
-            // }
+            if (newWindow) {
+                newWindow.document.body.innerHTML = "Failed to load PDF. Please try again.";
+            }
         }
     };
     //##############################################################
