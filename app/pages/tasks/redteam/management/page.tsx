@@ -14,7 +14,7 @@ import '@/components/client/management/ManagementTable.css';
 
 const TaskManagement: React.FC = () => {
     const {
-        setAttackReport,
+        setModelReport: setAttackReport,
         setBenchmark,
         benchmarkId
     } = useNNTrustStore()

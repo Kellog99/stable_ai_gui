@@ -6,14 +6,12 @@ import { TaskType } from "@/interfaces/NNInterfaces";
 import InfoButton from "./InfoButton";
 
 interface RepositoryProps {
-    activeId: string | undefined;
     elements: ModelInfo[] | DatasetInfo[];
     handleDelete: (elem: ModelInfo | DatasetInfo) => void;
     handleSelection: (element: ModelInfo | DatasetInfo) => void;
 }
 
 const Repository: React.FC<RepositoryProps> = ({
-    activeId,
     elements,
     handleDelete,
     handleSelection,
@@ -77,7 +75,7 @@ const Repository: React.FC<RepositoryProps> = ({
                 <table className="repository-table">
                     <thead className="table-header">
                         <tr>
-                            <th></th>
+                            <th>Info</th>
                             <th>Name</th>
                             <th>Task</th>
                             <th>Created</th>

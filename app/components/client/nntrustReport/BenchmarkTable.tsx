@@ -1,250 +1,139 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { BenchmarkDataProps, metricsProps } from '@/interfaces/reportInterfaces';
-import {
-    Chart as ChartJS,
-    ScatterController,
-    PointElement,
-    LinearScale,
-    Title,
-    Tooltip,
-    Legend,
-    LineElement,
-} from 'chart.js';
+import React, { useMemo, useState, useCallback } from 'react';
+import { BenchmarkDataProps, MetricsProps } from '@/interfaces/reportInterfaces';
 
-import { Scatter } from 'react-chartjs-2';
-
-import annotationPlugin from 'chartjs-plugin-annotation';
 import { Trophy } from 'lucide-react';
 import './BenchmarkTable.css';
+import { Table, TableData } from '@mantine/core';
+import { ScatterChart } from '@mantine/charts';
 
 
-ChartJS.register(annotationPlugin);
-ChartJS.register(
-    ScatterController,
-    PointElement,
-    LineElement,
-    LinearScale,
-    Title,
-    Tooltip,
-    Legend
-);
+export const formatMetricLabel = (key: string): string => key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+
+export const getMetricValue = (data: MetricsProps, key: string): number | undefined => {
+    const value = data[key as keyof MetricsProps];
+    return typeof value === 'number' ? value : undefined;
+};
 
 interface BenchmarkTableProps {
     modelName?: string;
     benchmark: BenchmarkDataProps[];
-    data: metricsProps;
+    data: MetricsProps;
 }
+
+const EXCLUDED_KEYS = new Set(['params', 'name', 'confusion_matrix', 'total benchmarks']);
 
 const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     modelName,
     benchmark,
     data
 }) => {
-    const availableBenchmarkingMetrics = useMemo(() =>
-        Object.keys(data).filter((key) => !["params", "name", "confusion_matrix", "total benchmarks"].includes(key) &&
-            !key.endsWith("_rank")),
+    // These are all the metrics that have been computed for the selected model
+    const availableBenchmarkingMetrics: string[] = useMemo(
+        () =>
+            Object.keys(data).filter(
+                (key) => !EXCLUDED_KEYS.has(key) && !key.endsWith('_rank')
+            ),
         [data]
     );
 
-    const [selectedBenchmark, setSelectedBenchmark] = useState<string>("");
-    // by default it set the selected metric as the first of the list of available metrics
-    useEffect(() => {
-        if (availableBenchmarkingMetrics.length > 0) {
-            setSelectedBenchmark(availableBenchmarkingMetrics[0]);
-        }
-    }, [availableBenchmarkingMetrics]);
+    const [selectedMetric, setSelectedMetric] = useState<keyof MetricsProps>(availableBenchmarkingMetrics[0] as keyof MetricsProps);
 
 
-    const [sortedData, setSortedData] = useState<[string, number][]>([]);
-    const [chartBenchmarkData, setChartBenchmarkData] = useState<{ [key: string]: number }[]>([]);
-    const [chartValueData, setChartValueData] = useState<{ [key: string]: number }[]>([]);
-
-    // Updating chart and sorted data when selectedBenchmark, benchmark, or data changes
-    useEffect(() => {
-        if (!selectedBenchmark) return;
-
-        const benchmarkValues: number[] = benchmark.map((benchmarkProp: BenchmarkDataProps) =>
-            benchmarkProp.metrics[selectedBenchmark] ?? 0
-        );
-
-        const dataValue = [data[selectedBenchmark as keyof metricsProps]];
-
-
-        if (benchmarkValues.length > 0) {
-            let benchmarkChartData = benchmark.map((benchmarkProp, index) => ({
-                params: benchmarkProp.info.parameters,
-                [selectedBenchmark]: benchmarkValues[index],
-            }));
-
-            let chartValueData: any[] = [];
-            if (dataValue.length > 0 && data.params !== undefined) {
-                chartValueData = [{
-                    params: data.params,
-                    [selectedBenchmark]: dataValue[0],
-                }];
-
-                benchmarkChartData = benchmarkChartData.filter(
-                    (entry) =>
-                        !(entry.params === data.params && entry[selectedBenchmark] === dataValue[0])
-                )
-            }
-
-            setChartBenchmarkData(benchmarkChartData);
-            setChartValueData(chartValueData);
-        } else {
-            setChartBenchmarkData([]);
-            setChartValueData([]);
+    const sortedData = useMemo(() => {
+        if (!selectedMetric) {
+            return [];
         }
 
-        const combined: [string, number][] = [];
+        const scored = benchmark
+            .map((b: BenchmarkDataProps) => ({
+                name: b.name,
+                params: b.param,
+                value: getMetricValue(b.metrics, selectedMetric)
+            }))
+            .filter((entry): entry is {
+                name: string;
+                params: number;
+                value: number
+            } => entry.value !== undefined);
 
-        benchmark.map((bench, index) => {
-            combined.push([bench.info.name, benchmarkValues[index]]);
-        });
+        const sortedData: { name: string; params: number; value: number }[] = scored
+            .sort((a, b) => b.value - a.value);
 
-        combined.sort((a, b) => b[1] - a[1]);
+        return sortedData
+    },
+        [selectedMetric, benchmark, data, modelName]
+    );
 
-        setSortedData(combined);
-    }, [selectedBenchmark, benchmark, data, modelName]);
+    const scatterData: { params: number, metric: number }[] = useMemo(() => {
+        return benchmark.filter((value: BenchmarkDataProps) => typeof value.metrics[selectedMetric] === "number")
+            .map((value: BenchmarkDataProps) => ({
+                params: value.param,
+                metric: value.metrics[selectedMetric] as number,
+            }))
+    }, [benchmark, selectedMetric])
 
-    const chartData = {
-        datasets: [
-            {
-                label: 'Benchmark Element',
-                data: chartBenchmarkData.map((d) => ({
-                    x: d.params,
-                    y: d[selectedBenchmark],
-                })),
-                backgroundColor: 'rgba(59, 130, 246, 0.7)',
-            },
-            {
-                label: 'Tested Model',
-                data: chartValueData.map((d) => ({
-                    x: d.params,
-                    y: d[selectedBenchmark],
-                })),
-                backgroundColor: 'rgba(239, 68, 68, 0.7)',
-            },
-        ],
+    const tableData: TableData = {
+        head: ['Rank', 'Model', 'Value'],
+        body: sortedData.map((data, index) => [index + 1, data.name, data.value.toFixed(3)]),
     };
-
-
-
-    const referenceY = data[selectedBenchmark as keyof metricsProps];
-    const referenceLabel = modelName || 'Tested Model';
-
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { position: 'top' as const },
-            annotation: {
-                annotations: {
-                    referenceLine: {
-                        type: 'line',
-                        yMin: referenceY,
-                        yMax: referenceY,
-                        borderColor: 'rgba(239, 68, 68, 0.8)',
-                        borderWidth: 1,
-                        label: {
-                            display: true,
-                            content: referenceLabel,
-                            position: 'start',
-                            color: 'rgba(239, 68, 68, 0.8)',
-                            backgroundColor: 'transparent',
-                            yAdjust: -10,
-                        },
-                    },
-                },
-            },
-            tooltip: {
-                callbacks: {
-                    title: () => '',
-                    label: (context: any) => {
-                        const point = context.raw;
-                        const params = point.x;
-                        const value = point.y;
-                        const modelName = context.dataset.label || '';
-
-                        return [
-                            `Group: ${modelName}`,
-                            `Params: ${params}`,
-                            `Value: ${value.toFixed(2)}`
-                        ];
-                    },
-                },
-            },
-        },
-        scales: {
-            x: {
-                title: { display: true, text: 'params' },
-                type: 'linear' as const,
-                position: 'bottom' as const,
-            },
-            y: {
-                title: { display: true, text: selectedBenchmark },
-            },
-        },
-    };
-
-
-
 
     return (
         <div className="benchmark-controls">
-            <select
-                value={selectedBenchmark}
-                onChange={(e) => setSelectedBenchmark(e.target.value)}
-                className="benchmark-select"
-            >
-                {availableBenchmarkingMetrics.map((key) => (
-                    <option key={key} value={key}>
-                        {key}
-                    </option>
-                ))}
-            </select>
+            <div className='benchmark_header'>
+                <p style={{ margin: "0px" }}>Metric selected:</p>
+                <select
+                    id="benchmark-metric-select"
+                    value={selectedMetric}
+                    onChange={(e) => setSelectedMetric(e.target.value as keyof MetricsProps)}
+                    className="benchmark-select"
+                >
+                    {availableBenchmarkingMetrics.map((key) => (
+                        <option key={key} value={key}>
+                            {formatMetricLabel(key)}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
-            <div className='results-grid'>
-                {/* Scatter plot */}
-                <div style={{ width: '100%', height: 400 }}>
-                    <Scatter data={chartData} options={options as any} />
+            <div className="results-grid">
+                <div className="chart-container">
+                    <ScatterChart
+                        h={"100%"}
+                        data={[
+                            {
+                                name: modelName ?? 'Models',
+                                color: 'blue.5',
+                                data: scatterData,
+                            },
+                        ]}
+                        xAxisLabel='Parameters'
+                        yAxisLabel='Value'
+                        yAxisProps={{ domain: [0, 1] }}
+                        dataKey={{ x: 'params', y: 'metric' }}
+                        referenceLines={[
+                            {
+                                y: data[selectedMetric as keyof MetricsProps] as number,
+                                label: 'Reference',
+                                color: 'red.7'
+                            },
+                        ]}
+                    />
                 </div>
 
                 <div className="leaderboard">
                     <div className="leaderboard-title">
-                        <Trophy size={"var(--icon-size)"} color='yellow' />
-                        <p>Leaderboard: {` `}
-                            {selectedBenchmark.charAt(0).toUpperCase() +
-                                selectedBenchmark.slice(1).replace(/_/g, ' ')}
+                        <Trophy size={20} color="yellow" />
+                        <p>
+                            Leaderboard:{" "}
+                            {selectedMetric ? formatMetricLabel(selectedMetric) : "—"}
                         </p>
                     </div>
-                    {/* Table */}
-                    <div className="table-container">
-                        <table className="entries-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Name</th>
-                                    <th>Score</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {sortedData.map(([name, value], index) => (
-                                    <tr key={index} className={name === modelName ? 'highlighted' : ''}>
-                                        <td className="rank-cell">
-                                            <div className="rank-circle">{index + 1}</div>
-                                        </td>
-                                        <td>{name}</td>
-                                        <td style={{ textAlign: "right" }}>{value.toFixed(3)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+
+                    <Table data={tableData} />
                 </div>
-            </div >
-        </div >
+            </div>
+        </div>
     );
 };
 
-export default BenchmarkTable;
+export default React.memo(BenchmarkTable);

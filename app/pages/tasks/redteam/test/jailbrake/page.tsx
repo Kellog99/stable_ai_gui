@@ -117,6 +117,7 @@ const Jailbraking = () => {
 
                 <div className={styles.prompt_container}>
                     <input
+                        key="adv_prompt_input"
                         type="text"
                         defaultValue={prompt}
                         value={prompt}

@@ -1,0 +1,44 @@
+.report_container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-left: 80px;
+    margin-right: 80px;
+    color: white;
+}
+
+.model-info {
+    display: flex;
+    flex-direction: row;
+    gap: 60px;
+    align-items: center;
+}
+
+.report_title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2vw;
+}
+
+.section {
+    width: 100%;
+    margin-bottom: 30px;
+    margin-top: 1vw;
+}
+
+.section h2 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.section p {
+    line-height: 1.6;
+}
+
+.model-details {
+    background-color: red;
+    width: 100%;
+    height: 300px;
+}
+

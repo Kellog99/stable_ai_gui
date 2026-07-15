@@ -35,7 +35,7 @@ interface AppState {
     map: { [key: string]: RegisterObjectProps },
     name: 'attacks' | 'metrics' | 'selectedAttacks' | 'selectedMetrics'
   ) => void;
-  setAttackReport: (attackReport: ModelReportProps) => void;
+  setModelReport: (attackReport: ModelReportProps) => void;
   setBenchmark: (benchmark: { [key: string]: BenchmarkDataProps }) => void;
 
   setVulnerabilitySelected: (vulnerabilitySelected: string) => void;
@@ -54,7 +54,7 @@ const useNNTrustStore = create<AppState>()(
       testAttack: null,
       loading: false,
       error: null,
-      modelReport: null,
+      modelReport: null,      // This is the model's report selected 
       benchmark: null,
       vulnerabilitySelected: null,
 
@@ -67,7 +67,7 @@ const useNNTrustStore = create<AppState>()(
       setSelectedAttackList: (selectedAttacks) => set({ selectedAttacks }),
       setBenchmarkId: (benchmarkId) => set({ benchmarkId }),
       setMap: (map, name) => set({ [name]: map }),
-      setAttackReport: (attackReport) => set({ modelReport: attackReport }),
+      setModelReport: (modelReport) => set({ modelReport: modelReport }),
       setBenchmark: (benchmark) => set({ benchmark }),
       setVulnerabilitySelected: (vulnerabilitySelected) => set({ vulnerabilitySelected }),
     }),
@@ -79,7 +79,7 @@ const useNNTrustStore = create<AppState>()(
         attacks: state.attacks,
         privacyAttacks: state.privacyAttacks,
         metrics: state.metrics,
-        attackReport: state.modelReport,
+        modelReport: state.modelReport,
         benchmark: state.benchmark,
         benchmarkId: state.benchmarkId,
         selectedAttacks: state.selectedAttacks

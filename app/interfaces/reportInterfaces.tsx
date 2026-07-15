@@ -1,7 +1,8 @@
 import Dataset from "./genericInterface";
 import { ModelInfo } from "./homePageInterface";
+import { ParametersProps } from "./NNInterfaces";
 
-export interface metricsProps {
+export interface MetricsProps {
     params: number;
     accuracy?: number;
     precision?: number;
@@ -11,8 +12,7 @@ export interface metricsProps {
     wobbliness?: number;
 }
 
-export interface attacksProps {
-    name: string,
+export interface AttackMetricsProps {
     risk: number,
     accuracy?: number,
     precision?: number,
@@ -23,12 +23,17 @@ export interface attacksProps {
     robustness?: number,
     confusionmatrix?: number[][]
 }
+export interface ReportAttackProps {
+    name: string,
+    metrics: AttackMetricsProps
+    parameters: ParametersProps[]
+}
 
 //  Interface for the report page
 export interface ModelReportProps {
     info: ModelInfo;
-    metrics: metricsProps;
-    attacks: { [key: string]: attacksProps }
+    metrics: MetricsProps;
+    attacks: { [key: string]: ReportAttackProps }
 }
 
 // Interface associated for retriving the values in the report.
@@ -36,7 +41,7 @@ export interface BenchmarkDataProps {
     name: string
     param: number
     task: string
-    metrics: { [key: string | number]: number[] }
+    metrics: MetricsProps
 }
 
 export interface DQReportProps {
