@@ -74,7 +74,25 @@ const SecurityReport = () => {
 
             // 4. Redirect the already-opened tab to the PDF URL
             if (newWindow) {
-                newWindow.location.href = pdfUrl;
+                const doc = newWindow.document;
+
+                doc.title = "🛡️ Adversarial Report";
+
+                // Remove the loading message
+                doc.body.innerHTML = "";
+
+                // Remove default margins
+                doc.body.style.margin = "0";
+                doc.body.style.height = "100vh";
+
+                // Create iframe
+                const iframe = doc.createElement("iframe");
+                iframe.src = pdfUrl;
+                iframe.style.width = "100%";
+                iframe.style.height = "100%";
+                iframe.style.border = "none";
+
+                doc.body.appendChild(iframe);
             }
         } catch (error) {
             console.error(error);
