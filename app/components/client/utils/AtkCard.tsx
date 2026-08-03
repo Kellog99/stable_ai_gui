@@ -35,7 +35,9 @@ const AttackCard: React.FC<AttackCardProps> = ({
 
     const handleSettingsClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        handleClick();
+        if (!isActive) {
+            handleClick();
+        }
         setIsClicked(true);
     }
     return (

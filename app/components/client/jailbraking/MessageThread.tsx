@@ -41,8 +41,8 @@ export default function MessageThread({
             {expanded ?
                 <Conversations
                     onClick={() => { setExpanded(false) }}
-                    conversationChat={fullHistory ? [fullHistory] : []}
-                /> : 
+                    conversationChat={conversationChat ?? []}
+                /> :
                 <>
                     <Bubble
                         msg={adversarialPrompt ?? ""}

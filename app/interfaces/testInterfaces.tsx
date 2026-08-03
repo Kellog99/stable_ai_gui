@@ -42,5 +42,6 @@ export interface JailbreakAttackOutput {
   best_response: string;
   best_score: number;
   history: { role: string; content: string; score?: number }[];
+  conversations: { role: string; content: string; score?: number }[][];
   metadata: { [key: string]: any };
 }
