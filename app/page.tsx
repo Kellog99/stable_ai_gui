@@ -5,7 +5,7 @@ import styles from '@/styles/HomePage.module.css';
 import { useEffect, useState } from 'react';
 
 // Configuration file for creating the HomePage Drag and Drop components
-import { getAttacksList, getMetricsList, getCoreElements, getPrivacyDatasetsList, getPrivacyModelsList } from './functionalities/TITANNServices/get_info';
+import { getAttacksList, getMetricsList, getCoreElements } from './functionalities/TITANNServices/get_info';
 import useNNTrustStore from '@/store/nnTrustStore';
 import FileRepository from './components/client/repository/FileRepository';
 import { DragDrop } from './components/client/upload/DragDrop';
@@ -31,7 +31,6 @@ export default function HomePage() {
   const {
     model,
     setAttacks,
-    setPrivacyAttacks,
     setModel,
     setMetrics,
   } = useNNTrustStore()
@@ -54,20 +53,9 @@ export default function HomePage() {
 
   useEffect(() => {
     getAttacksList(hostname, port)
-      .then((allAttacks) => {
-        setAttacks(
-            Object.fromEntries(
-                Object.entries(allAttacks).filter(([_, attack]) => attack.objective !== 'privacy')
-            )
-        );
-        setPrivacyAttacks(
-            Object.fromEntries(
-                Object.entries(allAttacks).filter(([_, attack]) => attack.objective === 'privacy')
-            )
-        );
-      })
+      .then(setAttacks)
       .catch(err => console.error("Failed to load attacks:", err));
-  }, [setAttacks, setPrivacyAttacks, hostname, port]);
+  }, [setAttacks, hostname, port]);
 
   // ################## Models' list ################## 
   useEffect(() => {
