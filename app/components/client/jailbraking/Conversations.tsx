@@ -28,12 +28,13 @@ const Conversations: React.FC<ConversationsProps> = ({
             </div>
             <div className='conv_body'>
                 {
-                    !conversationChat || conversationChat[activeIndex].length === 0 ?
+                    !conversationChat || conversationChat.length === 0 || !conversationChat[activeIndex] || conversationChat[activeIndex].length === 0 ?
                         <div className='conv_no_messages'>No conversation to show.</div> :
                         <>
                             <div className='conversation_chat_container'>
-                                {conversationChat[activeIndex].map((bubble) => (
+                                {conversationChat[activeIndex].map((bubble, idx) => (
                                     <Bubble
+                                        key={idx}
                                         msg={bubble.msg}
                                         user={bubble.sender === "user"}
                                         score={bubble.score}
