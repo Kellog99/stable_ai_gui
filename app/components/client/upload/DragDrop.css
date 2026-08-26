@@ -1,23 +1,26 @@
 .dropzone {
+  display: flex;
+  flex: 1;
+  min-height: 0;
   width: 100%;
-  height: 250px;
   border: 2px dashed white;
   border-radius: var(--border-radius);
   text-align: center;
   transition: all 0.3s ease-in-out;
   background-color: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(8px);
-  display: flex;
   align-items: center;
   justify-content: center;
-  pointer-events: 'none';
+  pointer-events: none;
+  /* was invalid: 'none' (quoted) had no effect */
   color: white;
+  box-sizing: border-box;
 }
 
 .dropzone:hover {
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
-  cursor: pointer
+  cursor: pointer;
 }
 
 .dropzone.loaded {
@@ -47,11 +50,27 @@
   border-color: #3B82F6;
 }
 
+/* Disabled state — was referenced via the `disabled` prop but had no
+   corresponding style. Mantine sets data-disabled on the root element. */
+.dropzone[data-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
-.dropzone_content {
+.dropzone[data-disabled]:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.dropzone_content,
+.dropzone>.mantine-Group-root {
   display: flex;
+  flex: 1;
+  min-height: 0;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   width: 100%;
 }
@@ -63,82 +82,23 @@
   gap: 0.8rem;
 }
 
-
 .container-idle {
   width: 100%;
-  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px
+  align-content: center;
+  gap: 10px;
+  font-size: 0.7rem;
+  box-sizing: border-box;
 }
 
 .idle-title {
   display: flex;
-  flex-direction: row;
-  gap: 20px
-}
-
-.dropzone_title {
-  display: inline-flex;
-  gap: 10px;
-  text-align: center;
-  align-items: center;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1F2937;
-  margin: auto;
-}
-
-.btns-container {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  position: absolute;
-  bottom: 0.5rem;
-}
-
-.dragdrop-btn {
-  width: 50px;
-  aspect-ratio: 1;
-  margin: 0;
-  background-color: transparent;
-  font-size: 0.6rem;
-  border: none;
-  border-radius: var(--border-radius);
-  display: flex;
-  align-content: center;
-  justify-content: center;
-}
-
-.dragdrop-btn.delete {
-  color: red;
-  background-color: rgba(129, 76, 76, 0.8);
-}
-
-.dragdrop-btn.load {
-  background-color: rgba(52, 193, 248, 0.6);
-  color: rgb(135, 206, 235);
-}
-
-.load:hover {
-  background-color: var(--bg-light);
-}
-
-.delete:hover {
-  background: rgba(255, 105, 97, 0.12);
-}
-
-.repositoryContainer {
   width: 100%;
-}
-
-.flexLoading {
-  min-height: 150px;
-  display: flex;
-  justify-content: center;
   align-items: center;
-  flex-direction: column;
-  flex-wrap: wrap;
-  width: 100%;
+  justify-content: center;
+  gap: 20px;
+  font-size: 1.1rem;
+  font-weight: bold;
 }
