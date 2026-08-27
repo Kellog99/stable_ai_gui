@@ -54,7 +54,7 @@ const Jailbraking = () => {
 
     const nlpAttacks = useMemo(() => {
         return Object.fromEntries(Object.entries(attacks).filter(([_, atk]: [string, RegisterObjectProps]) => {
-            return atk.objective && ["jailbreak", "jailbraking", "prompt_injection"].includes(atk.objective.toLowerCase())
+            return atk.objective && ["jailbreak", "prompt_injection"].includes(atk.objective.toLowerCase())
         }))
     }, [attacks])
     useEffect(() => {

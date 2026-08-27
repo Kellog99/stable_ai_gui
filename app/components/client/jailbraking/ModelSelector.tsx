@@ -115,7 +115,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        getCoreElements(hostname, port, "path_model_repo", "info.json")
+        getCoreElements(hostname, port, "path_model_repo", "model")
             .then((list) => setListModels(list as ModelInfo[]))
             .catch(err => console.error("Failed to load models:", err));
     }, [hostname, port]);
