@@ -7,6 +7,64 @@
   overflow-y: visible;
 }
 
+/* Minimal loading indicator shown while the attack runs */
+.attack-loading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 6px;
+  color: #ccc;
+  font-size: 0.8rem;
+  font-weight: 600;
+  user-select: none;
+}
+
+.attack-loading__dots {
+  display: inline-flex;
+  gap: 5px;
+}
+
+.attack-loading__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.25;
+  animation: attackLoadingDot 1.2s ease-in-out infinite;
+}
+
+.attack-loading__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.attack-loading__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes attackLoadingDot {
+  0%, 60%, 100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.attack-loading__text {
+  animation: attackLoadingText 1.2s ease-in-out infinite;
+}
+
+@keyframes attackLoadingText {
+  0%, 100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
 
 
 .button_container {

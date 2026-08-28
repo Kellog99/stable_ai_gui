@@ -27,6 +27,9 @@ export default function MessageThread({
         setIsMounted(true);
     }, []);
 
+    // Loading = attack submitted but no result yet.
+    const loading = !!(goal && !adversarialPrompt && !modelResponse);
+
     if (!isMounted) return <div className="screen" />;
     if (!goal) return <div className="screen" />
     return (
@@ -43,18 +46,27 @@ export default function MessageThread({
                     onClick={() => { setExpanded(false) }}
                     conversationChat={conversationChat ?? []}
                 /> :
-                <>
-                    <Bubble
-                        msg={adversarialPrompt ?? ""}
-                        user={true}
-                        loading={adversarialPrompt ? false : true}
-                    />
-                    <Bubble
-                        msg={modelResponse ?? ""}
-                        user={false}
-                        loading={modelResponse ? false : true}
-                    />
-                </>
+                loading ?
+                    <div className="attack-loading" role="status" aria-live="polite">
+                        <span className="attack-loading__text">Executing the attack</span>
+                        <span className="attack-loading__dots">
+                            <span className="attack-loading__dot" />
+                            <span className="attack-loading__dot" />
+                            <span className="attack-loading__dot" />
+                        </span>
+                    </div> :
+                    <>
+                        <Bubble
+                            msg={adversarialPrompt ?? ""}
+                            user={true}
+                            loading={adversarialPrompt ? false : true}
+                        />
+                        <Bubble
+                            msg={modelResponse ?? ""}
+                            user={false}
+                            loading={modelResponse ? false : true}
+                        />
+                    </>
             }
         </div>
     );

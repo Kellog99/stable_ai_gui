@@ -119,49 +119,55 @@ const Jailbraking = () => {
             setConversationChat(undefined)
             setModelResponse(undefined)
 
+            try {
+                const response = await fetch(`http://${hostname}:${port}/test/jailbreaking`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        "input": prompt,
+                        "model": model,
+                        "attack": selectedAttack,
+                        "task_type": "nlp",
+                        "attacker": attackerModel,
+                        "judge": judgeModel,
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-            const response = await fetch(`http://${hostname}:${port}/test/jailbreaking`, {
-                method: "POST",
-                body: JSON.stringify({
-                    "input": prompt,
-                    "model": model,
-                    "attack": selectedAttack,
-                    "task_type": "nlp",
-                    "attacker": attackerModel,
-                    "judge": judgeModel,
-                }),
-                headers: {
-                    'Content-Type': 'application/json'
+                if (!response.ok) {
+                    const errorDetail = await response.json();
+                    console.error('Server validation error:', JSON.stringify(errorDetail, null, 2));
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            });
 
-            if (!response.ok) {
-                const errorDetail = await response.json();
-                console.error('Server validation error:', JSON.stringify(errorDetail, null, 2));
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+                const data: JailbreakAttackOutput = await response.json();
 
-            const data: JailbreakAttackOutput = await response.json();
-
-            setAdversarialPrompt(data.best_prompt)
-            // Flat history for the "View Full Iteration History" expanded view
-            setFullHistory(data.history.map(turn => ({ 
-                sender: turn.role === "attacker" ? "user" : "model", 
-                msg: turn.content, 
-                score: turn.score 
-            })));
-            // Grouped conversations for the chat switcher:
-            // Stateless attacks → each attempt is its own chat (attacker + target)
-            // Stateful attacks → one continuous chat from target_context
-            setConversationChat(data.conversations.map(chat =>
-                chat.map(turn => ({
+                setAdversarialPrompt(data.best_prompt)
+                // Flat history for the "View Full Iteration History" expanded view
+                setFullHistory(data.history.map(turn => ({
                     sender: turn.role === "attacker" ? "user" : "model",
                     msg: turn.content,
-                    score: turn.score,
-                }))
-            ))
-            setModelResponse(data.best_response)
-            setIsClicked(false)
+                    score: turn.score
+                })));
+                // Grouped conversations for the chat switcher:
+                // Stateless attacks → each attempt is its own chat (attacker + target)
+                // Stateful attacks → one continuous chat from target_context
+                setConversationChat(data.conversations.map(chat =>
+                    chat.map(turn => ({
+                        sender: turn.role === "attacker" ? "user" : "model",
+                        msg: turn.content,
+                        score: turn.score,
+                    }))
+                ))
+                setModelResponse(data.best_response)
+            } catch (err) {
+                // Clear the goal so the loading indicator doesn't stay stuck
+                console.error('Jailbreaking attack failed:', err)
+                setGoal(undefined)
+            } finally {
+                setIsClicked(false)
+            }
         }
     }
 
@@ -176,6 +182,7 @@ const Jailbraking = () => {
             />
             <div className={styles.body}>
                 <VulnerabilitySelection
+                    stretch
                     attacks={nlpAttacks}
                     selectedAttack={selectedAttack}
                     handleSelection={(attackId) => {
