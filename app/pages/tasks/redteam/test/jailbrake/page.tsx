@@ -106,6 +106,9 @@ const Jailbraking = () => {
     const [modelResponse, setModelResponse] = useState<string | undefined>("");
     const [isClicked, setIsClicked] = useState<boolean>(false)
     const [adversarialPrompt, setAdversarialPrompt] = useState<string>()
+    const [attackSuccess, setAttackSuccess] = useState<boolean | undefined>(undefined)
+    const [bestScore, setBestScore] = useState<number | undefined>(undefined)
+    const [attackMetadata, setAttackMetadata] = useState<Record<string, unknown> | undefined>(undefined)
 
     //  this function handles the submission of the prompt and sets the goal and adversarial prompt
     const handleSubmit = async () => {
@@ -118,6 +121,9 @@ const Jailbraking = () => {
             setAdversarialPrompt(undefined)
             setConversationChat(undefined)
             setModelResponse(undefined)
+            setAttackSuccess(undefined)
+            setBestScore(undefined)
+            setAttackMetadata(undefined)
 
             try {
                 const response = await fetch(`http://${hostname}:${port}/test/jailbreaking`, {
@@ -161,10 +167,16 @@ const Jailbraking = () => {
                     }))
                 ))
                 setModelResponse(data.best_response)
+                setAttackSuccess(data.success)
+                setBestScore(data.best_score)
+                setAttackMetadata(data.metadata)
             } catch (err) {
                 // Clear the goal so the loading indicator doesn't stay stuck
                 console.error('Jailbreaking attack failed:', err)
                 setGoal(undefined)
+                setAttackSuccess(undefined)
+                setBestScore(undefined)
+                setAttackMetadata(undefined)
             } finally {
                 setIsClicked(false)
             }
@@ -229,6 +241,9 @@ const Jailbraking = () => {
                     conversationChat={conversationChat}
                     modelResponse={modelResponse}
                     fullHistory={fullHistory}
+                    success={attackSuccess}
+                    bestScore={bestScore}
+                    metadata={attackMetadata}
                 />
             </div>
         </div>
