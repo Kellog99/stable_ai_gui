@@ -21,6 +21,15 @@
     gap: 12px;
 }
 
+.goal_label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ccc;
+}
+
 .attack {
     height: 100%;
     display: flex;

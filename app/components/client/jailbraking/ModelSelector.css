@@ -100,11 +100,10 @@
 .advanced-panel {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-    border-radius: 14px;
-    background-color: color-mix(in hsl, var(--bg-dark) 20%, var(--bg) 80%);
-    border: 1px solid #333;
+    gap: 8px;
+    padding: 0 4px;
+    background-color: transparent;
+    border: none;
 }
 
 .advanced-panel-title {

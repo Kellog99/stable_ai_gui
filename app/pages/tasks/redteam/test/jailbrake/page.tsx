@@ -5,7 +5,7 @@ import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { useEffect, useMemo, useState } from 'react'
 import styles from '@/styles/Jailbrake.module.css'
-import { Send, Shield, Unlink } from 'lucide-react';
+import { Send, Shield, Target, Unlink } from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import MessageThread from '@/components/client/jailbraking/MessageThread';
 import ModelSelector from '@/components/client/jailbraking/ModelSelector';
@@ -175,35 +175,6 @@ const Jailbraking = () => {
 
             />
             <div className={styles.body}>
-                <MessageThread
-                    goal={goal}
-                    adversarialPrompt={adversarialPrompt}
-                    conversationChat={conversationChat}
-                    modelResponse={modelResponse}
-                    fullHistory={fullHistory}
-                />
-
-                <div className={styles.prompt_container}>
-                    <input
-                        type="text"
-                        value={prompt}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && isActive) {
-                                handleSubmit();
-                            }
-                        }}
-                        onChange={(e) => { setPrompt(e.target.value) }}
-                        className={styles.input_style}
-                        placeholder="Insert the goal of the attack."
-                    />
-                    <button
-                        className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
-                        disabled={isClicked && !isActive}
-                        onClick={handleSubmit}
-                    >
-                        <Send size={24} />
-                    </button>
-                </div>
                 <VulnerabilitySelection
                     attacks={nlpAttacks}
                     selectedAttack={selectedAttack}
@@ -217,6 +188,40 @@ const Jailbraking = () => {
                     judgeModel={judgeModel}
                     onAttackerChange={setAttackerModel}
                     onJudgeChange={setJudgeModel}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label className={styles.goal_label}>
+                        <Target size={16} color="rgb(187, 58, 58)" />
+                        Goal
+                    </label>
+                    <div className={styles.prompt_container}>
+                        <input
+                            type="text"
+                            value={prompt}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && isActive) {
+                                    handleSubmit();
+                                }
+                            }}
+                            onChange={(e) => { setPrompt(e.target.value) }}
+                            className={styles.input_style}
+                            placeholder="Insert the goal of the attack."
+                        />
+                        <button
+                            className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
+                            disabled={isClicked && !isActive}
+                            onClick={handleSubmit}
+                        >
+                            <Send size={24} />
+                        </button>
+                    </div>
+                </div>
+                <MessageThread
+                    goal={goal}
+                    adversarialPrompt={adversarialPrompt}
+                    conversationChat={conversationChat}
+                    modelResponse={modelResponse}
+                    fullHistory={fullHistory}
                 />
             </div>
         </div>
