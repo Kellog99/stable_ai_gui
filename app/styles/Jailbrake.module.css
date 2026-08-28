@@ -1,18 +1,21 @@
 .jailbraking_page {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: auto;
+    min-height: 100%;
 }
 
 .body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    height: calc(100vh - var(--header-height) - var(--page-title-height));
-    padding-left: 10vw;
-    padding-right: 10vw;
+    height: auto;
+    min-height: calc(100vh - var(--header-height) - var(--page-title-height));
+    padding-left: 2vw;
+    padding-right: 2vw;
     padding-bottom: 2vh;
-    overflow:auto ;
+    box-sizing: border-box;
+    overflow: visible;
 }
 
 .prompt_container {
