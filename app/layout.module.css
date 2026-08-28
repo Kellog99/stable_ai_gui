@@ -19,23 +19,6 @@
   height: calc(100vh - var(--header-height));
 }
 
-.dashboard-main::-webkit-scrollbar {
-  width: 8px;
-}
-
-.dashboard-main::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.5);
-}
-
-.dashboard-main::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.3);
-  border-radius: 4px;
-}
-
-.dashboard-main::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.5);
-}
-
 .mainContainer {
   height: 100%;
   width: 100%;

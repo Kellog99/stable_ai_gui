@@ -7,6 +7,18 @@
     border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
     border-radius: 12px;
     overflow: hidden;
+    animation: convReveal 0.35s ease-out both;
+}
+
+@keyframes convReveal {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ── Chat selector (center top) ── */
@@ -78,7 +90,10 @@
     flex-direction: column;
     gap: 12px;
     padding: 20px;
-    overflow-y: scroll;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .conv_no_messages {

@@ -51,6 +51,38 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── Global scrollbar theme (matches the dark slate/navy page) ── */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: color-mix(in hsl, var(--bg-dark) 45%, transparent);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in hsl, var(--bg-light) 45%, var(--bg-dark) 55%);
+  border-radius: 8px;
+  border: 2px solid color-mix(in hsl, var(--bg-dark) 55%, transparent);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in hsl, var(--bg-light) 70%, var(--bg-dark) 30%);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in hsl, var(--bg-light) 55%, var(--bg-dark) 45%
+  ) transparent;
+}
+
 h1 {
   color: var(--text-primary);
 }

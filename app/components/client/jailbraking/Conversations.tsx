@@ -1,5 +1,5 @@
 import { BubbleInterface } from '@/interfaces/testInterfaces'
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './Conversations.css'
 import Bubble from './Bubble'
 import { scoreToColor } from './scoreColor'
@@ -12,10 +12,36 @@ const Conversations: React.FC<ConversationsProps> = ({
     conversationChat,
 }) => {
     const [activeIndex, setActiveIndex] = useState<number>(0);
+    const selectorRef = useRef<HTMLDivElement>(null);
+
+    // Native non-passive wheel listener — switching chats via the wheel must NOT
+    // scroll the page. React's synthetic onWheel gets treated as passive, so
+    // preventDefault wouldn't cancel the scroll; a raw listener with
+    // { passive: false } guarantees it does.
+    useEffect(() => {
+        const el = selectorRef.current;
+        if (!el) return;
+
+        const onWheel = (e: WheelEvent) => {
+            const total = conversationChat?.length ?? 0;
+            if (total === 0) return;
+            e.preventDefault();
+            // DeltaY (or DeltaX on trackpads): up/left = previous, down/right = next
+            const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            if (delta === 0) return;
+            setActiveIndex((prev) => (prev + (delta > 0 ? 1 : -1) + total) % total);
+        };
+
+        el.addEventListener('wheel', onWheel, { passive: false });
+        return () => el.removeEventListener('wheel', onWheel);
+    }, [conversationChat?.length]);
 
     return (
         <div className='conversation_container'>
-            <div className='conv_chat_selector'>
+            <div
+                className='conv_chat_selector'
+                ref={selectorRef}
+            >
                 {(conversationChat ?? []).map((chat, i) => {
                     const score = chat.reduce<number | undefined>(
                         (acc, b) => (typeof b.score === 'number' && (acc === undefined || b.score > acc) ? b.score : acc),

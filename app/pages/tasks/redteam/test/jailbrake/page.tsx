@@ -3,7 +3,7 @@ import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import styles from '@/styles/Jailbrake.module.css'
 import { Send, Shield, Target, Unlink } from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
@@ -183,6 +183,67 @@ const Jailbraking = () => {
         }
     }
 
+    // ── Scroll-linked shrink of the top section (vuln selection, models, goal) ──
+    // As the user scrolls down, the top area scales down, fades out, and the results
+    // are pulled up to fill the freed space. Driven by rAF for smoothness.
+    const topSectionRef = useRef<HTMLDivElement>(null);
+    const [topShrink, setTopShrink] = useState(0); // 0..1 progress
+    const [topSectionH, setTopSectionH] = useState(0); // measured layout height
+
+    useEffect(() => {
+        const section = topSectionRef.current;
+        if (!section) return;
+
+        // Find the nearest scrollable ancestor (the app's single scroll container,
+        // .dashboard_main is a CSS module class -> hashed name, so walk up instead).
+        let scroller: Element | null = section.parentElement;
+        while (scroller && scroller !== document.body && scroller !== document.documentElement) {
+            const s = window.getComputedStyle(scroller);
+            if (/(auto|scroll|overlay)/.test(s.overflowY)) break;
+            scroller = scroller.parentElement;
+        }
+        if (!scroller || scroller === document.body) scroller = document.documentElement;
+
+        let raf = 0;
+
+        const onScroll = () => {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+                const top = scroller!.scrollTop || 0;
+                // Full shrink after ~300px of scrolling
+                setTopShrink(Math.min(1, Math.max(0, top / 300)));
+            });
+        };
+
+        scroller.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        const ro = new ResizeObserver(() => {
+            if (topSectionRef.current) setTopSectionH(topSectionRef.current.offsetHeight);
+        });
+        if (topSectionRef.current) ro.observe(topSectionRef.current);
+
+        return () => {
+            cancelAnimationFrame(raf);
+            scroller!.removeEventListener('scroll', onScroll);
+            ro.disconnect();
+        };
+    }, []);
+
+    // Scale + fade + negative bottom margin (pulls MessageThread up, matching the shrink)
+    const topShrinkStyle: React.CSSProperties = useMemo(() => {
+        const scale = 1 - 0.15 * topShrink;
+        // Layout space lost to the scale (height * (1 - scale)) — compensate so the
+        // results slide up as the top compresses instead of leaving a gap.
+        const lost = topSectionH * (1 - scale);
+        return {
+            transform: `scale(${scale})`,
+            transformOrigin: 'top center',
+            opacity: 1 - 0.45 * topShrink,
+            marginBottom: `-${lost}px`,
+            willChange: 'transform, opacity, margin-bottom',
+        };
+    }, [topShrink, topSectionH]);
+
     return (
         <div className={styles.jailbraking_page}>
             {/* Header */}
@@ -193,46 +254,49 @@ const Jailbraking = () => {
 
             />
             <div className={styles.body}>
-                <VulnerabilitySelection
-                    stretch
-                    attacks={nlpAttacks}
-                    selectedAttack={selectedAttack}
-                    handleSelection={(attackId) => {
-                        setSelectedAttack(buildSelectedAttack(attackId))
-                    }}
-                    handleChange={(value: (string | number)[]) => handleChange(value as number[])}
-                />
-                <ModelSelector
-                    attackerModel={attackerModel}
-                    judgeModel={judgeModel}
-                    onAttackerChange={setAttackerModel}
-                    onJudgeChange={setJudgeModel}
-                />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <label className={styles.goal_label}>
-                        <Target size={16} color="rgb(187, 58, 58)" />
-                        Goal
-                    </label>
-                    <div className={styles.prompt_container}>
-                        <input
-                            type="text"
-                            value={prompt}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && isActive) {
-                                    handleSubmit();
-                                }
-                            }}
-                            onChange={(e) => { setPrompt(e.target.value) }}
-                            className={styles.input_style}
-                            placeholder="Insert the goal of the attack."
-                        />
-                        <button
-                            className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
-                            disabled={isClicked && !isActive}
-                            onClick={handleSubmit}
-                        >
-                            <Send size={24} />
-                        </button>
+                {/* Top section shrinks & fades while scrolling down. */}
+                <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
+                    <VulnerabilitySelection
+                        stretch
+                        attacks={nlpAttacks}
+                        selectedAttack={selectedAttack}
+                        handleSelection={(attackId) => {
+                            setSelectedAttack(buildSelectedAttack(attackId))
+                        }}
+                        handleChange={(value: (string | number)[]) => handleChange(value as number[])}
+                    />
+                    <ModelSelector
+                        attackerModel={attackerModel}
+                        judgeModel={judgeModel}
+                        onAttackerChange={setAttackerModel}
+                        onJudgeChange={setJudgeModel}
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <label className={styles.goal_label}>
+                            <Target size={16} color="rgb(187, 58, 58)" />
+                            Goal
+                        </label>
+                        <div className={styles.prompt_container}>
+                            <input
+                                type="text"
+                                value={prompt}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && isActive) {
+                                        handleSubmit();
+                                    }
+                                }}
+                                onChange={(e) => { setPrompt(e.target.value) }}
+                                className={styles.input_style}
+                                placeholder="Insert the goal of the attack."
+                            />
+                            <button
+                                className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
+                                disabled={isClicked && !isActive}
+                                onClick={handleSubmit}
+                            >
+                                <Send size={24} />
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <MessageThread

@@ -14,14 +14,14 @@
   gap: 14px;
   padding: 20px 6px;
   color: #ccc;
-  font-size: 0.8rem;
+  font-size: 9.0rem;
   font-weight: 600;
   user-select: none;
 }
 
 .attack-loading__dots {
   display: inline-flex;
-  gap: 5px;
+  gap: 4px;
 }
 
 .attack-loading__dot {
@@ -80,10 +80,23 @@
   border-radius: 999px;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
+  opacity: 0;
+  animation: resultsReveal 0.45s ease-out 0.2s forwards;
 }
 
 .history-toggle:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes resultsReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .results-summary {
@@ -96,6 +109,8 @@
   padding: 6px 10px;
   background: transparent;
   border: none;
+  opacity: 0;
+  animation: resultsReveal 0.45s ease-out 0.05s forwards;
 }
 
 .result-badge {
@@ -152,6 +167,8 @@
   background: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
   border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
   border-radius: 12px;
+  opacity: 0;
+  animation: resultsReveal 0.5s ease-out 0.12s forwards;
 }
 
 .bubble-row {
