@@ -53,14 +53,22 @@
 }
 .input_style {
     width: 100%;
-    background-color: transparent;
-    border-radius: 20px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    border: 1px solid #444;
     background-color: color-mix(in hsl,
             var(--bg-dark) 50%,
             var(--bg) 50%);
     color: lightgray;
     font-size: 0.85rem;
-    padding-left: 10px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input_style:hover,
+.input_style:focus {
+    border-color: #888;
 }
 
 .execute_button {

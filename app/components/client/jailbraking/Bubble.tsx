@@ -26,7 +26,7 @@ const Bubble: React.FC<BubbleProps> = ({
                     className="bubble-score"
                     style={{ backgroundColor: scoreToColor(score), borderColor: scoreToColor(score) }}
                 >
-                    Judge score = {score.toFixed(3)}
+                    Judge score = {Math.round(score)}/10
                 </p>
             )}
         </div>

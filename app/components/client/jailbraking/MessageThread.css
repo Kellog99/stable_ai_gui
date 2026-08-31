@@ -123,16 +123,16 @@
   font-weight: 700;
 }
 
-/* Danger (successful jailbreak) — red, matching a high judge score */
-.result-badge--danger {
-  background: rgba(239, 68, 68, 0.14);
-  color: #f87171;
-}
-
-/* Safe (failed jailbreak) — green, matching a low judge score */
-.result-badge--safe {
+/* Success (high score) — green */
+.result-badge--success {
   background: rgba(16, 185, 129, 0.14);
   color: #34d399;
+}
+
+/* Failed (low score) — red */
+.result-badge--fail {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
 }
 
 .result-metric {

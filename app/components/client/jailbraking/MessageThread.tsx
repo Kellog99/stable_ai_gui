@@ -80,15 +80,15 @@ export default function MessageThread({
                 <>
                     {/* Attack stats — always visible, collapsed or expanded */}
                     <div className="results-summary">
-                        {/* Colors are inverted vs. the label: a successful jailbreak is a dangerous
-                            outcome (= high score = red), a failed attack is safe (= low score = green). */}
-                        <span className={`result-badge ${success ? "result-badge--danger" : "result-badge--safe"}`}>
+                        {/* A successful jailbreak = high score = green; a failed
+                            attack = low score = red (coherent with scoreToColor). */}
+                        <span className={`result-badge ${success ? "result-badge--success" : "result-badge--fail"}`}>
                             {success ? <Check size={15} /> : <X size={15} />}
                             {success ? "Success" : "Failed"}
                         </span>
                         {typeof bestScore === "number" && (
                             <span className="result-metric">
-                                <span className="result-metric__value">{bestScore.toFixed(3)}</span>
+                                <span className="result-metric__value">{Math.round(bestScore)}/10</span>
                                 <span className="result-metric__label">Best score</span>
                             </span>
                         )}

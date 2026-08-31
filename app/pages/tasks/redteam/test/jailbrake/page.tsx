@@ -271,7 +271,7 @@ const Jailbraking = () => {
                         onAttackerChange={setAttackerModel}
                         onJudgeChange={setJudgeModel}
                     />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px' }}>
                         <label className={styles.goal_label}>
                             <Target size={16} color="rgb(187, 58, 58)" />
                             Goal
