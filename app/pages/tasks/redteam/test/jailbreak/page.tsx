@@ -4,15 +4,15 @@ import { RegisterObjectProps } from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import styles from '@/styles/Jailbrake.module.css'
+import styles from '@/styles/jailbreak.module.css'
 import { Send, Shield, Target, Unlink } from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
-import MessageThread from '@/components/client/jailbraking/MessageThread';
-import ModelSelector from '@/components/client/jailbraking/ModelSelector';
+import MessageThread from '@/components/client/jailbreaking/MessageThread';
+import ModelSelector from '@/components/client/jailbreaking/ModelSelector';
 import { ModelInfo } from '@/interfaces/homePageInterface';
 import { BubbleInterface, JailbreakAttackOutput } from '@/interfaces/testInterfaces';
 
-const Jailbraking = () => {
+const Jailbreaking = () => {
     // ######################## stored Variables ########################
     const { hostname, port } = useBackendVariablesStore()
     const { attacks, model } = useNNTrustStore()
@@ -245,7 +245,7 @@ const Jailbraking = () => {
     }, [topShrink, topSectionH]);
 
     return (
-        <div className={styles.jailbraking_page}>
+        <div className={styles.jailbreaking_page}>
             {/* Header */}
             <HeaderPageTask
                 Icon={Unlink}
@@ -315,4 +315,4 @@ const Jailbraking = () => {
     )
 }
 
-export default Jailbraking
+export default Jailbreaking
