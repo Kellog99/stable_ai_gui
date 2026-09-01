@@ -69,7 +69,7 @@ export default function MessageThread({
         <div className="screen">
             {loading ? (
                 <div className="attack-loading" role="status" aria-live="polite">
-                    <span className="attack-loading__text">Executing the attack</span>
+                    <span className="attack-loading__text">Executing attack</span>
                     <span className="attack-loading__dots">
                         <span className="attack-loading__dot" />
                         <span className="attack-loading__dot" />

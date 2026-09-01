@@ -11,11 +11,11 @@
 .attack-loading {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 20px 6px;
+  gap: 8px;
+  padding: 10px 6px;
   color: #ccc;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
   user-select: none;
 }
 
@@ -25,8 +25,8 @@
 }
 
 .attack-loading__dot {
-  width: 7px;
-  height: 7px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: currentColor;
   opacity: 0.25;
