@@ -55,6 +55,7 @@
   color: #fff;
   display: flex;
   flex-direction: column;
+  border: 1px solid color-mix(in hsl, var(--bg-light) 25%, transparent);
 }
 
 
@@ -98,7 +99,19 @@
 .bubble p {
   color: darkgray;
   margin: 0;
-  font-size: 0.7rem;
+}
+
+/* Judge score — clearly visible badge under the message.
+   Background/border color is set inline per-score (green→red). */
+.bubble .bubble-score {
+  align-self: flex-start;
+  margin-top: 8px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
 }
 
 .bubble.model {

@@ -61,3 +61,11 @@ export interface AttackManagementProps {
   status: 'pending' | 'in_progress' | 'completed' | 'closed';
   progress: number
 }
+
+export interface ModelSpecs {
+  name: string;
+  task?: string;
+  num_classes?: number;
+  pretrained?: boolean;
+  type?: string;
+}

@@ -1,20 +1,32 @@
 import { DatasetInfo, ModelInfo } from '@/interfaces/homePageInterface';
 import { Modal, TableData, Table } from '@mantine/core';
 import { Info } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 interface InfoButtonProps {
   info?: ModelInfo | DatasetInfo
 }
 const InfoButton: React.FC<InfoButtonProps> = ({ info }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false)
-  const activeModal: TableData = {
+
+  const tableData: TableData = useMemo(() => ({
     body: info
-      ? Object.entries(info)
-        .filter(([key, value]) => !["id", "name"].includes(key) && value)
-        .map(([key, value]) => [key.replace("_", " "), value])
+      ? Object.entries(info).flatMap(([key, value]) => {
+        if (key === "id" || value == null) {
+          return [];
+        }
+
+        if (key === "transformation" && typeof value === "object") {
+          return Object.entries(value).map(([tKey, tValue]) => [
+            `transformation ${tKey}`,
+            Array.isArray(tValue) ? tValue.join(", ") : String(tValue),
+          ]);
+        }
+
+        return [[key.replace(/_/g, " "), String(value)]];
+      })
       : [],
-  };
+  }), [info]);
   return (
     <>
       <button
@@ -51,7 +63,7 @@ const InfoButton: React.FC<InfoButtonProps> = ({ info }) => {
               variant="vertical"
               layout="fixed"
               withTableBorder
-              data={activeModal}
+              data={tableData}
               className="info-table"
             />
           </>

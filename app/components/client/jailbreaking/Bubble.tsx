@@ -1,12 +1,13 @@
 import { Bot, User } from 'lucide-react';
 import './Bubble.css';
 import { useMemo } from 'react';
+import { scoreToColor } from './scoreColor';
 
 interface BubbleProps {
     msg: string;
     user: boolean;
     score?: number;
-    loading:boolean
+    loading: boolean
 }
 const Bubble: React.FC<BubbleProps> = ({
     msg,
@@ -20,9 +21,16 @@ const Bubble: React.FC<BubbleProps> = ({
     const text_component = useMemo(() => {
         return <div className={`bubble ${align} ${loading ? 'loading' : ''}`}>
             {msg}
-            {score && <p>Judge score = {score.toFixed(3)}</p>}
+            {!user && typeof score === 'number' && (
+                <p
+                    className="bubble-score"
+                    style={{ backgroundColor: scoreToColor(score), borderColor: scoreToColor(score) }}
+                >
+                    Judge score = {Math.round(score)}/10
+                </p>
+            )}
         </div>
-    }, [user, msg])
+    }, [user, msg, score])
     return (
         <div className={`bubble_container ${align}`}>
             {!user && <div className="icon_container model">{icon}</div>}

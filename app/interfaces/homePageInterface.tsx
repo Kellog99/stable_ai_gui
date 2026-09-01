@@ -13,11 +13,18 @@ export interface InfoProps {
     input_dimensionality: number[]    // dimensionality of each input or domain's dimensionality.
 }
 
+export interface Transformation {
+    mean: number[]
+    std: number[]
+    crop?: number
+    size?: number
+}
 // Model's information
 export interface ModelInfo extends InfoProps {
     dataset: string,                  // Dataset where the model had been optimized on 
     parameters: number | null,        // Number of the models' parameters
     type?: "llm" | "cv"               // Type of model that is used
+    transformation: Transformation
 }
 
 export interface DatasetInfo extends InfoProps {
