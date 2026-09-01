@@ -1,4 +1,4 @@
-import { CheckCircleIcon, RefreshCw, Save, Settings, TimerReset, Trash, X } from 'lucide-react';
+import { CheckCircle2, CheckCircleIcon, RefreshCw, Save, Settings, Settings2, X } from 'lucide-react';
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
@@ -67,9 +67,6 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
     };
 
 
-    const toNumber = (v: number | string): number =>
-        typeof v === 'number' ? v : Number(v) || 0;
-
 
     return (
         <Modal
@@ -77,16 +74,25 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
             onClose={onClose}
             size={500}
             title={
-                <Group
-                    gap="xs"
-                    style={{
-                        color: "black",
-                        fontWeight: 'bold'
-                    }}>
-                    <Settings size={24} />
-                    <span>Settings</span>
-                </Group>
+                <div className="parameters-header-content">
+                    <div className="parameters-icon">
+                        <Settings2 size={22} />
+                    </div>
+
+                    <div className='modal-title'>
+                        <p className="parameters-title">
+                            Parameters
+                        </p>
+
+                        <p className="parameters-subtitle">
+                            Configure the settings for this operation
+                        </p>
+                    </div>
+                </div>
             }
+            classNames={{
+                content: 'parameters-modal',
+            }}
             centered
         >
             {!parameters || parameters.length === 0 ? (
@@ -104,19 +110,42 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                 key={`${param.name}-${index}`}
                                 className="form-group"
                             >
-                                <div className="form-label">
-                                    <p>{param.name}</p>
+                                <div className="param-header">
+                                    <div className="param-title">
+                                        <p className="param-name">
+                                            {param.name}
+                                        </p>
+
+                                        {param.description && (
+                                            <p className="param-desc">
+                                                {param.description}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {param.kind !== 'enum' && (
+                                        <NumberInput
+                                            variant="filled"
+                                            size="xs"
+                                            w={100}
+                                            min={param.min}
+                                            max={param.max}
+                                            step={param.step}
+                                            allowDecimal={
+                                                !Number.isInteger(
+                                                    param.step ?? 1
+                                                )
+                                            }
+                                            allowNegative={
+                                                (param.min ?? 0) < 0
+                                            }
+                                            radius="md"
+                                            value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                            onChange={(value) => handleChange(index, Number(value) || 0)}
+                                        />
+                                    )}
                                 </div>
-                                {param.description && (
-                                    <p style={{
-                                        fontSize: '0.8rem',
-                                        color: '#6b7280',
-                                        marginTop: '0.25rem',
-                                        marginBottom: '0.75rem'
-                                    }}>
-                                        {param.description}
-                                    </p>
-                                )}
+
                                 {param.kind === "enum" ? (
                                     <Select
                                         size="xs"
@@ -127,40 +156,14 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                         onChange={(value) => value && handleChange(index, value)}
                                     />
                                 ) : (
-                                    <>
-                                        {param.id === "property_target_ratio" ? (
-                                            <Slider
-                                                min={param.min ?? 0}
-                                                max={param.max ?? 1}
-                                                step={0.05}
-                                                value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                                onChange={(value) => handleChange(index, value)}
-                                            />
-                                        ) : (
-                                            <>
-                                                <NumberInput
-                                                    variant="filled"
-                                                    size='xs'
-                                                    w={100}
-                                                    min={param.min}
-                                                    max={param.max}
-                                                    step={param.step}
-                                                    allowDecimal={!Number.isInteger(param.step ?? 1)}
-                                                    allowNegative={(param.min ?? 0) < 0}
-                                                    radius="md"
-                                                    value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                                    onChange={(value) => handleChange(index, Number(value) || 0)}
-                                                />
-                                                <Slider
-                                                    min={param.min ?? 0}
-                                                    max={param.max ?? 1}
-                                                    step={param.step ?? 0.01}
-                                                    value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                                    onChange={(value) => handleChange(index, value)}
-                                                />
-                                            </>
-                                        )}
-                                    </>
+
+                                    <Slider
+                                        min={param.min ?? 0}
+                                        max={param.max ?? 1}
+                                        step={param.step ?? 0.01}
+                                        value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                        onChange={(value) => handleChange(index, value)}
+                                    />
                                 )}
                             </div>
                         ))}
@@ -168,20 +171,39 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
                     {/* Footer */}
                     <div className="modal-footer">
-                        <button className="btn btn-ghost" onClick={handleReset}>
-                            <RefreshCw size={15} /> Reset
+                        <button
+                            className="footer-button reset"
+                            onClick={handleReset}
+                            type="button"
+                        >
+                            <RefreshCw size={16} />
+                            Reset
                         </button>
-                        <div className="btn-group">
-                            <button className="btn btn-outline" onClick={onClose}>
-                                <X size={15} /> Cancel
-                            </button>
+
+                        <div className="button-group">
                             <button
-                                className={`btn btn-primary ${isSaved ? 'btn-saved' : ''}`}
+                                className="footer-button cancel"
+                                onClick={onClose}
+                                type="button"
+                            >
+                                <X size={16} />
+                                Cancel
+                            </button>
+
+                            <button
+                                className={`footer-button save ${isSaved ? 'saving' : ''
+                                    }`}
                                 onClick={handleSave}
                                 disabled={isSaved}
+                                type="button"
                             >
-                                {isSaved ? <CheckCircleIcon size={15} /> : <Save size={15} />}
-                                {isSaved ? 'Saved' : 'Save'}
+                                {isSaved ? (
+                                    <CheckCircle2 size={16} />
+                                ) : (
+                                    <Save size={16} />
+                                )}
+
+                                {isSaved ? 'Saved' : 'Save changes'}
                             </button>
                         </div>
                     </div>
