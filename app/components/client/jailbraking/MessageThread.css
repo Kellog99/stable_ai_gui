@@ -1,9 +1,193 @@
 .screen {
   display: flex;
-  height: 100%;
+  height: auto;
+  min-height: fit-content;
   flex-direction: column;
   gap: 10px;
-  overflow-y: scroll;
+  overflow-y: visible;
+}
+
+/* Minimal loading indicator shown while the attack runs */
+.attack-loading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 6px;
+  color: #ccc;
+  font-size: 0.9rem;
+  font-weight: 600;
+  user-select: none;
+}
+
+.attack-loading__dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.attack-loading__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.25;
+  animation: attackLoadingDot 1.2s ease-in-out infinite;
+}
+
+.attack-loading__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.attack-loading__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes attackLoadingDot {
+  0%, 60%, 100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.attack-loading__text {
+  animation: attackLoadingText 1.2s ease-in-out infinite;
+}
+
+@keyframes attackLoadingText {
+  0%, 100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* ── Result summary bar ── */
+.history-toggle {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  background: transparent;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  opacity: 0;
+  animation: resultsReveal 0.45s ease-out 0.2s forwards;
+}
+
+.history-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes resultsReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.results-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  margin-top: 28px;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  opacity: 0;
+  animation: resultsReveal 0.45s ease-out 0.05s forwards;
+}
+
+.result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Success (high score) — green */
+.result-badge--success {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+}
+
+/* Failed (low score) — red */
+.result-badge--fail {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+}
+
+.result-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 64px;
+}
+
+.result-metric__value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.result-metric__label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: 0.03em;
+}
+
+/* ── Results card ── */
+.results-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px;
+  background: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
+  border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
+  border-radius: 12px;
+  opacity: 0;
+  animation: resultsReveal 0.5s ease-out 0.12s forwards;
+}
+
+.bubble-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bubble-label {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 5px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: color-mix(in hsl, var(--bg-light) 18%, transparent);
+  border-radius: 6px;
 }
 
 
