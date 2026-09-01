@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Bot, Scale, ExternalLink } from 'lucide-react';
 import { ModelInfo } from '@/interfaces/homePageInterface';
 import { getCoreElements } from '@/functionalities/TITANNServices/get_info';
@@ -119,32 +119,45 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
             .catch(err => console.error("Failed to load models:", err));
     }, [hostname, port]);
 
-    const [attackerMode, setAttackerMode] = useState<'repo' | 'ollama'>(
-        isOllamaModel(attackerModel) ? 'ollama' : 'repo'
-    );
-    const [judgeMode, setJudgeMode] = useState<'repo' | 'ollama'>(
-        isOllamaModel(judgeModel) ? 'ollama' : 'repo'
-    );
+    const [attackerMode, setAttackerMode] = useState<'repo' | 'ollama'>('repo');
+    const [judgeMode, setJudgeMode] = useState<'repo' | 'ollama'>('repo');
+
+    const effectiveAttackerModels = useMemo(() => {
+        if (attackerModel && isOllamaModel(attackerModel) && !listModels.some(m => m.id === attackerModel.id)) {
+            return [attackerModel, ...listModels];
+        }
+        return listModels;
+    }, [listModels, attackerModel]);
+
+    const effectiveJudgeModels = useMemo(() => {
+        if (judgeModel && isOllamaModel(judgeModel) && !listModels.some(m => m.id === judgeModel.id)) {
+            return [judgeModel, ...listModels];
+        }
+        return listModels;
+    }, [listModels, judgeModel]);
 
     const handleAttackerSelect = (val: string) => {
         if (val === '__target__') {
+            setAttackerMode('repo');
             onAttackerChange(null);
         } else if (val === '__ollama__') {
             setAttackerMode('ollama');
         } else {
             setAttackerMode('repo');
-            const found = listModels.find(m => m.id === val);
+            const found = effectiveAttackerModels.find(m => m.id === val);
             onAttackerChange(found ?? null);
         }
     };
+
     const handleJudgeSelect = (val: string) => {
         if (val === '__target__') {
+            setJudgeMode('repo');
             onJudgeChange(null);
         } else if (val === '__ollama__') {
             setJudgeMode('ollama');
         } else {
             setJudgeMode('repo');
-            const found = listModels.find(m => m.id === val);
+            const found = effectiveJudgeModels.find(m => m.id === val);
             onJudgeChange(found ?? null);
         }
     };
@@ -165,24 +178,27 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                     >
                         <option value="__target__">Use target model</option>
                         <option value="__ollama__">—— Custom Ollama model ——</option>
-                        {listModels.length > 0 && <option disabled>── Repository models ──</option>}
-                        {listModels.map((m) => (
+                        {effectiveAttackerModels.length > 0 && <option disabled>── Repository models ──</option>}
+                        {effectiveAttackerModels.map((m) => (
                             <option key={m.id} value={m.id}>
-                                {m.name} ({m.task ?? 'N/A'})
+                                {m.name} {isOllamaModel(m) ? '(Ollama)' : `(${m.task ?? 'N/A'})`}
                             </option>
                         ))}
                     </select>
                     {attackerMode === 'ollama' && (
                         <OllamaInput
                             value={attackerModel}
-                            onChange={onAttackerChange}
+                            onChange={(m) => {
+                                onAttackerChange(m);
+                                if (m && isOllamaModel(m)) setAttackerMode('repo');
+                            }}
                             label="Attacker"
                             icon={<Bot size={14} />}
                         />
                     )}
-                    {attackerMode === 'repo' && attackerModel && !isOllamaModel(attackerModel) && (
-                        <span className="model-selector-info">
-                            {attackerModel.name} &middot; {attackerModel.task}
+                    {attackerMode === 'repo' && attackerModel && (
+                        <span className="model-selector-info" style={{ color: isOllamaModel(attackerModel) ? 'rgb(187, 58, 58)' : undefined }}>
+                            {attackerModel.name} &middot; {isOllamaModel(attackerModel) ? `Ollama (${(attackerModel as any).api || 'http://localhost:11434'})` : attackerModel.task}
                         </span>
                     )}
                 </div>
@@ -200,24 +216,27 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                     >
                         <option value="__target__">Use target model</option>
                         <option value="__ollama__">—— Custom Ollama model ——</option>
-                        {listModels.length > 0 && <option disabled>── Repository models ──</option>}
-                        {listModels.map((m) => (
+                        {effectiveJudgeModels.length > 0 && <option disabled>── Repository models ──</option>}
+                        {effectiveJudgeModels.map((m) => (
                             <option key={m.id} value={m.id}>
-                                {m.name} ({m.task ?? 'N/A'})
+                                {m.name} {isOllamaModel(m) ? '(Ollama)' : `(${m.task ?? 'N/A'})`}
                             </option>
                         ))}
                     </select>
                     {judgeMode === 'ollama' && (
                         <OllamaInput
                             value={judgeModel}
-                            onChange={onJudgeChange}
+                            onChange={(m) => {
+                                onJudgeChange(m);
+                                if (m && isOllamaModel(m)) setJudgeMode('repo');
+                            }}
                             label="Judge"
                             icon={<Scale size={14} />}
                         />
                     )}
-                    {judgeMode === 'repo' && judgeModel && !isOllamaModel(judgeModel) && (
-                        <span className="model-selector-info">
-                            {judgeModel.name} &middot; {judgeModel.task}
+                    {judgeMode === 'repo' && judgeModel && (
+                        <span className="model-selector-info" style={{ color: isOllamaModel(judgeModel) ? 'rgb(187, 58, 58)' : undefined }}>
+                            {judgeModel.name} &middot; {isOllamaModel(judgeModel) ? `Ollama (${(judgeModel as any).api || 'http://localhost:11434'})` : judgeModel.task}
                         </span>
                     )}
                 </div>

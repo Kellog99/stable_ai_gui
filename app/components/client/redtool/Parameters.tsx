@@ -33,14 +33,21 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
     useEffect(() => {
         if (isOpen && parameters && parameters.length > 0) {
-            const defaults = parameters.map((p) => {
-                if (p.kind === 'enum') return typeof p.default === 'string' ? p.default : (p.options?.[0] ?? '');
-                if (typeof p.default === 'number') return p.default;
+            const currentValues = parameters.map((p) => {
+                if (p.default !== undefined && p.default !== null) return p.default;
+                if (p.kind === 'enum') return p.options?.[0] ?? '';
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
                 return 0;
             });
-            setValues(defaults);
+            const defaults = parameters.map((p) => {
+                if (typeof p.default === 'number' || typeof p.default === 'string') return p.default;
+                if (p.kind === 'enum') return p.options?.[0] ?? '';
+                if (p.max != null && p.min != null) return (p.max + p.min) / 2;
+                if (p.min != null) return p.min;
+                return 0;
+            });
+            setValues(currentValues);
             setDefaultValues(defaults);
             setIsSaved(false);
         }

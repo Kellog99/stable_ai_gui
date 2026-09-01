@@ -3,35 +3,67 @@ import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
+import useJailbreakStore from '@/store/jailbreakStore'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import styles from '@/styles/jailbreak.module.css'
 import { Send, Shield, Target, Unlink } from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import MessageThread from '@/components/client/jailbreaking/MessageThread';
 import ModelSelector from '@/components/client/jailbreaking/ModelSelector';
-import { ModelInfo } from '@/interfaces/homePageInterface';
 import { BubbleInterface, JailbreakAttackOutput } from '@/interfaces/testInterfaces';
 
 const Jailbreaking = () => {
     // ######################## stored Variables ########################
     const { hostname, port } = useBackendVariablesStore()
     const { attacks, model } = useNNTrustStore()
-    // ##################################################################
 
-    // Load persisted parameters from localStorage
-    const [savedParams, setSavedParams] = useState<Record<string, (number | string)[]>>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                return JSON.parse(localStorage.getItem('jailbreak_attack_params') || '{}');
-            } catch { return {}; }
-        }
-        return {};
-    });
+    const {
+        prompt,
+        setPrompt,
+        goal,
+        setGoal,
+        selectedAttackId,
+        setSelectedAttackId,
+        savedParams,
+        setSavedParams,
+        attackerModel,
+        setAttackerModel,
+        judgeModel,
+        setJudgeModel,
+        backendStartupId,
+        setBackendStartupId,
+        fullHistory,
+        conversationChat,
+        modelResponse,
+        adversarialPrompt,
+        setAdversarialPrompt,
+        attackSuccess,
+        bestScore,
+        attackMetadata,
+        isClicked,
+        setIsClicked,
+        setResults,
+        clearResults,
+    } = useJailbreakStore()
 
-    // Persist savedParams to localStorage whenever they change
+    // Check backend startup ID on mount to detect backend restart / turn off
     useEffect(() => {
-        localStorage.setItem('jailbreak_attack_params', JSON.stringify(savedParams));
-    }, [savedParams]);
+        if (!hostname || !port) return;
+        fetch(`http://${hostname}:${port}/`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.startup_id) {
+                    if (backendStartupId && backendStartupId !== data.startup_id) {
+                        clearResults();
+                    }
+                    setBackendStartupId(data.startup_id);
+                }
+            })
+            .catch(err => {
+                console.error("Failed to connect to backend for startup check:", err);
+            });
+    }, [hostname, port, backendStartupId, setBackendStartupId, clearResults]);
+    // ##################################################################
 
     // Helper: create a selectedAttack with saved params merged in
     const buildSelectedAttack = (attackId: string): RegisterObjectProps => {
@@ -46,31 +78,42 @@ const Jailbreaking = () => {
         return atk;
     };
 
-    const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>(() => {
-        const first = Object.values(attacks)[0];
-        if (first) return buildSelectedAttack(first.id);
-        return first;
-    });
-
     const nlpAttacks = useMemo(() => {
         return Object.fromEntries(Object.entries(attacks).filter(([_, atk]: [string, RegisterObjectProps]) => {
             return atk.objective && ["jailbreak", "prompt_injection"].includes(atk.objective.toLowerCase())
         }))
     }, [attacks])
-    useEffect(() => {
-        if (attacks && Object.keys(nlpAttacks).length > 0) {
-            setSelectedAttack(buildSelectedAttack(Object.values(nlpAttacks)[0].id));
+
+    const selectedAttack = useMemo(() => {
+        if (selectedAttackId && attacks[selectedAttackId]) {
+            return buildSelectedAttack(selectedAttackId);
         }
-    }, [attacks])
+        const first = Object.values(nlpAttacks)[0] || Object.values(attacks)[0];
+        if (first) return buildSelectedAttack(first.id);
+        return null;
+    }, [attacks, nlpAttacks, selectedAttackId, savedParams]);
 
-    const [prompt, setPrompt] = useState<string>(() => {
-        if (typeof window !== 'undefined') return localStorage.getItem('jailbreak_prompt') || "";
-        return "";
-    });
+    const attacksWithSavedParams = useMemo(() => {
+        return Object.fromEntries(
+            Object.entries(nlpAttacks).map(([id, atk]) => {
+                const saved = savedParams[id];
+                if (saved && atk.parameters && saved.length === atk.parameters.length) {
+                    const updatedParams = atk.parameters.map((param, i) => ({
+                        ...param,
+                        default: saved[i] ?? param.default,
+                    }));
+                    return [id, { ...atk, parameters: updatedParams }];
+                }
+                return [id, atk];
+            })
+        );
+    }, [nlpAttacks, savedParams]);
 
     useEffect(() => {
-        localStorage.setItem('jailbreak_prompt', prompt);
-    }, [prompt]);
+        if (attacks && Object.keys(nlpAttacks).length > 0 && !selectedAttackId) {
+            setSelectedAttackId(Object.values(nlpAttacks)[0].id);
+        }
+    }, [attacks, nlpAttacks, selectedAttackId, setSelectedAttackId]);
 
     //  This variable is for handling the possibility to do the attack
     const isActive = useMemo(() => {
@@ -78,52 +121,38 @@ const Jailbreaking = () => {
     }, [model, prompt, selectedAttack])
 
     const handleChange = (value: number[]) => {
-        setSelectedAttack(prev => {
-            if (!prev || !prev.parameters) return prev
+        if (!selectedAttack || !selectedAttack.parameters) return;
 
-            const newParameters = prev.parameters.map((param, i) => ({
-                ...param,
-                default: value[i]
-            }))
+        const newParameters = selectedAttack.parameters.map((param, i) => ({
+            ...param,
+            default: value[i]
+        }));
 
-            // Persist the new parameter values to localStorage
-            setSavedParams(prevSaved => ({
-                ...prevSaved,
-                [prev.id]: value,
-            }));
-
-            return { ...prev, parameters: newParameters }
-        })
+        // Persist the new parameter values to store
+        setSavedParams(prevSaved => ({
+            ...prevSaved,
+            [selectedAttack.id]: value,
+        }));
     }
-
-    // Attacker and judge model selection
-    const [attackerModel, setAttackerModel] = useState<ModelInfo | null>(null);
-    const [judgeModel, setJudgeModel] = useState<ModelInfo | null>(null);
-
-    const [goal, setGoal] = useState<string>();
-    const [fullHistory, setFullHistory] = useState<BubbleInterface[]>([]);
-    const [conversationChat, setConversationChat] = useState<BubbleInterface[][] | undefined>([]);
-    const [modelResponse, setModelResponse] = useState<string | undefined>("");
-    const [isClicked, setIsClicked] = useState<boolean>(false)
-    const [adversarialPrompt, setAdversarialPrompt] = useState<string>()
-    const [attackSuccess, setAttackSuccess] = useState<boolean | undefined>(undefined)
-    const [bestScore, setBestScore] = useState<number | undefined>(undefined)
-    const [attackMetadata, setAttackMetadata] = useState<Record<string, unknown> | undefined>(undefined)
 
     //  this function handles the submission of the prompt and sets the goal and adversarial prompt
     const handleSubmit = async () => {
-        if (isActive) {
-
+        if (isActive && selectedAttack) {
             setIsClicked(true)
-            setGoal(prompt)
+            const currentGoal = prompt
+            setGoal(currentGoal)
 
-            // these variables are for the deleting the previouse states
-            setAdversarialPrompt(undefined)
-            setConversationChat(undefined)
-            setModelResponse(undefined)
-            setAttackSuccess(undefined)
-            setBestScore(undefined)
-            setAttackMetadata(undefined)
+            // Clear previous states before starting
+            setResults({
+                goal: currentGoal,
+                fullHistory: [],
+                conversationChat: [],
+                modelResponse: "",
+                adversarialPrompt: undefined,
+                attackSuccess: false,
+                bestScore: 0,
+                attackMetadata: {},
+            })
 
             try {
                 const response = await fetch(`http://${hostname}:${port}/test/jailbreaking`, {
@@ -149,34 +178,36 @@ const Jailbreaking = () => {
 
                 const data: JailbreakAttackOutput = await response.json();
 
-                setAdversarialPrompt(data.best_prompt)
                 // Flat history for the "View Full Iteration History" expanded view
-                setFullHistory(data.history.map(turn => ({
+                const historyBubbles: BubbleInterface[] = data.history.map(turn => ({
                     sender: turn.role === "attacker" ? "user" : "model",
                     msg: turn.content,
                     score: turn.score
-                })));
-                // Grouped conversations for the chat switcher:
-                // Stateless attacks → each attempt is its own chat (attacker + target)
-                // Stateful attacks → one continuous chat from target_context
-                setConversationChat(data.conversations.map(chat =>
+                }));
+
+                // Grouped conversations for the chat switcher
+                const convBubbles: BubbleInterface[][] = data.conversations.map(chat =>
                     chat.map(turn => ({
                         sender: turn.role === "attacker" ? "user" : "model",
                         msg: turn.content,
                         score: turn.score,
                     }))
-                ))
-                setModelResponse(data.best_response)
-                setAttackSuccess(data.success)
-                setBestScore(data.best_score)
-                setAttackMetadata(data.metadata)
+                );
+
+                setResults({
+                    goal: currentGoal,
+                    fullHistory: historyBubbles,
+                    conversationChat: convBubbles,
+                    modelResponse: data.best_response,
+                    adversarialPrompt: data.best_prompt,
+                    attackSuccess: data.success,
+                    bestScore: data.best_score,
+                    attackMetadata: data.metadata,
+                });
             } catch (err) {
-                // Clear the goal so the loading indicator doesn't stay stuck
                 console.error('Jailbreaking attack failed:', err)
                 setGoal(undefined)
-                setAttackSuccess(undefined)
-                setBestScore(undefined)
-                setAttackMetadata(undefined)
+                setIsClicked(false)
             } finally {
                 setIsClicked(false)
             }
@@ -184,8 +215,6 @@ const Jailbreaking = () => {
     }
 
     // ── Scroll-linked shrink of the top section (vuln selection, models, goal) ──
-    // As the user scrolls down, the top area scales down, fades out, and the results
-    // are pulled up to fill the freed space. Driven by rAF for smoothness.
     const topSectionRef = useRef<HTMLDivElement>(null);
     const [topShrink, setTopShrink] = useState(0); // 0..1 progress
     const [topSectionH, setTopSectionH] = useState(0); // measured layout height
@@ -194,8 +223,6 @@ const Jailbreaking = () => {
         const section = topSectionRef.current;
         if (!section) return;
 
-        // Find the nearest scrollable ancestor (the app's single scroll container,
-        // .dashboard_main is a CSS module class -> hashed name, so walk up instead).
         let scroller: Element | null = section.parentElement;
         while (scroller && scroller !== document.body && scroller !== document.documentElement) {
             const s = window.getComputedStyle(scroller);
@@ -210,7 +237,6 @@ const Jailbreaking = () => {
             cancelAnimationFrame(raf);
             raf = requestAnimationFrame(() => {
                 const top = scroller!.scrollTop || 0;
-                // Full shrink after ~300px of scrolling
                 setTopShrink(Math.min(1, Math.max(0, top / 300)));
             });
         };
@@ -229,11 +255,8 @@ const Jailbreaking = () => {
         };
     }, []);
 
-    // Scale + fade + negative bottom margin (pulls MessageThread up, matching the shrink)
     const topShrinkStyle: React.CSSProperties = useMemo(() => {
         const scale = 1 - 0.15 * topShrink;
-        // Layout space lost to the scale (height * (1 - scale)) — compensate so the
-        // results slide up as the top compresses instead of leaving a gap.
         const lost = topSectionH * (1 - scale);
         return {
             transform: `scale(${scale})`,
@@ -251,17 +274,16 @@ const Jailbreaking = () => {
                 Icon={Unlink}
                 title="Jailbreaking"
                 descrition="Test on the loaded model, single attacks for a specific prompt."
-
             />
             <div className={styles.body}>
                 {/* Top section shrinks & fades while scrolling down. */}
                 <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
                     <VulnerabilitySelection
                         stretch
-                        attacks={nlpAttacks}
+                        attacks={attacksWithSavedParams}
                         selectedAttack={selectedAttack}
                         handleSelection={(attackId) => {
-                            setSelectedAttack(buildSelectedAttack(attackId))
+                            setSelectedAttackId(attackId)
                         }}
                         handleChange={(value: (string | number)[]) => handleChange(value as number[])}
                     />
@@ -311,8 +333,7 @@ const Jailbreaking = () => {
                 />
             </div>
         </div>
-
     )
 }
 
-export default Jailbreaking
+export default Jailbreaking;
