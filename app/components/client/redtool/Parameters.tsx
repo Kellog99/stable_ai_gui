@@ -66,7 +66,9 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
         }, 600);
     };
 
-
+    if (isOpen && parameters) {
+        console.log(parameters.map((param, index) => ([param.id, param.step, param.max])))
+    }
 
     return (
         <Modal
