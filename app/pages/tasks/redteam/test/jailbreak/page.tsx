@@ -48,6 +48,10 @@ const Jailbreaking = () => {
 
     // Check backend startup ID on mount to detect backend restart / turn off
     useEffect(() => {
+        // if (goal && !adversarialPrompt && !modelResponse) {
+        //     clearResults();
+        // }
+
         if (!hostname || !port) return;
         fetch(`http://${hostname}:${port}/`)
             .then(res => res.json())
@@ -61,8 +65,9 @@ const Jailbreaking = () => {
             })
             .catch(err => {
                 console.error("Failed to connect to backend for startup check:", err);
+                clearResults();
             });
-    }, [hostname, port, backendStartupId, setBackendStartupId, clearResults]);
+    }, [hostname, port, backendStartupId, setBackendStartupId, clearResults, goal, adversarialPrompt, modelResponse]);
     // ##################################################################
 
     // Helper: create a selectedAttack with saved params merged in

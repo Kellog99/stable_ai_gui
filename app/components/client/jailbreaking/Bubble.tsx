@@ -1,4 +1,4 @@
-import { Bot, User } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import './Bubble.css';
 import { useMemo } from 'react';
 import { scoreToColor } from './scoreColor';
@@ -15,7 +15,7 @@ const Bubble: React.FC<BubbleProps> = ({
     score,
     loading
 }) => {
-    const icon = user ? <User /> : <Bot />;
+    const icon = user ? <img src="/hacker.png" alt="Attacker" className="custom-icon" /> : <Bot />;
     const align = user ? 'user' : 'model';
 
     const text_component = useMemo(() => {

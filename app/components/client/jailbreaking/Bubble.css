@@ -23,13 +23,15 @@
 }
 
 .icon_container.user {
-  background: #475569;
+  background: transparent;
+  box-shadow: none;
 }
 
-.icon_container.user svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: white;
+.icon_container.user img {
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .icon_container.model {
