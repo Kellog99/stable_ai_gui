@@ -16,6 +16,15 @@ interface MessageThreadProps {
     metadata?: Record<string, unknown>;
 }
 
+const loadingSteps = [
+    "Initializing target, attacker, and judge models...",
+    "Configuring attack parameters and system prompts...",
+    "Generating initial adversarial prompt candidates...",
+    "Iterating prompt refinement and optimization...",
+    "Evaluating target responses with judge model...",
+    "Finalizing best jailbreak attempt..."
+];
+
 /** Number of attempts = number of conversations (each chat is one attempt). */
 function extractAttempts(conversationChat?: BubbleInterface[][]): number | undefined {
     return conversationChat && conversationChat.length > 0 ? conversationChat.length : undefined;
@@ -52,6 +61,7 @@ export default function MessageThread({
 }: MessageThreadProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [stepIndex, setStepIndex] = useState(0);
 
     useEffect(() => {
         setIsMounted(true);
@@ -62,19 +72,29 @@ export default function MessageThread({
     const attempts = extractAttempts(conversationChat);
     const duration = extractDuration(metadata);
 
+    useEffect(() => {
+        if (!loading) {
+            setStepIndex(0);
+            return;
+        }
+        const interval = setInterval(() => {
+            setStepIndex((prev) => (prev + 1) % loadingSteps.length);
+        }, 2800);
+        return () => clearInterval(interval);
+    }, [loading]);
+
     if (!isMounted) return <div className="screen" />;
     if (!goal) return <div className="screen" />
 
     return (
         <div className="screen">
             {loading ? (
-                <div className="attack-loading" role="status" aria-live="polite">
-                    <span className="attack-loading__text">Executing attack</span>
-                    <span className="attack-loading__dots">
-                        <span className="attack-loading__dot" />
-                        <span className="attack-loading__dot" />
-                        <span className="attack-loading__dot" />
-                    </span>
+                <div className="attack-loading-card" role="status" aria-live="polite">
+                    <div className="attack-loading-spinner" />
+                    <div className="attack-loading-content">
+                        <span className="attack-loading__title">Running Jailbreaking Attack</span>
+                        <span className="attack-loading__step">{loadingSteps[stepIndex]}</span>
+                    </div>
                 </div>
             ) : (
                 <>
