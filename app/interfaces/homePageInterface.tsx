@@ -23,6 +23,7 @@ export interface Transformation {
 export interface ModelInfo extends InfoProps {
     dataset: string,                  // Dataset where the model had been optimized on 
     parameters: number | null,        // Number of the models' parameters
+    model_type?: string,              // Library or API type (e.g. HuggingFace, Gemini, OpenRouter, Ollama)
     type?: "llm" | "cv"               // Type of model that is used
     transformation: Transformation
 }

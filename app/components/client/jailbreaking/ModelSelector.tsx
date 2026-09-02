@@ -29,8 +29,36 @@ function makeOllamaModelInfo(modelName: string, baseUrl: string): ModelInfo {
 
 /** Check whether a ModelInfo represents a user-entered Ollama model. */
 function isOllamaModel(model: ModelInfo | null): boolean {
-    return model !== null && !model.id.includes('/') && !model.id.startsWith('__');
+    return model !== null && model.model_type === 'Ollama';
 }
+
+/** Sort models by provider (model_type) and then alphabetically by name/id. */
+const sortModelsByProviderAndName = (models: ModelInfo[]) => {
+    return [...models].sort((a, b) => {
+        const typeA = a.model_type || 'Other';
+        const typeB = b.model_type || 'Other';
+        if (typeA !== typeB) {
+            return typeA.localeCompare(typeB);
+        }
+        const nameA = a.name || a.id || '';
+        const nameB = b.name || b.id || '';
+        return nameA.localeCompare(nameB);
+    });
+};
+
+/** Group sorted models by provider for optgroup rendering. */
+const getGroupedModels = (models: ModelInfo[]) => {
+    const sorted = sortModelsByProviderAndName(models);
+    const groups: { [provider: string]: ModelInfo[] } = {};
+    for (const m of sorted) {
+        const provider = m.model_type || 'Other';
+        if (!groups[provider]) {
+            groups[provider] = [];
+        }
+        groups[provider].push(m);
+    }
+    return groups;
+};
 
 interface OllamaInputProps {
     value: ModelInfo | null;
@@ -120,7 +148,13 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
     }, [hostname, port]);
 
     const [attackerMode, setAttackerMode] = useState<'repo' | 'ollama'>('repo');
-    const [judgeMode, setJudgeMode] = useState<'repo' | 'ollama'>('repo');
+    const [judgeMode, setJudgeMode] = useState<'repo' | 'ollama' | 'attacker'>('repo');
+
+    useEffect(() => {
+        if (judgeMode === 'attacker') {
+            onJudgeChange(attackerModel);
+        }
+    }, [attackerModel, judgeMode, onJudgeChange]);
 
     const effectiveAttackerModels = useMemo(() => {
         if (attackerModel && isOllamaModel(attackerModel) && !listModels.some(m => m.id === attackerModel.id)) {
@@ -153,6 +187,9 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
         if (val === '__target__') {
             setJudgeMode('repo');
             onJudgeChange(null);
+        } else if (val === '__attacker__') {
+            setJudgeMode('attacker');
+            onJudgeChange(attackerModel);
         } else if (val === '__ollama__') {
             setJudgeMode('ollama');
         } else {
@@ -178,12 +215,17 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                     >
                         <option value="__target__">Use target model</option>
                         <option value="__ollama__">—— Custom Ollama model ——</option>
-                        {effectiveAttackerModels.length > 0 && <option disabled>── Repository models ──</option>}
-                        {effectiveAttackerModels.map((m) => (
-                            <option key={m.id} value={m.id}>
-                                {m.name} {isOllamaModel(m) ? '(Ollama)' : `(${m.task ?? 'N/A'})`}
-                            </option>
-                        ))}
+                        {effectiveAttackerModels.length > 0 && (
+                            Object.entries(getGroupedModels(effectiveAttackerModels)).map(([provider, groupModels]) => (
+                                <optgroup key={provider} label={provider}>
+                                    {groupModels.map((m) => (
+                                        <option key={m.id} value={m.id}>
+                                            {m.name} {isOllamaModel(m) ? '(Ollama)' : `(${m.model_type ?? m.task ?? 'N/A'})`}
+                                        </option>
+                                    ))}
+                                </optgroup>
+                            ))
+                        )}
                     </select>
                     {attackerMode === 'ollama' && (
                         <OllamaInput
@@ -198,7 +240,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                     )}
                     {attackerMode === 'repo' && attackerModel && (
                         <span className="model-selector-info" style={{ color: isOllamaModel(attackerModel) ? 'rgb(187, 58, 58)' : undefined }}>
-                            {attackerModel.name} &middot; {isOllamaModel(attackerModel) ? `Ollama (${(attackerModel as any).api || 'http://localhost:11434'})` : attackerModel.task}
+                            {attackerModel.name} &middot; {isOllamaModel(attackerModel) ? `Ollama (${(attackerModel as any).api || 'http://localhost:11434'})` : (attackerModel.model_type ?? attackerModel.task)}
                         </span>
                     )}
                 </div>
@@ -211,17 +253,23 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                     </label>
                     <select
                         className="model-selector-dropdown"
-                        value={judgeMode === 'ollama' ? '__ollama__' : (judgeModel?.id ?? '__target__')}
+                        value={judgeMode === 'ollama' ? '__ollama__' : (judgeMode === 'attacker' ? '__attacker__' : (judgeModel?.id ?? '__target__'))}
                         onChange={(e) => handleJudgeSelect(e.target.value)}
                     >
                         <option value="__target__">Use target model</option>
+                        <option value="__attacker__">Use attacker model</option>
                         <option value="__ollama__">—— Custom Ollama model ——</option>
-                        {effectiveJudgeModels.length > 0 && <option disabled>── Repository models ──</option>}
-                        {effectiveJudgeModels.map((m) => (
-                            <option key={m.id} value={m.id}>
-                                {m.name} {isOllamaModel(m) ? '(Ollama)' : `(${m.task ?? 'N/A'})`}
-                            </option>
-                        ))}
+                        {effectiveJudgeModels.length > 0 && (
+                            Object.entries(getGroupedModels(effectiveJudgeModels)).map(([provider, groupModels]) => (
+                                <optgroup key={provider} label={provider}>
+                                    {groupModels.map((m) => (
+                                        <option key={m.id} value={m.id}>
+                                            {m.name} {isOllamaModel(m) ? '(Ollama)' : `(${m.model_type ?? m.task ?? 'N/A'})`}
+                                        </option>
+                                    ))}
+                                </optgroup>
+                            ))
+                        )}
                     </select>
                     {judgeMode === 'ollama' && (
                         <OllamaInput
@@ -236,7 +284,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                     )}
                     {judgeMode === 'repo' && judgeModel && (
                         <span className="model-selector-info" style={{ color: isOllamaModel(judgeModel) ? 'rgb(187, 58, 58)' : undefined }}>
-                            {judgeModel.name} &middot; {isOllamaModel(judgeModel) ? `Ollama (${(judgeModel as any).api || 'http://localhost:11434'})` : judgeModel.task}
+                            {judgeModel.name} &middot; {isOllamaModel(judgeModel) ? `Ollama (${(judgeModel as any).api || 'http://localhost:11434'})` : (judgeModel.model_type ?? judgeModel.task)}
                         </span>
                     )}
                 </div>
