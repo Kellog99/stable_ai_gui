@@ -9,17 +9,19 @@ export interface AttackConfig {
   confidence?: number;
 }
 export interface SingleAttackInput {
-  image: string,
+  input: string,
   attack: RegisterObjectProps,
   model: ModelInfo
 }
+export type ConfidenceSeries = number[] | { [key: string]: number };
+export type ConfidenceData = { [key: string]: ConfidenceSeries };
 export interface SingleAttackProps {
   adv_perturbation: string;
   x_adv: string;
   original_prediction: string;
   adversarial_prediction: string;
-  confidence: { [key: string]: number[] },
-  advance_metrics: { [key: string]: number }
+  confidence: ConfidenceData,
+  advance_metrics: { [key: string]: number | null }
 }
 
 export interface AttackStats {

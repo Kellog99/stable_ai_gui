@@ -42,6 +42,10 @@ export interface RegisterObjectProps {
   description: string
   task?: string
   objective?: string
+  type?: string
+  nature?: string
+  category?: string
+  attack_type?: string
   privacy_type?: string
   knowledge?: string
   parameters?: ParametersProps[]

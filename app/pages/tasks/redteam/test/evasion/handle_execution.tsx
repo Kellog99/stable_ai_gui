@@ -35,7 +35,6 @@ export async function handlePostRequest({
         setAdvImg(null)
         setAdvPert(null)
         setIsAttacking(true);
-
         try {
             // Extract base64 data safely
             const base64Image = file.includes(",")
@@ -44,10 +43,10 @@ export async function handlePostRequest({
 
             const input: SingleAttackInput = {
                 attack: attack,
-                image: base64Image,
+                input: base64Image,
                 model: model
             }
-            console.log(input)
+            console.log(attack)
             const response = await fetch(url, {
                 method: "POST",
                 body: JSON.stringify(input),
@@ -64,8 +63,6 @@ export async function handlePostRequest({
 
             const data: SingleAttackProps = await response.json();
 
-
-
             setAdvImg(data.x_adv)
             setAdvPert(data.adv_perturbation)
 
@@ -77,6 +74,7 @@ export async function handlePostRequest({
                 },
                 confidence: data.confidence,
                 metrics: data.advance_metrics,
+                parameters: attack.parameters?.map((parameter) => ({...parameter})),
             });
 
         } catch (error) {

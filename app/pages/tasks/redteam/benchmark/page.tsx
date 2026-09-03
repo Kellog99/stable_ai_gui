@@ -48,14 +48,16 @@ const Benchmark: React.FC = () => {
     id: string,
     map: { [key: string]: RegisterObjectProps },
     setMap: (map: { [key: string]: RegisterObjectProps }) => void,
-    completeList: { [key: string]: RegisterObjectProps }
+    completeList: { [key: string]: RegisterObjectProps },
+    visibleList: { [key: string]: RegisterObjectProps } = completeList
   ) => {
 
     if (id === 'all') {
-      setMap(completeList)
+      setMap({ ...map, ...visibleList })
     }
     else if (id === 'none') {
-      setMap({})
+      const visibleIds = new Set(Object.keys(visibleList));
+      setMap(Object.fromEntries(Object.entries(map).filter(([visibleId]) => !visibleIds.has(visibleId))))
     }
     else {
       const copiedMap = { ...map };
@@ -205,12 +207,14 @@ const Benchmark: React.FC = () => {
       <TableWrapper
         title='Vulnearbility selection'
         elements={attacks}
+        showAttackCategories
         selectedElement={selectedAttacks}
-        handleSelection={(id: string) => handleSelectionClick(
+        handleSelection={(id: string, visibleElements) => handleSelectionClick(
           id,
           selectedAttacks,
           setSelectedAttacks,
-          attacks
+          attacks,
+          visibleElements
         )}
         handleParametersChange={(id: string, parameters: number[]) => {
           handleParametersChange(
@@ -227,11 +231,12 @@ const Benchmark: React.FC = () => {
         title='Metric Selection'
         elements={metrics}
         selectedElement={selectedMetrics}
-        handleSelection={(id: string) => handleSelectionClick(
+        handleSelection={(id: string, visibleElements) => handleSelectionClick(
           id,
           selectedMetrics,
           setSelectedMetrics,
-          metrics
+          metrics,
+          visibleElements
         )}
         handleParametersChange={(id: string, parameters: number[]) => {
           handleParametersChange(id,

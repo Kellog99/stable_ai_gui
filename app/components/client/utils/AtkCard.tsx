@@ -19,6 +19,7 @@ export interface AttackCardProps {
     title: string,
     description: string,
     knowledge?: string,
+    category?: string,
     isActive: boolean,
     parameters: ParametersProps[],
     handleClick: () => void;
@@ -31,6 +32,7 @@ const AttackCard: React.FC<AttackCardProps> = ({
     isActive,
     description,
     knowledge,
+    category,
     parameters,
     handleClick,
     handleParametersChange
@@ -50,10 +52,13 @@ const AttackCard: React.FC<AttackCardProps> = ({
             className={`atk-card ${isActive ? 'active' : ''}`}
         >
             <div
-                className='title_container'
-                style={{ justifyContent: `${knowledge ? "space-between" : "center"}` }}>
-                {title}
-                {knowledge && (<div className='knowledge_container'>{knowledge}</div>)}
+                className={`title_container ${category || knowledge ? 'has_metadata' : 'no_metadata'}`}
+                >
+                <span className="attack_title">{title}</span>
+                {(category || knowledge) && <div className="attack_metadata">
+                    {category && <span className={`category_badge category_${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{category}</span>}
+                    {knowledge && (<div className='knowledge_container'>{knowledge}</div>)}
+                </div>}
             </div>
             <div className="icons_container">
                 <Tooltip
