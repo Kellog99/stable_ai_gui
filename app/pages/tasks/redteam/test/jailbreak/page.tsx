@@ -283,6 +283,7 @@ const Jailbreaking = () => {
             <div className={styles.body}>
                 {/* Top section shrinks & fades while scrolling down. */}
                 <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
+                {/* <div className={styles.top_section}> */}
                     <VulnerabilitySelection
                         stretch
                         attacks={attacksWithSavedParams}

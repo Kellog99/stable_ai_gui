@@ -126,6 +126,9 @@
 /* ── Result summary bar ── */
 .history-toggle {
   align-self: center;
+  margin-top: 0px;    /* space above the button */
+  margin-bottom: 10px; /* space below the button */
+  margin-left: 20px; /* space below the button */
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -220,13 +223,30 @@
 .results-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 14px;
   background: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
   border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
   border-radius: 12px;
+  overflow: hidden;
   opacity: 0;
   animation: resultsReveal 0.5s ease-out 0.12s forwards;
+}
+
+.results-card__body {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  height: 76vh;
+}
+
+.results-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .bubble-row {
