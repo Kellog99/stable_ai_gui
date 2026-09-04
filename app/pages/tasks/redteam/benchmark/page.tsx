@@ -40,9 +40,6 @@ const Benchmark: React.FC = () => {
     if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
         delete modifiedSelectedElement.confusionmatrix;
     }
-    const datasetName = dataset?.name
-    const modelName = useNNTrustStore((state) => state.model)?.name
-
 
     // Handler for the element's
     const handleSelectionClick = (
@@ -137,8 +134,8 @@ const Benchmark: React.FC = () => {
                     disabledDescription: description,
                     handleClick: () => handleClick({
                         url: `http://${hostname}:${port}/job/start_benchmark`,
-                        model: modelName,
-                        dataset: datasetName,
+                        model: model,
+                        dataset: dataset,
                         attacks: Object.values(selectedAttacks),
                         metrics: Object.values(modifiedSelectedElement),
                         isExecuting,

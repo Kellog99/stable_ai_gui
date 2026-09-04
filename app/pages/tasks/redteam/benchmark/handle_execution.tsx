@@ -1,9 +1,10 @@
 import {RegisterObjectProps} from '@/interfaces/NNInterfaces';
+import {DatasetInfo, ModelInfo} from "@/interfaces/homePageInterface";
 
 interface HandleBenchmarkRequestParams {
     url: string;
-    model: string | undefined;
-    dataset: string | undefined;
+    model: ModelInfo | null;
+    dataset: DatasetInfo | null;
     attacks: RegisterObjectProps[];
     metrics: RegisterObjectProps[];
     isExecuting: boolean;
@@ -74,35 +75,44 @@ export async function handleClick(
 
     setIsExecuting(true);
     try {
-        const requestBody = {model, dataset, attacks, metrics};
-        saveBodyToJson(requestBody);
+        if (model || dataset) {
+            const requestBody = {
+                model,
+                dataset,
+                attacks,
+                metrics
+            };
+            console.log("model = ", model)
+            console.log("dataset = ", dataset)
+            saveBodyToJson(requestBody);
 
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(requestBody),
-        });
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(requestBody),
+            });
 
-        const responseBody = await response.text();
-        if (!response.ok) {
-            throw new Error(getErrorMessage(responseBody, response.status));
+            const responseBody = await response.text();
+            if (!response.ok) {
+                throw new Error(getErrorMessage(responseBody, response.status));
+            }
+
+            let parsedBody: unknown;
+            try {
+                parsedBody = responseBody ? JSON.parse(responseBody) : undefined;
+            } catch {
+                throw new Error('The benchmark service returned an invalid JSON response.');
+            }
+
+            const benchmarkId = getBenchmarkId(parsedBody);
+            if (benchmarkId === undefined) {
+                throw new Error('The benchmark service response did not contain a benchmark ID.');
+            }
+
+            setSelectedAttackList(selectedAttacks);
+            setBenchmarkId(benchmarkId);
+            setIsClicked(true);
         }
-
-        let parsedBody: unknown;
-        try {
-            parsedBody = responseBody ? JSON.parse(responseBody) : undefined;
-        } catch {
-            throw new Error('The benchmark service returned an invalid JSON response.');
-        }
-
-        const benchmarkId = getBenchmarkId(parsedBody);
-        if (benchmarkId === undefined) {
-            throw new Error('The benchmark service response did not contain a benchmark ID.');
-        }
-
-        setSelectedAttackList(selectedAttacks);
-        setBenchmarkId(benchmarkId);
-        setIsClicked(true);
     } catch (error) {
         console.error('Error starting benchmark:', error);
     } finally {

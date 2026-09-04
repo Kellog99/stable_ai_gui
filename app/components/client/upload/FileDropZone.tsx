@@ -30,9 +30,6 @@ const FileDropZone = <T extends ModelInfo | DatasetInfo>(
         handleRefresh,
     }: FileDropZoneProps<T>
 ) => {
-    // Track which button/view is active by name, not a stale node
-    const [isRepo, setIsRepo] = useState<boolean>(true);
-
     return (
         <div className="containerDropzone">
             <div>
