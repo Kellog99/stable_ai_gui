@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import './TableWrapper.css';
-import { Search, SlidersHorizontal } from 'lucide-react';
-import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
+import {Search, SlidersHorizontal} from 'lucide-react';
+import {RegisterObjectProps} from '@/interfaces/NNInterfaces';
 import AttackCard from '../utils/AtkCard';
 
 
@@ -38,13 +38,13 @@ const getAttackCategory = (attack: RegisterObjectProps) => {
 };
 
 const TableWrapper: React.FC<TableWrapperProps> = ({
-    title,
-    elements,
-    selectedElement,
-    handleSelection,
-    handleParametersChange,
-    showAttackCategories = false,
-}) => {
+                                                       title,
+                                                       elements,
+                                                       selectedElement,
+                                                       handleSelection,
+                                                       handleParametersChange,
+                                                       showAttackCategories = false,
+                                                   }) => {
 
     const [query, setQuery] = useState("");
     const [category, setCategory] = useState("all");
@@ -77,7 +77,7 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 <div className="search-container">
                     <Search
                         size={"calc(var(--icon-size) * 0.8)"}
-                        className="search-icon" />
+                        className="search-icon"/>
                     <input
                         type="text"
                         placeholder="Search"
@@ -86,7 +86,7 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                     />
                 </div>
                 {showAttackCategories && <label className="category-filter">
-                    <SlidersHorizontal size={"calc(var(--icon-size) * 0.8)"} />
+                    <SlidersHorizontal size={"calc(var(--icon-size) * 0.8)"}/>
                     <span>Nature</span>
                     <select value={category} onChange={(e) => setCategory(e.target.value)}>
                         <option value="all">All</option>
@@ -96,11 +96,17 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 <div className='buttons-container'>
                     <button
                         className="button"
-                        onClick={() => { handleSelection("all", filteredItems) }}
-                    > Select All </button>
+                        onClick={() => {
+                            handleSelection("all", filteredItems)
+                        }}
+                    > Select All
+                    </button>
                     <button
                         className="button"
-                        onClick={() => { handleSelection("none", filteredItems) }}> Deselect All </button>
+                        onClick={() => {
+                            handleSelection("none", filteredItems)
+                        }}> Deselect All
+                    </button>
                 </div>
             </div>
             {Object.entries(filteredItems).length > 0 ?
@@ -118,7 +124,9 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                                 isActive={Object.keys(selectedElement).includes(id)}
                                 parameters={atk.parameters ? atk.parameters : []}
                                 handleClick={() => handleSelection(atk.id)}
-                                handleParametersChange={(parameters: (number | string)[]) => { handleParametersChange(id, parameters as number[]) }}
+                                handleParametersChange={(parameters: (number | string)[]) => {
+                                    handleParametersChange(id, parameters as number[])
+                                }}
                             />
                         ))
                     }

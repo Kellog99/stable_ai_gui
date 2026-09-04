@@ -1,23 +1,24 @@
-import React, { useMemo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import React, {useMemo, useState} from "react";
+import {RefreshCw, Trash2} from "lucide-react";
 import "./FileRepository.css";
-import { DatasetInfo, ModelInfo } from "@/interfaces/homePageInterface";
-import { TaskType } from "@/interfaces/NNInterfaces";
+import {DatasetInfo, ModelInfo} from "@/interfaces/homePageInterface";
+import {TaskType} from "@/interfaces/NNInterfaces";
 import InfoButton from "./InfoButton";
 
-interface RepositoryProps {
-    activeId: string | undefined;
-    elements: ModelInfo[] | DatasetInfo[];
-    handleDelete: (elem: ModelInfo | DatasetInfo) => void;
-    handleSelection: (element: ModelInfo | DatasetInfo) => void;
+interface RepositoryProps<T extends ModelInfo | DatasetInfo> {
+    elements: T[];
+    handleDelete: (elem: T) => void;
+    handleSelection: (element: T | null) => void;
+    handleRefresh?: () => void;
 }
 
-const Repository: React.FC<RepositoryProps> = ({
-    activeId,
-    elements,
-    handleDelete,
-    handleSelection,
-}) => {
+const Repository = <T extends ModelInfo | DatasetInfo>(
+    {
+        elements,
+        handleDelete,
+        handleSelection,
+        handleRefresh,
+    }: RepositoryProps<T>) => {
     // This variable is for keeping, locally, track of the selected element
     const [selectedElement, setSelectedElement] = useState<string>("")
 
@@ -48,7 +49,6 @@ const Repository: React.FC<RepositoryProps> = ({
     }, [elements, searchQuery, taskFilter]);
 
 
-
     return (
         <div className="file_repository_container">
             <div className="filters">
@@ -59,66 +59,84 @@ const Repository: React.FC<RepositoryProps> = ({
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <select
-                    className="task-select"
-                    value={taskFilter}
-                    onChange={(e) => setTaskFilter(e.target.value as TaskType | 'all')}
-                >
-                    {taskOptions.map((t) => (
-                        <option key={t} value={t}>
-                            {t === 'all'
-                                ? 'All Tasks'
-                                : t.charAt(0).toUpperCase() + t.slice(1)}
-                        </option>
-                    ))}
-                </select>
+                <div className="task-filter-group">
+                    <select
+                        className="task-select"
+                        value={taskFilter}
+                        onChange={(e) => setTaskFilter(e.target.value as TaskType | 'all')}
+                    >
+                        {taskOptions.map((t) => (
+                            <option key={t} value={t}>
+                                {t === 'all'
+                                    ? 'All Tasks'
+                                    : t.charAt(0).toUpperCase() + t.slice(1)}
+                            </option>
+                        ))}
+                    </select>
+                    {handleRefresh && (
+                        <button
+                            type="button"
+                            className="refresh-repository-button"
+                            onClick={handleRefresh}
+                            aria-label="Refresh repository"
+                            data-tooltip="Update the repository list"
+                        >
+                            <RefreshCw size={16}/>
+                        </button>
+                    )}
+                </div>
             </div>
             <div className="table-wrapper">
                 <table className="repository-table">
                     <thead className="table-header">
-                        <tr>
-                            <th></th>
-                            <th>Name</th>
-                            <th>Task</th>
-                            <th>Created</th>
-                            <th>Delete</th>
-                        </tr>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Task</th>
+                        <th>Created</th>
+                        <th>Delete</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {filteredElements.map((elem: ModelInfo | DatasetInfo) => (
-                            <tr
-                                key={elem.id}
-                                className={`table-row ${selectedElement === elem.id ? 'selected' : ''}`}
-                                onClick={() => {
+                    {filteredElements.map((elem: T) => (
+                        <tr
+                            key={elem.id}
+                            className={`table-row ${selectedElement === elem.id ? 'selected' : ''}`}
+                            onClick={() => {
+                                if (elem.id !== selectedElement) {
                                     handleSelection(elem)
                                     setSelectedElement(elem.id)
-                                }}
-                            >
-                                <td>
-                                    <InfoButton info={elem} />
-                                </td>
-                                <td>
-                                    <div className="name-container">{elem.name}</div>
-                                </td>
-                                <td>
-                                    <div className={`container_task ${elem.task ?? 'unknown'}`}>
-                                        {elem.task ?? "Unknown"}
-                                    </div>
-                                </td>
-                                <td>{elem.date ?? "Not registered"}</td>
-                                <td>
-                                    <button
-                                        className="table-btn delete"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDelete(elem);
-                                        }}
-                                    >
-                                        <Trash2 size={18} color="red" />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                                } else {
+                                    handleSelection(null)
+                                    setSelectedElement("")
+                                }
+                            }}
+                        >
+                            <td>
+                                <InfoButton info={elem}/>
+                            </td>
+                            <td>
+                                <div className="name-container">{elem.name}</div>
+                            </td>
+                            <td>
+                                <div className={`container_task ${elem.task ?? 'unknown'}`}>
+                                    {elem.task ?? "Unknown"}
+                                </div>
+                            </td>
+                            <td>{elem.date ?? "Not registered"}</td>
+                            <td>
+                                <button
+                                    className="table-btn delete"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(elem);
+                                    }}
+                                >
+                                    <Trash2 size={18} color="red"/>
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </div>

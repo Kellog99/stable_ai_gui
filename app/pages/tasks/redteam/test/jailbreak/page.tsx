@@ -278,7 +278,7 @@ const Jailbreaking = () => {
             <HeaderPageTask
                 Icon={Unlink}
                 title="Jailbreaking"
-                descrition="Test on the loaded model, single attacks for a specific prompt."
+                description="Test on the loaded model, single attacks for a specific prompt."
             />
             <div className={styles.body}>
                 {/* Top section shrinks & fades while scrolling down. */}

@@ -14,8 +14,8 @@ export interface ButtonsProps {
 export interface HeaderPageTaskProps {
     Icon: LucideIcon,
     title: string,
-    descrition?: string,
-    buttonprops?: ButtonsProps
+    description?: string,
+    button_props?: ButtonsProps
 }
 /**
 * @param Icon: this is the icon to show as the representative
@@ -26,8 +26,8 @@ export interface HeaderPageTaskProps {
 const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
     Icon,
     title,
-    descrition,
-    buttonprops
+    description,
+    button_props
 }) => {
 
     return (
@@ -36,26 +36,26 @@ const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
                 <Icon size={"calc(var(--icon-size) * 3)"} color='red' />
                 <div>
                     <h1 style={{ margin: "0", fontSize: "2.1rem" }}>{title}</h1>
-                    {descrition && (<p style={{ color: "lightgray", margin: 0, fontSize:"0.8rem" }}>{descrition}</p>)}
+                    {description && (<p style={{ color: "lightgray", margin: 0, fontSize:"0.8rem" }}>{description}</p>)}
                 </div>
             </div>
             {
-                buttonprops ?
+                button_props ?
                     <HoverCard
                         width={170}
                         shadow="md"
-                        disabled={!buttonprops.isDisabled}>
+                        disabled={!button_props.isDisabled}>
                         <HoverCard.Target>
                             <div>
                                 <button
-                                    disabled={buttonprops.isDisabled}
-                                    onClick={buttonprops.handleClick}
-                                    className={`header-button ${buttonprops.isDisabled ? 'disabled' : ''}`}>
-                                    {buttonprops.description} {buttonprops.Icon ? <buttonprops.Icon size={25} /> : <CircleArrowRight size={25} />}
+                                    disabled={button_props.isDisabled}
+                                    onClick={button_props.handleClick}
+                                    className={`header-button ${button_props.isDisabled ? 'disabled' : ''}`}>
+                                    {button_props.description} {button_props.Icon ? <button_props.Icon size={25} /> : <CircleArrowRight size={25} />}
                                 </button>
                             </div>
                         </HoverCard.Target>
-                        <HoverCard.Dropdown>{buttonprops.disabledDescription}</HoverCard.Dropdown>
+                        <HoverCard.Dropdown>{button_props.disabledDescription}</HoverCard.Dropdown>
                     </HoverCard>
                     : null
             }

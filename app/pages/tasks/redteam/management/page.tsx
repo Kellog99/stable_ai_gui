@@ -137,8 +137,8 @@ const TaskManagement: React.FC = () => {
             <HeaderPageTask
                 Icon={AppWindowIcon}
                 title="Job Status Management"
-                descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
-                buttonprops={{
+                description="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
+                button_props={{
                     description: "Vulnerability Report",
                     isDisabled: isDisabled,
                     disabledDescription: description,

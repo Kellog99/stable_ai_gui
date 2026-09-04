@@ -1,7 +1,7 @@
-import { ModelInfo } from "@/interfaces/homePageInterface";
-import { RegisterObjectProps } from "@/interfaces/NNInterfaces";
-import { SingleAttackInput, SingleAttackProps } from "@/interfaces/testInterfaces";
-import { AttackResults } from "./page";
+import {ModelInfo} from "@/interfaces/homePageInterface";
+import {RegisterObjectProps} from "@/interfaces/NNInterfaces";
+import {SingleAttackInput, SingleAttackProps} from "@/interfaces/testInterfaces";
+import {AttackResults} from "./page";
 
 interface HandlePostRequestParams {
     url: string;
@@ -16,19 +16,19 @@ interface HandlePostRequestParams {
 }
 
 /*
-This function is responsable for handling the post request for the single attack.
+This function is responsible for handling the post request for the single attack.
 */
 export async function handlePostRequest({
-    url,
-    file,
-    model,
-    attack,
-    isAttacking,
-    setAdvImg,
-    setAdvPert,
-    setIsAttacking,
-    setAttackResults
-}: HandlePostRequestParams) {
+                                            url,
+                                            file,
+                                            model,
+                                            attack,
+                                            isAttacking,
+                                            setAdvImg,
+                                            setAdvPert,
+                                            setIsAttacking,
+                                            setAttackResults
+                                        }: HandlePostRequestParams) {
     // At this moment there could be one click at the time
     // If an attack has been executed then the button will not be available untill the attack finishes its process. 
     if (!!(file && model && attack && !isAttacking)) {

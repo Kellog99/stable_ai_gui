@@ -30,9 +30,9 @@ export interface ParametersProps {
   min?: number
   max?: number
   step?: number
-  default: number | string
+  default: number | string | boolean
   description: string
-  kind?: 'number' | 'enum'
+  kind?: 'number' | 'enum' | 'boolean'
   options?: string[]
 }
 

@@ -6,8 +6,11 @@
 
 .filters {
     display: grid;
-    grid-template-columns: 4fr 1fr;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 1fr);
     gap: 10px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     font-size: 0.9rem;
     background-color: color-mix(in hsl,
             var(--bg-dark) 40%,
@@ -20,6 +23,9 @@
 .search-input {
     border-radius: calc(2*var(--border-radius));
     padding-left: 10px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .task-select {
@@ -30,6 +36,67 @@
             var(--bg) 90%);
     color: white;
     border: none;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.task-filter-group {
+    display: flex;
+    flex: 1;
+    gap: 0.4rem;
+    min-width: 0;
+    overflow: visible;
+}
+
+.task-filter-group .task-select {
+    flex: 1;
+}
+
+.refresh-repository-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 35px;
+    width: 35px;
+    min-width: 35px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: calc(2 * var(--border-radius));
+    background: color-mix(in hsl, var(--bg-dark) 50%, var(--bg) 50%);
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.refresh-repository-button:hover {
+    background: color-mix(in hsl, var(--bg-dark) 30%, var(--bg) 70%);
+}
+
+.refresh-repository-button::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 8px);
+    z-index: 10;
+    width: max-content;
+    max-width: 180px;
+    padding: 0.4rem 0.55rem;
+    border-radius: 0.35rem;
+    background: var(--bg-dark);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 400;
+    line-height: 1.2;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.refresh-repository-button:hover::after,
+.refresh-repository-button:focus-visible::after {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .table-wrapper {

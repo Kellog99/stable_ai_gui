@@ -53,7 +53,7 @@ function Test() {
                     ? {...attack, parameters: attackParameterOverrides[id]}
                     : attack
             ])
-        ) as {[key: string]: RegisterObjectProps}
+        ) as { [key: string]: RegisterObjectProps }
     }, [attacks, attackParameterOverrides])
 
     const selectedAttack = selectedAttackId ? displayedAttacks[selectedAttackId] : undefined
@@ -104,7 +104,7 @@ function Test() {
             <HeaderPageTask
                 Icon={Shield}
                 title="Evasion Attack"
-                descrition="Test on the loaded model single attack for a specific image."
+                description="Test on the loaded model single attack for a specific image."
 
             />
             <div className={styles.content_container}>
@@ -218,15 +218,15 @@ function Test() {
                         </button>
                     </div>
                 </div>
-                    {showResults ? (
-                        <div className={styles.results_container}>
-                            <AttackVisualization
-                                prediction={attackResults.prediction}
-                                confidence={attackResults.confidence}
-                                results={attackResults.metrics}
-                                parameters={attackResults.parameters}/>
-                        </div>
-                    ) : null}
+                {showResults ? (
+                    <div className={styles.results_container}>
+                        <AttackVisualization
+                            prediction={attackResults.prediction}
+                            confidence={attackResults.confidence}
+                            results={attackResults.metrics}
+                            parameters={attackResults.parameters}/>
+                    </div>
+                ) : null}
             </div>
         </div>
     );

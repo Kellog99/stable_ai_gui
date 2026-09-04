@@ -1,92 +1,58 @@
 "use client"
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import './FileDropZone.css';
-import { DatasetInfo, InfoUploader, ModelInfo } from '@/interfaces/homePageInterface';
-import { InfoLoader } from './InfoLoader';
-import { Database, LucideIcon, Upload } from 'lucide-react';
-import { DragDrop } from './DragDrop';
+import {DatasetInfo, InfoUploader, ModelInfo} from '@/interfaces/homePageInterface';
+import {InfoLoader} from './InfoLoader';
+import {LucideIcon} from 'lucide-react';
 import FileRepository from '../repository/FileRepository';
 
-export interface FileDropZoneProps {
-    id: string,
+export interface FileDropZoneProps<T extends ModelInfo | DatasetInfo = ModelInfo | DatasetInfo> {
     title: string,
     description: string,
-    elements: ModelInfo[] | DatasetInfo[];
+    elements: T[];
     Icon: LucideIcon,
     fileDropInformation: InfoUploader,
-    handleSelection: (element: ModelInfo | DatasetInfo) => void,
-    handleDeletion: (element: ModelInfo | DatasetInfo) => void;
-    handleFileUpload: (file: File | null) => void;
+    handleSelection: (element: T | null) => void,
+    handleDeletion: (element: T) => void;
+    handleRefresh?: () => void;
 }
 
 
-const FileDropZone: React.FC<FileDropZoneProps> = ({
-    id,
-    title,
-    description,
-    elements,
-    Icon,
-    fileDropInformation,
-    handleSelection,
-    handleDeletion,
-    handleFileUpload
-}) => {
+const FileDropZone = <T extends ModelInfo | DatasetInfo>(
+    {
+        title,
+        description,
+        elements,
+        Icon,
+        fileDropInformation,
+        handleSelection,
+        handleDeletion,
+        handleRefresh,
+    }: FileDropZoneProps<T>
+) => {
     // Track which button/view is active by name, not a stale node
     const [isRepo, setIsRepo] = useState<boolean>(true);
-
-    const renderActiveChild = () => {
-        if (isRepo) {
-            return (
-                <FileRepository
-                    elements={elements}
-                    handleSelection={handleSelection}
-                    handleDelete={handleDeletion}
-                />
-            );
-        }
-        return (
-            <DragDrop
-                name={"Load your Dataset"}
-                Icon={Database}
-                acceptedType={"zip"}
-                description={'Make sure your zip contains raw data and a json config file.'}
-                handleFileUpload={handleFileUpload}
-            />
-        );
-
-    };
 
     return (
         <div className="containerDropzone">
             <div>
                 <h1 className="container_header">
-                    <Icon size={30} /> {title} Selection <InfoLoader config={fileDropInformation} />
+                    <Icon size={30}/> {title} Selection <InfoLoader config={fileDropInformation}/>
                 </h1>
                 <p className="container_description">
                     {description}
                 </p>
             </div>
-
-            <div className="selection_buttons">
-                <button
-                    onClick={() => setIsRepo(false)}
-                    className={`selection-button ${!isRepo ? "active" : ""}`}>
-                    <Upload size={18} />
-                    Upload
-                </button>
-
-                <button
-                    onClick={() => setIsRepo(true)}
-                    className={`selection-button ${isRepo ? "active" : ""}`}>
-                    <Icon size={18} />
-                    <span>Repository</span>
-                </button>
-            </div>
             <div className="child_container">
-                {renderActiveChild()}
+                <FileRepository<T>
+                    elements={elements}
+                    handleSelection={handleSelection}
+                    handleDelete={handleDeletion}
+                    handleRefresh={handleRefresh}
+                />
             </div>
         </div>
     );
-}
+};
 
 export default FileDropZone;
