@@ -99,9 +99,9 @@ export async function getCoreElements(
   hostname: string,
   port: string,
   repository: string,
-  file_checker: string,
+  model_type: string,
 ): Promise<ModelInfo[] | DatasetInfo[] | ModelReportProps[]> {
-  const response = await fetch(`http://${hostname}:${port}/repository/getList?file_checker=${file_checker}&repo_path=${repository}`);
+  const response = await fetch(`http://${hostname}:${port}/repository/getList?model_type=${model_type}&repo_path=${repository}`);
   if (!response.ok) throw new Error('Failed to get model info from the backend');
   return response.json();
 }

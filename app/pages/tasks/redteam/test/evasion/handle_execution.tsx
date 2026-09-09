@@ -1,7 +1,7 @@
-import { ModelInfo } from "@/interfaces/homePageInterface";
-import { RegisterObjectProps } from "@/interfaces/NNInterfaces";
-import { SingleAttackInput, SingleAttackProps } from "@/interfaces/testInterfaces";
-import { AttackResults } from "./page";
+import {ModelInfo} from "@/interfaces/homePageInterface";
+import {RegisterObjectProps} from "@/interfaces/NNInterfaces";
+import {SingleAttackInput, SingleAttackProps} from "@/interfaces/testInterfaces";
+import {AttackResults} from "./page";
 
 interface HandlePostRequestParams {
     url: string;
@@ -16,26 +16,25 @@ interface HandlePostRequestParams {
 }
 
 /*
-This function is responsable for handling the post request for the single attack.
+This function is responsible for handling the post request for the single attack.
 */
 export async function handlePostRequest({
-    url,
-    file,
-    model,
-    attack,
-    isAttacking,
-    setAdvImg,
-    setAdvPert,
-    setIsAttacking,
-    setAttackResults
-}: HandlePostRequestParams) {
+                                            url,
+                                            file,
+                                            model,
+                                            attack,
+                                            isAttacking,
+                                            setAdvImg,
+                                            setAdvPert,
+                                            setIsAttacking,
+                                            setAttackResults
+                                        }: HandlePostRequestParams) {
     // At this moment there could be one click at the time
     // If an attack has been executed then the button will not be available untill the attack finishes its process. 
     if (!!(file && model && attack && !isAttacking)) {
         setAdvImg(null)
         setAdvPert(null)
         setIsAttacking(true);
-
         try {
             // Extract base64 data safely
             const base64Image = file.includes(",")
@@ -44,10 +43,10 @@ export async function handlePostRequest({
 
             const input: SingleAttackInput = {
                 attack: attack,
-                image: base64Image,
+                input: base64Image,
                 model: model
             }
-            console.log(input)
+            console.log(attack)
             const response = await fetch(url, {
                 method: "POST",
                 body: JSON.stringify(input),
@@ -64,8 +63,6 @@ export async function handlePostRequest({
 
             const data: SingleAttackProps = await response.json();
 
-
-
             setAdvImg(data.x_adv)
             setAdvPert(data.adv_perturbation)
 
@@ -77,6 +74,7 @@ export async function handlePostRequest({
                 },
                 confidence: data.confidence,
                 metrics: data.advance_metrics,
+                parameters: attack.parameters?.map((parameter) => ({...parameter})),
             });
 
         } catch (error) {

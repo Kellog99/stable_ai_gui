@@ -8,7 +8,7 @@ import useNNTrustStore from '@/store/nnTrustStore';
 import useBackendVariablesStore from '@/store/globalStore';
 import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import { PrivacyAttackOutput, PrivacyDatasetInfo, PrivacyModelInfo } from '@/interfaces/privacyInterfaces';
-import { getAttacksList, getPrivacyDatasetsList, getPrivacyModelsList, getPrivacyJobResult, getPrivacyJobStatus, startPrivacyJob } from '@/functionalities/TITANNServices/get_info';
+import { getPrivacyJobResult, getPrivacyJobStatus, startPrivacyJob } from '@/functionalities/TITANNServices/get_info';
 import VulnerabilitySelection from '../utils/VulnerabilitySelection';
 import ModalButton from '../test/ModalButton';
 import PrivacyContext from './PrivacyContext';
@@ -41,7 +41,7 @@ const PrivacyAttackPanel: React.FC<PrivacyAttackPanelProps> = ({
     description
 }) => {
     const { hostname, port } = useBackendVariablesStore();
-    const { privacyAttacks, setAttacks, setPrivacyAttacks } = useNNTrustStore();
+    const { privacyAttacks, setPrivacyAttacks } = useNNTrustStore();
     const [datasets, setDatasets] = useState<PrivacyDatasetInfo[]>([]);
     const [models, setModels] = useState<PrivacyModelInfo[]>([]);
     const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps | undefined>(undefined);
@@ -73,27 +73,10 @@ const PrivacyAttackPanel: React.FC<PrivacyAttackPanelProps> = ({
     }, [models, privacyType]);
 
     useEffect(() => {
-        getPrivacyDatasetsList(hostname, port).then(setDatasets).catch(console.error);
-        getPrivacyModelsList(hostname, port).then(setModels).catch(console.error);
-    }, [hostname, port]);
+        console.log(`[PrivacyAttackPanel] Mounting: ${privacyType}`);
+        return () => console.log(`[PrivacyAttackPanel] Unmounting: ${privacyType}`);
+    }, [privacyType]);
 
-    useEffect(() => {
-        if (Object.keys(privacyAttacks).length > 0) return;
-        getAttacksList(hostname, port)
-            .then((allAttacks) => {
-                setAttacks(
-                    Object.fromEntries(
-                        Object.entries(allAttacks).filter(([_, attack]) => attack.objective !== 'privacy')
-                    )
-                );
-                setPrivacyAttacks(
-                    Object.fromEntries(
-                        Object.entries(allAttacks).filter(([_, attack]) => attack.objective === 'privacy')
-                    )
-                );
-            })
-            .catch(console.error);
-    }, [hostname, port, privacyAttacks, setAttacks, setPrivacyAttacks]);
 
     const attackListKey = useMemo(() => Object.keys(attacks).sort().join(','), [attacks]);
 

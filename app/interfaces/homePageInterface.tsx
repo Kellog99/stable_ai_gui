@@ -1,5 +1,3 @@
-import { LucideIcon } from "lucide-react";
-
 export interface InfoProps {
     id: string                        // id for the file identification.
     name: string,                     // File's name, ex. "Resnet50" or "Imagenette".
@@ -13,17 +11,36 @@ export interface InfoProps {
     input_dimensionality: number[]    // dimensionality of each input or domain's dimensionality.
 }
 
+export interface Transformation {
+    mean: number[]
+    std: number[]
+    crop?: number
+    size?: number
+}
+
+export type ModelType =
+    | "Ollama"
+    | "Gemini"
+    | "OpenRouter"
+    | "HuggingFace"
+    | "plain"
+    | "timm"
+    | "torch_script"
+    | "torch_dynamo"
+    | "onnx"
+    | "api";
+
 // Model's information
 export interface ModelInfo extends InfoProps {
     dataset: string,                  // Dataset where the model had been optimized on 
     parameters: number | null,        // Number of the models' parameters
-    type?: "llm" | "cv"               // Type of model that is used
+    model_type?: ModelType,           // Model implementation or provider type
+    transformation: Transformation
 }
 
 export interface DatasetInfo extends InfoProps {
     num_samples: number,              // Number of the dataset' samples
 }
-
 
 
 interface field {
@@ -40,11 +57,3 @@ export interface InfoUploader {
     fields: field[],
     example: { [key: string]: any }
 }
-
-export interface ButtonProps {
-    id: string,
-    name: string,
-    child: React.ReactNode,
-    Icon: LucideIcon
-}
-

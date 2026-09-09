@@ -1,13 +1,19 @@
 .benchmark-controls {
     margin-top: 2vw;
-
     margin-bottom: 20px;
 }
 
+.benchmark_header {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-content: center;
+}
+
 .benchmark-select {
-    padding: 10px;
-    width: 120px;
-    aspect-ratio: 3.14;
+    padding: 5px;
+    width: 100px;
+    height: 30px;
     border: 1px solid gray;
     border-radius: 6px;
     background: var(--bg);
@@ -32,99 +38,46 @@
 
 .results-grid {
     display: grid;
-    column-gap: 30px;
-    grid-template-columns: 1fr 250px;
+    grid-template-columns: 3fr 1fr;
+    gap: 20px;
     width: 100%;
+    height: 40vh;
+    align-items: start;
+
 }
 
-/* ############## Leaderbord Table ############## */
+.chart-container,
 .leaderboard {
-    height: 450px;
+    min-width: 0;
+}
+
+.chart-container {
+    width: 100%;
+    height: 100%;
+}
+
+.leaderboard {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    padding-bottom: 40px;
     border-radius: 0.75rem;
-        padding-bottom: 40px;
-
 }
 
 .leaderboard-title {
     display: flex;
-    align-items: center;
+    height: 50px;
     justify-content: center;
+    align-items: center;
     gap: 0.5rem;
+
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+
+    color: white;
     font-size: 1rem;
     font-weight: 600;
-    color: white;
-    margin-bottom: 1rem;
-    background-color: var(--bg);
+
+    background: color-mix(in hsl, var(--bg-dark) 60%, var(--bg-light) 40%);
     border-radius: var(--border-radius);
-}
-
-.table-container {
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border-radius: 0.5rem;
-}
-
-.entries-table {
-    width: 100%;
-    height: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.entries-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: #1f2937;
-    /* darker gray for header */
-}
-
-.entries-table th {
-    padding: 0.75rem;
-    color: white;
-    font-weight: 600;
-    text-align: left;
-    background-color: #1f2937;
-    border-bottom: 2px solid #374151;
-}
-
-.entries-table th:last-child {
-    text-align: right;
-}
-
-.entries-table tbody tr {
-    background-color: var(--bg);
-    transition: all 0.2s;
-}
-
-.entries-table tbody tr:hover {
-    background-color: #374151;
-}
-
-.entries-table tbody tr.highlighted {
-    background-color: var(--bg-light);
-}
-
-.entries-table td {
-    padding: 0.75rem;
-    color: white;
-}
-
-.rank-cell {
-    width: 60px;
-}
-
-.rank-circle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 50%;
-    background-color: gray;
-    font-weight: 600;
-    font-size: 0.875rem;
 }

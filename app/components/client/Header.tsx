@@ -3,15 +3,13 @@
 import { CheckCircle, Circle, Shield } from 'lucide-react';
 import '@/styles/Header.css';
 import { useRouter } from 'next/navigation';
-import { title } from '@/page';
+import { title } from '@/store/title';
 
 import useNNTrustStore from '@/store/nnTrustStore';
-import useStore from '@/store/dsStore';
 
 const Header = () => {
 
-  const { model } = useNNTrustStore()
-  const { dataset } = useStore()
+  const { model, dataset } = useNNTrustStore()
   const router = useRouter()
   return (
     <header className="app-header">

@@ -151,9 +151,9 @@ export const sections: { [key: string]: NavigationSection[] } = {
                     Icon: HatGlasses,
                 },
                 {
-                    id: 'jailbraking',
-                    title: 'Jailbrake',
-                    href: '/pages/tasks/redteam/test/jailbrake',
+                    id: 'jailbreaking',
+                    title: 'Jailbreak',
+                    href: '/pages/tasks/redteam/test/jailbreak',
                     Icon: Fence,
                 },
 

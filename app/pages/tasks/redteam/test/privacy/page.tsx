@@ -26,7 +26,7 @@ function Privacy() {
             <HeaderPageTask
                 Icon={HatGlasses}
                 title="Privacy Lab"
-                descrition="Test whether a specific model has specific privacy vulnerabilities."
+                description="Test whether a specific model has specific privacy vulnerabilities."
             />
             <div className='privacy-container'>
                 <div className='btn-container'>

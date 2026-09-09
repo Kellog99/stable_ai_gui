@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import useNNTrustStore from '@/store/nnTrustStore'
 import { AppWindowIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -9,19 +9,19 @@ import { AttackManagementProps } from '@/interfaces/NNInterfaces';
 import { getStatusIcon } from '@/components/client/management/utils';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import ManagementTable from '@/components/client/management/ManagementTable';
-import useStore from '@/store/dsStore';
 import '@/components/client/management/ManagementTable.css';
 
 const TaskManagement: React.FC = () => {
     const {
-        setAttackReport,
+        setModelReport: setAttackReport,
+        dataset,
         setBenchmark,
         benchmarkId
     } = useNNTrustStore()
 
     const [listExecutedAttacks, setListExecutedAttacks] = useState<AttackManagementProps[]>([]);
     const [description, setDescription] = useState<string>('');
-    const datasetName = useStore((state) => state.dataset)?.name
+    const datasetName = useMemo(()=>{return dataset?.name},[dataset])
 
     // getting the advancement status from the job, starting from the id
     const handleRefresh = async () => {
@@ -88,7 +88,7 @@ const TaskManagement: React.FC = () => {
         if (listExecutedAttacks.length > 0) {
             notFinished = status["Pending"] + status["In Progress"];
             if (notFinished > 0) {
-                setDescription(`It remains ${notFinished} attackto be finished.`);
+                setDescription(`${notFinished} attack${notFinished === 1 ? '' : 's'} remaining.`);
             } else {
                 setDescription("All jobs completed.");
             }
@@ -137,8 +137,8 @@ const TaskManagement: React.FC = () => {
             <HeaderPageTask
                 Icon={AppWindowIcon}
                 title="Job Status Management"
-                descrition="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
-                buttonprops={{
+                description="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
+                button_props={{
                     description: "Vulnerability Report",
                     isDisabled: isDisabled,
                     disabledDescription: description,
@@ -146,27 +146,38 @@ const TaskManagement: React.FC = () => {
                 }}
             />
 
-            {/* Status Summary Cards */}
-            <>
-                <h3 style={{ margin: 0, padding: 0, color: "white" }}>Overview Jobs:</h3>
+            <section className="management-overview" aria-labelledby="job-overview-title">
+                <div className="management-section-heading">
+                    <div>
+                        <span className="management-eyebrow">Live overview</span>
+                        <h2 id="job-overview-title">Job progress</h2>
+                    </div>
+                    <p>{description}</p>
+                </div>
                 <div className="container-cards">
                     {Object.entries(attackStates).map(([status, value]) => (
                         <div key={status} className="card-summary">
-                            {getStatusIcon(status)}
-                            <div>
-                                <div style={{ fontSize: "0.8rem" }}>{status}:</div>
-                                <span style={{ fontSize: "1.4rem", fontWeight: 700 }}>{value ? value : 0}</span>
+                            <div className="summary-icon">{getStatusIcon(status)}</div>
+                            <div className="summary-content">
+                                <span>{status}</span>
+                                <strong>{value}</strong>
                             </div>
                         </div>
                     ))}
                 </div>
-            </>
+            </section>
             {/* Table Management */}
-            <div>
-                <h3 style={{ color: 'white' }}>Info Vulnerabilities</h3>
+            <section className="management-table-section" aria-labelledby="job-details-title">
+                <div className="management-section-heading">
+                    <div>
+                        <span className="management-eyebrow">Execution details</span>
+                        <h2 id="job-details-title">Vulnerability jobs</h2>
+                    </div>
+                    <p>Search and filter the attacks included in this benchmark.</p>
+                </div>
                 <ManagementTable jobs={listExecutedAttacks}
                 />
-            </div>
+            </section>
         </div>
     );
 }

@@ -1,8 +1,9 @@
 import { LineChart } from '@mantine/charts';
 import React from 'react'
+import {ConfidenceData} from '@/interfaces/testInterfaces';
 
 interface ConfidenceChartProps {
-    confidence?: { [key: string]: { [key: number]: number } },
+    confidence?: ConfidenceData,
 }
 
 const ConfidenceChart: React.FC<ConfidenceChartProps> = ({
@@ -13,22 +14,21 @@ const ConfidenceChart: React.FC<ConfidenceChartProps> = ({
     }
 
     // ###################### Confidence Chart Data ######################
-    // Collect all unique steps across all series
-    const allSteps = new Set<number>();
-    Object.values(confidence).forEach(series => {
-        Object.keys(series).forEach(step => allSteps.add(Number(step)));
-    });
+    const getSeriesValues = (series: ConfidenceData[string]): number[] =>
+        Array.isArray(series) ? series : Object.keys(series)
+            .sort((a, b) => Number(a) - Number(b))
+            .map((step) => series[step]);
 
-    // Sort steps numerically
-    const sortedSteps = Array.from(allSteps).sort((a, b) => a - b);
-
-    // Build chart data with all steps, using null/undefined for missing values
-    const chartData = sortedSteps.map(step => {
-        const point: any = { step };
-        Object.entries(confidence).forEach(([key, series]) => {
-            // Use null or undefined if this step doesn't exist in this series
-            point[key] = series[step] !== undefined
-                ? parseFloat(series[step].toFixed(3))
+    const normalizedConfidence = Object.fromEntries(
+        Object.entries(confidence).map(([key, series]) => [key, getSeriesValues(series)])
+    );
+    const longestSeries = Math.max(0, ...Object.values(normalizedConfidence).map((series) => series.length));
+    const chartData = Array.from({length: longestSeries}, (_, step) => {
+        const point: Record<string, number | null> = {step};
+        Object.entries(normalizedConfidence).forEach(([key, series]) => {
+            const value = series[step];
+            point[key] = typeof value === 'number' && Number.isFinite(value)
+                ? parseFloat(value.toFixed(3))
                 : null;
         });
         return point;
@@ -36,7 +36,7 @@ const ConfidenceChart: React.FC<ConfidenceChartProps> = ({
 
 
     const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
-    const series = Object.keys(confidence).map((key, index) => ({
+    const series = Object.keys(normalizedConfidence).map((key, index) => ({
         name: key,
         color: colors[index % colors.length],
     }));
@@ -46,10 +46,15 @@ const ConfidenceChart: React.FC<ConfidenceChartProps> = ({
             series.map(s => item[s.name]).filter(val => val !== undefined && val !== null)
         );
 
+        if (allValues.length === 0) return [0, 1];
+
         const minVal = Math.min(...allValues);
         const maxVal = Math.max(...allValues);
+        const padding = minVal === maxVal
+            ? Math.max(Math.abs(minVal) * 0.05, 0.01)
+            : (maxVal - minVal) * 0.05;
 
-        return [minVal - 0.0, maxVal + 0.0];
+        return [minVal - padding, maxVal + padding];
     };
 
 
@@ -57,15 +62,12 @@ const ConfidenceChart: React.FC<ConfidenceChartProps> = ({
 
 
     return (
-        <div style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "12px"
-        }}>
+        <section className="confidence-section" aria-labelledby="confidence-chart-title">
             <div>
-                <h3 className="card-title">Confidence Chart</h3>
-                <span style={{ fontSize: "0.8rem" }}>
-                    The following graph shows the trend in confidence for the original class and the opposing class.        </span>
+                <h3 className="card-title" id="confidence-chart-title">Confidence chart</h3>
+                <p className="card-description">
+                    Confidence trend for the model classes during the attack.
+                </p>
             </div>
 
             <LineChart
@@ -82,7 +84,7 @@ const ConfidenceChart: React.FC<ConfidenceChartProps> = ({
                 yAxisProps={{ domain: getConfidenceBounds() }}
                 series={series}
             />
-        </div>
+        </section>
     )
 }
 

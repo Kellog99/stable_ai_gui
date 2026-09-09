@@ -1,0 +1,30 @@
+.info_table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.info_table__header-row {
+    border-bottom: 1px solid gray;
+}
+
+.info_table__title {
+    text-align: left;
+    padding: 20px;
+    font-weight: bold;
+}
+
+.info_table__key {
+    text-align: left;
+    padding: 8px 20px;
+    background-color: color-mix(in hsl, var(--bg-dark) 60%, var(--bg-light) 40%);
+    border-bottom: 1px solid rgba(0, 81, 255, 0.39);
+    width: 33.33%;
+}
+
+.info_table__value {
+    text-align: left;
+    font-weight: bold;
+    color: lightgray;
+    padding: 8px 20px;
+    width: 66.66%;
+}

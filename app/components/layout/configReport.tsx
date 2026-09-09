@@ -1,6 +1,6 @@
 import { File, HardDrive, Upload } from 'lucide-react';
 import { FileDropZoneProps } from '@/interfaces/homePageInterface';
-import { infoModel } from '../client/upload/config';
+import { infoModel } from '../client/repository/config';
 
 // Repository
 import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';

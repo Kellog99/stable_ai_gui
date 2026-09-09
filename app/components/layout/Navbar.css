@@ -32,13 +32,19 @@
   width: 6px;
 }
 
+.nav-section::-webkit-scrollbar-track {
+  background: color-mix(in hsl, var(--bg-dark) 45%, transparent);
+  border-radius: 6px;
+}
+
 .nav-section::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
+  background-color: color-mix(in hsl, var(--bg-light) 45%, var(--bg-dark) 55%);
+  border-radius: 6px;
+  border: 2px solid color-mix(in hsl, var(--bg-dark) 55%, transparent);
 }
 
 .nav-section::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: color-mix(in hsl, var(--bg-light) 70%, var(--bg-dark) 30%);
 }
 
 .container-nav>div:last-child {

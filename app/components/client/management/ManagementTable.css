@@ -1,38 +1,40 @@
 .table-container{
-    padding: 20px;
-    background-color: var(--bg);
-    border-radius: var(--border-radius);
+    padding: 18px;
+    background: linear-gradient(145deg, color-mix(in hsl, var(--bg-dark) 45%, var(--bg) 55%), color-mix(in hsl, var(--bg-dark) 72%, var(--bg) 28%));
+    border: 1px solid color-mix(in srgb, var(--bg-light) 42%, transparent);
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
 }
 .selectionButton {
-    background-color: var(--bg-light);
-    border: 1px solid black;
-    color: white;
+    background-color: color-mix(in hsl, var(--bg-dark) 45%, var(--bg-light) 55%);
+    border: 1px solid color-mix(in srgb, var(--bg-light) 80%, white 20%);
+    color: var(--text-primary);
 }
 
 
-.filters {
+.management-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
     align-items: center;
 }
 
-.filter {
+.management-filter {
     display: flex;
-    color: white;
-    gap: 20px;
+    color: var(--text-secondary);
+    gap: 10px;
     align-items: center;
     font-weight: bold;
 }
 
-.search-wrapper {
+.management-search-wrapper {
     flex: 1;
     min-width: 250px;
     position: relative;
 }
 
-.search-icon {
+.management-search-icon {
     position: absolute;
     left: 0.75rem;
     top: 50%;
@@ -42,75 +44,80 @@
     height: 1.25rem;
 }
 
-input[type="text"] {
+.management-search-wrapper input[type="text"] {
     width: 100%;
     padding: 0.5rem 1rem 0.5rem 2.5rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--bg-light) 65%, transparent);
+    border-radius: 8px;
     font-size: 0.875rem;
+    color: var(--text-primary);
+    background: color-mix(in hsl, var(--bg-dark) 72%, var(--bg) 28%);
     transition: all 0.2s;
 }
 
-input[type="text"]:focus {
+.management-search-wrapper input[type="text"]:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-select {
+.management-filter select {
     padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
+    border-radius: 8px;
     font-size: 0.875rem;
     background: white;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-select:focus {
+.management-filter select:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.table-wrapper {
+.management-table-wrapper {
     max-height: 400px;
     overflow: auto;
-    border-radius: var(--border-radius);
+    border: 1px solid color-mix(in srgb, var(--bg-light) 35%, transparent);
+    border-radius: 9px;
 }
 
-.table-wrapper table {
+.management-table-wrapper table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
 }
 
-.table-wrapper thead th {
+.management-table-wrapper thead th {
     position: sticky;
     top: 0;
-    background-color: var(--bg);
-    color: lightgray;
+    background-color: color-mix(in hsl, var(--bg-dark) 52%, var(--bg) 48%);
+    color: var(--text-secondary);
     font-weight: 800;
     text-align: left;
-    padding: 4px 0 4px 4px;
-    border-bottom: 1px solid #e5e7eb
+    padding: 11px 12px;
+    font-size: 0.73rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid color-mix(in srgb, var(--bg-light) 42%, transparent);
 }
 
-.table-wrapper tbody td {
-    padding: 6px 12px;
-    height: 50px;
-    /* Reduced padding for smaller rows */
-    border-bottom: 1px solid var(--border-color);
-    color: white;
+.management-table-wrapper tbody td {
+    padding: 10px 12px;
+    height: 48px;
+    border-bottom: 1px solid color-mix(in srgb, var(--bg-light) 22%, transparent);
+    color: var(--text-primary);
     background-color: transparent;
 }
 
-.table-wrapper tbody tr:hover {
-    background-color: var(--bg-light);
+.management-table-wrapper tbody tr:hover {
+    background-color: color-mix(in hsl, var(--bg) 50%, var(--bg-light) 50%);
     transition: background-color 0.15s;
 }
 
-.table-wrapper th button {
+.management-table-wrapper th button {
     background: none;
     border: none;
     cursor: pointer;

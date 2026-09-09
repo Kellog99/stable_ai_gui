@@ -1,8 +1,10 @@
-import { CheckCircleIcon, RefreshCw, Save, Settings, TimerReset, Trash, X } from 'lucide-react';
+import { CheckCircle2, CheckCircleIcon, RefreshCw, Save, Settings, Settings2, X } from 'lucide-react';
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
-import { Group, Modal, NumberInput, Select, Slider } from '@mantine/core';
+import { Modal, NumberInput, Select, Slider, Switch } from '@mantine/core';
+
+type ParameterValue = number | string | boolean;
 
 /**
  * Processes a user's subscription.
@@ -27,27 +29,36 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
 }) => {
 
-    const [values, setValues] = useState<(number | string)[]>([]);
-    const [defaultValues, setDefaultValues] = useState<(number | string)[]>([]);
+    const [values, setValues] = useState<ParameterValue[]>([]);
+    const [defaultValues, setDefaultValues] = useState<ParameterValue[]>([]);
     const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
         if (isOpen && parameters && parameters.length > 0) {
-            const defaults = parameters.map((p) => {
-                if (p.kind === 'enum') return typeof p.default === 'string' ? p.default : (p.options?.[0] ?? '');
-                if (typeof p.default === 'number') return p.default;
+            const currentValues = parameters.map((p) => {
+                if (p.default !== undefined && p.default !== null) return p.default;
+                if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
+                if (p.kind === 'enum') return p.options?.[0] ?? '';
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
                 return 0;
             });
-            setValues(defaults);
+            const defaults = parameters.map((p) => {
+                if (p.default !== undefined && p.default !== null) return p.default;
+                if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
+                if (p.kind === 'enum') return p.options?.[0] ?? '';
+                if (p.max != null && p.min != null) return (p.max + p.min) / 2;
+                if (p.min != null) return p.min;
+                return 0;
+            });
+            setValues(currentValues);
             setDefaultValues(defaults);
             setIsSaved(false);
         }
     }, [isOpen, parameters]);
 
 
-    const handleChange = (index: number, newValue: number | string) => {
+    const handleChange = (index: number, newValue: ParameterValue) => {
         setValues((prev) => {
             const next = [...prev];
             next[index] = newValue;
@@ -66,10 +77,9 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
         }, 600);
     };
 
-
-    const toNumber = (v: number | string): number =>
-        typeof v === 'number' ? v : Number(v) || 0;
-
+    if (isOpen && parameters) {
+        console.log(parameters.map((param, index) => ([param.id, param.step, param.max])))
+    }
 
     return (
         <Modal
@@ -77,16 +87,25 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
             onClose={onClose}
             size={500}
             title={
-                <Group
-                    gap="xs"
-                    style={{
-                        color: "black",
-                        fontWeight: 'bold'
-                    }}>
-                    <Settings size={24} />
-                    <span>Settings</span>
-                </Group>
+                <div className="parameters-header-content">
+                    <div className="parameters-icon">
+                        <Settings2 size={22} />
+                    </div>
+
+                    <div className='modal-title'>
+                        <p className="parameters-title">
+                            Parameters
+                        </p>
+
+                        <p className="parameters-subtitle">
+                            Configure the settings for this operation
+                        </p>
+                    </div>
+                </div>
             }
+            classNames={{
+                content: 'parameters-modal',
+            }}
             centered
         >
             {!parameters || parameters.length === 0 ? (
@@ -100,24 +119,54 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
                         {/* Settings Content */}
                         {parameters.map((param, index) => (
+                            // Boolean parameters use a switch instead of numeric controls.
                             <div
                                 key={`${param.name}-${index}`}
                                 className="form-group"
                             >
-                                <div className="form-label">
-                                    <p>{param.name}</p>
+                                <div className="param-header">
+                                    <div className="param-title">
+                                        <p className="param-name">
+                                            {param.name}
+                                        </p>
+
+                                        {param.description && (
+                                            <p className="param-desc">
+                                                {param.description}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {(param.kind === 'boolean' || typeof param.default === 'boolean') ? (
+                                        <Switch
+                                            size="md"
+                                            checked={values[index] === true}
+                                            onChange={(event) => handleChange(index, event.currentTarget.checked)}
+                                        />
+                                    ) : param.kind !== 'enum' && (
+                                        <NumberInput
+                                            variant="filled"
+                                            size="xs"
+                                            w={100}
+                                            min={param.min}
+                                            max={param.max}
+                                            step={param.step}
+                                            allowDecimal={
+                                                !Number.isInteger(
+                                                    param.step ?? 1
+                                                )
+                                            }
+                                            allowNegative={
+                                                (param.min ?? 0) < 0
+                                            }
+                                            radius="md"
+                                            value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                            onChange={(value) => handleChange(index, Number(value) || 0)}
+                                        />
+                                    )}
                                 </div>
-                                {param.description && (
-                                    <p style={{
-                                        fontSize: '0.8rem',
-                                        color: '#6b7280',
-                                        marginTop: '0.25rem',
-                                        marginBottom: '0.75rem'
-                                    }}>
-                                        {param.description}
-                                    </p>
-                                )}
-                                {param.kind === "enum" ? (
+
+                                {(param.kind === "boolean" || typeof param.default === 'boolean') ? null : param.kind === "enum" ? (
                                     <Select
                                         size="xs"
                                         variant="filled"
@@ -127,40 +176,14 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                         onChange={(value) => value && handleChange(index, value)}
                                     />
                                 ) : (
-                                    <>
-                                        {param.id === "property_target_ratio" ? (
-                                            <Slider
-                                                min={param.min ?? 0}
-                                                max={param.max ?? 1}
-                                                step={0.05}
-                                                value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                                onChange={(value) => handleChange(index, value)}
-                                            />
-                                        ) : (
-                                            <>
-                                                <NumberInput
-                                                    variant="filled"
-                                                    size='xs'
-                                                    w={100}
-                                                    min={param.min}
-                                                    max={param.max}
-                                                    step={param.step}
-                                                    allowDecimal={!Number.isInteger(param.step ?? 1)}
-                                                    allowNegative={(param.min ?? 0) < 0}
-                                                    radius="md"
-                                                    value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                                    onChange={(value) => handleChange(index, Number(value) || 0)}
-                                                />
-                                                <Slider
-                                                    min={param.min ?? 0}
-                                                    max={param.max ?? 1}
-                                                    step={param.step ?? 0.01}
-                                                    value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                                    onChange={(value) => handleChange(index, value)}
-                                                />
-                                            </>
-                                        )}
-                                    </>
+
+                                    <Slider
+                                        min={param.min ?? 0}
+                                        max={param.max ?? 1}
+                                        step={param.step ?? 0.01}
+                                        value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                        onChange={(value) => handleChange(index, value)}
+                                    />
                                 )}
                             </div>
                         ))}
@@ -168,20 +191,39 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
                     {/* Footer */}
                     <div className="modal-footer">
-                        <button className="btn btn-ghost" onClick={handleReset}>
-                            <RefreshCw size={15} /> Reset
+                        <button
+                            className="footer-button reset"
+                            onClick={handleReset}
+                            type="button"
+                        >
+                            <RefreshCw size={16} />
+                            Reset
                         </button>
-                        <div className="btn-group">
-                            <button className="btn btn-outline" onClick={onClose}>
-                                <X size={15} /> Cancel
-                            </button>
+
+                        <div className="button-group">
                             <button
-                                className={`btn btn-primary ${isSaved ? 'btn-saved' : ''}`}
+                                className="footer-button cancel"
+                                onClick={onClose}
+                                type="button"
+                            >
+                                <X size={16} />
+                                Cancel
+                            </button>
+
+                            <button
+                                className={`footer-button save ${isSaved ? 'saving' : ''
+                                    }`}
                                 onClick={handleSave}
                                 disabled={isSaved}
+                                type="button"
                             >
-                                {isSaved ? <CheckCircleIcon size={15} /> : <Save size={15} />}
-                                {isSaved ? 'Saved' : 'Save'}
+                                {isSaved ? (
+                                    <CheckCircle2 size={16} />
+                                ) : (
+                                    <Save size={16} />
+                                )}
+
+                                {isSaved ? 'Saved' : 'Save changes'}
                             </button>
                         </div>
                     </div>
