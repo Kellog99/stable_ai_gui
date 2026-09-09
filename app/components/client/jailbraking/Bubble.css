@@ -1,0 +1,117 @@
+/* Base bubble styles (from the first snippet) */
+.score_container {
+  display: flex;
+  flex-direction: column;
+}
+
+.bubble_container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: flex-end;
+  gap: 10px
+}
+
+.icon_container {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon_container.user {
+  background: #475569;
+}
+
+.icon_container.user svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: white;
+}
+
+.icon_container.model {
+  background: linear-gradient(135deg, #10b981, #0d9488);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.icon_container.model svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: white;
+}
+
+
+.bubble {
+  width: 55%;
+  height: 100%;
+  min-height: 40px;
+  background-color: blue;
+  padding: 9px 13px;
+  border-radius: 18px;
+  font-size: 0.825rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.bubble::before,
+.bubble::after {
+  animation: colorShift 3s ease-in-out infinite alternate;
+}
+
+.bubble::before {
+  background-color: var(--bg);
+}
+
+.bubble::after {
+  background-color: var(--bg-light);
+  animation-direction: alternate-reverse;
+}
+
+
+@keyframes bubbleShift {
+  0% {
+    background: color-mix(in hsl, var(--bg) 80%, var(--bg-light) 20%);
+  }
+
+  50% {
+    background: color-mix(in hsl, var(--bg) 20%, var(--bg-light) 80%);
+  }
+
+  100% {
+    background: color-mix(in hsl, var(--bg) 80%, var(--bg-light) 20%);
+  }
+}
+
+.bubble.loading {
+  animation: bubbleShift 1.8s ease-in-out infinite;
+}
+
+.bubble_container.model {
+  justify-content: flex-start;
+}
+
+.bubble p {
+  color: darkgray;
+  margin: 0;
+  font-size: 0.7rem;
+}
+
+.bubble.model {
+  background: color-mix(in hsl,
+      var(--bg) 60%,
+      var(--bg-light) 40%);
+  border-top-left-radius: 4px;
+}
+
+
+.bubble.user {
+  background: color-mix(in hsl,
+      var(--bg) 60%,
+      var(--bg-light) 40%);
+  border-top-right-radius: 4px;
+}
