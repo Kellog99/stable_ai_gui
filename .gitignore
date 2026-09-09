@@ -135,6 +135,9 @@ dist
 
 .DS_Store
 
+# JetBrains IDE project settings
+.idea/
+
 # Ignore everything in /public
 /public/**
 
