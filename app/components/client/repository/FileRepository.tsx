@@ -1,29 +1,39 @@
-import React, {useMemo, useState} from "react";
-import {RefreshCw, Trash2} from "lucide-react";
+import React, {ChangeEvent, useMemo, useState} from "react";
+import {RefreshCw} from "lucide-react";
 import "./FileRepository.css";
-import {DatasetInfo, ModelInfo} from "@/interfaces/homePageInterface";
+import {DatasetInfo, ModelInfo, ModelType} from "@/interfaces/homePageInterface";
 import {TaskType} from "@/interfaces/NNInterfaces";
 import InfoButton from "./InfoButton";
 
-interface RepositoryProps<T extends ModelInfo | DatasetInfo> {
+export type RepositoryType = "model" | "dataset";
+
+export interface FileRepositoryProps<T extends ModelInfo | DatasetInfo> {
     elements: T[];
-    handleDelete: (elem: T) => void;
     handleSelection: (element: T | null) => void;
     handleRefresh?: () => void;
+    repositoryType: RepositoryType;
 }
+
+const getModelType = (element: ModelInfo | DatasetInfo) =>
+    "model_type" in element ? element.model_type ?? "Unknown" : "N/A";
+
+const isModelInfo = (element: ModelInfo | DatasetInfo): element is ModelInfo =>
+    "parameters" in element;
 
 const Repository = <T extends ModelInfo | DatasetInfo>(
     {
         elements,
-        handleDelete,
         handleSelection,
         handleRefresh,
-    }: RepositoryProps<T>) => {
+        repositoryType,
+    }: FileRepositoryProps<T>) => {
     // This variable is for keeping, locally, track of the selected element
     const [selectedElement, setSelectedElement] = useState<string>("")
 
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [taskFilter, setTaskFilter] = useState<TaskType | 'all'>('all');
+    const [modelTypeFilter, setModelTypeFilter] = useState<ModelType | 'all'>('all');
+    const showModelType = repositoryType === "model";
 
     // Derive unique task options from the elements themselves
     const taskOptions = useMemo<Array<TaskType | 'all'>>(() => {
@@ -33,25 +43,42 @@ const Repository = <T extends ModelInfo | DatasetInfo>(
         return ['all', ...Array.from(new Set(tasks))];
     }, [elements]);
 
-    // Derive filtered list — no useEffect or redundant state needed
+    const modelTypeOptions = useMemo<Array<ModelType | 'all'>>(() => {
+        const modelTypes = elements
+            .map((element) => isModelInfo(element) ? element.model_type : undefined)
+            .filter((modelType): modelType is ModelType => Boolean(modelType));
+        return ['all', ...Array.from(new Set(modelTypes))];
+    }, [elements]);
+
+    // Derive the filtered and ordered list — no useEffect or redundant state needed
     const filteredElements = useMemo(() => {
-        return elements.filter((elem) => {
-            const matchesSearch = elem.name
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase());
+        return elements
+            .filter((elem) => {
+                const matchesSearch = elem.name
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase());
 
-            const matchesTask =
-                taskFilter === 'all' ||
-                (elem.task ?? '').toLowerCase() === taskFilter.toLowerCase();
+                const matchesTask =
+                    taskFilter === 'all' ||
+                    (elem.task ?? '').toLowerCase() === taskFilter.toLowerCase();
 
-            return matchesSearch && matchesTask;
-        });
-    }, [elements, searchQuery, taskFilter]);
+                const matchesModelType =
+                    !showModelType ||
+                    modelTypeFilter === 'all' ||
+                    (isModelInfo(elem) && elem.model_type === modelTypeFilter);
+
+                return matchesSearch && matchesTask && matchesModelType;
+            })
+            .sort((first, second) =>
+                getModelType(first).localeCompare(getModelType(second)) ||
+                first.name.localeCompare(second.name)
+            );
+    }, [elements, searchQuery, taskFilter, modelTypeFilter, showModelType]);
 
 
     return (
         <div className="file_repository_container">
-            <div className="filters">
+            <div className={`repository-filters ${showModelType ? 'has-model-type-filter' : ''}`}>
                 <input
                     type="text"
                     className="search-input"
@@ -68,11 +95,26 @@ const Repository = <T extends ModelInfo | DatasetInfo>(
                         {taskOptions.map((t) => (
                             <option key={t} value={t}>
                                 {t === 'all'
-                                    ? 'All Tasks'
+                                    ? 'All'
                                     : t.charAt(0).toUpperCase() + t.slice(1)}
                             </option>
                         ))}
                     </select>
+                    {showModelType && (
+                        <select
+                            className="model-type-select"
+                            value={modelTypeFilter}
+                            onChange={
+                                (e) => setModelTypeFilter(e.target.value as ModelType | 'all')
+                            }
+                        >
+                            {modelTypeOptions.map((modelType) => (
+                                <option key={modelType} value={modelType}>
+                                    {modelType === 'all' ? 'All' : modelType}
+                                </option>
+                            ))}
+                        </select>
+                    )}
                     {handleRefresh && (
                         <button
                             type="button"
@@ -86,15 +128,20 @@ const Repository = <T extends ModelInfo | DatasetInfo>(
                     )}
                 </div>
             </div>
-            <div className="table-wrapper">
+            <div className="repository-table-wrapper">
                 <table className="repository-table">
+                    <colgroup>
+                        <col className="info-table-column"/>
+                        <col/>
+                        <col className="task-table-column"/>
+                        {showModelType && <col className="model-type-table-column"/>}
+                    </colgroup>
                     <thead className="table-header">
                     <tr>
                         <th></th>
                         <th>Name</th>
-                        <th>Task</th>
-                        <th>Created</th>
-                        <th>Delete</th>
+                        <th className="task-column">Task</th>
+                        {showModelType && <th className="model-type-column">Model Type</th>}
                     </tr>
                     </thead>
                     <tbody>
@@ -118,23 +165,12 @@ const Repository = <T extends ModelInfo | DatasetInfo>(
                             <td>
                                 <div className="name-container">{elem.name}</div>
                             </td>
-                            <td>
+                            <td className="task-column">
                                 <div className={`container_task ${elem.task ?? 'unknown'}`}>
                                     {elem.task ?? "Unknown"}
                                 </div>
                             </td>
-                            <td>{elem.date ?? "Not registered"}</td>
-                            <td>
-                                <button
-                                    className="table-btn delete"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete(elem);
-                                    }}
-                                >
-                                    <Trash2 size={18} color="red"/>
-                                </button>
-                            </td>
+                            {showModelType && <td className="model-type-column">{getModelType(elem)}</td>}
                         </tr>
                     ))}
                     </tbody>

@@ -94,7 +94,6 @@ const Benchmark: React.FC = () => {
     const [description, setDescription] = useState<string>("")
 
     useEffect(() => {
-        console.log(dataset)
         if (dataset == null) {
             setExecuteBenchmark(false)
             setDescription("A dataset is required to perform a benchmark.")

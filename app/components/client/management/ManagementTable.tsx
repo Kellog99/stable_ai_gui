@@ -49,9 +49,9 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
     return (
         <div className='table-container'>
             <div>
-                <div className="filters">
-                    <div className="search-wrapper">
-                        <Search className="search-icon" />
+                <div className="management-filters">
+                    <div className="management-search-wrapper">
+                        <Search className="management-search-icon" />
                         <input
                             type="text"
                             id="searchInput"
@@ -61,7 +61,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                         />
                     </div>
 
-                    <div className='filter'>
+                    <div className='management-filter'>
                         <div>Filter by:</div>
                         <select
                             className='selectionButton'
@@ -77,7 +77,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                         </select>
                     </div>
                 </div>
-                <div className="table-wrapper">
+                <div className="management-table-wrapper">
 
                     <table>
                         <thead>

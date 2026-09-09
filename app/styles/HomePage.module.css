@@ -47,10 +47,6 @@
   /* Add this line */
 }
 
-.selection_card {
-  display: flex;
-  flex-direction: column;
-}
 
 .home_actions {
   text-align: center;

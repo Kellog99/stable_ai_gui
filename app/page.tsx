@@ -1,13 +1,13 @@
 "use client"
 
-import FileDropZone from '@/components/client/upload/FileDropZone';
+import FileSelectionPanel from '@/components/client/repository/FileSelectionPanel';
 import styles from '@/styles/HomePage.module.css';
 import {useEffect} from 'react';
 
 import {getAttacksList, getCoreElements, getMetricsList} from './functionalities/TITANNServices/get_info';
 import useNNTrustStore from '@/store/nnTrustStore';
 import {Brain, DatabaseIcon} from 'lucide-react';
-import {infoDataset, infoModel} from './components/client/upload/config';
+import {infoDataset, infoModel} from './components/client/repository/config';
 import {DatasetInfo, ModelInfo} from './interfaces/homePageInterface';
 import useBackendVariablesStore from './store/globalStore';
 import {title} from './store/title';
@@ -92,15 +92,6 @@ export default function HomePage() {
         };
     };
 
-    // ################## Deletion handler ##################
-    const createDeletionHandler = <T extends ModelInfo | DatasetInfo>(
-        setter: (value: T[]) => void,
-        currentList: T[]
-    ) => {
-        return (selected: T) => {
-            setter(currentList.filter(value => value.id !== selected.id));
-        };
-    };
     return (
         <div className={styles.home_page}>
             <div className={styles.home_header}>
@@ -115,8 +106,7 @@ export default function HomePage() {
 
             <div className={styles.upload_container}>
                 {/* Model selection */}
-                <div className={styles.selection_card}>
-                    <FileDropZone
+                    <FileSelectionPanel
                         key="model_loader"
                         title="Model"
                         description="Drag and drop your model or choose an existing model."
@@ -124,14 +114,11 @@ export default function HomePage() {
                         Icon={Brain}
                         fileDropInformation={infoModel}
                         handleSelection={createToggleHandler(setModel, model)}
-                        handleDeletion={createDeletionHandler(setListModels, listModels ?? [])}
                         handleRefresh={() => setListModels(null)}
+                        repositoryType="model"
                     />
-                </div>
 
-                {/* Dataset selection */}
-                <div className={styles.selection_card}>
-                    <FileDropZone
+                    <FileSelectionPanel
                         key="dataset_loader"
                         title="Dataset"
                         description="Load your dataset or choose an existing dataset."
@@ -139,10 +126,9 @@ export default function HomePage() {
                         Icon={DatabaseIcon}
                         fileDropInformation={infoDataset}
                         handleSelection={createToggleHandler(setDataset, dataset)}
-                        handleDeletion={createDeletionHandler(setListDatasets, listDatasets ?? [])}
                         handleRefresh={() => setListDatasets(null)}
+                        repositoryType="dataset"
                     />
-                </div>
             </div>
         </div>
     );

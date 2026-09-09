@@ -18,12 +18,23 @@ export interface Transformation {
     size?: number
 }
 
+export type ModelType =
+    | "Ollama"
+    | "Gemini"
+    | "OpenRouter"
+    | "HuggingFace"
+    | "plain"
+    | "timm"
+    | "torch_script"
+    | "torch_dynamo"
+    | "onnx"
+    | "api";
+
 // Model's information
 export interface ModelInfo extends InfoProps {
     dataset: string,                  // Dataset where the model had been optimized on 
     parameters: number | null,        // Number of the models' parameters
-    model_type?: string,              // Library or API type (e.g. HuggingFace, Gemini, OpenRouter, Ollama)
-    type?: "llm" | "cv"               // Type of model that is used
+    model_type?: ModelType,           // Model implementation or provider type
     transformation: Transformation
 }
 

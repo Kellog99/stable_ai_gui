@@ -5,7 +5,8 @@ import useNNTrustStore from '@/store/nnTrustStore';
 import { ReportAttackProps } from '@/interfaces/reportInterfaces';
 import './AttackPageStyle.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
-import { ChevronLeft } from 'lucide-react';
+import { ArrowLeft, ChartNoAxesCombined, SlidersHorizontal } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const HIDDEN_METRIC_KEYS = new Set([
     'name',
@@ -28,6 +29,7 @@ function formatMetricValue(value: unknown): string {
 
 const AttackPage = () => {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const atkId = searchParams.get('atkId');
 
     const {
@@ -58,14 +60,14 @@ const AttackPage = () => {
     const metricEntries = useMemo(() => {
         if (!attack) return [];
         return Object.entries(attack.metrics)
-            .filter(([key]) => key !== "confusion_matrix")
+            .filter(([key]) => !HIDDEN_METRIC_KEYS.has(key))
             .map(([key, value]) => {
                 const transformedKey = key
                     .split("_")
                     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(" ");
 
-                return [transformedKey, value];
+                return { key, label: transformedKey, value };
             });
     }, [attack]);
     // ##############################################
@@ -85,46 +87,61 @@ const AttackPage = () => {
     }
 
     return (
-        <div className="dashboard">
+        <main className="attack-dashboard">
             <button
-                className='go_back'
-                onClick={() => { }}
+                className='attack-back-button'
+                onClick={() => router.back()}
+                aria-label="Back to security report"
             >
-                <ChevronLeft size={20} />
+                <ArrowLeft size={18} />
+                <span>Back to report</span>
             </button>
-            <div className="container">
-                <div className="header">
+            <section className="attack-hero">
+                <div className="attack-hero-icon"><ChartNoAxesCombined size={24} /></div>
+                <div>
+                    <span className="attack-eyebrow">Attack analysis</span>
                     <h1>Performance of {attack.name}</h1>
                     <p>Comprehensive metrics overview</p>
                 </div>
-                <div className="metrics-container">
-                    {metricEntries.map(([metric, value]) => (
-                        <div className="metric-container" key={metric}>
-                            <p className="metric-title">{metric}:</p>
+            </section>
+
+            <section className="attack-section" aria-labelledby="attack-metrics-title">
+                <div className="attack-section-heading">
+                    <h2 id="attack-metrics-title">Measured performance</h2>
+                    <span>{metricEntries.length} metrics</span>
+                </div>
+                <div className="attack-metrics-grid">
+                    {metricEntries.map(({ key, label, value }) => (
+                        <article className="attack-metric-card" key={key}>
+                            <p className="attack-metric-label">{label}</p>
                             <p className="metric-value">
-                                {RAW_STRING_METRICS.has(metric) ? String(value) : formatMetricValue(value)}
+                                {RAW_STRING_METRICS.has(key) ? String(value) : formatMetricValue(value)}
                             </p>
-                        </div>
+                        </article>
                     ))}
                 </div>
-            </div>
+            </section>
 
             {usedParams && usedParams.length > 0 && (
-                <div className="container">
-                    <div className="header">
-                        <p>Parameters used</p>
+                <section className="attack-section attack-parameters" aria-labelledby="attack-parameters-title">
+                    <div className="attack-section-heading">
+                        <div className="attack-parameters-title">
+                            <SlidersHorizontal size={18} />
+                            <h2 id="attack-parameters-title">Parameters used</h2>
+                        </div>
+                        <span>{usedParams.length} configured</span>
                     </div>
-                    <div className="metrics-container">
+                    <div className="attack-metrics-grid">
                         {usedParams.map((param) => (
-                            <div className="metric-container" key={param.id}>
-                                <p className="metric-title">{param.id}:</p>
+                            <article className="attack-metric-card" key={param.id}>
+                                <p className="attack-metric-label">{param.id}</p>
                                 <p className="metric-value">{formatMetricValue(param.default)}</p>
-                            </div>
+                            </article>
                         ))}
                     </div>
-                </div>
+                </section>
             )}
-        </div>
+        </main>
     );
 };
 

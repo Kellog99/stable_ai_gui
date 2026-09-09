@@ -1,10 +1,10 @@
 "use client"
-import React, {useState} from 'react';
-import './FileDropZone.css';
+import React from 'react';
+import './FileSelectionPanel.css';
 import {DatasetInfo, InfoUploader, ModelInfo} from '@/interfaces/homePageInterface';
 import {InfoLoader} from './InfoLoader';
 import {LucideIcon} from 'lucide-react';
-import FileRepository from '../repository/FileRepository';
+import FileRepository from "@/components/client/repository/FileRepository";
 
 export interface FileDropZoneProps<T extends ModelInfo | DatasetInfo = ModelInfo | DatasetInfo> {
     title: string,
@@ -13,12 +13,12 @@ export interface FileDropZoneProps<T extends ModelInfo | DatasetInfo = ModelInfo
     Icon: LucideIcon,
     fileDropInformation: InfoUploader,
     handleSelection: (element: T | null) => void,
-    handleDeletion: (element: T) => void;
     handleRefresh?: () => void;
+    repositoryType: "model" | "dataset";
 }
 
 
-const FileDropZone = <T extends ModelInfo | DatasetInfo>(
+const FileSelectionPanel = <T extends ModelInfo | DatasetInfo>(
     {
         title,
         description,
@@ -26,8 +26,8 @@ const FileDropZone = <T extends ModelInfo | DatasetInfo>(
         Icon,
         fileDropInformation,
         handleSelection,
-        handleDeletion,
         handleRefresh,
+        repositoryType,
     }: FileDropZoneProps<T>
 ) => {
     return (
@@ -41,15 +41,25 @@ const FileDropZone = <T extends ModelInfo | DatasetInfo>(
                 </p>
             </div>
             <div className="child_container">
-                <FileRepository<T>
-                    elements={elements}
-                    handleSelection={handleSelection}
-                    handleDelete={handleDeletion}
-                    handleRefresh={handleRefresh}
-                />
+                {repositoryType === "model" ? (
+                    <FileRepository
+                        elements={elements as ModelInfo[]}
+                        handleSelection={handleSelection as (element: ModelInfo | null) => void}
+                        handleRefresh={handleRefresh}
+                        repositoryType="model"
+                    />
+                ) : (
+                    <FileRepository
+                        elements={elements as DatasetInfo[]}
+                        handleSelection={handleSelection as (element: DatasetInfo | null) => void}
+                        handleRefresh={handleRefresh}
+                        repositoryType="dataset"
+
+                    />
+                )}
             </div>
         </div>
     );
 };
 
-export default FileDropZone;
+export default FileSelectionPanel;
