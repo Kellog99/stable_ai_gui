@@ -97,6 +97,19 @@ function Test() {
         return !!(uploadedFile && model && selectedAttack) && !isAttacking
     }, [uploadedFile, model, selectedAttack, isAttacking])
 
+    const handleDownloadAdversarialImage = () => {
+        if (!advImg) return
+
+        const mimeType = 'image/png'
+        const dataUrl = `data:${mimeType};base64,${advImg}`
+        const link = document.createElement('a')
+
+        link.href = dataUrl
+        link.download = 'image.png'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
 
     return (
         <div className={styles.evasion_page}>
@@ -110,7 +123,6 @@ function Test() {
             <div className={styles.content_container}>
                 <div className={styles.grid_container}>
                     {/* Selection of the attacks */}
-                    <div className={styles.inline_item}>
                         <ImageDisplay
                             title="Select the target image"
                             placeholder='Load an PNG or a JPG file.'
@@ -130,9 +142,7 @@ function Test() {
                                 </button>
                             }
                         />
-                    </div>
                     {/* Results */}
-                    <div className={styles.inline_item}>
                         <ImageDisplay
                             title="Adversarial Perturbation"
                             placeholder="No image loaded"
@@ -140,8 +150,6 @@ function Test() {
                             imageSrc={advPert ? "data:image/jpeg;base64," + advPert : undefined}
                         />
 
-                    </div>
-                    <div className={styles.inline_item}>
                         <ImageDisplay
                             title="Adversarial Example"
                             placeholder="No image loaded"
@@ -149,19 +157,7 @@ function Test() {
                             imageSrc={advImg ? "data:image/jpeg;base64," + advImg : undefined}
                             actionButton={
                                 <button
-                                    onClick={() => {
-                                        if (advImg) {
-                                            const mimeType = "image/png"; // or image/jpeg
-                                            const dataUrl = `data:${mimeType};base64,${advImg}`;
-
-                                            const link = document.createElement("a");
-                                            link.href = dataUrl;
-                                            link.download = "image.png";
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            document.body.removeChild(link);
-                                        }
-                                    }}
+                                    onClick={handleDownloadAdversarialImage}
                                     className={styles.action_button}
                                 >
                                     <Download
@@ -172,7 +168,6 @@ function Test() {
                             }
 
                         />
-                    </div>
 
 
                     <div className={styles.bottom_item}>

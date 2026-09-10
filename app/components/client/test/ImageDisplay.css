@@ -1,11 +1,18 @@
 .image-wrapper {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    width: 100%;
     height: 100%;
+    min-width: 0;
+    min-height: 0;
     gap: 0.5rem;
 }
 
 .image-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 0.75rem;
     margin: 0;
     font-weight: 600;
@@ -14,12 +21,26 @@
     flex-shrink: 0;
 }
 
+.image-area {
+    display: grid;
+    place-items: center;
+    container-type: size;
+    height: 100%;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
 .image-container {
     position: relative;
-    height: clamp(400px, 100%, 900px);
-    aspect-ratio: 1 / 1.167;
+    /* Fit the largest 1.16:1 frame inside the image area's grid cell. */
+    width: min(100cqw, 116cqh);
+    height: auto;
+    min-width: 0;
+    aspect-ratio: 1.16 / 1;
     border-radius: 0.8rem;
     border: 2px dashed #d1d5db;
+    box-sizing: border-box;
     overflow: hidden;
 
     display: flex;
@@ -30,10 +51,8 @@
 }
 
 .image {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     display: block;
 }

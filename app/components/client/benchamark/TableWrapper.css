@@ -1,51 +1,52 @@
 .wrapper {
-    width: auto;
+    width: 100%;
     height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 14px;
+    background: color-mix(in hsl, var(--bg-dark) 76%, var(--bg) 24%);
 }
 
 
 /* HEADER part */
-.header {
+.benchmark-section-header {
     display: flex;
-    flex-direction: column;
-    margin-bottom: 7px;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
     width: 100%;
 }
 
 .table-title {
     font-size: 1rem;
-    font-weight: bold;
-    margin: 0 0 0.25rem 0;
+    font-weight: 650;
+    margin: 0;
 }
 
 .subtitle {
-    font-size: 0.825rem;
-    color: #6b7280;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
     margin: 0;
 }
 
 /* search part */
 .scroll-header {
-    display: grid;
-    grid-template-columns: minmax(180px, 1fr) minmax(130px, auto);
-    grid-template-rows: 1fr 1fr;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     width: 100%;
-    max-width: 500px;
-    height: 70px;
-    align-items: stretch;
-    gap: 0.4rem;
-    margin-bottom: 15px;
-}
-
-.scroll-header:not(.has-category-filter) {
-    grid-template-columns: 1fr;
+    min-height: 36px;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
 }
 
 .search-container {
-    width: 100%;
+    flex: 1 1 220px;
     position: relative;
 }
 
@@ -53,18 +54,19 @@
     display: flex;
     align-items: center;
     gap: 0.35rem;
-    color: #d1d5db;
+    height: 36px;
+    color: var(--text-secondary);
     font-size: 0.75rem;
     white-space: nowrap;
 }
 
 .category-filter select {
-    min-width: 100px;
-    height: 100%;
-    padding: 0 0.45rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.75rem;
-    background: var(--bg-light);
+    min-width: 90px;
+    height: 36px;
+    padding: 0 0.55rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.42);
     color: white;
     font-size: 0.75rem;
 }
@@ -80,9 +82,12 @@
 
 .search-input {
     width: 100%;
+    height: 36px;
     padding-left: 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.42);
+    color: var(--text-primary);
     outline: none;
     font-size: 0.95rem;
     box-sizing: border-box;
@@ -95,33 +100,29 @@
 }
 
 .buttons-container {
-    grid-column: 1 / -1;
     display: flex;
     flex-direction: row;
-    gap: 10px;
-    width: 100%;
-    height: 100%;
-    border-radius: var(--border-radius);
+    gap: 0.2rem;
+    margin-left: auto;
 }
 
 .button {
-    flex: 1;
-    /* replaces width:100% so both buttons share space evenly */
-    height: 100%;
-    border-radius: 10px;
+    height: 36px;
+    padding: 0 0.65rem;
+    border-radius: 8px;
     font-size: 0.8rem;
-    font-weight: 600;
-    background-color: var(--bg);
-    border: none;
-    color: white;
+    font-weight: 500;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: 0.3s ease;
 }
 
 .button:hover {
-    background-color: white;
-    color: black;
-    transform: scale(1.05);
+    background: rgba(148, 163, 184, 0.1);
+    border-color: rgba(148, 163, 184, 0.2);
+    color: var(--text-primary);
 }
 
 .scroll-text {
@@ -135,18 +136,25 @@
 
 /* Grid layout for cards */
 .card-grid {
-    width: 90%;
+    width: 100%;
     height: 100%;
-    padding: 20px;
-    min-width: max-content;
+    min-height: 0;
+    padding: 0.15rem 0.15rem 0.25rem;
+    box-sizing: border-box;
     display: grid;
-    grid-template-columns: repeat(auto-fill, var(--card-width));
-    grid-template-rows: 1fr;
+    /* The grid determines cards per row while preserving a usable card width. */
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    grid-auto-rows: max-content;
     overflow-y: auto;
     overflow-x: hidden;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    border-radius: 20px;
-    background-color: color-mix(in hsl, var(--bg) 20%, var(--bg-dark) 80%);
+    align-items: stretch;
+    align-content: start;
+    gap: 0.7rem;
+}
+
+@media (max-width: 720px) {
+    .wrapper { padding: 1rem; }
+    .scroll-header { align-items: stretch; }
+    .category-filter { flex: 1; }
+    .buttons-container { margin-left: 0; }
 }

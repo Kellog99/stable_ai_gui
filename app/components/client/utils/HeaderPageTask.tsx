@@ -18,11 +18,15 @@ export interface HeaderPageTaskProps {
     button_props?: ButtonsProps
 }
 /**
-* @param Icon: this is the icon to show as the representative
-* @param title: title to show
-* @param description: description of the page 
-* @param buttonprops: these are all the attributes for the button 
-*/
+ * Renders the title area shared by task pages, optionally with an action
+ * button and a tooltip explaining why that action is unavailable.
+ *
+ * @param props - Component properties.
+ * @param props.Icon - Lucide icon displayed beside the page title.
+ * @param props.title - Main page title.
+ * @param props.description - Optional text displayed below the title.
+ * @param props.button_props - Optional configuration for the action button.
+ */
 const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
     Icon,
     title,
@@ -33,10 +37,10 @@ const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
     return (
         <div className='container-header'>
             <div className='container-title'>
-                <Icon size={"calc(var(--icon-size) * 3)"} color='red' />
+                <Icon className="page-task-icon" size={"calc(var(--icon-size) * 2)"} />
                 <div>
-                    <h1 style={{ margin: "0", fontSize: "2.1rem" }}>{title}</h1>
-                    {description && (<p style={{ color: "lightgray", margin: 0, fontSize:"0.8rem" }}>{description}</p>)}
+                    <h1 className="page-task-title">{title}</h1>
+                    {description && (<p className="page-task-description">{description}</p>)}
                 </div>
             </div>
             {

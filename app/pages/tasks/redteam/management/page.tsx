@@ -1,12 +1,12 @@
 "use client";
 import React, {useEffect, useMemo, useState} from 'react'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { AppWindowIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { BenchmarkDataProps, ModelReportProps } from '@/interfaces/reportInterfaces';
-import { benchmarkFetch_get, jobProgress_get, reportFetch_get } from '@/properties/urlsNNTrust';
-import { AttackManagementProps } from '@/interfaces/NNInterfaces';
-import { getStatusIcon } from '@/components/client/management/utils';
+import {AppWindowIcon} from 'lucide-react';
+import {useRouter} from 'next/navigation';
+import {BenchmarkDataProps, ModelReportProps} from '@/interfaces/reportInterfaces';
+import {benchmarkFetch_get, jobProgress_get, reportFetch_get} from '@/properties/urlsNNTrust';
+import {AttackManagementProps} from '@/interfaces/NNInterfaces';
+import {getStatusIcon} from '@/components/client/management/utils';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import ManagementTable from '@/components/client/management/ManagementTable';
 import '@/components/client/management/ManagementTable.css';
@@ -21,14 +21,15 @@ const TaskManagement: React.FC = () => {
 
     const [listExecutedAttacks, setListExecutedAttacks] = useState<AttackManagementProps[]>([]);
     const [description, setDescription] = useState<string>('');
-    const datasetName = useMemo(()=>{return dataset?.name},[dataset])
+    const datasetName = useMemo(() => {
+        return dataset?.name
+    }, [dataset])
 
     // getting the advancement status from the job, starting from the id
     const handleRefresh = async () => {
         if (!benchmarkId) {
             return;
         }
-
         try {
             const response = await fetch(`${jobProgress_get}?id=${encodeURIComponent(benchmarkId)}`, {
                 method: "GET",
@@ -40,8 +41,6 @@ const TaskManagement: React.FC = () => {
             if (!response.ok) {
                 throw new Error(`Failed to get jobs ids from the backend: ${response.status}`);
             }
-
-
             const listAttacks: AttackManagementProps[] = await response.json();
             setListExecutedAttacks(listAttacks);
         } catch (error) {
@@ -56,7 +55,6 @@ const TaskManagement: React.FC = () => {
 
     const [attackStates, setAttackStates] = useState<{ [key: string]: number }>({})
     const [isDisabled, setIsDisabled] = useState<boolean>(false)
-
 
 
     useEffect(() => {
@@ -117,6 +115,7 @@ const TaskManagement: React.FC = () => {
                 return undefined; // Explicitly return undefined on error
             }
         }
+
         // fetching the report
         const reportFetch = await fetchResult<ModelReportProps>(`${reportFetch_get}?id=${encodeURIComponent(benchmarkId as string)}`);
         if (reportFetch) {
@@ -126,7 +125,7 @@ const TaskManagement: React.FC = () => {
         // fetching the benchmark
         const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
         if (benchmarkFetch) {
-            setBenchmark({ [benchmarkId!.toString()]: benchmarkFetch });
+            setBenchmark({[benchmarkId!.toString()]: benchmarkFetch});
         }
         router.push("/pages/report/reportTITANN")
     }

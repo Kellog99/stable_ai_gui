@@ -70,7 +70,7 @@ const Benchmark: React.FC = () => {
     // handler for changing the parameters
     const handleParametersChange = (
         id: string,
-        parameters: number[],
+        parameters: (number | string)[],
         setMap: (map: { [key: string]: RegisterObjectProps }) => void,
         registeredObject: { [key: string]: RegisterObjectProps },
     ) => {
@@ -185,7 +185,7 @@ const Benchmark: React.FC = () => {
 
             {/* Attacks Selection */}
             <TableWrapper
-                title='Vulnearbility selection'
+                title='Vulnerability selection'
                 elements={attacks}
                 showAttackCategories
                 selectedElement={selectedAttacks}
@@ -196,7 +196,7 @@ const Benchmark: React.FC = () => {
                     attacks,
                     visibleElements
                 )}
-                handleParametersChange={(id: string, parameters: number[]) => {
+                handleParametersChange={(id: string, parameters: (number | string)[]) => {
                     handleParametersChange(
                         id,
                         parameters,
@@ -218,7 +218,7 @@ const Benchmark: React.FC = () => {
                     metrics,
                     visibleElements
                 )}
-                handleParametersChange={(id: string, parameters: number[]) => {
+                handleParametersChange={(id: string, parameters: (number | string)[]) => {
                     handleParametersChange(id,
                         parameters,
                         setSelectedMetrics,

@@ -10,7 +10,7 @@ interface TableWrapperProps {
     elements: { [key: string]: RegisterObjectProps };
     selectedElement: { [key: string]: RegisterObjectProps };
     handleSelection: (id: string, visibleElements?: { [key: string]: RegisterObjectProps }) => void;
-    handleParametersChange: (id: string, parameters: number[]) => void;
+    handleParametersChange: (id: string, parameters: (number | string)[]) => void;
     showAttackCategories?: boolean;
 }
 
@@ -19,8 +19,10 @@ const formatCategory = (category: string) =>
         .replace(/[_-]+/g, ' ')
         .replace(/\b\w/g, (letter) => letter.toUpperCase());
 
-/** Resolve the attack family from an explicit backend field or its metadata. */
-const getAttackCategory = (attack: RegisterObjectProps) => {
+/** Resolve the attack objective from its explicit backend field or metadata. */
+const getAttackObjective = (attack: RegisterObjectProps) => {
+    if (attack.objective) return formatCategory(attack.objective);
+
     const explicitCategory = attack.category || attack.nature || attack.attack_type || attack.type;
     if (explicitCategory) return formatCategory(explicitCategory);
     if (attack.privacy_type) return 'Privacy';
@@ -37,19 +39,25 @@ const getAttackCategory = (attack: RegisterObjectProps) => {
     return 'Other';
 };
 
-const TableWrapper: React.FC<TableWrapperProps> = ({
-                                                       title,
-                                                       elements,
-                                                       selectedElement,
-                                                       handleSelection,
-                                                       handleParametersChange,
-                                                       showAttackCategories = false,
-                                                   }) => {
+const matchesKnowledge = (attack: RegisterObjectProps, knowledge: string) =>
+    knowledge === 'all' || attack.knowledge?.toLowerCase().includes(knowledge);
+
+const TableWrapper: React.FC<TableWrapperProps> = (
+    {
+        title,
+        elements,
+        selectedElement,
+        handleSelection,
+        handleParametersChange,
+        showAttackCategories = false,
+    }
+) => {
 
     const [query, setQuery] = useState("");
-    const [category, setCategory] = useState("all");
-    const categories = useMemo(() => Array.from(new Set(
-        showAttackCategories ? Object.values(elements).map(getAttackCategory) : []
+    const [objective, setObjective] = useState("all");
+    const [knowledge, setKnowledge] = useState("all");
+    const objectives = useMemo(() => Array.from(new Set(
+        showAttackCategories ? Object.values(elements).map(getAttackObjective) : []
     )).sort(), [elements, showAttackCategories]);
 
     const filteredItems = useMemo(() => {
@@ -58,18 +66,21 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 query === "" ||
                 value.name.toLowerCase().includes(query.toLowerCase()) ||
                 value.description.toLowerCase().includes(query.toLowerCase()) ||
-                (showAttackCategories && getAttackCategory(value).toLowerCase().includes(query.toLowerCase()))
+                (showAttackCategories && getAttackObjective(value).toLowerCase().includes(query.toLowerCase())) ||
+                value.knowledge?.toLowerCase().includes(query.toLowerCase())
         ).filter(([_id, value]) =>
-            !showAttackCategories || category === "all" || getAttackCategory(value) === category
+            !showAttackCategories || objective === "all" || getAttackObjective(value) === objective
+        ).filter(([_id, value]) =>
+            !showAttackCategories || matchesKnowledge(value, knowledge)
         ));
-    }, [query, category, elements, showAttackCategories]);
+    }, [query, objective, knowledge, elements, showAttackCategories]);
 
     return (
         <div className="wrapper">
-            <div className="header">
+            <div className="benchmark-section-header">
                 <h2 className="table-title">{title}</h2>
                 <p className="subtitle">
-                    Selected: {selectedElement ? Object.keys(selectedElement).length : 0} / {Object.keys(elements).length}
+                    {selectedElement ? Object.keys(selectedElement).length : 0} / {Object.keys(elements).length} selected
                 </p>
             </div>
             <div className={`scroll-header ${showAttackCategories ? 'has-category-filter' : ''}`}>
@@ -87,10 +98,19 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                 </div>
                 {showAttackCategories && <label className="category-filter">
                     <SlidersHorizontal size={"calc(var(--icon-size) * 0.8)"}/>
-                    <span>Nature</span>
-                    <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                    <span>Objective</span>
+                    <select value={objective} onChange={(e) => setObjective(e.target.value)}>
                         <option value="all">All</option>
-                        {categories.map((item) => <option key={item} value={item}>{item}</option>)}
+                        {objectives.map((item) => <option key={item} value={item}>{item}</option>)}
+                    </select>
+                </label>}
+                {showAttackCategories && <label className="category-filter">
+                    <SlidersHorizontal size={"calc(var(--icon-size) * 0.8)"}/>
+                    <span>Knowledge</span>
+                    <select value={knowledge} onChange={(e) => setKnowledge(e.target.value)}>
+                        <option value="all">All</option>
+                        <option value="white">White</option>
+                        <option value="black">Black</option>
                     </select>
                 </label>}
                 <div className='buttons-container'>
@@ -99,36 +119,35 @@ const TableWrapper: React.FC<TableWrapperProps> = ({
                         onClick={() => {
                             handleSelection("all", filteredItems)
                         }}
-                    > Select All
+                    > Select all
                     </button>
                     <button
                         className="button"
                         onClick={() => {
                             handleSelection("none", filteredItems)
-                        }}> Deselect All
+                        }}> Clear
                     </button>
                 </div>
             </div>
             {Object.entries(filteredItems).length > 0 ?
                 <div className="card-grid">
                     {
-                        Object.entries(filteredItems).map(([id, atk]: [string, RegisterObjectProps]) => (
+                        Object.entries(filteredItems).map(([id, atk]: [string, RegisterObjectProps]) => {
+                            const selectedAttack = selectedElement[id];
 
-                            <AttackCard
+                            return <AttackCard
                                 key={id}
                                 id={id}
                                 title={atk.name}
                                 description={atk.description}
                                 knowledge={atk.knowledge}
-                                category={showAttackCategories ? getAttackCategory(atk) : undefined}
-                                isActive={Object.keys(selectedElement).includes(id)}
-                                parameters={atk.parameters ? atk.parameters : []}
+                                category={showAttackCategories ? getAttackObjective(atk) : undefined}
+                                isActive={selectedAttack?.id === atk.id}
+                                parameters={selectedAttack?.parameters ?? atk.parameters ?? []}
                                 handleClick={() => handleSelection(atk.id)}
-                                handleParametersChange={(parameters: (number | string)[]) => {
-                                    handleParametersChange(id, parameters as number[])
-                                }}
+                                handleParametersChange={(parameters) => handleParametersChange(id, parameters)}
                             />
-                        ))
+                        })
                     }
                 </div>
                 : <div className='scroll-text'>
