@@ -85,6 +85,8 @@ const useNNTrustStore = create<AppState>()(
         {
             name: "app-storage-models",
             storage: createJSONStorage(() => localStorage),
+            // Start from the defaults instead of restoring a possibly stale browser snapshot.
+            skipHydration: true,
             partialize: (state) => ({
                 model: state.model,
                 dataset: state.dataset,

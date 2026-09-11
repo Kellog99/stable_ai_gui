@@ -1,18 +1,10 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import './AtkCard.css';
-import { Info, Settings2 } from 'lucide-react';
+import {Info, Settings2} from 'lucide-react';
 import ParametersWindow from '@/components/client/redtool/Parameters';
-import { ParametersProps } from '@/interfaces/NNInterfaces';
-import { Tooltip } from '@mantine/core';
+import {ParametersProps} from '@/interfaces/NNInterfaces';
+import {Tooltip} from '@mantine/core';
 
-/**
- * Processes a user's subscription.
- * @param id - attack's id
- * @param title - it represent the attack's name
- * @param parameters - attack's parameters
- * @param handleClick - it handles the selection of a specific AtkCard
- * @param handleParametersChange - It handles the change of the attack's parameters
-*/
 
 export interface AttackCardProps {
     id: string,
@@ -26,17 +18,34 @@ export interface AttackCardProps {
     handleParametersChange: (parameters: (number | string)[]) => void;
 }
 
-const AttackCard: React.FC<AttackCardProps> = ({
-    id,
-    title,
-    isActive,
-    description,
-    knowledge,
-    category,
-    parameters,
-    handleClick,
-    handleParametersChange
-}) => {
+/**
+ * Renders a selectable attack card with its metadata, description tooltip,
+ * and a settings control for editing attack parameters.
+ *
+ * @param props - Component properties.
+ * @param props.id - Unique identifier for the attack.
+ * @param props.title - Attack name displayed on the card.
+ * @param props.description - Description shown in the information tooltip.
+ * @param props.knowledge - Optional attack knowledge level.
+ * @param props.category - Optional attack category.
+ * @param props.isActive - Whether this attack is currently selected.
+ * @param props.parameters - Parameter definitions passed to the settings dialog.
+ * @param props.handleClick - Selects this attack.
+ * @param props.handleParametersChange - Receives updated parameter values.
+ */
+const AttackCard: React.FC<AttackCardProps> = (
+    {
+        id,
+        title,
+        isActive,
+        description,
+        knowledge,
+        category,
+        parameters,
+        handleClick,
+        handleParametersChange
+    }
+) => {
     const [isClicked, setIsClicked] = useState<boolean>(false)
 
     const handleSettingsClick = (e: React.MouseEvent) => {
@@ -53,10 +62,11 @@ const AttackCard: React.FC<AttackCardProps> = ({
         >
             <div
                 className={`title_container ${category || knowledge ? 'has_metadata' : 'no_metadata'}`}
-                >
+            >
                 <span className="attack_title">{title}</span>
                 {(category || knowledge) && <div className="attack_metadata">
-                    {category && <span className={`category_badge category_${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{category}</span>}
+                    {category && <span
+                        className={`category_badge category_${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{category}</span>}
                     {knowledge && (<div className='knowledge_container'>{knowledge}</div>)}
                 </div>}
             </div>
@@ -66,7 +76,7 @@ const AttackCard: React.FC<AttackCardProps> = ({
                     key={id}
                     w={220}
                     withArrow
-                    transitionProps={{ duration: 200 }}
+                    transitionProps={{duration: 200}}
                     label={description}
                     style={{
                         fontSize: "0.6rem",
@@ -75,13 +85,13 @@ const AttackCard: React.FC<AttackCardProps> = ({
                         color: "black"
                     }}
                 >
-                    <Info size={20} className='info_icon' />
+                    <Info size={20} className='info_icon'/>
                 </Tooltip>
                 <button
                     className='card-settings-btn'
                     onClick={handleSettingsClick}
                 >
-                    <Settings2 size={20} />
+                    <Settings2 size={20}/>
                 </button>
             </div>
             <ParametersWindow
@@ -90,7 +100,7 @@ const AttackCard: React.FC<AttackCardProps> = ({
                 onClose={() => setIsClicked(false)}
                 handleParametersChange={handleParametersChange}
             />
-        </div >
+        </div>
     )
 }
 

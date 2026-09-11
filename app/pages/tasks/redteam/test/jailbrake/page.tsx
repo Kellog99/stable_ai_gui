@@ -1,19 +1,19 @@
 "use client";
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import { RegisterObjectProps } from '@/interfaces/NNInterfaces'
+import {RegisterObjectProps} from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
-import { useEffect, useMemo, useState } from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import styles from '@/styles/Jailbrake.module.css'
-import { Send, Shield, Unlink } from 'lucide-react';
+import {Send, Unlink} from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import MessageThread from '@/components/client/jailbraking/MessageThread';
-import { BubbleInterface, JailbreakAttackOutput } from '@/interfaces/testInterfaces';
+import {BubbleInterface, JailbreakAttackOutput} from '@/interfaces/testInterfaces';
 
 const Jailbraking = () => {
     // ######################## stored Variables ########################
-    const { hostname, port } = useBackendVariablesStore()
-    const { attacks, model } = useNNTrustStore()
+    const {hostname, port} = useBackendVariablesStore()
+    const {attacks, model} = useNNTrustStore()
     // ##################################################################
 
     const [selectedAttack, setSelectedAttack] = useState<RegisterObjectProps>(Object.values(attacks)[0])
@@ -45,7 +45,7 @@ const Jailbraking = () => {
                 default: value[i]
             }))
 
-            return { ...prev, parameters: newParameters }
+            return {...prev, parameters: newParameters}
         })
     }
 
@@ -104,7 +104,7 @@ const Jailbraking = () => {
             <HeaderPageTask
                 Icon={Unlink}
                 title="Jailbreaking"
-                descrition="Test on the loaded model, single attacks for a specific prompt."
+                description="Test on the loaded model, single attacks for a specific prompt."
 
             />
             <div className={styles.body}>
@@ -125,7 +125,9 @@ const Jailbraking = () => {
                                 handleSubmit();
                             }
                         }}
-                        onChange={(e) => { setPrompt(e.target.value) }}
+                        onChange={(e) => {
+                            setPrompt(e.target.value)
+                        }}
                         className={styles.input_style}
                         placeholder="Insert the goal of the attack."
                     />
@@ -134,7 +136,7 @@ const Jailbraking = () => {
                         disabled={isClicked && !isActive}
                         onClick={handleSubmit}
                     >
-                        <Send size={24} />
+                        <Send size={24}/>
                     </button>
                 </div>
                 <VulnerabilitySelection
