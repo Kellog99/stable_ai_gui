@@ -2,7 +2,7 @@
 
 import React, {useEffect, useMemo, useState} from 'react';
 import {ChartColumn, Download, Play, Shield, X} from 'lucide-react';
-import {ImageDisplay} from '@/components/client/test/ImageDisplay';
+import {ImageDisplay} from '@/components/client/evasion/ImageDisplay';
 import {ParametersProps, RegisterObjectProps} from '@/interfaces/NNInterfaces';
 import {ConfidenceData} from '@/interfaces/testInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
@@ -12,7 +12,7 @@ import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelec
 import '@mantine/charts/styles.css';
 import styles from '@/styles/Evasion.module.css';
 import {handlePostRequest} from './handle_execution';
-import {AttackVisualization} from '@/components/client/test/AttackVisualization';
+import {AttackVisualization} from '@/components/client/evasion/AttackVisualization';
 
 export interface AttackResults {
     prediction?: { original: string; adversarial: string };

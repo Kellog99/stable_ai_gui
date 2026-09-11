@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {RefreshCw} from "lucide-react";
 import "./FileRepository.css";
 import {DatasetInfo, ModelInfo, ModelType} from "@/interfaces/homePageInterface";
@@ -119,7 +119,14 @@ const Repository = <T extends ModelInfo | DatasetInfo>(
                         <button
                             type="button"
                             className="refresh-repository-button"
-                            onClick={handleRefresh}
+                            onClick={(event) => {
+                                // Keep the refresh action scoped to the repository controls.
+                                // This also makes the optional callback safe for repositories
+                                // that do not provide refresh support (for example reports).
+                                event.stopPropagation();
+                                setSelectedElement("");
+                                handleRefresh?.();
+                            }}
                             aria-label="Refresh repository"
                             data-tooltip="Update the repository list"
                         >

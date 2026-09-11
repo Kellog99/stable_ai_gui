@@ -67,7 +67,7 @@ const SecurityReport = () => {
             if (!response.ok) throw new Error('PDF generation failed');
 
             // 2. Convert response to a Blob (binary data)
-            const blob = await response.blob({ type: 'application/pdf' });
+            const blob = await response.blob();
 
             // 3. Create a temporary local URL for the blob
             const pdfUrl = URL.createObjectURL(blob);

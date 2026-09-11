@@ -1,0 +1,17 @@
+const backend = 'http://localhost:8000';
+export const datasets_get = `${backend}/dataset/getDatasets`;
+export const dataset_get = `${backend}/dataset/getDataset`;
+export const save_get = `${backend}/dataset/save`;
+export const completeness_start = `${backend}/dq/completeness`;
+export const completenessOK_get = `${backend}/dq/completeness/status`;
+export const data_get = `${backend}/dq/data`;
+export const duplicates_start = `${backend}/dq/duplicates`;
+export const getAllReports_get = `${backend}/report/repository`;
+export const getDQReportByName = `${backend}/report/get`;
+export const model_info_get = `${backend}/model/info`;
+export const outliers_start = `${backend}/dq/outliers`;
+export const prototypes_get = `${backend}/dq/prototypes`;
+export const retrieve_get = `${backend}/dq/retrieve`;
+export const root_folder = `${backend}`;
+export const saveMetric = `${backend}/dq/metric`;
+export const upload_post = `${backend}/dataset/upload`;

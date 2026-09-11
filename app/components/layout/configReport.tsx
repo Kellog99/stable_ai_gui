@@ -1,62 +1,13 @@
-import { File, HardDrive, Upload } from 'lucide-react';
-import { FileDropZoneProps } from '@/interfaces/homePageInterface';
-import { infoModel } from '../client/repository/config';
+import {File, HardDrive} from 'lucide-react';
+import {JsonRepository} from '@/components/client/repository/jsonRepository';
 
-// Repository
-import { DatasetRepository } from '@/components/client/DatasetsRepoLoad';
-import { DragDrop } from '@/components/client/upload/DragDrop';
-import { JsonRepository } from '@/components/client/repository/jsonRepository';
-
-
-// Configuration file of the Report's drag and drop component
-export const reportSection: FileDropZoneProps =
-{
-    id: "report_loader",
-    title: "Report",
-    description: "Drag and drop the JSON of the report.",
+/** Legacy report configuration kept for consumers of the old layout API. */
+export const reportSection = {
+    id: 'report_loader',
+    title: 'Report',
+    description: 'Browse generated reports.',
     Icon: File,
-    fileDropInformation: infoModel,
     buttons: [
-        {
-            id: "report",
-            name: "Upload report",
-            Icon: Upload,
-            child: <DragDrop
-                name={"File"}
-                Icon={File}
-                acceptedType={"json"}
-                description={'Upload the JSON file related to the report.'}
-                onFileUpload={() => { }}
-            />,
-        },
-        {
-            id: "repo-model-report",
-            name: "Repository Model",
-            Icon: HardDrive,
-            child: <JsonRepository tool='nntrust' />,
-        },
-        {
-            id: "repo-dataset-report",
-            name: "Repository Dataset",
-            Icon: HardDrive,
-            child: <JsonRepository tool='dq' />,
-        }
+        {id: 'repo-model-report', name: 'Repository Model', Icon: HardDrive, child: <JsonRepository/>},
     ],
-    storeSetter: (
-        file: File,             // Actual model (.pth)
-        name: string,           // Extracted model name
-        numClasses: number      // Extracted class count
-    ) => {
-        const { setModel, setModelName } = getStore();
-
-        setModel({
-            name: name,
-            task: "Classification",
-            file: file,
-            numClasses: numClasses
-        });
-
-        setModelName(name);
-    },
-    Repository: DatasetRepository
-}
+};

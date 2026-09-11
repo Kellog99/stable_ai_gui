@@ -105,4 +105,8 @@ export async function getCoreElements(
   if (!response.ok) throw new Error('Failed to get model info from the backend');
   return response.json();
 }
+
+export async function getReports(hostname: string, port: string): Promise<ModelReportProps[]> {
+  return getCoreElements(hostname, port, "path_model_report_repo", "report_model") as Promise<ModelReportProps[]>;
+}
 // #####################################################################################

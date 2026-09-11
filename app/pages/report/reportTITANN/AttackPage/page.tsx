@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import useNNTrustStore from '@/store/nnTrustStore';
 import { ReportAttackProps } from '@/interfaces/reportInterfaces';
@@ -27,7 +27,7 @@ function formatMetricValue(value: unknown): string {
     return String(value);
 }
 
-const AttackPage = () => {
+const AttackPageContent = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const atkId = searchParams.get('atkId');
@@ -144,5 +144,11 @@ const AttackPage = () => {
         </main>
     );
 };
+
+const AttackPage = () => (
+    <Suspense fallback={<div className="dashboard-message">Loading...</div>}>
+        <AttackPageContent />
+    </Suspense>
+);
 
 export default AttackPage;
