@@ -1,17 +1,19 @@
 import "./SettingsModal.css"
-import { Group, Modal, NativeSelect, ScrollArea, TextInput } from "@mantine/core";
-import React, { useEffect, useState } from "react";
-import { Gpu } from "lucide-react";
-import { ServerConfig, SettingsModalProps } from "@/interfaces/globalVariableInterface";
+import {Group, Modal, NativeSelect, ScrollArea, TextInput} from "@mantine/core";
+import React, {useEffect, useRef, useState} from "react";
+import {Gpu} from "lucide-react";
+import {ServerConfig, SettingsModalProps} from "@/interfaces/globalVariableInterface";
 import useBackendVariablesStore from "@/store/globalStore";
-import { getDevicesList, getServerConfiguration, validatePath } from "@/functionalities/TITANNServices/get_settings";
-import { pathConfigs, ServerConfigDescritpion } from "./settingsConfig";
-import { handleSave } from "@/functionalities/TITANNServices/post_info";
+import {getDevicesList, getServerConfiguration, validatePath} from "@/functionalities/TITANNServices/get_settings";
+import {pathConfigs, ServerConfigDescritpion} from "./settingsConfig";
+import {handleSave} from "@/functionalities/TITANNServices/post_info";
 
-const SettingsModal: React.FC<SettingsModalProps> = ({
-    isOpen,
-    onClose,
-}) => {
+const SettingsModal: React.FC<SettingsModalProps> = (
+    {
+        isOpen,
+        onClose,
+    }
+) => {
     const {
         port,
         hostname,
@@ -20,13 +22,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     } = useBackendVariablesStore()
 
     const [globalParameters, setGlobalParameters] = useState<ServerConfig>()
+    const [invalidPaths, setInvalidPaths] = useState<Record<string, boolean>>({})
+    const [folderField, setFolderField] = useState<string>()
+    const folderInputRef = useRef<HTMLInputElement>(null)
 
     // Get the global variable from the backend
     useEffect(() => {
+        if (!isOpen) return;
+
         getServerConfiguration(hostname, port)
-            .then(setGlobalParameters)
+            .then((configuration) => {
+                setGlobalParameters(configuration)
+                setInvalidPaths({})
+            })
             .catch((err) => console.error("Failed to load server configuration:", err));
-    }, [hostname, port]);
+    }, [isOpen]);
 
 
     /** Update any field in globalParameters */
@@ -37,23 +47,57 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         }));
     };
 
+    const validateEditedPath = async (field: string, value: string) => {
+        if (!value) {
+            setInvalidPaths((current) => ({...current, [field]: false}));
+            return;
+        }
+
+        try {
+            const isValid = await validatePath(hostname, port, value);
+            setInvalidPaths((current) => ({...current, [field]: !isValid}));
+        } catch (error) {
+            console.error("Failed to validate path:", error);
+        }
+    };
+
+    const chooseFolder = (field: string) => {
+        setFolderField(field);
+        folderInputRef.current?.click();
+    };
+
+    const handleFolderSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = event.target.files?.[0];
+        if (!selectedFile || !folderField) return;
+
+        // Browsers intentionally expose the selected folder as a relative path.
+        // This is the path that can safely be passed to the backend for validation.
+        const selectedFolder = selectedFile.webkitRelativePath.split("/")[0];
+        updateField(folderField, selectedFolder);
+        setInvalidPaths((current) => ({...current, [folderField]: false}));
+        void validateEditedPath(folderField, selectedFolder);
+
+        // Allow selecting the same folder again later.
+        event.target.value = "";
+    };
 
 
     // ########################### devices ###########################
     const [deviceList, setDeviceList] = useState<string[]>(["cpu"])
 
     useEffect(() => {
+        if (!isOpen) return;
+
         getDevicesList(hostname, port)
             .then((listDevices: string[]) => {
                 if (listDevices && listDevices.length > 0) {
                     setDeviceList(listDevices)
-                }
-                else {
+                } else {
                     // the cpu always exists
                     setDeviceList(["cpu"])
                 }
             })
-    }, [hostname, port])
+    }, [isOpen])
     // ################################################################
 
     return (
@@ -61,36 +105,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             opened={isOpen}
             onClose={onClose}
             title="Configuration Window"
-            styles={{
-                content: {
-                    minHeight: "400px",
-                    borderRadius: '16px',
-                    padding: "10px",
-                    backgroundColor: "var(--bg)",
-                    color: "white"
-                },
-                title: {
-                    fontWeight: "bold",
-                    fontSize: "1.7rem",
-                    margin: 0,
-                    color: "white"
-                },
-                header: {
-                    background: "none"
-                },
-                body: {
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px"
-                }
+            classNames={{
+                content: "settings-modal-content",
+                title: "settings-modal-title",
+                header: "settings-modal-header",
+                body: "settings-modal-body",
             }}
             scrollAreaComponent={ScrollArea.Autosize}
             centered
             size="40rem"
         >
             <p className="settings-text">
-                With this parameters it is possible to set all the paths that are required for a working application (it is suggested to provide the absolute path).
-                Moreover, it is possible to set the hostname and the port for the backend services and the device where the computations will be performed.
+                With this parameters it is possible to set all the paths that are required for a working application (it
+                is suggested to provide the absolute path).
+                Moreover, it is possible to set the hostname and the port for the backend services and the device where
+                the computations will be performed.
             </p>
             <div className="settings-container">
                 {
@@ -99,31 +128,42 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         return (
                             <TextInput
                                 key={key}
-                                className="flex-1"
                                 label={config.label}
                                 description={config.description}
                                 value={value}
-                                rightSection={<config.Icon />}
-                                onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+                                className={`settings-input ${invalidPaths[key] ? "settings-input-invalid" : ""}`}
+                                error={invalidPaths[key] ? "This path does not exist." : undefined}
+                                rightSection={config.type === "path" ? (
+                                    <button
+                                        type="button"
+                                        className="settings-folder-button"
+                                        aria-label={`Select ${config.label}`}
+                                        onClick={() => chooseFolder(key)}
+                                    >
+                                        <config.Icon/>
+                                    </button>
+                                ) : <config.Icon/>}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                     const newValue = e.target.value;
-                                    let isValid = true;
 
+                                    if (config.type === "number" && !/^\d*$/.test(newValue)) {
+                                        return;
+                                    }
+
+                                    // Update the controlled value immediately so the input remains editable.
+                                    updateField(key, newValue);
+                                    setInvalidPaths((current) => ({...current, [key]: false}));
+
+                                    if (key === "host") {
+                                        setHostname(newValue);
+                                    } else if (key === "port") {
+                                        setPort(newValue);
+                                    }
+                                }}
+                                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
                                     if (config.type === "path") {
-                                        isValid = await validatePath(hostname, port, newValue);
+                                        void validateEditedPath(key, e.currentTarget.value);
                                     }
-                                    else if (config.type === "number") {
-                                        isValid = /^\d*$/.test(newValue);
-                                    }
-                                    if (isValid || config.type !== "number") {
-                                        if (key === "host") {
-                                            setHostname(newValue);
-                                        } else if (key === "port") {
-                                            setPort(newValue);
-                                        } else {
-                                            updateField(key, newValue);
-                                        }
-                                    }
-
                                 }}
                             />
                         )
@@ -133,11 +173,21 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                     label="Select Device"
                     description="Select the device where the computation occours."
                     data={deviceList}
-                    rightSection={<Gpu />}
+                    rightSection={<Gpu/>}
                 />
             </div>
 
-            <Group mt="lg" justify="center">
+            <input
+                ref={folderInputRef}
+                className="settings-folder-input"
+                type="file"
+                // @ts-expect-error webkitdirectory is supported by Chromium-based browsers.
+                webkitdirectory="true"
+                directory="true"
+                onChange={handleFolderSelected}
+            />
+
+            <Group className="settings-actions" justify="center">
                 <button
                     onClick={onClose}
                     className="settings-button close"
