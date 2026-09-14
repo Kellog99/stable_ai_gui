@@ -85,7 +85,8 @@ const useNNTrustStore = create<AppState>()(
         {
             name: "app-storage-models",
             storage: createJSONStorage(() => localStorage),
-            // Start from the defaults instead of restoring a possibly stale browser snapshot.
+            // RootLayout restores this after mount to keep the server and first client
+            // render in sync while still preserving state across page refreshes.
             skipHydration: true,
             partialize: (state) => ({
                 model: state.model,
@@ -96,9 +97,8 @@ const useNNTrustStore = create<AppState>()(
                 privacyAttacks: state.privacyAttacks,
                 metrics: state.metrics,
                 modelReport: state.modelReport,
-                benchmark: state.benchmark,
+                selectedAttacks: state.selectedAttacks,
                 benchmarkId: state.benchmarkId,
-                selectedAttacks: state.selectedAttacks
             }),
         }
     )

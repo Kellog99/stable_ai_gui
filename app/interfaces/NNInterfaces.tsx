@@ -59,12 +59,27 @@ export interface ParametersWindowProps {
   handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
 }
 
-export interface AttackManagementProps {
-  id: number;
-  name: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'closed';
-  progress: number
+export type AttackStatus = 'pending' | 'in progress' | 'finished' | 'error';
+
+export interface ParameterLogProps {
+  id: string;
+  name?: string | null;
+  value: unknown;
+  description?: string | null;
 }
+
+export interface JobResult {
+  id: string;
+  parameters?: ParameterLogProps[] | null;
+  result?: Record<string, unknown> | null;
+  total?: number | null;
+  progress?: number | null;
+  /** Defaults to `pending` when omitted by the backend model. */
+  status?: AttackStatus;
+  error?: string | null;
+}
+
+export type JobResults = JobResult;
 
 export interface ModelSpecs {
   name: string;

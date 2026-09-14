@@ -124,13 +124,8 @@ const Jailbreaking = () => {
         return !!(model && prompt && prompt !== "" && selectedAttack)
     }, [model, prompt, selectedAttack])
 
-    const handleChange = (value: number[]) => {
+    const handleChange = (value: (number | string)[]) => {
         if (!selectedAttack || !selectedAttack.parameters) return;
-
-        const newParameters = selectedAttack.parameters.map((param, i) => ({
-            ...param,
-            default: value[i]
-        }));
 
         // Persist the new parameter values to store
         setSavedParams(prevSaved => ({
@@ -286,10 +281,8 @@ const Jailbreaking = () => {
                         stretch
                         attacks={attacksWithSavedParams}
                         selectedAttack={selectedAttack ?? undefined}
-                        handleSelection={(attackId) => {
-                            setSelectedAttackId(attackId)
-                        }}
-                        handleChange={(value: (string | number)[]) => handleChange(value as number[])}
+                        handleSelection={setSelectedAttackId}
+                        handleChange={handleChange}
                     />
                     <ModelSelector
                         attackerModel={attackerModel}

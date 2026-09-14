@@ -1,48 +1,41 @@
-import { AttackManagementProps } from '@/interfaces/NNInterfaces';
+import type {JobResult} from '@/interfaces/NNInterfaces';
 import { Progress } from '@mantine/core';
 import { Search } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import './TaskManagement.css';
-import { getStatusIcon, getStatusColor, statuses } from './utils';
+import {getStatusIcon, getStatusColor, getStatusLabel, statuses} from './utils';
+import type {AttackStatusLabel} from './utils';
 interface ManagementTableProps {
-    jobs: AttackManagementProps[]
+    jobs: JobResult[];
+    attackNames?: Record<string, string>;
 }
 
 const ManagementTable: React.FC<ManagementTableProps> = ({
-    jobs
+    jobs,
+    attackNames = {},
 }) => {
 
 
-    const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('All');
-    const [sortConfig, setSortConfig] = useState<{ key: keyof AttackManagementProps | null, direction: 'asc' | 'desc' }>({
-        key: null,
-        direction: 'asc'
-    });
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [statusFilter, setStatusFilter] = useState<'All' | AttackStatusLabel>('All');
 
 
-    const filteredAndSortedJobs = useMemo(() => {
-        const statusMap = {
-            "completed": "Completed",
-            "in_progress": "In Progress",
-            "pending": "Pending",
-            "closed": "Closed",
-        };
-        
-        let filtered = jobs.filter(job => {
+    const filteredJobs = useMemo<JobResult[]>(() => {
+        const normalizedSearchTerm: string = searchTerm.trim().toLowerCase();
+
+        return jobs.filter((job) => {
+            const attackName = attackNames[job.id] ?? job.id;
             const matchesSearch =
-                job.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                job.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-                job.status.toLowerCase().includes(searchTerm.toLowerCase());
+                attackName.toLowerCase().includes(normalizedSearchTerm) ||
+                job.id.toLowerCase().includes(normalizedSearchTerm) ||
+                getStatusLabel(job.status ?? 'pending').toLowerCase().includes(normalizedSearchTerm);
 
-            const matchesStatus = statusFilter === 'All' || statusMap[job.status] === statusFilter
-;
+            const matchesStatus = statusFilter === 'All' || getStatusLabel(job.status ?? 'pending') === statusFilter;
 
             return matchesSearch && matchesStatus;
         });
 
-        return filtered;
-    }, [jobs, searchTerm, statusFilter]);
+    }, [attackNames, jobs, searchTerm, statusFilter]);
 
 
 
@@ -67,7 +60,7 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                             className='selectionButton'
                             id="statusFilter"
                             value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
+                            onChange={(e) => setStatusFilter(e.target.value as 'All' | AttackStatusLabel)}
                         >
                             <option value="All">All Statuses</option>
                             {statuses.map(status => {
@@ -88,31 +81,33 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
                             </tr>
                         </thead>
                         <tbody>
-                            {jobs.length === 0 ? (
+                            {filteredJobs.length === 0 ? (
                                 <tr>
                                     <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
-                                        No jobs found
+                                        {jobs.length === 0 ? 'No jobs have been executed' : 'No jobs match the current filters'}
                                     </td>
                                 </tr>
                             ) : (
-                                filteredAndSortedJobs.map((job, index) => {
+                                filteredJobs.map((job) => {
                                     return (
-                                        <tr key={`${job.id}-${index}`}>
+                                        <tr key={job.id}>
                                             <td>
                                                 {job.id}
                                             </td>
                                             <td style={{ fontWeight: "bold" }}>
-                                                {job.name}
+                                                {attackNames[job.id] ?? job.id}
                                             </td>
                                             <td>
-                                                {job.status === "in_progress" ?
-                                                    <Progress value={job.progress} color='blue' animated />
-                                                    : job.status === "completed" && job.progress !== 100 ?
-                                                        <Progress value={job.progress} color='red' />
-                                                        :
-                                                    <div className={`status-badge ${getStatusColor(job.status)}`}>
-                                                        {getStatusIcon(job.status)}
-                                                        <span>{job.status}</span>
+                                                {job.status === "in progress" ?
+                                                    <Progress
+                                                        value={job.total ? ((job.progress ?? 0) / job.total) * 100 : 0}
+                                                        color='blue'
+                                                        animated
+                                                    />
+                                                    :
+                                                    <div className={`status-badge ${getStatusColor(job.status ?? 'pending')}`}>
+                                                        {getStatusIcon(job.status ?? 'pending')}
+                                                        <span>{getStatusLabel(job.status ?? 'pending')}</span>
                                                     </div>
                                                 }
                                             </td>

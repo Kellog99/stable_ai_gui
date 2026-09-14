@@ -77,6 +77,18 @@
     font-size: 0.84rem;
 }
 
+.management-section-heading .management-benchmark-id {
+    margin-top: 8px;
+}
+
+.management-benchmark-id code {
+    padding: 3px 7px;
+    color: var(--text-primary);
+    background: color-mix(in hsl, var(--bg-light) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bg-light) 42%, transparent);
+    border-radius: 5px;
+}
+
 .management-eyebrow {
     color: #55c7db;
     font-size: 0.68rem;
