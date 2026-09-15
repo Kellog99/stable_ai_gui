@@ -1,23 +1,30 @@
-import type {JobResult} from '@/interfaces/NNInterfaces';
-import { Progress } from '@mantine/core';
-import { Search } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import {ATTACK_STATUSES} from '@/interfaces/NNInterfaces';
+import type {AttackStatus, JobResult} from '@/interfaces/NNInterfaces';
+import {Progress} from '@mantine/core';
+import {Search} from 'lucide-react';
+import React, {useMemo, useState} from 'react';
 import './TaskManagement.css';
-import {getStatusIcon, getStatusColor, getStatusLabel, statuses} from './utils';
-import type {AttackStatusLabel} from './utils';
+import {getStatusColor, getStatusIcon, getStatusLabel} from './utils';
+
 interface ManagementTableProps {
     jobs: JobResult[];
     attackNames?: Record<string, string>;
+    isLoading?: boolean;
+    error?: string | null;
 }
 
-const ManagementTable: React.FC<ManagementTableProps> = ({
-    jobs,
-    attackNames = {},
-}) => {
+const ManagementTable: React.FC<ManagementTableProps> = (
+    {
+        jobs,
+        attackNames = {},
+        isLoading = false,
+        error = null,
+    }
+) => {
 
 
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [statusFilter, setStatusFilter] = useState<'All' | AttackStatusLabel>('All');
+    const [statusFilter, setStatusFilter] = useState<'All' | AttackStatus>('All');
 
 
     const filteredJobs = useMemo<JobResult[]>(() => {
@@ -28,9 +35,9 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
             const matchesSearch =
                 attackName.toLowerCase().includes(normalizedSearchTerm) ||
                 job.id.toLowerCase().includes(normalizedSearchTerm) ||
-                getStatusLabel(job.status ?? 'pending').toLowerCase().includes(normalizedSearchTerm);
+                getStatusLabel(job.status).toLowerCase().includes(normalizedSearchTerm);
 
-            const matchesStatus = statusFilter === 'All' || getStatusLabel(job.status ?? 'pending') === statusFilter;
+            const matchesStatus = statusFilter === 'All' || job.status === statusFilter;
 
             return matchesSearch && matchesStatus;
         });
@@ -38,35 +45,34 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
     }, [attackNames, jobs, searchTerm, statusFilter]);
 
 
-
     return (
         <div className='table-container'>
             <div>
                 <div className="management-filters">
                     <div className="management-search-wrapper">
-                        <Search className="management-search-icon" />
+                        <Search className="management-search-icon" aria-hidden="true"/>
                         <input
                             type="text"
                             id="searchInput"
                             placeholder="Search jobs..."
+                            aria-label="Search vulnerability jobs"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
                     <div className='management-filter'>
-                        <div>Filter by:</div>
+                        <label htmlFor="statusFilter">Filter by:</label>
                         <select
                             className='selectionButton'
                             id="statusFilter"
                             value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value as 'All' | AttackStatusLabel)}
+                            onChange={(e) => setStatusFilter(e.target.value as 'All' | AttackStatus)}
                         >
                             <option value="All">All Statuses</option>
-                            {statuses.map(status => {
-                                return <option key={status} value={status}>{status}</option>
-                            })
-                            }
+                            {ATTACK_STATUSES.map((status) => (
+                                <option key={status} value={status}>{getStatusLabel(status)}</option>
+                            ))}
                         </select>
                     </div>
                 </div>
@@ -74,48 +80,58 @@ const ManagementTable: React.FC<ManagementTableProps> = ({
 
                     <table>
                         <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Attack Name </th>
-                                <th>Status & Progress</th>
-                            </tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Attack Name</th>
+                            <th>Status & Progress</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {filteredJobs.length === 0 ? (
-                                <tr>
-                                    <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
-                                        {jobs.length === 0 ? 'No jobs have been executed' : 'No jobs match the current filters'}
-                                    </td>
-                                </tr>
-                            ) : (
-                                filteredJobs.map((job) => {
-                                    return (
-                                        <tr key={job.id}>
-                                            <td>
-                                                {job.id}
-                                            </td>
-                                            <td style={{ fontWeight: "bold" }}>
-                                                {attackNames[job.id] ?? job.id}
-                                            </td>
-                                            <td>
-                                                {job.status === "in progress" ?
-                                                    <Progress
-                                                        value={job.total ? ((job.progress ?? 0) / job.total) * 100 : 0}
-                                                        color='blue'
-                                                        animated
-                                                    />
-                                                    :
-                                                    <div className={`status-badge ${getStatusColor(job.status ?? 'pending')}`}>
-                                                        {getStatusIcon(job.status ?? 'pending')}
-                                                        <span>{getStatusLabel(job.status ?? 'pending')}</span>
-                                                    </div>
-                                                }
-                                            </td>
+                        {filteredJobs.length === 0 ? (
+                            <tr>
+                                <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
+                                    <span role="status" aria-live="polite">
+                                        {isLoading
+                                            ? 'Loading jobs…'
+                                            : error
+                                                ? error
+                                                : jobs.length === 0
+                                                    ? 'No jobs have been executed'
+                                                    : 'No jobs match the current filters'}
+                                    </span>
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredJobs.map((job) => {
+                                return (
+                                    <tr key={job.id}>
+                                        <td>
+                                            {job.id}
+                                        </td>
+                                        <td style={{fontWeight: "bold"}}>
+                                            {attackNames[job.id] ?? job.id}
+                                        </td>
+                                        <td>
+                                            {job.status === 'in progress' ?
+                                                <Progress
+                                                    value={job.total ? ((job.progress ?? 0) / job.total) * 100 : 0}
+                                                    color='blue'
+                                                    animated
+                                                    aria-label={`${getStatusLabel(job.status)}: ${job.progress ?? 0} of ${job.total ?? 0}`}
+                                                />
+                                                :
+                                                <div
+                                                    className={`status-badge ${getStatusColor(job.status)}`}>
+                                                    {getStatusIcon(job.status)}
+                                                    <span>{getStatusLabel(job.status)}</span>
+                                                </div>
+                                            }
+                                        </td>
 
-                                        </tr>
-                                    );
-                                })
-                            )}
+                                    </tr>
+                                );
+                            })
+                        )}
                         </tbody>
                     </table>
                 </div>

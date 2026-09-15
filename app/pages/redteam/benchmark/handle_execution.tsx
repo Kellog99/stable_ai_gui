@@ -57,7 +57,7 @@ export async function handleClick(
         setBenchmarkId,
         setIsClicked,
     }: HandleBenchmarkRequestParams) {
-    if (isExecuting || !model || !dataset || attacks.length === 0) return;
+    if (isExecuting || !model || !dataset || attacks.length === 0 || metrics.length === 0) return;
 
     setBenchmarkId(null);
     setIsExecuting(true);
@@ -79,13 +79,14 @@ export async function handleClick(
                 body: JSON.stringify(requestBody),
             });
 
-            const responseBody: string = await response.text();
+            const responseBody = await response.text();
             if (!response.ok) {
                 throw new Error(getErrorMessage(responseBody, response.status));
             }
-            console.log("id = ", responseBody)
+            const benchmarkId: string = JSON.parse(responseBody);
+            console.log("id = ", benchmarkId)
             setSelectedAttackList(selectedAttacks);
-            setBenchmarkId(responseBody);
+            setBenchmarkId(benchmarkId);
             setIsClicked(true);
         }
     } catch (error) {

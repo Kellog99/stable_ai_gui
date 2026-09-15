@@ -40,6 +40,7 @@ const Benchmark: React.FC = () => {
     if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
         delete modifiedSelectedElement.confusionmatrix;
     }
+    const selectedMetricCount = Object.keys(modifiedSelectedElement).length;
 
     // handler for changing the parameters
     const handleParametersChange = (
@@ -74,6 +75,9 @@ const Benchmark: React.FC = () => {
         } else if (Object.keys(attacks).length === 0) {
             setExecuteBenchmark(false)
             setDescription("No attacks are available for the execution.")
+        } else if (selectedMetricCount === 0) {
+            setExecuteBenchmark(false)
+            setDescription("At least one benchmark metric must be selected.")
         } else {
             setExecuteBenchmark(Object.keys(selectedAttacks).length > 0)
 
@@ -84,7 +88,7 @@ const Benchmark: React.FC = () => {
             }
         }
 
-    }, [attacks, dataset, selectedAttacks])
+    }, [attacks, dataset, selectedAttacks, selectedMetricCount])
 
     // Click Execution Attack Handle
     const [isClicked, setIsClicked] = useState<boolean>(false)

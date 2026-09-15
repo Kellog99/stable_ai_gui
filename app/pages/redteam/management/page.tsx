@@ -1,131 +1,202 @@
 "use client";
-import React, {useEffect, useMemo, useState} from 'react'
-import useNNTrustStore from '@/store/nnTrustStore'
+
+import ManagementTable from '@/components/client/management/ManagementTable';
+import {getStatusIcon, getStatusLabel} from '@/components/client/management/utils';
+import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
+import type {AttackStatus, JobResult} from '@/interfaces/NNInterfaces';
+import {ATTACK_STATUSES} from '@/interfaces/NNInterfaces';
+import useBackendVariablesStore from '@/store/globalStore';
+import useNNTrustStore from '@/store/nnTrustStore';
 import {AppWindowIcon} from 'lucide-react';
 import {useRouter} from 'next/navigation';
-import type {BenchmarkDataProps, ModelReportProps} from '@/interfaces/reportInterfaces';
-import {benchmarkFetch_get, reportFetch_get} from '@/properties/urlsNNTrust';
-import type {JobResult} from '@/interfaces/NNInterfaces';
-import type {AttackStatusLabel} from '@/components/client/management/utils';
-import {getStatusIcon, getStatusLabel, statuses,} from '@/components/client/management/utils';
-import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import ManagementTable from '@/components/client/management/ManagementTable';
-import {handleRefresh} from './handle_refresh';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import '@/components/client/management/ManagementTable.css';
-import useBackendVariablesStore from "@/store/globalStore";
+import {handleRefresh} from './handle_refresh';
+import {handleClickReport} from "@/pages/redteam/management/handle_report";
 
-const TaskManagement: React.FC = () => {
+const POLLING_INTERVAL_MS = 3000;
+
+function getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : 'An unexpected error occurred.';
+}
+
+function createBackendUrl(hostname: string, port: string, pathname: string): URL {
+    return new URL(pathname, `http://${hostname}:${port}`);
+}
+
+async function fetchJson<T>(url: URL, signal?: AbortSignal): Promise<T> {
+    const response = await fetch(url, {signal});
+    if (!response.ok) {
+        throw new Error(`Request failed with HTTP ${response.status}.`);
+    }
+
+    return response.json() as Promise<T>;
+}
+
+const TaskManagement = () => {
     const {
-        setModelReport: setAttackReport,
+        model,
         dataset,
-        setBenchmark,
         benchmarkId,
         selectedAttacks,
-    } = useNNTrustStore()
+        setModelReport,
+    } = useNNTrustStore();
+    const {hostname, port} = useBackendVariablesStore();
+    const router = useRouter();
 
-    const {hostname, port} = useBackendVariablesStore()
-    const [listExecutedAttacks, setListExecutedAttacks] = useState<JobResult[]>([]);
-    const datasetName: string | undefined = dataset?.name;
+    const [jobs, setJobs] = useState<JobResult[]>([]);
+    const [isLoadingJobs, setIsLoadingJobs] = useState(false);
+    const [jobsError, setJobsError] = useState<string | null>(null);
+    const [isLoadingReport, setIsLoadingReport] = useState(false);
+    const [reportError, setReportError] = useState<string | null>(null);
+    const reportRequestRef = useRef<AbortController | null>(null);
+
+    const selectedAttackList = useMemo(() => Object.values(selectedAttacks), [selectedAttacks]);
+    const attackIds = useMemo(() => selectedAttackList.map((attack) => attack.id), [selectedAttackList]);
+    const attackNames = useMemo<Record<string, string>>(
+        () => Object.fromEntries(selectedAttackList.map((attack) => [attack.id, attack.name])),
+        [selectedAttackList],
+    );
 
     useEffect(() => {
+        setJobs([]);
+        setJobsError(null);
+
         if (benchmarkId === null) {
-            setListExecutedAttacks([]);
+            setIsLoadingJobs(false);
             return;
         }
 
-        // Do not keep showing jobs from the previous benchmark while the newly
-        // selected benchmark is being fetched.
-        setListExecutedAttacks([]);
+        const controller = new AbortController();
+        let timeout: ReturnType<typeof setTimeout> | undefined;
+        let isActive = true;
 
-        const refresh = (): void => {
-            void handleRefresh({
-                benchmarkId,
-                attackIds: Object.keys(selectedAttacks),
-                url: `http://${hostname}:${port}/job/getJobs`,
-                setListExecutedAttacks,
-            });
+        const refresh = async (): Promise<void> => {
+            try {
+                const refreshedJobs = await handleRefresh({
+                    benchmarkId,
+                    modelId: model?.id,
+                    datasetId: dataset?.id,
+                    attackIds,
+                    url: createBackendUrl(hostname, port, '/job/getJobs').toString(),
+                    signal: controller.signal,
+                });
+
+                if (isActive) {
+                    setJobs(refreshedJobs);
+                    setJobsError(null);
+                }
+            } catch (error) {
+                if (isActive && !controller.signal.aborted) {
+                    setJobsError(getErrorMessage(error));
+                }
+            } finally {
+                if (isActive) {
+                    setIsLoadingJobs(false);
+                    timeout = setTimeout(() => void refresh(), POLLING_INTERVAL_MS);
+                }
+            }
         };
 
-        refresh();
-        const interval = setInterval(refresh, 3000);
-        return () => clearInterval(interval);
-    }, [benchmarkId, hostname, port, selectedAttacks]);
+        setIsLoadingJobs(true);
+        void refresh();
 
-    const attackNames = useMemo<Record<string, string>>(() => Object.fromEntries(
-        Object.values(selectedAttacks).map((attack) => [attack.id, attack.name])
-    ), [selectedAttacks]);
+        return () => {
+            isActive = false;
+            controller.abort();
+            if (timeout !== undefined) clearTimeout(timeout);
+        };
+    }, [attackIds, benchmarkId, dataset?.id, hostname, model?.id, port]);
 
-    const attackStates = useMemo<Record<AttackStatusLabel, number>>(() => {
-        const counts = Object.fromEntries(
-            statuses.map((status): [AttackStatusLabel, number] => [status, 0])
-        ) as Record<AttackStatusLabel, number>;
+    useEffect(() => {
+        setReportError(null);
+        setIsLoadingReport(false);
 
-        listExecutedAttacks.forEach((job) => {
-            counts[getStatusLabel(job.status ?? 'pending')] += 1;
-        });
+        return () => reportRequestRef.current?.abort();
+    }, [benchmarkId, hostname, port]);
 
+    const attackState = useMemo<Record<AttackStatus, number>>(() => {
+        const counts: Record<AttackStatus, number> = {
+            pending: 0,
+            'in progress': 0,
+            finished: 0,
+            error: 0,
+        };
+
+        for (const job of jobs) counts[job.status] += 1;
         return counts;
-    }, [listExecutedAttacks]);
+    }, [jobs]);
 
-    const unfinishedAttacks: number = attackStates.Pending + attackStates['In Progress'];
-    const failedAttacks: number = attackStates.Error;
-    const description: string = listExecutedAttacks.length === 0
-        ? 'No jobs have been executed.'
-        : unfinishedAttacks > 0
-            ? `${unfinishedAttacks} attack${unfinishedAttacks === 1 ? '' : 's'} remaining.`
-            : failedAttacks > 0
-                ? `${failedAttacks} attack${failedAttacks === 1 ? '' : 's'} failed.`
-                : 'All jobs completed.';
-    const isDisabled: boolean = listExecutedAttacks.length === 0 || unfinishedAttacks > 0 || failedAttacks > 0;
+    const unfinishedAttacks = attackState.pending + attackState['in progress'];
+    const failedAttacks = attackState.error;
+    const modelId: string | undefined = model?.id;
+    const datasetId: string | undefined = dataset?.id;
 
-    const router = useRouter()
-
-    const handleClickReport = async (): Promise<void> => {
-        if (benchmarkId === null || !datasetName) return;
-
-        // If the button is clickable then all the attacks are done and the JSON has been produced
-        async function fetchResult<T>(url: string): Promise<T | undefined> {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error for the report JSON! Status: ${response.status}`);
-                }
-                const json: T = await response.json();
-                return json;
-            } catch (err) {
-                console.error(err instanceof Error ? err.message : "An error occurred");
-                return undefined; // Explicitly return undefined on error
-            }
+    function getDescription(): string {
+        if (benchmarkId === null) return 'No benchmark selected.';
+        if (isLoadingJobs) return 'Loading jobs…';
+        if (jobsError) return 'Job status is temporarily unavailable.';
+        if (jobs.length === 0) return 'No jobs have been executed.';
+        if (unfinishedAttacks > 0) {
+            return `${unfinishedAttacks} attack${unfinishedAttacks === 1 ? '' : 's'} remaining.`;
         }
-
-        // fetching the report
-        const reportFetch = await fetchResult<ModelReportProps>(`${reportFetch_get}?id=${encodeURIComponent(String(benchmarkId))}`);
-        if (reportFetch) {
-            setAttackReport(reportFetch);
+        if (failedAttacks > 0) {
+            return `${failedAttacks} attack${failedAttacks === 1 ? '' : 's'} failed.`;
         }
-
-        // fetching the benchmark
-        const benchmarkFetch = await fetchResult<BenchmarkDataProps>(`${benchmarkFetch_get}?dataset=${datasetName}`);
-        if (benchmarkFetch) {
-            setBenchmark({[String(benchmarkId)]: benchmarkFetch});
-        }
-        router.push("/pages/report/reportTITANN")
+        return 'All jobs completed.';
     }
+
+    const description = getDescription();
+
+    const canOpenReport: boolean = benchmarkId !== null
+        && Boolean(modelId)
+        && Boolean(datasetId)
+        && jobs.length > 0
+        && unfinishedAttacks === 0
+        && failedAttacks === 0
+        && !jobsError
+        && !isLoadingJobs
+        && !isLoadingReport;
+
+    const disabledDescription = isLoadingReport
+        ? 'Loading the vulnerability report…'
+        : benchmarkId !== null && (!modelId || !datasetId)
+            ? 'Model or dataset details are not available.'
+            : description;
 
     return (
         <div className="container-pages">
-            {/* Header Part */}
             <HeaderPageTask
                 Icon={AppWindowIcon}
                 title="Job Status Management"
-                description="Here it is possible to controll the advancement of all the vulnerabilities that have been executed in the Benchmark page."
+                description="Monitor the progress of every vulnerability test scheduled from the Benchmark page."
                 button_props={{
-                    description: "Vulnerability Report",
-                    isDisabled: isDisabled,
-                    disabledDescription: description,
-                    handleClick: handleClickReport
+                    description: isLoadingReport ? 'Loading Report…' : 'Vulnerability Report',
+                    isDisabled: !canOpenReport,
+                    disabledDescription,
+                    handleClick: () => handleClickReport({
+                        benchmarkId,
+                        modelId: modelId ?? '',
+                        datasetId: datasetId ?? '',
+                        hostname,
+                        port,
+                        canOpenReport,
+                        reportRequestRef,
+                        setIsLoadingReport,
+                        setReportError,
+                        setModelReport,
+                        router,
+                        getErrorMessage,
+                    }),
                 }}
             />
+
+            {reportError && <p className="management-message error" role="alert">{reportError}</p>}
+            {jobsError && jobs.length > 0 && (
+                <p className="management-message error" role="alert">
+                    Unable to refresh job status: {jobsError}
+                </p>
+            )}
 
             <section className="management-overview" aria-labelledby="job-overview-title">
                 <div className="management-section-heading">
@@ -136,21 +207,21 @@ const TaskManagement: React.FC = () => {
                             Benchmark ID: <code>{benchmarkId === null ? 'Not available' : String(benchmarkId)}</code>
                         </p>
                     </div>
-                    <p>{description}</p>
+                    <p role="status" aria-live="polite">{description}</p>
                 </div>
                 <div className="container-cards">
-                    {statuses.map((status) => (
+                    {ATTACK_STATUSES.map((status) => (
                         <div key={status} className="card-summary">
-                            <div className="summary-icon">{getStatusIcon(status)}</div>
+                            <div className="summary-icon" aria-hidden="true">{getStatusIcon(status)}</div>
                             <div className="summary-content">
-                                <span>{status}</span>
-                                <strong>{attackStates[status]}</strong>
+                                <span>{getStatusLabel(status)}</span>
+                                <strong>{attackState[status]}</strong>
                             </div>
                         </div>
                     ))}
                 </div>
             </section>
-            {/* Table Management */}
+
             <section className="management-table-section" aria-labelledby="job-details-title">
                 <div className="management-section-heading">
                     <div>
@@ -159,11 +230,15 @@ const TaskManagement: React.FC = () => {
                     </div>
                     <p>Search and filter the attacks included in this benchmark.</p>
                 </div>
-                <ManagementTable jobs={listExecutedAttacks} attackNames={attackNames}
+                <ManagementTable
+                    jobs={jobs}
+                    attackNames={attackNames}
+                    isLoading={isLoadingJobs}
+                    error={jobsError}
                 />
             </section>
         </div>
     );
-}
+};
 
-export default TaskManagement
+export default TaskManagement;

@@ -1,52 +1,39 @@
-import {
-    Clock,
-    Loader,
-    CheckCircle2,
-    XCircle
-} from 'lucide-react';
+import {CheckCircle2, Clock, Loader, XCircle} from 'lucide-react';
 import type {AttackStatus} from '@/interfaces/NNInterfaces';
 
 export const statusLabels = {
     pending: 'Pending',
-    'in progress': 'In Progress',
+    'in progress': 'In progress',
     finished: 'Finished',
     error: 'Error',
 } as const satisfies Record<AttackStatus, string>;
 
-export type AttackStatusLabel = typeof statusLabels[AttackStatus];
-export type DisplayStatus = AttackStatus | AttackStatusLabel;
+export const getStatusLabel = (status: AttackStatus): string => statusLabels[status];
 
-export const statuses: readonly AttackStatusLabel[] = Object.values(statusLabels);
-
-export const getStatusLabel = (status: AttackStatus): AttackStatusLabel => statusLabels[status];
-
-const toStatusLabel = (status: DisplayStatus): AttackStatusLabel =>
-    status in statusLabels ? statusLabels[status as AttackStatus] : status as AttackStatusLabel;
-
-export const getStatusIcon = (status: DisplayStatus) => {
-    switch (toStatusLabel(status)) {
-        case 'Finished':
-            return <CheckCircle2 size={20} className="status-icon completed" />;
-        case 'In Progress':
-            return <Loader size={20} className="status-icon in-progress" />;
-        case 'Pending':
-            return <Clock size={20} className="status-icon pending" />;
-        case 'Error':
-            return <XCircle size={20} className="status-icon closed" />;
+export const getStatusIcon = (status: AttackStatus) => {
+    switch (status) {
+        case 'finished':
+            return <CheckCircle2 size={20} className="status-icon completed"/>;
+        case 'in progress':
+            return <Loader size={20} className="status-icon in-progress"/>;
+        case 'pending':
+            return <Clock size={20} className="status-icon pending"/>;
+        case 'error':
+            return <XCircle size={20} className="status-icon closed"/>;
         default:
-            return <Clock size={20} className="status-icon" />;
+            return <Clock size={20} className="status-icon"/>;
     }
 };
 
-export const getStatusColor = (status: DisplayStatus) => {
-    switch (toStatusLabel(status)) {
-        case 'Finished':
+export const getStatusColor: (status: AttackStatus) => string = (status: AttackStatus) => {
+    switch (status) {
+        case 'finished':
             return 'status-completed';
-        case 'In Progress':
+        case 'in progress':
             return 'status-in-progress';
-        case 'Pending':
+        case 'pending':
             return 'status-pending';
-        case 'Error':
+        case 'error':
             return 'status-closed';
         default:
             return '';

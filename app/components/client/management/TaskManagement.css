@@ -97,6 +97,19 @@
     text-transform: uppercase;
 }
 
+.management-message {
+    margin: 18px 0 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+.management-message.error {
+    color: var(--error);
+    background: color-mix(in srgb, var(--error) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
+}
+
 @media (max-width: 840px) {
     .container-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .management-section-heading { align-items: start; flex-direction: column; gap: 8px; }
