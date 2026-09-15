@@ -68,13 +68,11 @@ export default function MessageThread({
     return (
         <div className="screen">
             {loading ? (
-                <div className="attack-loading" role="status" aria-live="polite">
-                    <span className="attack-loading__text">Executing attack</span>
-                    <span className="attack-loading__dots">
-                        <span className="attack-loading__dot" />
-                        <span className="attack-loading__dot" />
-                        <span className="attack-loading__dot" />
-                    </span>
+                <div className="attack-loading-card" role="status" aria-live="polite">
+                    <div className="attack-loading-spinner" />
+                    <div className="attack-loading-content">
+                        <span className="attack-loading__title">Running Jailbreaking Attack</span>
+                    </div>
                 </div>
             ) : (
                 <>
@@ -119,26 +117,30 @@ export default function MessageThread({
                         />
                     ) : (
                         <div className="results-card">
-                            <div className="bubble-row">
-                                <span className="bubble-label">
-                                    <Flame size={12} /> Adversarial prompt
-                                </span>
-                                <Bubble
-                                    msg={adversarialPrompt ?? ""}
-                                    user={true}
-                                    loading={adversarialPrompt ? false : true}
-                                />
-                            </div>
-                            <div className="bubble-row">
-                                <span className="bubble-label">
-                                    <Bot size={12} /> Target response
-                                </span>
-                                <Bubble
-                                    msg={modelResponse ?? ""}
-                                    user={false}
-                                    loading={modelResponse ? false : true}
-                                    score={typeof bestScore === "number" ? bestScore : undefined}
-                                />
+                            <div className="results-card__body">
+                                <div className="results-card__content">
+                                    <div className="bubble-row">
+                                        <span className="bubble-label">
+                                            <Flame size={12} /> Adversarial prompt
+                                        </span>
+                                        <Bubble
+                                            msg={adversarialPrompt ?? ""}
+                                            user={true}
+                                            loading={adversarialPrompt ? false : true}
+                                        />
+                                    </div>
+                                    <div className="bubble-row">
+                                        <span className="bubble-label">
+                                            <Bot size={12} /> Target response
+                                        </span>
+                                        <Bubble
+                                            msg={modelResponse ?? ""}
+                                            user={false}
+                                            loading={modelResponse ? false : true}
+                                            score={typeof bestScore === "number" ? bestScore : undefined}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
