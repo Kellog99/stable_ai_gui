@@ -1,5 +1,5 @@
-import { ModelInfo } from "./homePageInterface";
-import { ParametersProps } from "./NNInterfaces";
+import {ModelInfo} from "./homePageInterface";
+import {ParametersProps} from "./NNInterfaces";
 
 export interface MetricsProps {
     params: number;
@@ -22,9 +22,10 @@ export interface AttackMetricsProps {
     robustness?: number,
     confusionmatrix?: number[][]
 }
+
 export interface ReportAttackProps {
     name: string,
-    metrics: AttackMetricsProps
+    metrics: AttackMetricsProps | null
     parameters: ParametersProps[]
 }
 
@@ -35,7 +36,7 @@ export interface ModelReportProps {
     attacks: { [key: string]: ReportAttackProps }
 }
 
-// Interface associated for retriving the values in the report.
+// Interface associated for retrieving the values in the report.
 export interface BenchmarkDataProps {
     name: string
     param: number

@@ -82,7 +82,9 @@
     font-size: 0.94rem;
 }
 
-.attack-section { margin-top: 28px; }
+.attack-section {
+    margin-top: 28px;
+}
 
 .attack-section-heading {
     display: flex;
@@ -123,12 +125,17 @@
     border-radius: 12px;
     background: linear-gradient(145deg, color-mix(in hsl, var(--bg-dark) 64%, var(--bg) 36%), color-mix(in hsl, var(--bg-dark) 88%, var(--bg-light) 12%));
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
-    transition: transform 160ms ease, border-color 160ms ease;
 }
 
-.attack-metric-card:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--bg-light) 88%, white 12%);
+
+.attack-metric-description {
+    overflow: hidden;
+    color: darkgrey;
+    font-size: 0.6rem;
+    font-weight: 650;
+    letter-spacing: 0.02em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .attack-metric-label {
@@ -152,11 +159,46 @@
     overflow-wrap: anywhere;
 }
 
+.metric-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.metric-values span {
+    padding: 5px 8px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--bg-light) 28%, transparent);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
 @media (max-width: 560px) {
-    .attack-dashboard { padding: 20px 16px 40px; }
-    .attack-back-button span { display: none; }
-    .attack-hero { align-items: flex-start; margin-top: 24px; }
-    .attack-hero-icon { width: 44px; height: 44px; }
-    .attack-metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .attack-metric-card { min-height: 82px; padding: 13px; }
+    .attack-dashboard {
+        padding: 20px 16px 40px;
+    }
+
+    .attack-back-button span {
+        display: none;
+    }
+
+    .attack-hero {
+        align-items: flex-start;
+        margin-top: 24px;
+    }
+
+    .attack-hero-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .attack-metrics-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .attack-metric-card {
+        min-height: 82px;
+        padding: 13px;
+    }
 }

@@ -1,12 +1,8 @@
 'use client';
-import { Suspense, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import {useRouter, useSearchParams} from 'next/navigation';
 import useNNTrustStore from '@/store/nnTrustStore';
-import { ReportAttackProps } from '@/interfaces/reportInterfaces';
 import './AttackPageStyle.css';
-import { ParametersProps } from '@/interfaces/NNInterfaces';
-import { ArrowLeft, ChartNoAxesCombined, SlidersHorizontal } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import {ArrowLeft, ChartNoAxesCombined, SlidersHorizontal} from 'lucide-react';
 
 const HIDDEN_METRIC_KEYS = new Set([
     'name',
@@ -17,7 +13,13 @@ const HIDDEN_METRIC_KEYS = new Set([
     'power',
 ]);
 
-const RAW_STRING_METRICS = new Set(['imagemean', 'imagevariance']);
+interface MetricCardItem {
+    key: string;
+    label: string;
+    value: unknown;
+    description?: string;
+}
+
 
 function formatMetricValue(value: unknown): string {
     if (typeof value === 'number' && Number.isFinite(value)) {
@@ -27,63 +29,47 @@ function formatMetricValue(value: unknown): string {
     return String(value);
 }
 
-const AttackPageContent = () => {
+const MetricCards = ({items}: { items: MetricCardItem[] }) => (
+    <div className="attack-metrics-grid">
+        {items.map(({key, label, value, description}) => (
+            <article className="attack-metric-card" key={key}>
+                <p className="attack-metric-label">{label}</p>
+                {description && <p className="attack-metric-description">{description}</p>}
+                {Array.isArray(value) && value.every(item => typeof item === 'number') ? (
+                    <div className="metric-values">
+                        {value.map((item, index) => <span key={index}>{formatMetricValue(item)}</span>)}
+                    </div>
+                ) : <p className="metric-value">{formatMetricValue(value)}</p>}
+            </article>
+        ))}
+    </div>
+);
+
+const AttackPage = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const atkId = searchParams.get('atkId');
 
-    const {
-        modelReport,
-        selectedAttacks
-    } = useNNTrustStore();
-
-    const [attack, setAttack] = useState<ReportAttackProps | null>(null);
-    const [usedParams, setUsedParams] = useState<ParametersProps[] | null>(null);
-    const [notFound, setNotFound] = useState(false);
-
-    useEffect(() => {
-        if (!modelReport || !atkId) return;
-
-        const matchedAttack = modelReport.attacks?.[atkId];
-
-        if (!matchedAttack) {
-            setNotFound(true);
-            return;
-        }
-
-        setNotFound(false);
-        setAttack(matchedAttack);
-        setUsedParams(modelReport.attacks[atkId].parameters);
-    }, [atkId, modelReport, selectedAttacks]);
-
-    // ################### METRICS ###################
-    const metricEntries = useMemo(() => {
-        if (!attack) return [];
-        return Object.entries(attack.metrics)
-            .filter(([key]) => !HIDDEN_METRIC_KEYS.has(key))
-            .map(([key, value]) => {
-                const transformedKey = key
-                    .split("_")
-                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ");
-
-                return { key, label: transformedKey, value };
-            });
-    }, [attack]);
-    // ##############################################
-
-
+    const {modelReport} = useNNTrustStore();
+    const attack = atkId ? modelReport?.attacks?.[atkId] : null;
+    const usedParams = attack?.parameters ?? [];
+    const metricCards: MetricCardItem[] = Object.entries(attack?.metrics ?? {})
+        .filter(([key, value]) => value != null && !HIDDEN_METRIC_KEYS.has(key))
+        .map(([key, value]) => ({
+            key,
+            label: key
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' '),
+            value,
+        }));
 
     if (!atkId) {
         return <div className="dashboard-message">No attack selected.</div>;
-    }
-
-    if (notFound) {
-        return <div className="dashboard-message">No data found for attack "{atkId}".</div>;
-    }
-
-    if (!modelReport || !attack) {
+    } else if (!modelReport) {
         return <div className="dashboard-message">Loading...</div>;
+    } else if (!attack) {
+        return <div className="dashboard-message">No data found for attack "{atkId}".</div>;
     }
 
     return (
@@ -93,14 +79,14 @@ const AttackPageContent = () => {
                 onClick={() => router.back()}
                 aria-label="Back to security report"
             >
-                <ArrowLeft size={18} />
+                <ArrowLeft size={18}/>
                 <span>Back to report</span>
             </button>
             <section className="attack-hero">
-                <div className="attack-hero-icon"><ChartNoAxesCombined size={24} /></div>
+                <div className="attack-hero-icon"><ChartNoAxesCombined size={24}/></div>
                 <div>
                     <span className="attack-eyebrow">Attack analysis</span>
-                    <h1>Performance of {attack.name}</h1>
+                    <h1>{attack.name.toUpperCase()} performance</h1>
                     <p>Comprehensive metrics overview</p>
                 </div>
             </section>
@@ -108,47 +94,31 @@ const AttackPageContent = () => {
             <section className="attack-section" aria-labelledby="attack-metrics-title">
                 <div className="attack-section-heading">
                     <h2 id="attack-metrics-title">Measured performance</h2>
-                    <span>{metricEntries.length} metrics</span>
+                    <span>{metricCards.length} metrics</span>
                 </div>
-                <div className="attack-metrics-grid">
-                    {metricEntries.map(({ key, label, value }) => (
-                        <article className="attack-metric-card" key={key}>
-                            <p className="attack-metric-label">{label}</p>
-                            <p className="metric-value">
-                                {RAW_STRING_METRICS.has(key) ? String(value) : formatMetricValue(value)}
-                            </p>
-                        </article>
-                    ))}
-                </div>
+                <MetricCards items={metricCards}/>
             </section>
 
-            {usedParams && usedParams.length > 0 && (
+            {usedParams.length > 0 && (
                 <section className="attack-section attack-parameters" aria-labelledby="attack-parameters-title">
                     <div className="attack-section-heading">
                         <div className="attack-parameters-title">
-                            <SlidersHorizontal size={18} />
+                            <SlidersHorizontal size={18}/>
                             <h2 id="attack-parameters-title">Parameters used</h2>
                         </div>
                         <span>{usedParams.length} configured</span>
                     </div>
-                    <div className="attack-metrics-grid">
-                        {usedParams.map((param) => (
-                            <article className="attack-metric-card" key={param.id}>
-                                <p className="attack-metric-label">{param.id}</p>
-                                <p className="metric-value">{formatMetricValue(param.default)}</p>
-                            </article>
-                        ))}
-                    </div>
+                    <MetricCards items={usedParams.map(param => ({
+                        key: param.id,
+                        label: param.name || param.id,
+                        description: param.description,
+                        value: ('value' in param ? param.value : undefined) ?? param.default,
+                    }))}/>
                 </section>
             )}
         </main>
     );
 };
 
-const AttackPage = () => (
-    <Suspense fallback={<div className="dashboard-message">Loading...</div>}>
-        <AttackPageContent />
-    </Suspense>
-);
 
 export default AttackPage;
