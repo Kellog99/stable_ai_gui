@@ -5,6 +5,7 @@
   flex-direction: column;
   gap: 10px;
   overflow-y: visible;
+  --thread-height: 76vh;
 }
 
 /* Enhanced loading indicator card shown while the attack runs */
@@ -223,6 +224,7 @@
 .results-card {
   display: flex;
   flex-direction: column;
+  height: var(--thread-height);
   background: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
   border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
   border-radius: 12px;
@@ -235,7 +237,8 @@
   display: flex;
   flex-direction: column;
   background-color: transparent;
-  height: 76vh;
+  flex: 1;
+  min-height: 0;
 }
 
 .results-card__content {
