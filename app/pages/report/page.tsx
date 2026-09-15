@@ -1,11 +1,11 @@
 "use client"
 
-import FileDropZone from "@/components/client/upload/FileDropZone";
+import FileSelectionPanel from "@/components/client/repository/FileSelectionPanel";
 import styles from '@/styles/HomePage.module.css';
 import { File } from "lucide-react";
-import { infoModel } from "@/components/client/upload/config";
+import { infoModel } from "@/components/client/repository/config";
 
-import {  InfoProps, ModelInfo } from "@/interfaces/homePageInterface";
+import {InfoProps} from "@/interfaces/homePageInterface";
 import { useEffect, useState } from "react";
 import { getCoreElements } from "@/functionalities/TITANNServices/get_info";
 import useNNTrustStore from "@/store/nnTrustStore";
@@ -46,9 +46,8 @@ export default function ReportPage() {
   return (
     <div className={styles.test_container}>
       <div className={styles.upload_container}>
-        <FileDropZone
+        <FileSelectionPanel
           key="report_loader"
-          id="report_loader"
           title="Report"
           elements={modelsReports.map((report) => report.info)}
           description="Drag and drop the JSON of the report."
@@ -61,17 +60,8 @@ export default function ReportPage() {
               router.push("/pages/report/reportTITANN");
             }
           }}
-          handleDeletion={(report) => {
-            const reportId: string = (report as ModelInfo).id;
-            setModelsReports(modelsReports.filter(reportContained => (reportContained as ModelReportProps).info.id !== reportId));
-          }}
-          handleFileUpload={(file: File | null) => {
-            if (file) {
-              // uploadReport(file)
-              //   .then(setAttackReport)
-              //   .then(() => router.push("/pages/report/reportTITANN"))
-            }
-          }} />
+          repositoryType="model"
+        />
       </div>
     </div>
 

@@ -2,7 +2,9 @@ import { CheckCircle2, CheckCircleIcon, RefreshCw, Save, Settings, Settings2, X 
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
-import { Group, Modal, NumberInput, Select, Slider } from '@mantine/core';
+import { Modal, NumberInput, Select, Slider, Switch } from '@mantine/core';
+
+type ParameterValue = number | string | boolean;
 
 /**
  * Processes a user's subscription.
@@ -27,21 +29,23 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
 }) => {
 
-    const [values, setValues] = useState<(number | string)[]>([]);
-    const [defaultValues, setDefaultValues] = useState<(number | string)[]>([]);
+    const [values, setValues] = useState<ParameterValue[]>([]);
+    const [defaultValues, setDefaultValues] = useState<ParameterValue[]>([]);
     const [isSaved, setIsSaved] = useState(false);
 
     useEffect(() => {
         if (isOpen && parameters && parameters.length > 0) {
             const currentValues = parameters.map((p) => {
                 if (p.default !== undefined && p.default !== null) return p.default;
+                if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
                 if (p.kind === 'enum') return p.options?.[0] ?? '';
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
                 return 0;
             });
             const defaults = parameters.map((p) => {
-                if (typeof p.default === 'number' || typeof p.default === 'string') return p.default;
+                if (p.default !== undefined && p.default !== null) return p.default;
+                if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
                 if (p.kind === 'enum') return p.options?.[0] ?? '';
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
@@ -54,7 +58,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
     }, [isOpen, parameters]);
 
 
-    const handleChange = (index: number, newValue: number | string) => {
+    const handleChange = (index: number, newValue: ParameterValue) => {
         setValues((prev) => {
             const next = [...prev];
             next[index] = newValue;
@@ -115,6 +119,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
 
                         {/* Settings Content */}
                         {parameters.map((param, index) => (
+                            // Boolean parameters use a switch instead of numeric controls.
                             <div
                                 key={`${param.name}-${index}`}
                                 className="form-group"
@@ -132,7 +137,13 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                         )}
                                     </div>
 
-                                    {param.kind !== 'enum' && (
+                                    {(param.kind === 'boolean' || typeof param.default === 'boolean') ? (
+                                        <Switch
+                                            size="md"
+                                            checked={values[index] === true}
+                                            onChange={(event) => handleChange(index, event.currentTarget.checked)}
+                                        />
+                                    ) : param.kind !== 'enum' && (
                                         <NumberInput
                                             variant="filled"
                                             size="xs"
@@ -155,7 +166,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                                     )}
                                 </div>
 
-                                {param.kind === "enum" ? (
+                                {(param.kind === "boolean" || typeof param.default === 'boolean') ? null : param.kind === "enum" ? (
                                     <Select
                                         size="xs"
                                         variant="filled"

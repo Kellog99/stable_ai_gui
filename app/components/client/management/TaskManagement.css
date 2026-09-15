@@ -1,22 +1,97 @@
 
 .container-cards {
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
-    border-radius: calc(2*var(--border-radius));
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
 }
 
 .card-summary {
-    width: 180px;
-    height: 80px;
-    padding: 15px;
+    min-height: 94px;
+    padding: 16px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-weight: 400;
-    color: white;
-    border-radius: var(--border-radius);
-    background-color: var(--bg-light);
+    gap: 13px;
+    color: var(--text-primary);
+    border: 1px solid color-mix(in srgb, var(--bg-light) 45%, transparent);
+    border-radius: 12px;
+    background: linear-gradient(135deg, color-mix(in hsl, var(--bg-dark) 72%, var(--bg) 28%), color-mix(in hsl, var(--bg-dark) 86%, var(--bg-light) 14%));
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+    transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.card-summary:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--bg-light) 85%, white 15%);
+}
+
+.summary-icon {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    background: color-mix(in hsl, var(--bg-light) 18%, transparent);
+}
+
+.summary-content {
+    display: grid;
+    gap: 2px;
+}
+
+.summary-content span {
+    color: var(--text-tertiary);
+    font-size: 0.77rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.summary-content strong {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.management-overview,
+.management-table-section {
+    margin-top: 28px;
+}
+
+.management-section-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 14px;
+}
+
+.management-section-heading h2 {
+    margin: 3px 0 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.management-section-heading p {
+    margin: 0;
+    color: var(--text-tertiary);
+    font-size: 0.84rem;
+}
+
+.management-eyebrow {
+    color: #55c7db;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 840px) {
+    .container-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .management-section-heading { align-items: start; flex-direction: column; gap: 8px; }
+}
+
+@media (max-width: 480px) {
+    .container-cards { grid-template-columns: 1fr; }
 }
 
 

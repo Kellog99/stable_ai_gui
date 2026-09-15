@@ -54,12 +54,12 @@
 
 
 .section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: rgb(238, 79, 79);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(248, 113, 113, 0.62);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
+    margin: 0.5rem 0 0.55rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

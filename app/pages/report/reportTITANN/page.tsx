@@ -111,8 +111,8 @@ const SecurityReport = () => {
             <HeaderPageTask
                 Icon={IdCardLanyard}
                 title="Security Report"
-                descrition="Here are displayed all the results that comes from the Benchmark evaluation."
-                buttonprops={{
+                description="Here are displayed all the results that comes from the Benchmark evaluation."
+                button_props={{
                     description: "Download PDF",
                     isDisabled: false,
                     handleClick: handleDownloadPDF,

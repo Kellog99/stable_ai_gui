@@ -5,7 +5,7 @@
     align-content: center;
     justify-content: space-between;
     margin-bottom: 0;
-    height: var(--page-title-height);
+    height: 100%;
 }
 
 /* This contain the Icon and the component with title and the description */
@@ -13,10 +13,25 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 100%;
-    height: 130px;
-    gap: 18px;
-    color: rgb(187, 184, 184);
+    gap: 12px;
+    color: var(--text-secondary);
+}
+
+.page-task-icon {
+    color: rgb(255 0 0 / 0.89);
+}
+
+.page-task-title {
+    margin: 0;
+    font-size: 1.65rem;
+    line-height: 1.1;
+}
+
+.page-task-description {
+    color: var(--text-tertiary);
+    margin: 0.3rem 0 0;
+    font-size: 0.8rem;
+    max-width: 640px;
 }
 
 
@@ -24,15 +39,15 @@
     display: flex;
     align-items: center;
     align-content: center;
-    height: 25px;
-    width: 220px;
+    height: 38px;
+    min-width: 190px;
     font-size: 0.8rem;
     font-weight: 700;
     justify-content: space-between;
-    padding: 20px;
-    border-radius: var(--border-radius);
-    border: none;
-    background-color: var(--bg);
+    padding: 0 0.8rem 0 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(34, 211, 238, 0.6);
+    background-color: rgb(8, 145, 178);
     color: white;
 }
 
@@ -41,7 +56,7 @@
 }
 
 .header-button:hover:not(.disabled) {
-    background-color: var(--bg-light);
+    background-color: rgb(6, 182, 212);
 }
 
 .header-button:hover:not(.disabled) svg {

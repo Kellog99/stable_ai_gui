@@ -30,9 +30,9 @@ export interface ParametersProps {
   min?: number
   max?: number
   step?: number
-  default: number | string
+  default: number | string | boolean
   description: string
-  kind?: 'number' | 'enum'
+  kind?: 'number' | 'enum' | 'boolean'
   options?: string[]
 }
 
@@ -42,6 +42,10 @@ export interface RegisterObjectProps {
   description: string
   task?: string
   objective?: string
+  type?: string
+  nature?: string
+  category?: string
+  attack_type?: string
   privacy_type?: string
   knowledge?: string
   parameters?: ParametersProps[]

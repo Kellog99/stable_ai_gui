@@ -1,12 +1,15 @@
 .page {
   display: grid;
-  grid-template-rows: var(--page-title-height) 1fr 1fr;
+  grid-template-rows: 88px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.75rem 1.25rem 1.25rem;
+  box-sizing: border-box;
   height: calc(100vh - var(--header-height));
   min-height: 0;
 }
 .page > * {
   min-height: 0;    /* the crucial fix — overrides default min-height: auto */
-  overflow: auto;   /* scroll inside the row instead of pushing the page taller */
+  overflow: hidden; /* card grids scroll inside their own section */
 }
 .allert_message {
   width: 500px;
