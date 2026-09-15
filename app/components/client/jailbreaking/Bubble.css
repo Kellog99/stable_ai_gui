@@ -99,7 +99,7 @@
 }
 
 .bubble p {
-  color: darkgray;
+  color: inherit;
   margin: 0;
 }
 
