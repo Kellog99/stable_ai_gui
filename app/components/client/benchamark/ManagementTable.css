@@ -1,3 +1,49 @@
+.job-monitoring {
+    padding-bottom: 1rem;
+}
+
+.job-monitoring-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 14px;
+}
+
+.job-monitoring-heading h2 {
+    margin: 3px 0 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.job-monitoring-heading p {
+    margin: 8px 0 0;
+    color: var(--text-tertiary);
+    font-size: 0.84rem;
+}
+
+.job-monitoring-id code {
+    padding: 3px 7px;
+    color: var(--text-primary);
+    background: color-mix(in hsl, var(--bg-light) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bg-light) 42%, transparent);
+    border-radius: 5px;
+}
+
+.job-monitoring-cards {
+    display: flex;
+    gap: 12px;
+}
+
+.job-monitoring-card {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 54px;
+    color: darkgrey;
+    font-size: 0.825rem;
+}
+
 .table-container{
     padding: 18px;
     background: linear-gradient(145deg, color-mix(in hsl, var(--bg-dark) 45%, var(--bg) 55%), color-mix(in hsl, var(--bg-dark) 72%, var(--bg) 28%));

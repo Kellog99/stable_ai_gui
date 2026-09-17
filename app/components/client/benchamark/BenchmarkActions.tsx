@@ -3,7 +3,6 @@ import {Check, ChevronDown, CircleArrowRight, RotateCcw} from 'lucide-react';
 import React, {useEffect, useMemo, useState} from 'react';
 import './BenchmarkActions.css';
 import useNNTrustStore from "@/store/nnTrustStore";
-import {getDisabledDescription} from "@/pages/redteam/benchmark/utils";
 
 interface BenchmarkActionsProps {
     onRun: (metrics: RegisterObjectProps[]) => void;
@@ -60,14 +59,17 @@ const BenchmarkActions: React.FC<BenchmarkActionsProps> = (
         [availableMetrics, selectedMetrics],
     );
 
-    const disabledDescription = useMemo(
-        () => getDisabledDescription(
-            dataset,
-            selectedAttacks,
-            selectedMetricObjects,
-            isExecuting,
-        ),
-        [dataset, selectedAttacks, selectedMetricObjects, isExecuting],
+    const disabledDescription: string = useMemo<string>(
+        () => {
+            if (dataset === null) return 'A dataset is required to perform a benchmark.';
+            if (Object.keys(selectedAttacks).length === 0)
+                return `You have to select at least one attack.`;
+            if (Object.keys(selectedMetrics).length === 0)
+                return 'At least one benchmark metric must be selected.';
+            if (isExecuting) return 'The benchmark is being scheduled.';
+            return '';
+        },
+        [dataset, selectedAttacks, selectedMetrics, isExecuting],
     );
     const isRunDisabled = disabledDescription !== '';
     const onSelectAll = () => setSelectedMetrics(
