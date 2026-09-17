@@ -1,9 +1,15 @@
+export type Task =
+    | "classification"
+    | "segmentation"
+    | "detection"
+    | "language"
+
 export interface InfoProps {
     id: string                        // id for the file identification.
     name: string,                     // File's name, ex. "Resnet50" or "Imagenette".
     date?: string,                    // Date when the file has been generated 
     image?: string | null,            // an image that represents the file.
-    task: string,                     // task associated with, i.e. classification, detection, etc.
+    task: Task,                       // task associated with, i.e. classification, detection, etc.
     domain: string,                   // Domain of the file, i.e. RGB, ultraviolet, etc.
     num_classes?: number,             // number of classes in the output.
     weights?: number,                 // Size of the file.

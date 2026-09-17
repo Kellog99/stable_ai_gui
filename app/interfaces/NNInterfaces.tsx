@@ -39,25 +39,35 @@ export interface ParametersProps {
 export interface RegisterObjectProps {
     id: string,
     name: string,
-    description: string
-    task?: string
+    description?: string
+    parameters: ParametersProps[]
+    task: string[] | string
+    knowledge?: string
     objective?: string
     type?: string
     nature?: string
     category?: string
     attack_type?: string
     privacy_type?: string
-    knowledge?: string
-    parameters?: ParametersProps[]
 }
 
-// Settings Modal Component
-export interface ParametersWindowProps {
-    isOpen: boolean,
-    onClose: () => void,
-    parameters: ParametersProps[],
-    handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
-}
+/**
+ * Checks whether a registered object supports the given task.
+ * Handles both a single task and a list of tasks using case-insensitive matching.
+ * @param.registeredObject : this is the object to check whether its task(s) is/are supported
+ * @param.task : Task to check
+ */
+export const supportsTask = (
+    registeredObject: RegisterObjectProps,
+    task: string
+): boolean => {
+    const normalizedTask: string = task.toLowerCase();
+    const supportedTasks: string[] = Array.isArray(registeredObject.task)
+        ? registeredObject.task
+        : [registeredObject.task];
+
+    return supportedTasks.some((supportedTask) => supportedTask.toLowerCase() === normalizedTask);
+};
 
 export const ATTACK_STATUSES = ['pending', 'in progress', 'finished', 'error'] as const;
 
@@ -76,6 +86,9 @@ export interface JobResult {
     result?: Record<string, unknown> | null;
     total?: number | null;
     progress?: number | null;
+    iteration_time?: number | null;
+    execution_time?: number | null;
+    estimated_execution_time?: number | null;
     status: AttackStatus;
     error?: string | null;
 }

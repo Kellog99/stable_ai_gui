@@ -23,7 +23,6 @@ interface HandleClickReportParams {
     canOpenReport: boolean;
     reportRequestRef: React.MutableRefObject<AbortController | null>;
     setIsLoadingReport: (loading: boolean) => void;
-    setReportError: (error: string | null) => void;
     setModelReport: (report: ModelReportProps) => void;
     router: { push: (path: string) => void };
     getErrorMessage: (error: unknown) => string;
@@ -39,7 +38,6 @@ export async function handleClickReport(
         canOpenReport,
         reportRequestRef,
         setIsLoadingReport,
-        setReportError,
         setModelReport,
         router,
         getErrorMessage,
@@ -50,7 +48,6 @@ export async function handleClickReport(
     const controller = new AbortController();
     reportRequestRef.current = controller;
     setIsLoadingReport(true);
-    setReportError(null);
 
     const reportUrl = createBackendUrl(hostname, port, '/job/getReport');
     reportUrl.searchParams.set('benchmark_id', String(benchmarkId));
@@ -66,7 +63,7 @@ export async function handleClickReport(
         setModelReport(modelReport);
         router.push('/pages/report/reportTITANN');
     } catch (error) {
-        if (!controller.signal.aborted) setReportError(getErrorMessage(error));
+        console.log(error);
     } finally {
         if (reportRequestRef.current === controller) {
             reportRequestRef.current = null;

@@ -1,201 +1,214 @@
-"use client"
+"use client";
 
-import React, {useEffect, useState} from 'react';
-import {RegisterObjectProps} from '@/interfaces/NNInterfaces';
-import TableWrapper from "@/components/client/benchamark/TableWrapper"
-import {BrickWallFireIcon, ChevronRight, Info} from 'lucide-react';
-import {Group, Modal} from '@mantine/core';
+import BenchmarkActions from '@/components/client/benchamark/BenchmarkActions';
+import {handleClickReport} from '@/components/client/benchamark/handle_report';
+import TableWrapper from '@/components/client/benchamark/TableWrapper';
+import ManagementTable from '@/components/client/management/ManagementTable';
+import {getStatusLabel} from '@/components/client/management/utils';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import useBackendVariablesStore from '@/store/globalStore';
-
-import useNNTrustStore from '@/store/nnTrustStore';
-import styles from '@/styles/Benchmark.module.css';
-import {handleClick} from './handle_execution';
+import type {AttackStatus, RegisterObjectProps} from '@/interfaces/NNInterfaces';
+import {ATTACK_STATUSES, supportsTask} from '@/interfaces/NNInterfaces';
 import {updateParameterDefaults, updateSelectedObjects} from '@/lib/utils';
+import useBackendVariablesStore from '@/store/globalStore';
+import useNNTrustStore from '@/store/nnTrustStore';
+import {BrickWallFireIcon} from 'lucide-react';
+import type {AppRouterInstance} from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import {useRouter} from 'next/navigation';
+import React, {useMemo, useRef, useState} from 'react';
+import {handleClick} from './handle_execution';
+import styles from './page.module.css';
+import '@/components/client/management/ManagementTable.css';
+import {getErrorMessage, getJobStatusDescription, getReportDisabledDescription,} from "@/pages/redteam/benchmark/utils";
 
 const Benchmark: React.FC = () => {
-    // ######################## stored Variables ########################
     const {
         hostname,
-        port,
-    } = useBackendVariablesStore()
-
+        port
+    } = useBackendVariablesStore();
     const {
         model,
         dataset,
         attacks,
-        metrics,
         setSelectedAttackList,
-        setBenchmarkId
-    } = useNNTrustStore()
-
-    // ##################################################################
-
-    const [selectedAttacks, setSelectedAttacks] = useState<{ [key: string]: RegisterObjectProps }>({})
-    const [selectedMetrics, setSelectedMetrics] = useState<{ [key: string]: RegisterObjectProps }>({})
-
-    const numClasses = model?.num_classes as number
-
-    let modifiedSelectedElement = {...selectedMetrics};
-    if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
-        delete modifiedSelectedElement.confusionmatrix;
-    }
-    const selectedMetricCount = Object.keys(modifiedSelectedElement).length;
-
-    // handler for changing the parameters
-    const handleParametersChange = (
-        id: string,
-        parameters: (number | string)[],
-        setMap: (map: { [key: string]: RegisterObjectProps }) => void,
-        registeredObject: { [key: string]: RegisterObjectProps },
-    ) => {
-
-        const currentObject = registeredObject[id];
-        if (currentObject && currentObject.parameters) {
-            setMap({
-                ...registeredObject,
-                [id]: {
-                    ...currentObject,
-                    parameters: updateParameterDefaults(currentObject.parameters, parameters),
-                },
-            });
-        }
-    }
+        setBenchmarkId,
+        setModelReport,
+    } = useNNTrustStore();
 
 
-    // #################### Benchmark constraints ####################
-    const [executeBenchmark, setExecuteBenchmark] = useState<boolean>(true)
-    // Provides the context of why the Benchmarking is not executable
-    const [description, setDescription] = useState<string>("")
+    const [selectedAttacks, setSelectedAttacks] = useState<{ [k: string]: RegisterObjectProps }>({});
+    const [isExecuting, setIsExecuting] = useState(false);
 
-    useEffect(() => {
-        if (dataset == null) {
-            setExecuteBenchmark(false)
-            setDescription("A dataset is required to perform a benchmark.")
-        } else if (Object.keys(attacks).length === 0) {
-            setExecuteBenchmark(false)
-            setDescription("No attacks are available for the execution.")
-        } else if (selectedMetricCount === 0) {
-            setExecuteBenchmark(false)
-            setDescription("At least one benchmark metric must be selected.")
-        } else {
-            setExecuteBenchmark(Object.keys(selectedAttacks).length > 0)
+    // Filtering the list of all possible attacks through the model's task
+    const compatibleAttacks: { [k: string]: RegisterObjectProps } = useMemo(
+        () => Object.fromEntries(
+            Object.entries(attacks).filter(([, attack]: [string, RegisterObjectProps]) =>
+                Boolean(model?.task && attack.task) &&
+                supportsTask(attack, model!.task!),
+            ),
+        ),
+        [attacks, model],
+    );
 
-            if (Object.keys(selectedAttacks).length === 0) {
-                setDescription(`None of the ${Object.keys(attacks).length} attacks have been selected.`)
-            } else {
-                setDescription("Another Benchmarking is running. Please wait till the end.")
-            }
-        }
 
-    }, [attacks, dataset, selectedAttacks, selectedMetricCount])
+    const handleParametersChange = (id: string, parameters: (number | string)[]) => {
+        const currentAttack = selectedAttacks[id];
+        if (!currentAttack?.parameters) return;
+        setSelectedAttacks({
+            ...selectedAttacks,
+            [id]: {
+                ...currentAttack,
+                parameters: updateParameterDefaults(currentAttack.parameters, parameters)
+            },
+        });
+    };
 
-    // Click Execution Attack Handle
-    const [isClicked, setIsClicked] = useState<boolean>(false)
-    const [isExecuting, setIsExecuting] = useState<boolean>(false)
+    const router: AppRouterInstance = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isLoadingReport, setIsLoadingReport] = useState(false);
+    const reportRequestRef = useRef<AbortController | null>(null);
 
+    const selectedAttackList = useMemo(() => Object.values(selectedAttacks), [selectedAttacks]);
+    const attackIds = useMemo(() => selectedAttackList.map((a) => a.id), [selectedAttackList]);
+    const attackNames = useMemo(
+        () => Object.fromEntries(selectedAttackList.map((a) => [a.id, a.name])),
+        [selectedAttackList],
+    );
+
+
+    const attackState = useMemo<Record<AttackStatus, number>>(() => {
+        const counts: Record<AttackStatus, number> = {pending: 0, 'in progress': 0, finished: 0, error: 0};
+        for (const job of jobs) counts[job.status] += 1;
+        return counts;
+    }, [jobs]);
+
+    const unfinishedAttacks = attackState.pending + attackState['in progress'];
+    const failedAttacks = attackState.error;
+    const canOpenReport = benchmarkId !== null
+        && model?.id != null
+        && dataset?.id != null
+        && jobs.length > 0
+        && unfinishedAttacks === 0
+        && failedAttacks === 0
+        && !error
+        && !isLoading
+        && !isLoadingReport;
+
+    const description: string = useMemo(
+        () => getJobStatusDescription(
+            benchmarkId,
+            isLoading,
+            error, jobs,
+            unfinishedAttacks,
+            failedAttacks
+        ),
+        [benchmarkId, isLoading, error, jobs, unfinishedAttacks, failedAttacks],
+    );
+
+    const reportDisabledDescription: string = useMemo(
+        () => getReportDisabledDescription(
+            isLoadingReport,
+            benchmarkId,
+            model,
+            dataset,
+            description
+        ), [isLoadingReport, benchmarkId, model, dataset, description]);
 
     return (
-        <div
-            className={styles.page}>
-            {/* Header */}
-            <HeaderPageTask
-                Icon={BrickWallFireIcon}
-                title="Red Teaming"
-                description="
-                Select all the attacks and all the metrics needed for executing the benchmark.
-                "
-                button_props={{
-                    description: "Execute Benchmark",
-                    isDisabled: !executeBenchmark || isExecuting || dataset == null,
-                    disabledDescription: description,
-                    handleClick: () => handleClick({
-                        url: `http://${hostname}:${port}/job/start_benchmark`,
-                        model: model,
-                        dataset: dataset,
-                        attacks: Object.values(selectedAttacks),
-                        metrics: Object.values(modifiedSelectedElement),
-                        isExecuting,
-                        setIsExecuting,
-                        setSelectedAttackList,
-                        selectedAttacks,
-                        setBenchmarkId,
-                        setIsClicked,
-                    })
-                }}
-            />
-            <Modal
-                opened={isClicked}
-                className={styles.allert_message}
-                onClose={() => setIsClicked(false)}
-                withCloseButton={false}
-                styles={{
-                    title: {
-                        color: "white",
-                        fontWeight: "bold",
-                        marginBottom: "15px"
-                    },
-                    content: {
-                        backgroundColor: "var(--bg-light)",
-                        borderRadius: "var(--border-radius)",
-                        color: "white",
-                        fontSize: "0.8rem"
+        <div className={styles.page}>
+            <div className={styles.header}>
+                <HeaderPageTask
+                    Icon={BrickWallFireIcon}
+                    title="Testing Vulnerabilities"
+                    description="Select the vulnerabilities and metrics to run, then monitor every attack from this page."
+                />
+            </div>
 
-                    }
-                }}
-                centered>
-                <Modal.Title>
-                    <Group>
-                        <Info/> Information
-                    </Group>
-                </Modal.Title>
-
-                A Benchmark containing {Object.keys(selectedAttacks).length} vulnerabilities has been scheduled.
-                Visit the management page for checking the advancement of the experiments.
-
-                <button
-                    onClick={() => window.location.href = "/pages/redteam/management"}
-                    className={styles.allert_button}
-                >
-                    Go to Management Table <ChevronRight size={"var(--icon-size)"}/>
-                </button>
-            </Modal>
-
-            {/* Attacks Selection */}
             <TableWrapper
-                title='Vulnerability selection'
-                elements={attacks}
                 showAttackCategories
                 selectedElement={selectedAttacks}
-                handleSelection={(id: string, visibleElements) => setSelectedAttacks(
-                    updateSelectedObjects(id, selectedAttacks, attacks, visibleElements)
-                )}
-                handleParametersChange={(id: string, parameters: (number | string)[]) => {
-                    handleParametersChange(
-                        id,
-                        parameters,
-                        setSelectedAttacks,
-                        selectedAttacks
-                    )
-                }}
+                handleSelection={
+                    (
+                        id: string,
+                        visibleElements: { [k: string]: RegisterObjectProps } | undefined
+                    ) =>
+                        setSelectedAttacks(
+                            updateSelectedObjects(
+                                id,
+                                selectedAttacks,
+                                compatibleAttacks,
+                                visibleElements
+                            ),
+                        )}
+                handleParametersChange={handleParametersChange}
             />
 
-            {/* Metrics Selection */}
-            <TableWrapper
-                title='Metric Selection'
-                elements={metrics}
-                selectedElement={selectedMetrics}
-                handleSelection={(id: string, visibleElements) => setSelectedMetrics(
-                    updateSelectedObjects(id, selectedMetrics, metrics, visibleElements)
-                )}
-                handleParametersChange={(id: string, parameters: (number | string)[]) => {
-                    handleParametersChange(id,
-                        parameters,
-                        setSelectedMetrics,
-                        selectedMetrics)
-                }}/>
+
+            <BenchmarkActions
+                selectedAttacks={selectedAttacks}
+                onReset={() => {
+                    setBenchmarkId(null);
+                    setSelectedAttackList({});
+                    setSelectedAttacks({});
+                }}
+                onRun={(
+                    metrics: RegisterObjectProps[],
+                ) => void handleClick({
+                    url: `http://${hostname}:${port}/job/start_benchmark`,
+                    model,
+                    dataset,
+                    attacks: Object.values(selectedAttacks),
+                    metrics,
+                    isExecuting,
+                    setIsExecuting,
+                    setSelectedAttackList,
+                    selectedAttacks,
+                    setBenchmarkId,
+                })}
+                isExecuting={isExecuting}
+            />
+
+            <section className={styles.jobMonitoring} aria-labelledby="job-monitoring-title">
+                <div className={styles.jobMonitoringHeading}>
+                    <div>
+                        <h2 id="job-monitoring-title">Execution details</h2>
+                        <p className={styles.jobMonitoringId}>
+                            Benchmark
+                            ID: <code>{benchmarkId === null ? 'Not available' : String(benchmarkId)}</code>
+                        </p>
+                    </div>
+                    <div className={styles.jobMonitoringCards}>
+                        {ATTACK_STATUSES.map((status) => (
+                            <div key={status} className={styles.jobMonitoringCard}>
+                                {getStatusLabel(status)}: <b>{attackState[status]}</b>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <ManagementTable
+                    isLoading={isLoading}
+                    error={error}
+                    reportAction={{
+                        label: isLoadingReport ? 'Loading report…' : 'Vulnerability report',
+                        disabledDescription: reportDisabledDescription,
+                        onClick: () => void handleClickReport({
+                            benchmarkId,
+                            modelId: model?.id == null ? '' : String(model.id),
+                            datasetId: dataset?.id == null ? '' : String(dataset.id),
+                            hostname,
+                            port,
+                            canOpenReport,
+                            reportRequestRef,
+                            setIsLoadingReport,
+                            setModelReport,
+                            router,
+                            getErrorMessage,
+                        }),
+                    }}
+                />
+            </section>
         </div>
-    )
+    );
 };
 
 export default Benchmark;

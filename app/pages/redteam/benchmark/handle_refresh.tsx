@@ -1,14 +1,6 @@
 import {ATTACK_STATUSES} from '@/interfaces/NNInterfaces';
 import type {AttackStatus, JobResult} from '@/interfaces/NNInterfaces';
 
-interface HandleRefreshParams {
-    benchmarkId: string | number;
-    modelId?: string | number;
-    datasetId?: string | number;
-    attackIds?: string[];
-    url: string;
-    signal?: AbortSignal;
-}
 
 const isAttackStatus = (value: unknown): value is AttackStatus =>
     typeof value === 'string' && ATTACK_STATUSES.includes(value as AttackStatus);
@@ -41,14 +33,25 @@ function parseJobs(value: unknown): JobResult[] {
     });
 }
 
-export async function handleRefresh({
-    benchmarkId,
-    modelId,
-    datasetId,
-    attackIds = [],
-    url,
-    signal,
-}: HandleRefreshParams): Promise<JobResult[]> {
+interface GetAttackStatusParams {
+    benchmarkId: string | number;
+    modelId?: string | number;
+    datasetId?: string | number;
+    attackIds?: string[];
+    url: string;
+    signal?: AbortSignal;
+}
+
+export async function GetAttackStatus(
+    {
+        benchmarkId,
+        modelId,
+        datasetId,
+        attackIds = [],
+        url,
+        signal,
+    }: GetAttackStatusParams
+): Promise<JobResult[]> {
     const searchParams = new URLSearchParams({
         benchmark_id: String(benchmarkId),
     });

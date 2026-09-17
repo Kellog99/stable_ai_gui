@@ -12,7 +12,6 @@ interface HandleBenchmarkRequestParams {
     setSelectedAttackList: (attacks: { [key: string]: RegisterObjectProps }) => void;
     selectedAttacks: { [key: string]: RegisterObjectProps };
     setBenchmarkId: (benchmarkId: string | number | null) => void;
-    setIsClicked: (isClicked: boolean) => void;
 }
 
 function getErrorMessage(body: string, status: number): string {
@@ -51,16 +50,13 @@ export async function handleClick(
         attacks,
         metrics,
         isExecuting,
-        setIsExecuting,
         setSelectedAttackList,
         selectedAttacks,
         setBenchmarkId,
-        setIsClicked,
     }: HandleBenchmarkRequestParams) {
     if (isExecuting || !model || !dataset || attacks.length === 0 || metrics.length === 0) return;
 
     setBenchmarkId(null);
-    setIsExecuting(true);
     try {
         if (model || dataset) {
             const requestBody = {
@@ -69,8 +65,6 @@ export async function handleClick(
                 attacks,
                 metrics
             };
-            console.log("model = ", model)
-            console.log("dataset = ", dataset)
             //saveBodyToJson(requestBody);
 
             const response = await fetch(url, {
@@ -87,11 +81,8 @@ export async function handleClick(
             console.log("id = ", benchmarkId)
             setSelectedAttackList(selectedAttacks);
             setBenchmarkId(benchmarkId);
-            setIsClicked(true);
         }
     } catch (error) {
         console.error('Error starting benchmark:', error);
-    } finally {
-        setIsExecuting(false);
     }
 }

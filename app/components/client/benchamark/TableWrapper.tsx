@@ -1,18 +1,10 @@
 import React, {useMemo, useState} from 'react';
 import './TableWrapper.css';
 import {Search, SlidersHorizontal} from 'lucide-react';
-import {RegisterObjectProps} from '@/interfaces/NNInterfaces';
+import {RegisterObjectProps, supportsTask} from '@/interfaces/NNInterfaces';
 import AttackCard from '../utils/AtkCard';
+import useNNTrustStore from "@/store/nnTrustStore";
 
-
-interface TableWrapperProps {
-    title: string,
-    elements: { [key: string]: RegisterObjectProps };
-    selectedElement: { [key: string]: RegisterObjectProps };
-    handleSelection: (id: string, visibleElements?: { [key: string]: RegisterObjectProps }) => void;
-    handleParametersChange: (id: string, parameters: (number | string)[]) => void;
-    showAttackCategories?: boolean;
-}
 
 const formatCategory = (category: string) =>
     category
@@ -42,45 +34,86 @@ const getAttackObjective = (attack: RegisterObjectProps) => {
 const matchesKnowledge = (attack: RegisterObjectProps, knowledge: string) =>
     knowledge === 'all' || attack.knowledge?.toLowerCase().includes(knowledge);
 
+interface TableWrapperProps {
+    selectedElement: { [key: string]: RegisterObjectProps };
+    handleSelection: (id: string, visibleElements?: { [key: string]: RegisterObjectProps }) => void;
+    handleParametersChange: (id: string, parameters: (number | string)[]) => void;
+    showAttackCategories?: boolean;
+}
+
 const TableWrapper: React.FC<TableWrapperProps> = (
     {
-        title,
-        elements,
         selectedElement,
         handleSelection,
         handleParametersChange,
         showAttackCategories = false,
     }
 ) => {
+    const {
+        model,
+        attacks
+    } = useNNTrustStore()
+
+    // Filtering the list of all possible metrics through the model's task
+    const availableAttacks: { [k: string]: RegisterObjectProps } = useMemo(
+        () => Object.fromEntries(
+            Object.entries(attacks).filter(([, atk]: [string, RegisterObjectProps]) => {
+                    console.log("atk id = ", atk.id)
+                    console.log("atk task", atk.task)
+                    if (!model || !atk.task || !model.task) return false
+                    return supportsTask(atk, model.task)
+                }
+            ),
+        ),
+        [attacks, model],
+    );
 
     const [query, setQuery] = useState("");
     const [objective, setObjective] = useState("all");
     const [knowledge, setKnowledge] = useState("all");
-    const objectives = useMemo(() => Array.from(new Set(
-        showAttackCategories ? Object.values(elements).map(getAttackObjective) : []
-    )).sort(), [elements, showAttackCategories]);
+    const objectives: string[] = useMemo(() => Array.from(new Set(
+        showAttackCategories ? Object.values(attacks).map(getAttackObjective) : []
+    )).sort(), [attacks, showAttackCategories]);
 
-    const filteredItems = useMemo(() => {
-        return Object.fromEntries(Object.entries(elements).filter(
-            ([_, value]) =>
-                query === "" ||
-                value.name.toLowerCase().includes(query.toLowerCase()) ||
-                value.description.toLowerCase().includes(query.toLowerCase()) ||
-                (showAttackCategories && getAttackObjective(value).toLowerCase().includes(query.toLowerCase())) ||
-                value.knowledge?.toLowerCase().includes(query.toLowerCase())
-        ).filter(([_id, value]) =>
-            !showAttackCategories || objective === "all" || getAttackObjective(value) === objective
-        ).filter(([_id, value]) =>
-            !showAttackCategories || matchesKnowledge(value, knowledge)
-        ));
-    }, [query, objective, knowledge, elements, showAttackCategories]);
+    const filteredItems: { [k: string]: RegisterObjectProps } = useMemo(
+        () => {
+            return Object.fromEntries(Object.entries(availableAttacks).filter(
+                ([_, value]: [string, RegisterObjectProps]) =>
+                    query === "" ||
+                    value.name.toLowerCase().includes(query.toLowerCase()) ||
+                    value.id.toLowerCase().includes(query.toLowerCase())
+            ).filter(([_id, value]) =>
+                !showAttackCategories || objective === "all" || getAttackObjective(value) === objective
+            ).filter(([_id, value]) =>
+                !showAttackCategories || matchesKnowledge(value, knowledge)
+            ));
+        }, [query, objective, knowledge, attacks, showAttackCategories]);
+
+    const renderCard = ([id, atk]: [string, RegisterObjectProps]) => {
+        const selectedAttack = selectedElement[id];
+
+        return (
+            <AttackCard
+                key={id}
+                id={id}
+                title={atk.name}
+                description={atk.description ?? ''}
+                knowledge={atk.knowledge}
+                category={showAttackCategories ? getAttackObjective(atk) : undefined}
+                isActive={selectedAttack?.id === atk.id}
+                parameters={selectedAttack?.parameters ?? atk.parameters ?? []}
+                handleClick={() => handleSelection(atk.id)}
+                handleParametersChange={(parameters) => handleParametersChange(id, parameters)}
+            />
+        );
+    };
 
     return (
         <div className="wrapper">
             <div className="benchmark-section-header">
-                <h2 className="table-title">{title}</h2>
+                <h2 className="table-title">Vulnerability selection</h2>
                 <p className="subtitle">
-                    {selectedElement ? Object.keys(selectedElement).length : 0} / {Object.keys(elements).length} selected
+                    {selectedElement ? Object.keys(selectedElement).length : 0} / {Object.keys(attacks).length} selected
                 </p>
             </div>
             <div className={`scroll-header ${showAttackCategories ? 'has-category-filter' : ''}`}>
@@ -130,28 +163,9 @@ const TableWrapper: React.FC<TableWrapperProps> = (
                 </div>
             </div>
             {Object.entries(filteredItems).length > 0 ?
-                <div className="card-grid">
-                    {
-                        Object.entries(filteredItems).map(([id, atk]: [string, RegisterObjectProps]) => {
-                            const selectedAttack = selectedElement[id];
-
-                            return <AttackCard
-                                key={id}
-                                id={id}
-                                title={atk.name}
-                                description={atk.description}
-                                knowledge={atk.knowledge}
-                                category={showAttackCategories ? getAttackObjective(atk) : undefined}
-                                isActive={selectedAttack?.id === atk.id}
-                                parameters={selectedAttack?.parameters ?? atk.parameters ?? []}
-                                handleClick={() => handleSelection(atk.id)}
-                                handleParametersChange={(parameters) => handleParametersChange(id, parameters)}
-                            />
-                        })
-                    }
-                </div>
+                <div className="card-grid">{Object.entries(filteredItems).map(renderCard)}</div>
                 : <div className='scroll-text'>
-                    {Object.keys(elements).length > 0
+                    {Object.keys(attacks).length > 0
                         ? <p>No elements match the current filters.</p>
                         : <p>No elements have been passed.</p>}
                 </div>
