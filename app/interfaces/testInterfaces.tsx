@@ -47,3 +47,12 @@ export interface JailbreakAttackOutput {
   conversations: { role: string; content: string; score?: number }[][];
   metadata: { [key: string]: any };
 }
+
+export interface JailbreakHistoryEntry {
+  id: string;
+  goal: string;
+  success: boolean;
+  best_score?: number;
+  n_attempts: number;
+  saved_at: string;
+}

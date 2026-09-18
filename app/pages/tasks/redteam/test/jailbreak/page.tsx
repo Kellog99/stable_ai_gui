@@ -10,6 +10,7 @@ import { Send, Shield, Target, Unlink } from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import MessageThread from '@/components/client/jailbreaking/MessageThread';
 import ModelSelector from '@/components/client/jailbreaking/ModelSelector';
+import SavedAttacksBoard from '@/components/client/jailbreaking/SavedAttacksBoard';
 import { BubbleInterface, JailbreakAttackOutput } from '@/interfaces/testInterfaces';
 
 const Jailbreaking = () => {
@@ -140,6 +141,43 @@ const Jailbreaking = () => {
         }));
     }
 
+    // Maps a JailbreakAttackOutput (fresh or replayed from a saved state) onto the store's result shape.
+    const applyJailbreakOutput = (data: JailbreakAttackOutput) => {
+        // Flat history for the "View Full Iteration History" expanded view
+        const historyBubbles: BubbleInterface[] = data.history.map(turn => ({
+            sender: turn.role === "attacker" ? "user" : "model",
+            msg: turn.content,
+            score: turn.score
+        }));
+
+        // Grouped conversations for the chat switcher
+        const convBubbles: BubbleInterface[][] = data.conversations.map(chat =>
+            chat.map(turn => ({
+                sender: turn.role === "attacker" ? "user" : "model",
+                msg: turn.content,
+                score: turn.score,
+            }))
+        );
+
+        setResults({
+            goal: data.goal,
+            fullHistory: historyBubbles,
+            conversationChat: convBubbles,
+            modelResponse: data.best_response,
+            adversarialPrompt: data.best_prompt,
+            attackSuccess: data.success,
+            bestScore: data.best_score,
+            attackMetadata: data.metadata,
+        });
+    };
+
+    // Loads a previously saved attack state and shows it as if it had just been run.
+    const handleLoadSavedAttack = (data: JailbreakAttackOutput) => {
+        setPrompt(data.goal);
+        setGoal(data.goal);
+        applyJailbreakOutput(data);
+    };
+
     //  this function handles the submission of the prompt and sets the goal and adversarial prompt
     const handleSubmit = async () => {
         if (isActive && selectedAttack) {
@@ -182,33 +220,7 @@ const Jailbreaking = () => {
                 }
 
                 const data: JailbreakAttackOutput = await response.json();
-
-                // Flat history for the "View Full Iteration History" expanded view
-                const historyBubbles: BubbleInterface[] = data.history.map(turn => ({
-                    sender: turn.role === "attacker" ? "user" : "model",
-                    msg: turn.content,
-                    score: turn.score
-                }));
-
-                // Grouped conversations for the chat switcher
-                const convBubbles: BubbleInterface[][] = data.conversations.map(chat =>
-                    chat.map(turn => ({
-                        sender: turn.role === "attacker" ? "user" : "model",
-                        msg: turn.content,
-                        score: turn.score,
-                    }))
-                );
-
-                setResults({
-                    goal: currentGoal,
-                    fullHistory: historyBubbles,
-                    conversationChat: convBubbles,
-                    modelResponse: data.best_response,
-                    adversarialPrompt: data.best_prompt,
-                    attackSuccess: data.success,
-                    bestScore: data.best_score,
-                    attackMetadata: data.metadata,
-                });
+                applyJailbreakOutput(data);
             } catch (err) {
                 console.error('Jailbreaking attack failed:', err)
                 setGoal(undefined)
@@ -293,12 +305,24 @@ const Jailbreaking = () => {
                         }}
                         handleChange={(value: (string | number)[]) => handleChange(value as number[])}
                     />
-                    <ModelSelector
-                        attackerModel={attackerModel}
-                        judgeModel={judgeModel}
-                        onAttackerChange={setAttackerModel}
-                        onJudgeChange={setJudgeModel}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <ModelSelector
+                                attackerModel={attackerModel}
+                                judgeModel={judgeModel}
+                                onAttackerChange={setAttackerModel}
+                                onJudgeChange={setJudgeModel}
+                            />
+                        </div>
+                        {/* Offset to align with the model dropdowns' row, below the "Attacker/Judge Model" labels. */}
+                        <div style={{ marginTop: '22px' }}>
+                            <SavedAttacksBoard
+                                attackId={selectedAttack?.id ?? null}
+                                attackName={selectedAttack?.name}
+                                onSelect={handleLoadSavedAttack}
+                            />
+                        </div>
+                    </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px' }}>
                         <label className={styles.goal_label}>
                             <Target size={16} color="rgb(187, 58, 58)" />
