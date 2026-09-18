@@ -1,8 +1,9 @@
+// Backward-compatible alias; TaskType is the canonical backend task type.
 export type Task =
-    | "classification"
-    | "segmentation"
-    | "detection"
-    | "language"
+    | 'classification'
+    | 'segmentation'
+    | 'detection'
+    | 'language';
 
 export interface InfoProps {
     id: string                        // id for the file identification.

@@ -88,13 +88,14 @@ const useNNTrustStore = create<AppState>()(
             // RootLayout restores this after mount to keep the server and first client
             // render in sync while still preserving state across page refreshes.
             skipHydration: true,
-            // benchmarkId belongs to the current browser session. Older versions of
-            // the store persisted it, so explicitly discard that legacy value while
-            // rehydrating instead of letting the default shallow merge restore it.
+            // benchmarkId and modelReport belong to the current browser session.
+            // Older versions persisted them, so explicitly discard those legacy
+            // values instead of letting the default shallow merge restore them.
             merge: (persistedState, currentState) => ({
                 ...currentState,
                 ...(persistedState as Partial<AppState>),
                 benchmarkId: null,
+                modelReport: null,
             }),
             partialize: (state) => ({
                 model: state.model,
@@ -104,8 +105,7 @@ const useNNTrustStore = create<AppState>()(
                 attacks: state.attacks,
                 privacyAttacks: state.privacyAttacks,
                 metrics: state.metrics,
-                modelReport: state.modelReport,
-                selectedAttacks: state.selectedAttacks
+                selectedAttacks: state.selectedAttacks,
             }),
         }
     )

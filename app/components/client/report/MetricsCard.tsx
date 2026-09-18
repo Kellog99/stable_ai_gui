@@ -7,7 +7,11 @@ interface ModelMetricsProps {
     metrics: MetricsProps;
 }
 
-const MetricsCard: React.FC<ModelMetricsProps> = ({metrics}) => {
+const MetricsCard: React.FC<ModelMetricsProps> = (
+    {
+        metrics
+    }: ModelMetricsProps
+) => {
 
     const allMetricCards = Object.entries(metrics)
         .filter(([key, value]: [string, any]) =>

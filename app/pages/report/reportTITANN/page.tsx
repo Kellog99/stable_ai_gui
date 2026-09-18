@@ -20,6 +20,7 @@ const SecurityReport = () => {
     const {modelReport} = useNNTrustStore();
     const [benchmark, setBenchmark] = useState<BenchmarkDataProps[]>([]);
 
+    console.log(modelReport)
     useEffect(() => {
         getBenchmarkList(hostname, port)
             .then(setBenchmark)

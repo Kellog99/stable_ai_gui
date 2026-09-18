@@ -1,20 +1,7 @@
 import {LucideIcon} from "lucide-react";
 import {ReactEventHandler} from "react";
+import {Task} from "@/interfaces/homePageInterface";
 
-export interface LoadedFile {
-    name: string;
-    file: File;
-    type: 'dataset' | 'model' | 'json';
-}
-
-export interface AppState {
-    currentPage: 'home' | 'report';
-    dataset: LoadedFile | null;
-    model: LoadedFile | null;
-    reportFiles: LoadedFile[];
-}
-
-export type TaskType = 'benchmark' | 'one-image-attack' | 'analysis';
 
 export interface ButtonProps {
     id: string,
@@ -41,7 +28,7 @@ export interface RegisterObjectProps {
     name: string,
     description?: string
     parameters: ParametersProps[]
-    task: string[] | string
+    task: Task[] | Task
     knowledge?: string
     objective?: string
     type?: string
@@ -91,12 +78,4 @@ export interface JobResult {
     estimated_execution_time?: number | null;
     status: AttackStatus;
     error?: string | null;
-}
-
-export interface ModelSpecs {
-    name: string;
-    task?: string;
-    num_classes?: number;
-    pretrained?: boolean;
-    type?: string;
 }

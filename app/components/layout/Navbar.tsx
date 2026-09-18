@@ -1,11 +1,11 @@
 "use client"
 import './Navbar.css';
-import { NavigationSection, sections } from './config';
+import {NavigationSection, sections} from './config';
 import NavigationButton from './NavigationButton';
-import { Burger } from '@mantine/core';
+import {Burger} from '@mantine/core';
 import Profile from './Profile';
-import { useMemo, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import {useMemo, useState} from 'react';
+import {useRouter, usePathname} from 'next/navigation';
 
 interface FlatNavItem {
     id: string;
@@ -44,6 +44,7 @@ export default function Navbar() {
                 : [flat];
         });
     }
+
     // Since the section is a static constant then it is possible to create this element
     // by just invoking the function once.
     const itemsById = useMemo(() => {
@@ -75,7 +76,7 @@ export default function Navbar() {
                     size={20}
                     color='white'
                     opened={isOpen}
-                    onClick={() => { setIsOpen(!isOpen) }}
+                    onClick={() => setIsOpen(!isOpen)}
                 />
                 {isOpen ? "Menu" : null}
             </div>
@@ -104,7 +105,7 @@ export default function Navbar() {
                         </div>
                     ))}
             </div>
-            <Profile isOpen={isOpen} />
+            <Profile isOpen={isOpen}/>
         </div>
     );
 }

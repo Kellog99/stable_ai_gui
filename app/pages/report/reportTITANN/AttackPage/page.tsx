@@ -48,9 +48,11 @@ const MetricCards = ({items}: { items: MetricCardItem[] }) => (
 const AttackPage = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const atkId = searchParams.get('atkId');
 
+    const atkId: string | null = searchParams.get('atkId');
     const {modelReport} = useNNTrustStore();
+
+
     const attack = atkId ? modelReport?.attacks?.[atkId] : null;
     const usedParams = attack?.parameters ?? [];
     const metricCards: MetricCardItem[] = Object.entries(attack?.metrics ?? {})

@@ -31,6 +31,7 @@ export interface ReportAttackProps {
 
 //  Interface for the report page
 export interface ModelReportProps {
+    id?: string
     info: ModelInfo;
     metrics: MetricsProps;
     attacks: { [key: string]: ReportAttackProps }

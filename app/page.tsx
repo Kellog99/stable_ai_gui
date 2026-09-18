@@ -1,6 +1,6 @@
 "use client"
 
-import FileSelectionPanel from '@/components/client/repository/FileSelectionPanel';
+import FileRepository from '@/components/client/repository/FileRepository';
 import styles from '@/styles/HomePage.module.css';
 import {useCallback, useEffect} from 'react';
 
@@ -111,10 +111,10 @@ export default function HomePage() {
 
             <div className={styles.upload_container}>
                 {/* Model selection */}
-                <FileSelectionPanel
+                <FileRepository
                     key="model_loader"
                     title="Model"
-                    description="Drag and drop your model or choose an existing model."
+                    description="Select the model to test."
                     elements={listModels ?? []}
                     Icon={Brain}
                     fileDropInformation={infoModel}
@@ -123,10 +123,10 @@ export default function HomePage() {
                     repositoryType="model"
                 />
 
-                <FileSelectionPanel
+                <FileRepository
                     key="dataset_loader"
                     title="Dataset"
-                    description="Load your dataset or choose an existing dataset."
+                    description="Select the dataset to use for the benchmarking."
                     elements={listDatasets ?? []}
                     Icon={DatabaseIcon}
                     fileDropInformation={infoDataset}
