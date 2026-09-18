@@ -32,7 +32,7 @@ export interface ParametersProps {
   step?: number
   default: number | string | boolean
   description: string
-  kind?: 'number' | 'enum' | 'boolean'
+  kind?: 'number' | 'enum' | 'boolean' | 'string'
   options?: string[]
 }
 
