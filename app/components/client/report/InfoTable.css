@@ -1,6 +1,6 @@
 .info_table__section {
     width: 100%;
-    margin: 0 0 46px;
+    margin: 0;
 }
 
 .info_table__heading {
@@ -24,20 +24,27 @@
 
 .info_table__content {
     display: grid;
-    gap: 28px;
+    gap: 15px;
 }
 
 .info_table__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     margin: 0;
-    border-top: 1px solid color-mix(in srgb, var(--bg-light) 24%, transparent);
 }
 
-.info_table__grid > div {
+.info_table__item {
+    box-sizing: border-box;
+    flex: 0 0 220px;
+    width: 220px;
+    max-width: 100%;
+    min-height: 78px;
     min-width: 0;
-    padding: 14px 16px 14px 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--bg-light) 20%, transparent);
+    background-color: color-mix(in srgb, var(--bg-light) 24%, transparent);
+    padding: 14px 16px;
+    border: 1px solid color-mix(in srgb, var(--bg-light) 20%, transparent);
+    border-radius: 10px;
 }
 
 .info_table__grid dt {
@@ -110,15 +117,10 @@
     overflow-wrap: anywhere;
 }
 
-@media (max-width: 920px) {
-    .info_table__grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
 @media (max-width: 640px) {
-    .info_table__grid {
-        grid-template-columns: 1fr;
+    .info_table__item {
+        flex-basis: 100%;
+        width: 100%;
     }
 
     .info_table__preprocessing dl > div {

@@ -3,6 +3,8 @@ import {useRouter, useSearchParams} from 'next/navigation';
 import useNNTrustStore from '@/store/nnTrustStore';
 import './AttackPageStyle.css';
 import {ArrowLeft, ChartNoAxesCombined, SlidersHorizontal} from 'lucide-react';
+import MetricsCard, {MetricCardItem} from '@/components/client/report/MetricsCard';
+import {ParametersProps} from "@/interfaces/NNInterfaces";
 
 const HIDDEN_METRIC_KEYS = new Set([
     'name',
@@ -12,38 +14,6 @@ const HIDDEN_METRIC_KEYS = new Set([
     'num_queries',
     'power',
 ]);
-
-interface MetricCardItem {
-    key: string;
-    label: string;
-    value: unknown;
-    description?: string;
-}
-
-
-function formatMetricValue(value: unknown): string {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-        return value.toFixed(2);
-    }
-    if (value === null || value === undefined) return '—';
-    return String(value);
-}
-
-const MetricCards = ({items}: { items: MetricCardItem[] }) => (
-    <div className="attack-metrics-grid">
-        {items.map(({key, label, value, description}) => (
-            <article className="attack-metric-card" key={key}>
-                <p className="attack-metric-label">{label}</p>
-                {description && <p className="attack-metric-description">{description}</p>}
-                {Array.isArray(value) && value.every(item => typeof item === 'number') ? (
-                    <div className="metric-values">
-                        {value.map((item, index) => <span key={index}>{formatMetricValue(item)}</span>)}
-                    </div>
-                ) : <p className="metric-value">{formatMetricValue(value)}</p>}
-            </article>
-        ))}
-    </div>
-);
 
 const AttackPage = () => {
     const searchParams = useSearchParams();
@@ -71,7 +41,7 @@ const AttackPage = () => {
     } else if (!modelReport) {
         return <div className="dashboard-message">Loading...</div>;
     } else if (!attack) {
-        return <div className="dashboard-message">No data found for attack "{atkId}".</div>;
+        return <div className="dashboard-message">No data found for attack &quot;{atkId}&quot;.</div>;
     }
 
     return (
@@ -98,7 +68,7 @@ const AttackPage = () => {
                     <h2 id="attack-metrics-title">Measured performance</h2>
                     <span>{metricCards.length} metrics</span>
                 </div>
-                <MetricCards items={metricCards}/>
+                <MetricsCard items={metricCards}/>
             </section>
 
             {usedParams.length > 0 && (
@@ -110,12 +80,13 @@ const AttackPage = () => {
                         </div>
                         <span>{usedParams.length} configured</span>
                     </div>
-                    <MetricCards items={usedParams.map(param => ({
-                        key: param.id,
-                        label: param.name || param.id,
-                        description: param.description,
-                        value: ('value' in param ? param.value : undefined) ?? param.default,
-                    }))}/>
+                    <MetricsCard items={
+                        usedParams.map((param: ParametersProps) => ({
+                            key: param.id,
+                            label: param.name || param.id,
+                            description: param.description,
+                            value: ('value' in param ? param.value : undefined) ?? param.default,
+                        }))}/>
                 </section>
             )}
         </main>

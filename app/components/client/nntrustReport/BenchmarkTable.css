@@ -1,24 +1,33 @@
 .benchmark-controls {
+    display: flex;
+    flex-direction: column;
     margin-top: 2vw;
     margin-bottom: 20px;
+    gap: 25px;
 }
 
 .benchmark_header {
     display: flex;
-    flex-direction: row;
-    gap: 5px;
-    align-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.benchmark-label {
+    margin: 0;
+    color: darkgray;
+    font-size: 0.725rem;
+    white-space: nowrap;
 }
 
 .benchmark-select {
-    padding: 5px;
     width: 100px;
     height: 30px;
     border: 1px solid gray;
     border-radius: 6px;
     background: var(--bg);
     cursor: pointer;
-    margin-bottom: 20px;
+    margin: 0;
     font-size: 0.8rem;
     color: lightgray;
 }
@@ -80,4 +89,20 @@
 
     background: color-mix(in hsl, var(--bg-dark) 60%, var(--bg-light) 40%);
     border-radius: var(--border-radius);
+}
+
+.leaderboard-title p {
+    margin: 0;
+}
+
+.leaderboard table {
+    color: var(--text-primary);
+}
+
+.leaderboard th {
+    color: var(--text-secondary);
+}
+
+.leaderboard td {
+    color: var(--text-primary);
 }

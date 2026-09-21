@@ -79,7 +79,7 @@ const InfoTable = ({info}: InfoTableProps) => {
             <div className="info_table__content">
                 <dl className="info_table__grid">
                     {detailEntries.map(([key, value]) => (
-                        <div key={key}>
+                        <div className="info_table__item" key={key}>
                             <dt>{formatLabel(key)}</dt>
                             <dd className={['repository', 'source_path', 'path'].includes(key)
                                 ? 'info_table__path_value'
