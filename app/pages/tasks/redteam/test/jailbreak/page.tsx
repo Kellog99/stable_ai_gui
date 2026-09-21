@@ -41,6 +41,7 @@ const Jailbreaking = () => {
         attackSuccess,
         bestScore,
         attackMetadata,
+        resultAttackId,
         isClicked,
         setIsClicked,
         setResults,
@@ -142,25 +143,32 @@ const Jailbreaking = () => {
     }
 
     // Maps a JailbreakAttackOutput (fresh or replayed from a saved state) onto the store's result shape.
-    const applyJailbreakOutput = (data: JailbreakAttackOutput) => {
+    const applyJailbreakOutput = (data: JailbreakAttackOutput, attackId?: string) => {
         // Flat history for the "View Full Iteration History" expanded view
         const historyBubbles: BubbleInterface[] = data.history.map(turn => ({
             sender: turn.role === "attacker" ? "user" : "model",
             msg: turn.content,
-            score: turn.score
+            score: turn.score,
+            improvement: turn.improvement,
+            depth: turn.depth,
         }));
 
-        // Grouped conversations for the chat switcher
+        // Grouped conversations for the chat switcher. For tree attacks each
+        // entry is one root→leaf path, which is what the tree view rebuilds
+        // the escalation tree from — hence `improvement` and `depth` are kept.
         const convBubbles: BubbleInterface[][] = data.conversations.map(chat =>
             chat.map(turn => ({
                 sender: turn.role === "attacker" ? "user" : "model",
                 msg: turn.content,
                 score: turn.score,
+                improvement: turn.improvement,
+                depth: turn.depth,
             }))
         );
 
         setResults({
             goal: data.goal,
+            resultAttackId: attackId,
             fullHistory: historyBubbles,
             conversationChat: convBubbles,
             modelResponse: data.best_response,
@@ -175,7 +183,9 @@ const Jailbreaking = () => {
     const handleLoadSavedAttack = (data: JailbreakAttackOutput) => {
         setPrompt(data.goal);
         setGoal(data.goal);
-        applyJailbreakOutput(data);
+        // The board only lists runs of the currently selected attack, so that
+        // is the attack the replayed results come from.
+        applyJailbreakOutput(data, selectedAttack?.id);
     };
 
     //  this function handles the submission of the prompt and sets the goal and adversarial prompt
@@ -188,6 +198,7 @@ const Jailbreaking = () => {
             // Clear previous states before starting
             setResults({
                 goal: currentGoal,
+                resultAttackId: selectedAttack.id,
                 fullHistory: [],
                 conversationChat: [],
                 modelResponse: "",
@@ -220,7 +231,7 @@ const Jailbreaking = () => {
                 }
 
                 const data: JailbreakAttackOutput = await response.json();
-                applyJailbreakOutput(data);
+                applyJailbreakOutput(data, selectedAttack.id);
             } catch (err) {
                 console.error('Jailbreaking attack failed:', err)
                 setGoal(undefined)
@@ -360,6 +371,7 @@ const Jailbreaking = () => {
                     success={attackSuccess}
                     bestScore={bestScore}
                     metadata={attackMetadata}
+                    attackId={resultAttackId}
                 />
             </div>
         </div>

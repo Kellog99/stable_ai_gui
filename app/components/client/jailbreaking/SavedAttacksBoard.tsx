@@ -30,6 +30,7 @@ const SavedAttacksBoard: React.FC<SavedAttacksBoardProps> = ({ attackId, attackN
     const [entries, setEntries] = useState<JailbreakHistoryEntry[]>([]);
     const [loadingList, setLoadingList] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const fetchHistory = () => {
@@ -74,6 +75,24 @@ const SavedAttacksBoard: React.FC<SavedAttacksBoardProps> = ({ attackId, attackN
                 setError('Failed to load the selected attack.');
             })
             .finally(() => setLoadingId(null));
+    };
+
+    const handleDelete = (entry: JailbreakHistoryEntry) => {
+        if (!hostname || !port || !attackId) return;
+        setDeletingId(entry.id);
+        setError(null);
+        fetch(`http://${hostname}:${port}/test/jailbreaking/history/${encodeURIComponent(attackId)}/${encodeURIComponent(entry.id)}`, {
+            method: 'DELETE',
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                setEntries((prev) => prev.filter((e) => e.id !== entry.id));
+            })
+            .catch((err) => {
+                console.error('Failed to delete saved attack:', err);
+                setError('Failed to delete the selected attack.');
+            })
+            .finally(() => setDeletingId(null));
     };
 
     if (!attackId) return null;
@@ -146,7 +165,7 @@ const SavedAttacksBoard: React.FC<SavedAttacksBoardProps> = ({ attackId, attackN
                     ) : (
                         <ul className="saved-attacks-list">
                             {entries.map((entry) => (
-                                <li key={entry.id}>
+                                <li key={entry.id} className="saved-attacks-row">
                                     <button
                                         type="button"
                                         className="saved-attacks-item"
@@ -165,6 +184,18 @@ const SavedAttacksBoard: React.FC<SavedAttacksBoardProps> = ({ attackId, attackN
                                             </span>
                                         </span>
                                         {loadingId === entry.id && <Loader2 size={14} className="spin" />}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="saved-attacks-delete"
+                                        disabled={loadingId !== null || deletingId !== null}
+                                        onClick={() => handleDelete(entry)}
+                                        aria-label="Delete this saved attack"
+                                        title="Delete this saved attack"
+                                    >
+                                        {deletingId === entry.id
+                                            ? <Loader2 size={12} className="spin" />
+                                            : <X size={12} />}
                                     </button>
                                 </li>
                             ))}

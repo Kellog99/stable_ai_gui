@@ -93,11 +93,42 @@
     gap: 4px;
 }
 
+.saved-attacks-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.saved-attacks-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.saved-attacks-delete:hover:not(:disabled) {
+    color: rgb(210, 90, 90);
+    background-color: rgba(187, 58, 58, 0.18);
+}
+
+.saved-attacks-delete:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
 .saved-attacks-item {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     text-align: left;
     background: none;
     border: 1px solid transparent;
