@@ -40,7 +40,7 @@ export default function ReportPage() {
 
     // ################# router #################
     const router = useRouter()
-    console.log(modelsReports.map((rep)=>rep.id))
+    console.log(modelsReports.map((rep) => rep.id))
 
 
     return (

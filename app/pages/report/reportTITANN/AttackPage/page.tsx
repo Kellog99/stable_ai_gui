@@ -5,6 +5,7 @@ import './AttackPageStyle.css';
 import {ArrowLeft, ChartNoAxesCombined, SlidersHorizontal} from 'lucide-react';
 import MetricsCard, {MetricCardItem} from '@/components/client/report/MetricsCard';
 import {ParametersProps} from "@/interfaces/NNInterfaces";
+import {Suspense} from 'react';
 
 const HIDDEN_METRIC_KEYS = new Set([
     'name',
@@ -15,7 +16,7 @@ const HIDDEN_METRIC_KEYS = new Set([
     'power',
 ]);
 
-const AttackPage = () => {
+const AttackPageContent = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -93,5 +94,10 @@ const AttackPage = () => {
     );
 };
 
+const AttackPage = () => (
+    <Suspense fallback={<div className="dashboard-message">Loading...</div>}>
+        <AttackPageContent/>
+    </Suspense>
+);
 
 export default AttackPage;
