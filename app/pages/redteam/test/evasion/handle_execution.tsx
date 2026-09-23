@@ -8,6 +8,7 @@ interface HandlePostRequestParams {
     file?: string;
     model: ModelInfo | null;
     attack?: RegisterObjectProps;
+    device: "cpu" | "gpu" | "nps",
     isAttacking: boolean;
     setAdvImg: React.Dispatch<React.SetStateAction<string | null>>;
     setAdvPert: React.Dispatch<React.SetStateAction<string | null>>;
@@ -24,6 +25,7 @@ export async function handlePostRequest(
         file,
         model,
         attack,
+        device = "gpu",
         isAttacking,
         setAdvImg,
         setAdvPert,
@@ -43,12 +45,13 @@ export async function handlePostRequest(
                 ? file.split(",")[1]
                 : file;
 
+            console.log("handle device = ", device)
             const input: SingleAttackInput = {
                 attack: attack,
+                device: device,
                 input: base64Image,
                 model: model
             }
-            console.log(attack)
             const response = await fetch(url, {
                 method: "POST",
                 body: JSON.stringify(input),

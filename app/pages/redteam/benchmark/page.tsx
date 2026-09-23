@@ -1,7 +1,7 @@
 "use client";
 
 import BenchmarkActions from '@/components/client/benchamark/BenchmarkActions';
-import TableWrapper from '@/components/client/benchamark/TableWrapper';
+import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import ManagementTable from '@/components/client/benchamark/ManagementTable';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
 import type {RegisterObjectProps} from '@/interfaces/NNInterfaces';
@@ -66,24 +66,27 @@ const Benchmark: React.FC = () => {
                 />
             </div>
 
-            <TableWrapper
-                showAttackCategories
-                selectedElement={selectedAttacks}
-                handleSelection={
-                    (
-                        id: string,
-                        visibleElements: { [k: string]: RegisterObjectProps } | undefined
-                    ) =>
-                        setSelectedAttacks(
-                            updateSelectedObjects(
-                                id,
-                                selectedAttacks,
-                                compatibleAttacks,
-                                visibleElements
-                            ),
-                        )}
-                handleParametersChange={handleParametersChange}
-            />
+            <div className={styles.vulnerabilities}>
+                <VulnerabilitySelection
+                    attacks={compatibleAttacks}
+                    showAttackCategories
+                    selectedAttacks={selectedAttacks}
+                    handleSelection={
+                        (
+                            id: string,
+                            visibleElements: { [k: string]: RegisterObjectProps } | undefined
+                        ) =>
+                            setSelectedAttacks(
+                                updateSelectedObjects(
+                                    id,
+                                    selectedAttacks,
+                                    compatibleAttacks,
+                                    visibleElements
+                                ),
+                            )}
+                    handleChange={(parameters, id) => handleParametersChange(id, parameters)}
+                />
+            </div>
 
 
             <BenchmarkActions

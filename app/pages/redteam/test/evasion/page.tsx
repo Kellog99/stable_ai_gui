@@ -3,7 +3,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {ChartColumn, Download, Play, Shield, X} from 'lucide-react';
 import {ImageDisplay} from '@/components/client/evasion/ImageDisplay';
-import {ParametersProps, RegisterObjectProps} from '@/interfaces/NNInterfaces';
+import {ParametersProps, RegisterObjectProps, supportsTask} from '@/interfaces/NNInterfaces';
 import {ConfidenceData} from '@/interfaces/testInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
@@ -22,9 +22,14 @@ export interface AttackResults {
     parameters?: ParametersProps[];
 }
 
+const toImageDataUrl = (image?: string | null): string | undefined => {
+    if (!image) return undefined
+    return image.startsWith('data:') ? image : `data:image/png;base64,${image}`
+}
+
 function Test() {
     // ######################## stored Variables ########################
-    const {hostname, port} = useBackendVariablesStore()
+    const {hostname, port, device} = useBackendVariablesStore()
     const {attacks, model} = useNNTrustStore()
     // ##################################################################
 
@@ -35,26 +40,31 @@ function Test() {
     const [attackResults, setAttackResults] = useState<AttackResults>({});
     const [showResults, setShowResults] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (attacks && Object.keys(attacks).length > 0) {
-            setSelectedAttackId((currentId) =>
-                currentId && attacks[currentId] ? currentId : Object.keys(attacks)[0]
-            )
-        }
-    }, [attacks])
+    const evasionAttacks = useMemo(() => Object.fromEntries(
+        Object.entries(attacks).filter(([, attack]) =>
+            attack.objective?.toLowerCase() === 'evasion' &&
+            (!model?.task || (attack.task && supportsTask(attack, model.task)))
+        )
+    ), [attacks, model?.task])
 
-    const displayedAttacks = useMemo(() => {
+    useEffect(() => {
+        setSelectedAttackId((currentId) =>
+            currentId && evasionAttacks[currentId] ? currentId : Object.keys(evasionAttacks)[0]
+        )
+    }, [evasionAttacks])
+
+    const displayedAttacks: { [key: string]: RegisterObjectProps } = useMemo(() => {
         return Object.fromEntries(
-            Object.entries(attacks).map(([id, attack]) => [
+            Object.entries(evasionAttacks).map(([id, attack]) => [
                 id,
                 attackParameterOverrides[id]
                     ? {...attack, parameters: attackParameterOverrides[id]}
                     : attack
             ])
         ) as { [key: string]: RegisterObjectProps }
-    }, [attacks, attackParameterOverrides])
+    }, [evasionAttacks, attackParameterOverrides])
 
-    const selectedAttack = selectedAttackId ? displayedAttacks[selectedAttackId] : undefined
+    const selectedAttack: RegisterObjectProps | undefined = selectedAttackId ? displayedAttacks[selectedAttackId] : undefined
 
     // ######################## Upload image ########################
     const [uploadedFile, setUploadedFile] = useState<string>();
@@ -75,6 +85,14 @@ function Test() {
     const [advImg, setAdvImg] = useState<string | null>(null)
     const [advPert, setAdvPert] = useState<string | null>(null)
 
+    const isObjectDetection = model?.task === 'detection'
+    const displayedOriginalImage = isObjectDetection
+        ? attackResults.prediction?.original
+        : advPert
+    const displayedAdversarialImage = isObjectDetection
+        ? attackResults.prediction?.adversarial
+        : advImg
+
     const handleChange = (value: (number | string)[]) => {
         if (!selectedAttackId || !selectedAttack?.parameters) return
 
@@ -93,13 +111,12 @@ function Test() {
     }, [uploadedFile, model, selectedAttack, isAttacking])
 
     const handleDownloadAdversarialImage = () => {
-        if (!advImg) return
+        const imageSrc = toImageDataUrl(displayedAdversarialImage)
+        if (!imageSrc) return
 
-        const mimeType = 'image/png'
-        const dataUrl = `data:${mimeType};base64,${advImg}`
         const link = document.createElement('a')
 
-        link.href = dataUrl
+        link.href = imageSrc
         link.download = 'image.png'
         document.body.appendChild(link)
         link.click()
@@ -139,17 +156,17 @@ function Test() {
                     />
                     {/* Results */}
                     <ImageDisplay
-                        title="Adversarial Perturbation"
+                        title="Original Prediction"
                         placeholder="No image loaded"
                         isLoading={isAttacking}
-                        imageSrc={advPert ? "data:image/jpeg;base64," + advPert : undefined}
+                        imageSrc={isAttacking ? undefined : toImageDataUrl(displayedOriginalImage)}
                     />
 
                     <ImageDisplay
                         title="Adversarial Example"
                         placeholder="No image loaded"
                         isLoading={isAttacking}
-                        imageSrc={advImg ? "data:image/jpeg;base64," + advImg : undefined}
+                        imageSrc={isAttacking ? undefined : toImageDataUrl(displayedAdversarialImage)}
                         actionButton={
                             <button
                                 onClick={handleDownloadAdversarialImage}
@@ -183,6 +200,7 @@ function Test() {
                                     file: uploadedFile,
                                     model: model,
                                     attack: selectedAttack,
+                                    device: device,
                                     isAttacking: isAttacking,
                                     setAdvImg: setAdvImg,
                                     setAdvPert: setAdvPert,
@@ -209,7 +227,7 @@ function Test() {
                 {showResults ? (
                     <div className={styles.results_container}>
                         <AttackVisualization
-                            prediction={attackResults.prediction}
+                            prediction={isObjectDetection ? undefined : attackResults.prediction}
                             confidence={attackResults.confidence}
                             results={attackResults.metrics}
                             parameters={attackResults.parameters}/>
