@@ -2,6 +2,7 @@ import { Bot } from 'lucide-react';
 import './Bubble.css';
 import { useMemo } from 'react';
 import { scoreToColor } from './scoreColor';
+import ReactMarkdown from 'react-markdown';
 
 interface BubbleProps {
     msg: string;
@@ -20,7 +21,7 @@ const Bubble: React.FC<BubbleProps> = ({
 
     const text_component = useMemo(() => {
         return <div className={`bubble ${align} ${loading ? 'loading' : ''}`}>
-            {msg}
+            <ReactMarkdown>{msg}</ReactMarkdown>
             {!user && typeof score === 'number' && (
                 <p
                     className="bubble-score"

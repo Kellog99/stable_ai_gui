@@ -2,9 +2,18 @@ import { CheckCircle2, CheckCircleIcon, RefreshCw, Save, Settings, Settings2, X 
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
-import { Modal, NumberInput, Select, Slider, Switch } from '@mantine/core';
+import { Modal, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
 
 type ParameterValue = number | string | boolean;
+
+// Resolves the effective control type for a parameter, since `kind` may be
+// omitted (defaults to 'number' server-side) even for boolean defaults.
+const getResolvedKind = (param: ParametersProps): 'boolean' | 'enum' | 'string' | 'number' => {
+    if (param.kind === 'boolean' || typeof param.default === 'boolean') return 'boolean';
+    if (param.kind === 'enum') return 'enum';
+    if (param.kind === 'string') return 'string';
+    return 'number';
+};
 
 /**
  * Processes a user's subscription.
@@ -118,75 +127,86 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                     <div className='parameters-container'>
 
                         {/* Settings Content */}
-                        {parameters.map((param, index) => (
-                            // Boolean parameters use a switch instead of numeric controls.
-                            <div
-                                key={`${param.name}-${index}`}
-                                className="form-group"
-                            >
-                                <div className="param-header">
-                                    <div className="param-title">
-                                        <p className="param-name">
-                                            {param.name}
-                                        </p>
-
-                                        {param.description && (
-                                            <p className="param-desc">
-                                                {param.description}
+                        {parameters.map((param, index) => {
+                            const resolvedKind = getResolvedKind(param);
+                            return (
+                                // Boolean parameters use a switch instead of numeric controls.
+                                <div
+                                    key={`${param.name}-${index}`}
+                                    className="form-group"
+                                >
+                                    <div className="param-header">
+                                        <div className="param-title">
+                                            <p className="param-name">
+                                                {param.name}
                                             </p>
+
+                                            {param.description && (
+                                                <p className="param-desc">
+                                                    {param.description}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {resolvedKind === 'boolean' ? (
+                                            <Switch
+                                                size="md"
+                                                checked={values[index] === true}
+                                                onChange={(event) => handleChange(index, event.currentTarget.checked)}
+                                            />
+                                        ) : resolvedKind === 'number' && (
+                                            <NumberInput
+                                                variant="filled"
+                                                size="xs"
+                                                w={100}
+                                                min={param.min}
+                                                max={param.max}
+                                                step={param.step}
+                                                allowDecimal={
+                                                    !Number.isInteger(
+                                                        param.step ?? 1
+                                                    )
+                                                }
+                                                allowNegative={
+                                                    (param.min ?? 0) < 0
+                                                }
+                                                radius="md"
+                                                value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                                onChange={(value) => handleChange(index, Number(value) || 0)}
+                                            />
                                         )}
                                     </div>
 
-                                    {(param.kind === 'boolean' || typeof param.default === 'boolean') ? (
-                                        <Switch
-                                            size="md"
-                                            checked={values[index] === true}
-                                            onChange={(event) => handleChange(index, event.currentTarget.checked)}
-                                        />
-                                    ) : param.kind !== 'enum' && (
-                                        <NumberInput
-                                            variant="filled"
+                                    {resolvedKind === 'boolean' ? null : resolvedKind === 'enum' ? (
+                                        <Select
                                             size="xs"
-                                            w={100}
-                                            min={param.min}
-                                            max={param.max}
-                                            step={param.step}
-                                            allowDecimal={
-                                                !Number.isInteger(
-                                                    param.step ?? 1
-                                                )
-                                            }
-                                            allowNegative={
-                                                (param.min ?? 0) < 0
-                                            }
+                                            variant="filled"
                                             radius="md"
+                                            data={(param.options ?? []).map((option) => ({ value: option, label: option }))}
+                                            value={typeof values[index] === "string" ? values[index] as string : null}
+                                            onChange={(value) => value && handleChange(index, value)}
+                                        />
+                                    ) : resolvedKind === 'string' ? (
+                                        <TextInput
+                                            size="xs"
+                                            variant="filled"
+                                            radius="md"
+                                            value={typeof values[index] === "string" ? values[index] as string : ''}
+                                            onChange={(event) => handleChange(index, event.currentTarget.value)}
+                                        />
+                                    ) : (
+
+                                        <Slider
+                                            min={param.min ?? 0}
+                                            max={param.max ?? 1}
+                                            step={param.step ?? 0.01}
                                             value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                            onChange={(value) => handleChange(index, Number(value) || 0)}
+                                            onChange={(value) => handleChange(index, value)}
                                         />
                                     )}
                                 </div>
-
-                                {(param.kind === "boolean" || typeof param.default === 'boolean') ? null : param.kind === "enum" ? (
-                                    <Select
-                                        size="xs"
-                                        variant="filled"
-                                        radius="md"
-                                        data={(param.options ?? []).map((option) => ({ value: option, label: option }))}
-                                        value={typeof values[index] === "string" ? values[index] as string : null}
-                                        onChange={(value) => value && handleChange(index, value)}
-                                    />
-                                ) : (
-
-                                    <Slider
-                                        min={param.min ?? 0}
-                                        max={param.max ?? 1}
-                                        step={param.step ?? 0.01}
-                                        value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
-                                        onChange={(value) => handleChange(index, value)}
-                                    />
-                                )}
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
                     {/* Footer */}

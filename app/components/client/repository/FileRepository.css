@@ -200,6 +200,12 @@
     margin: 0;
 }
 
+.repository-table tr,
+.repository-table th {
+    height: 20px;
+    margin: 0;
+}
+
 .table-header {
     position: sticky;
     top: 0;
@@ -273,6 +279,38 @@
     height: 20px;
     justify-content: center;
     align-items: center;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+}
+
+.container_task.unknown {
+    background-color: black;
+}
+
+.container_task.classification {
+    background-color: hsl(210, 75%, 50%);
+}
+
+.container_task.detection {
+    background-color: hsl(30, 90%, 55%);
+}
+
+.container_task.nlp {
+    background-color: hsl(320, 75%, 55%);
+}
+
+.container_task.nlp-classification {
+    background-color: hsl(275, 65%, 55%);
+}
+
+.container_task.transcription {
+    background-color: hsl(0, 75%, 55%);
+}
+
+.container_task {
+    display: flex;
+    align-content: center;
+    padding-left: 4px;
     border-radius: var(--border-radius);
     font-weight: 600;
 }
