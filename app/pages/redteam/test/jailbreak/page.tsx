@@ -4,7 +4,7 @@ import {RegisterObjectProps} from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
 import useJailbreakStore from '@/store/jailbreakStore'
-import {useEffect, useMemo, useRef, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import styles from '@/styles/jailbreak.module.css'
 import {Send, Target, Unlink} from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
@@ -12,6 +12,7 @@ import MessageThread from '@/components/client/jailbreaking/MessageThread';
 import ModelSelector from '@/components/client/jailbreaking/ModelSelector';
 import SavedAttacksBoard from '@/components/client/jailbreaking/SavedAttacksBoard';
 import {BubbleInterface, JailbreakAttackOutput} from '@/interfaces/testInterfaces';
+import {handleSubmit} from './handle_execution';
 
 const Jailbreaking = () => {
     // ######################## stored Variables ########################
@@ -37,7 +38,6 @@ const Jailbreaking = () => {
         conversationChat,
         modelResponse,
         adversarialPrompt,
-        setAdversarialPrompt,
         attackSuccess,
         bestScore,
         attackMetadata,
@@ -124,16 +124,11 @@ const Jailbreaking = () => {
 
     //  This variable is for handling the possibility to do the attack
     const isActive = useMemo(() => {
-        return !!(model && prompt && prompt !== "" && selectedAttack)
+        return !!(model?.task === "language" && prompt && prompt !== "" && selectedAttack)
     }, [model, prompt, selectedAttack])
 
     const handleChange = (value: number[]) => {
         if (!selectedAttack || !selectedAttack.parameters) return;
-
-        const newParameters = selectedAttack.parameters.map((param, i) => ({
-            ...param,
-            default: value[i]
-        }));
 
         // Persist the new parameter values to store
         setSavedParams(prevSaved => ({
@@ -188,59 +183,19 @@ const Jailbreaking = () => {
         applyJailbreakOutput(data, selectedAttack?.id);
     };
 
-    //  this function handles the submission of the prompt and sets the goal and adversarial prompt
-    const handleSubmit = async () => {
-        if (isActive && selectedAttack) {
-            setIsClicked(true)
-            const currentGoal = prompt
-            setGoal(currentGoal)
-
-            // Clear previous states before starting
-            setResults({
-                goal: currentGoal,
-                resultAttackId: selectedAttack.id,
-                fullHistory: [],
-                conversationChat: [],
-                modelResponse: "",
-                adversarialPrompt: undefined,
-                attackSuccess: false,
-                bestScore: 0,
-                attackMetadata: {},
-            })
-
-            try {
-                const response = await fetch(`http://${hostname}:${port}/test/jailbreaking`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        "input": prompt,
-                        "model": model,
-                        "attack": selectedAttack,
-                        "task_type": "nlp",
-                        "attacker": attackerModel,
-                        "judge": judgeModel,
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorDetail = await response.json();
-                    console.error('Server validation error:', JSON.stringify(errorDetail, null, 2));
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data: JailbreakAttackOutput = await response.json();
-                applyJailbreakOutput(data, selectedAttack.id);
-            } catch (err) {
-                console.error('Jailbreaking attack failed:', err)
-                setGoal(undefined)
-                setIsClicked(false)
-            } finally {
-                setIsClicked(false)
-            }
-        }
-    }
+    const submitAttack = () => handleSubmit({
+        url: `http://${hostname}:${port}/test/jailbreaking`,
+        isActive,
+        prompt,
+        model,
+        selectedAttack,
+        attackerModel,
+        judgeModel,
+        setGoal,
+        setIsClicked,
+        setResults,
+        applyJailbreakOutput,
+    });
 
     // ── Scroll-linked shrink of the top section (vuln selection, models, goal) ──
     const topSectionRef = useRef<HTMLDivElement>(null);
@@ -301,7 +256,7 @@ const Jailbreaking = () => {
             <HeaderPageTask
                 Icon={Unlink}
                 title="Jailbreaking"
-                descrition="Test on the loaded model, single attacks for a specific prompt."
+                description="Test on the loaded model, single attacks for a specific prompt."
             />
             {/* Top section shrinks & fades while scrolling down. */}
             <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
@@ -309,7 +264,7 @@ const Jailbreaking = () => {
                 <VulnerabilitySelection
                     stretch
                     attacks={attacksWithSavedParams}
-                    selectedAttack={selectedAttack}
+                    selectedAttack={selectedAttack ?? undefined}
                     handleSelection={(attackId) => {
                         setSelectedAttackId(attackId)
                     }}
@@ -344,7 +299,7 @@ const Jailbreaking = () => {
                             value={prompt}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && isActive) {
-                                    handleSubmit();
+                                    submitAttack();
                                 }
                             }}
                             onChange={(e) => {
@@ -355,8 +310,8 @@ const Jailbreaking = () => {
                         />
                         <button
                             className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
-                            disabled={isClicked && !isActive}
-                            onClick={handleSubmit}
+                            disabled={isClicked || !isActive}
+                            onClick={submitAttack}
                         >
                             <Send size={24}/>
                         </button>

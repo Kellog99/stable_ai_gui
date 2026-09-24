@@ -27,7 +27,6 @@ export interface BubbleInterface {
     score?: number;
     /** Attacker's stated escalation rationale for this step (tree attacks). */
     improvement?: string;
-    /** Escalation round the turn belongs to, 1-based (tree attacks). */
     depth?: number;
 }
 
