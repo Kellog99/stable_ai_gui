@@ -1,17 +1,35 @@
-import { Settings, X } from 'lucide-react';
+import { CheckCircle2, CheckCircleIcon, RefreshCw, Save, Settings, Settings2, X } from 'lucide-react';
 import './Parameters.css';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { Modal, NumberInput, Select, Slider, Switch, TextInput } from '@mantine/core';
 
+type ParameterValue = number | string | boolean;
+
+// Resolves the effective control type for a parameter, since `kind` may be
+// omitted (defaults to 'number' server-side) even for boolean defaults.
+const getResolvedKind = (param: ParametersProps): 'boolean' | 'enum' | 'string' | 'number' => {
+    if (param.kind === 'boolean' || typeof param.default === 'boolean') return 'boolean';
+    if (param.kind === 'enum') return 'enum';
+    if (param.kind === 'string') return 'string';
+    return 'number';
+};
+
+/**
+ * Processes a user's subscription.
+ * @param isOpen - It is a flag that tells whether the windows is open or not.
+ * @param parameters - The unique identifier for the selected tier.
+ * @param onClose - It is the function that handles the closing of the ModalWindow
+ * @param handleParametersChange - It handles the change of the attack's parameters
+*/
 interface ParametersWindowProps {
     isOpen: boolean;
-    parameters: ParametersProps[];
+    parameters?: ParametersProps[];
     onClose: () => void;
-    handleParametersChange: (parameters: number[]) => void;
+    handleParametersChange: (parameters: any[]) => void;
 }
-
+// This component handles the attack's parameters Modal windows
+// It allows to modify and update the parameters for a specific attack
 const ParametersWindow: React.FC<ParametersWindowProps> = ({
     isOpen,
     parameters,
@@ -19,110 +37,219 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
     handleParametersChange
 
 }) => {
-    const [values, setValues] = useState<number[]>(parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []);
-    const [clicked, setClicked] = useState<boolean>(false);
-    const defaultParameters = parameters && parameters.length > 0 ? parameters.map((item) => item.default) : []
 
-    // Update values when parameters change or modal opens
+    const [values, setValues] = useState<ParameterValue[]>([]);
+    const [defaultValues, setDefaultValues] = useState<ParameterValue[]>([]);
+    const [isSaved, setIsSaved] = useState(false);
+
     useEffect(() => {
-        if (isOpen) {
-            setValues(parameters.map(p => p.default));
+        if (isOpen && parameters && parameters.length > 0) {
+            const currentValues = parameters.map((p) => {
+                if (p.default !== undefined && p.default !== null) return p.default;
+                if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
+                if (p.kind === 'enum') return p.options?.[0] ?? '';
+                if (p.max != null && p.min != null) return (p.max + p.min) / 2;
+                if (p.min != null) return p.min;
+                return 0;
+            });
+            const defaults = parameters.map((p) => {
+                if (p.default !== undefined && p.default !== null) return p.default;
+                if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
+                if (p.kind === 'enum') return p.options?.[0] ?? '';
+                if (p.max != null && p.min != null) return (p.max + p.min) / 2;
+                if (p.min != null) return p.min;
+                return 0;
+            });
+            setValues(currentValues);
+            setDefaultValues(defaults);
+            setIsSaved(false);
         }
     }, [isOpen, parameters]);
 
-    if (!isOpen) return null;
 
-    const handleChange = (index: number, newValue: number) => {
-        const newValues = [...values];
-        newValues[index] = newValue;
-        setValues(newValues);
+    const handleChange = (index: number, newValue: ParameterValue) => {
+        setValues((prev) => {
+            const next = [...prev];
+            next[index] = newValue;
+            return next;
+        });
     };
 
-    const handleReset = () => {
-        setValues(defaultParameters);
+    const handleReset = () => setValues(defaultValues);
+
+    const handleSave = () => {
+        handleParametersChange(values);
+        setIsSaved(true);
+        setTimeout(() => {
+            setIsSaved(false);
+            onClose();
+        }, 600);
     };
+
+    if (isOpen && parameters) {
+        console.log(parameters.map((param, index) => ([param.id, param.step, param.max])))
+    }
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-window" onClick={(e) => e.stopPropagation()}>
-                {/* Header */}
-                <div className="modal-header">
-                    <h2 className="modal-title">
-                        <Settings size={24} />
-                        Settings
-                    </h2>
-                    <button onClick={onClose} className="close-button">
-                        <X size={24} />
-                    </button>
-                </div>
+        <Modal
+            opened={isOpen}
+            onClose={onClose}
+            size={500}
+            title={
+                <div className="parameters-header-content">
+                    <div className="parameters-icon">
+                        <Settings2 size={22} />
+                    </div>
 
-                {/* Settings Content */}
-                <div className="modal-content">
-                    {parameters.map((param, index) => (
-                        <div key={`${param.label}-${index}`} className="form-group">
-                            <label className="form-label">
-                                {param.label}
-                                <span style={{
-                                    float: 'right',
-                                    fontWeight: 'bold',
-                                    color: '#3b82f6'
-                                }}>
-                                    {values[index]?.toFixed(2) ?? param.default}
-                                </span>
-                            </label>
-                            {param.description && (
-                                <p style={{
-                                    fontSize: '0.8rem',
-                                    color: '#6b7280',
-                                    marginTop: '0.25rem',
-                                    marginBottom: '0.75rem'
-                                }}>
-                                    {param.description}
-                                </p>
-                            )}
-                            <input
-                                type="range"
-                                min={param.min}
-                                max={param.max}
-                                step={(param.max - param.min) / 100}
-                                value={values[index] ?? param.default}
-                                onChange={(e) => handleChange(index, parseFloat(e.target.value))}
-                                className="form-slider"
-                            />
-                        </div>
-                    ))}
-                </div>
+                    <div className='modal-title'>
+                        <p className="parameters-title">
+                            Parameters
+                        </p>
 
-                {/* Footer */}
-                <div className="modal-footer">
-                    <button onClick={handleReset} className="reset-button">
-                        Reset to Default
-                    </button>
-                    <div className="button-group">
-                        <button
-                            onClick={onClose}
-                            className="cancel-button">
-                            Cancel
-                        </button>
-                        <button
-                            onClick={() => {
-                                handleParametersChange(values);
-                                setClicked(true);
-                                setTimeout(() => {
-                                    setClicked(false);
-                                }, 1000);
-                            }}
-                            className="save-button"
-                        >
-                            {clicked ? <>
-                                <FontAwesomeIcon icon={faCheck} style={{ marginRight: 8 }} />
-                                <span>Saved</span>
-                            </> : <p>Save Changes</p>}
-                        </button>
+                        <p className="parameters-subtitle">
+                            Configure the settings for this operation
+                        </p>
                     </div>
                 </div>
-            </div>
-        </div>
+            }
+            classNames={{
+                content: 'parameters-modal',
+            }}
+            centered
+        >
+            {!parameters || parameters.length === 0 ? (
+                <p style={{ padding: '1.5rem', textAlign: 'center' }}>
+                    No parameters have been passed
+                </p>
+            ) : (
+                <>
+                    {/* Content Area */}
+                    <div className='parameters-container'>
+
+                        {/* Settings Content */}
+                        {parameters.map((param, index) => {
+                            const resolvedKind = getResolvedKind(param);
+                            return (
+                                // Boolean parameters use a switch instead of numeric controls.
+                                <div
+                                    key={`${param.name}-${index}`}
+                                    className="form-group"
+                                >
+                                    <div className="param-header">
+                                        <div className="param-title">
+                                            <p className="param-name">
+                                                {param.name}
+                                            </p>
+
+                                            {param.description && (
+                                                <p className="param-desc">
+                                                    {param.description}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        {resolvedKind === 'boolean' ? (
+                                            <Switch
+                                                size="md"
+                                                checked={values[index] === true}
+                                                onChange={(event) => handleChange(index, event.currentTarget.checked)}
+                                            />
+                                        ) : resolvedKind === 'number' && (
+                                            <NumberInput
+                                                variant="filled"
+                                                size="xs"
+                                                w={100}
+                                                min={param.min}
+                                                max={param.max}
+                                                step={param.step}
+                                                allowDecimal={
+                                                    !Number.isInteger(
+                                                        param.step ?? 1
+                                                    )
+                                                }
+                                                allowNegative={
+                                                    (param.min ?? 0) < 0
+                                                }
+                                                radius="md"
+                                                value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                                onChange={(value) => handleChange(index, Number(value) || 0)}
+                                            />
+                                        )}
+                                    </div>
+
+                                    {resolvedKind === 'boolean' ? null : resolvedKind === 'enum' ? (
+                                        <Select
+                                            size="xs"
+                                            variant="filled"
+                                            radius="md"
+                                            data={(param.options ?? []).map((option) => ({ value: option, label: option }))}
+                                            value={typeof values[index] === "string" ? values[index] as string : null}
+                                            onChange={(value) => value && handleChange(index, value)}
+                                        />
+                                    ) : resolvedKind === 'string' ? (
+                                        <TextInput
+                                            size="xs"
+                                            variant="filled"
+                                            radius="md"
+                                            value={typeof values[index] === "string" ? values[index] as string : ''}
+                                            onChange={(event) => handleChange(index, event.currentTarget.value)}
+                                        />
+                                    ) : (
+
+                                        <Slider
+                                            min={param.min ?? 0}
+                                            max={param.max ?? 1}
+                                            step={param.step ?? 0.01}
+                                            value={typeof values[index] === "number" ? values[index] : Number(values[index]) || 0}
+                                            onChange={(value) => handleChange(index, value)}
+                                        />
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="modal-footer">
+                        <button
+                            className="footer-button reset"
+                            onClick={handleReset}
+                            type="button"
+                        >
+                            <RefreshCw size={16} />
+                            Reset
+                        </button>
+
+                        <div className="button-group">
+                            <button
+                                className="footer-button cancel"
+                                onClick={onClose}
+                                type="button"
+                            >
+                                <X size={16} />
+                                Cancel
+                            </button>
+
+                            <button
+                                className={`footer-button save ${isSaved ? 'saving' : ''
+                                    }`}
+                                onClick={handleSave}
+                                disabled={isSaved}
+                                type="button"
+                            >
+                                {isSaved ? (
+                                    <CheckCircle2 size={16} />
+                                ) : (
+                                    <Save size={16} />
+                                )}
+
+                                {isSaved ? 'Saved' : 'Save changes'}
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+        </Modal>
     );
 };
 

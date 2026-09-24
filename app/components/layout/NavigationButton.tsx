@@ -1,89 +1,108 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { NavigationSection } from "./config";
-import { usePathname, useRouter } from "next/navigation";
-import "./Navbar.css";
+import React, {useEffect, useMemo, useState} from "react";
+import {ChevronDown, ChevronUp} from "lucide-react";
+import {NavigationSection} from "./config";
+import "./NavigationButton.css";
 
 interface NavigationButtonProps extends NavigationSection {
-    setActiveLink: (id: string) => void;
     isClosed: boolean;   // Whether the NavBar is collapsed
     isDisabled?: boolean; // Whether the button is disabled
+    isActive: (id: string) => boolean;   // Given the id, it tells whether this button is active or not
+    handleClick: (href?: string, id?: string) => void; // Function to handle button click
 }
 
-const NavigationButton: React.FC<NavigationButtonProps> = ({
-    id,
-    title,
-    Icon,
-    href,
-    items,
-    setActiveLink,
-    isClosed,
-    isDisabled = false,
-}) => {
-    const pathname = usePathname();
-    const router = useRouter();
+/**
+ *
+ * @param id: the id of the button, used to identify it and to tell whether it's active or not
+ * @param title: the title of the button
+ * @param Icon: the icon of the button
+ * @param href: the link to navigate to when the button is clicked, if it exists
+ * @param items: the children of the button, if they exist
+ * @param isActive: a function that given the id of the button, tells whether it's active or not
+ * @param handleClick: a function that handle the click on the button, it receives the href and the id of the button
+ * @param isClosed: a boolean that tells whether the lateral navbar is collapsed or not, used to decide whether to show the title of the button or not
+ * @param isDisabled: a boolean that tells whether the button is disabled or not, used to disable the button when the user doesn't have the necessary permissions to access the page
+ */
+const NavigationButton: React.FC<NavigationButtonProps> = (
+    {
+        id,
+        title,
+        Icon,
+        href,
+        items,
+        isActive,
+        handleClick,
+        isClosed,
+        isDisabled = false,
+    }
+) => {
 
     const [expanded, setExpanded] = useState<boolean>(true); // all visible by default
-    const [isActive, setIsActive] = useState<boolean>(pathname === href);
 
-    useEffect(() => {
-        setIsActive(pathname === href);
-    }, [pathname, href]);
+    // This constant allow to tells whether a component has children
+    const hasChildren = useMemo(
+        () => !!items && items.length > 0
+        , [items]);
 
-    const hasChildren = !!items && items.length > 0;
     // Every time I explode the lateral navbar, the children are shown
     useEffect(() => {
         setExpanded(!isClosed)
     }, [isClosed])
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-
-        if (isDisabled) return; // safeguard
-        if (hasChildren) setExpanded((prev) => !prev)
-        if (href) {
-            router.push(href);
-            setActiveLink(id);
-        }
-    };
 
     return (
-        <div className="flex flex-col w-full">
-            <button
-                onClick={handleClick}
-                disabled={isDisabled}
-                className={`nav-item flex items-center justify-between w-full py-2 px-3 rounded-md transition-all
-          ${isActive ? "active" : ""}
-          ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+        <div className="nav-button-container">
+            <div
+                onClick={() => !isDisabled && handleClick(href, id)}
+                className={`nav-item ${isActive(id) ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+                style={{cursor: isDisabled ? "not-allowed" : "pointer"}}
+                role="button"
+                tabIndex={isDisabled ? -1 : 0}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        if (!isDisabled) handleClick(href, id);
+                    }
+                }}
             >
-                <div
-                    className="nav-item-content flex items-center"
-                    style={{ gap: isClosed ? "0px" : "1vw" }}
-                >
-                    <Icon size={22} aria-hidden="true" />
-                    {!isClosed && <span>{title}</span>}
+                <div className={`nav-item-content ${isClosed ? "collapsed" : ""}`}>
+
+                    <Icon
+                        size={18}
+                        aria-hidden="true"
+                    />
+                    {!isClosed && <div className="button-name">{title}</div>}
                 </div>
 
-                {!isClosed && hasChildren && (
-                    isClosed ? (
-                        <ChevronUp size={18} />
-                    ) : (
-                        <ChevronDown size={18} />
-                    )
+
+                {hasChildren && (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setExpanded((prev) => !prev);
+                        }}
+                        className="expand-button"
+                        type="button"
+                    >
+                        {expanded ? <ChevronUp size={18}/> : <ChevronDown size={18}/>}
+                    </button>
                 )}
-            </button>
+            </div>
 
             {/* Sub-items */}
-            {!isClosed && hasChildren && expanded && (
-                <div className="sub-items">
+            {hasChildren && expanded && (
+                <div className="sub-items" role="group">
                     {items!.map((item) => (
                         <NavigationButton
                             key={item.id}
-                            {...item}
-                            setActiveLink={setActiveLink}
+                            id={item.id}
+                            href={item.href}
+                            Icon={item.Icon}
+                            title={item.title}
                             isClosed={isClosed}
                             isDisabled={item.requiresEmbeddings === false}
+                            handleClick={handleClick}
+                            isActive={isActive}
                         />
                     ))}
                 </div>

@@ -1,0 +1,126 @@
+.model-selector-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.model-selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.model-selector-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ccc;
+}
+
+.model-selector-dropdown {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background-color: color-mix(in hsl, var(--bg-dark) 50%, var(--bg) 50%);
+    color: lightgray;
+    font-size: 0.8rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.model-selector-dropdown:hover,
+.model-selector-dropdown:focus {
+    border-color: #888;
+}
+
+.model-selector-dropdown option {
+    background-color: var(--bg-dark);
+    color: lightgray;
+}
+
+.model-selector-info {
+    font-size: 0.7rem;
+    color: #888;
+    padding-left: 2px;
+}
+
+.model-selector-input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    background-color: color-mix(in hsl, var(--bg-dark) 50%, var(--bg) 50%);
+    color: lightgray;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.model-selector-input:hover,
+.model-selector-input:focus {
+    border-color: #888;
+}
+
+.model-selector-input::placeholder {
+    color: #666;
+}
+
+/* Advanced settings toggle */
+.advanced-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid #444;
+    border-radius: 10px;
+    padding: 8px 14px;
+    color: #aaa;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+}
+
+.advanced-toggle:hover {
+    border-color: #888;
+    color: #ddd;
+}
+
+.advanced-toggle.active {
+    border-color: rgb(187, 58, 58);
+    color: rgb(187, 58, 58);
+}
+
+.advanced-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 4px;
+    background-color: transparent;
+    border: none;
+}
+
+.advanced-panel-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #bbb;
+    margin: 0;
+}
+
+.model-selector-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .model-selector-row {
+        grid-template-columns: 1fr;
+    }
+}

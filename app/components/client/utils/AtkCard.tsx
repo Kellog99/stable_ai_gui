@@ -1,0 +1,117 @@
+import React, {useState} from 'react'
+import './AtkCard.css';
+import {Info, Settings2} from 'lucide-react';
+import ParametersWindow from '@/components/client/redtool/Parameters';
+import {ParametersProps} from '@/interfaces/NNInterfaces';
+import {Tooltip} from '@mantine/core';
+
+
+export interface AttackCardProps {
+    id: string,
+    title: string,
+    description: string,
+    knowledge?: string,
+    category?: string,
+    isActive: boolean,
+    parameters: ParametersProps[],
+    handleClick: () => void;
+    handleParametersChange: (parameters: (number | string)[]) => void;
+}
+
+/**
+ * Renders a selectable attack card with its metadata, description tooltip,
+ * and a settings control for editing attack parameters.
+ *
+ * @param props - Component properties.
+ * @param props.id - Unique identifier for the attack.
+ * @param props.title - Attack name displayed on the card.
+ * @param props.description - Description shown in the information tooltip.
+ * @param props.knowledge - Optional attack knowledge level.
+ * @param props.category - Optional attack category.
+ * @param props.isActive - Whether this attack is currently selected.
+ * @param props.parameters - Parameter definitions passed to the settings dialog.
+ * @param props.handleClick - Selects this attack.
+ * @param props.handleParametersChange - Receives updated parameter values.
+ */
+const AttackCard: React.FC<AttackCardProps> = (
+    {
+        id,
+        title,
+        isActive,
+        description,
+        knowledge,
+        category,
+        parameters,
+        handleClick,
+        handleParametersChange
+    }
+) => {
+    const [isClicked, setIsClicked] = useState<boolean>(false)
+
+    const handleSettingsClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        handleClick();
+        setIsClicked(true);
+    }
+    return (
+        <div
+            key={id}
+            role='button'
+            tabIndex={0}
+            aria-pressed={isActive}
+            onClick={handleClick}
+            onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleClick();
+                }
+            }}
+            className={`atk-card ${isActive ? 'active' : ''}`}
+        >
+            <div
+                className={`title_container ${category || knowledge ? 'has_metadata' : 'no_metadata'}`}
+            >
+                <Tooltip label={title} withArrow openDelay={450}>
+                    <span className="attack_title">{title}</span>
+                </Tooltip>
+                {(category || knowledge) && <div className="attack_metadata">
+                    {category && <span
+                        className={`category_badge category_${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{category}</span>}
+                    {knowledge && (<div className='knowledge_container'>{knowledge}</div>)}
+                </div>}
+            </div>
+            <div className="icons_container">
+                <Tooltip
+                    multiline
+                    key={id}
+                    w={220}
+                    withArrow
+                    transitionProps={{duration: 200}}
+                    label={description}
+                    style={{
+                        fontSize: "0.6rem",
+                        backgroundColor: "darkgray",
+                        borderRadius: "12px",
+                        color: "black"
+                    }}
+                >
+                    <Info size={20} className='info_icon'/>
+                </Tooltip>
+                <button
+                    className='card-settings-btn'
+                    onClick={handleSettingsClick}
+                >
+                    <Settings2 size={20}/>
+                </button>
+            </div>
+            <ParametersWindow
+                isOpen={isClicked}
+                parameters={parameters}
+                onClose={() => setIsClicked(false)}
+                handleParametersChange={handleParametersChange}
+            />
+        </div>
+    )
+}
+
+export default AttackCard

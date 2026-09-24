@@ -1,87 +1,103 @@
 'use client';
-import React, { useEffect, useState } from 'react'
+import {useRouter, useSearchParams} from 'next/navigation';
 import useNNTrustStore from '@/store/nnTrustStore';
-import { attacksProps } from '@/interfaces/reportInterfaces';
 import './AttackPageStyle.css';
-import { useSearchParams } from 'next/navigation';
+import {ArrowLeft, ChartNoAxesCombined, SlidersHorizontal} from 'lucide-react';
+import MetricsCard, {MetricCardItem} from '@/components/client/report/MetricsCard';
+import {ParametersProps} from "@/interfaces/NNInterfaces";
+import {Suspense} from 'react';
 
-const AttackPage = () => {
+const HIDDEN_METRIC_KEYS = new Set([
+    'name',
+    'id',
+    'confusion_matrix',
+    'risk',
+    'num_queries',
+    'power',
+]);
+
+const AttackPageContent = () => {
     const searchParams = useSearchParams();
-    const atkId = searchParams.get('atkId');
-    console.log("atkId = ", atkId)
+    const router = useRouter();
 
-    const { attackReport } = useNNTrustStore();
-    const [attack, setAttack] = useState<attacksProps | null>(null);
-    const [usedParams, setUsedParams] = useState<any>(null)
+    const atkId: string | null = searchParams.get('atkId');
+    const {modelReport} = useNNTrustStore();
 
-    const {
-        selectedAttacks,
-    } = useNNTrustStore();
 
-    //console.log("ATTACK!",selectedAttacks[atkId?.toLowerCase()])
-    // Wait for router to be ready and initialize attackReport
-    useEffect(() => {
-        if (attackReport && atkId) {
-            setAttack(attackReport.attacks[atkId]);
-            setUsedParams(selectedAttacks[atkId?.toLowerCase()].parameters)
-        }
-    }, [atkId, attackReport]);
+    const attack = atkId ? modelReport?.attacks?.[atkId] : null;
+    const usedParams = attack?.parameters ?? [];
+    const metricCards: MetricCardItem[] = Object.entries(attack?.metrics ?? {})
+        .filter(([key, value]) => value != null && !HIDDEN_METRIC_KEYS.has(key))
+        .map(([key, value]) => ({
+            key,
+            label: key
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' '),
+            value,
+        }));
 
-    // Show loading state while router or data is not ready
-    if (!atkId || !attackReport || !attack) {
-        return <div>Loading...</div>;
+    if (!atkId) {
+        return <div className="dashboard-message">No attack selected.</div>;
+    } else if (!modelReport) {
+        return <div className="dashboard-message">Loading...</div>;
+    } else if (!attack) {
+        return <div className="dashboard-message">No data found for attack &quot;{atkId}&quot;.</div>;
     }
 
-    console.log("attackReport", attack);
-
-    const attackMetrics = Object.keys(attackReport).filter(
-        item => !["name", "risk", "confusionmatrix"].includes(item)
-    );
-
-    console.log(attackMetrics);
-
     return (
-        <div className="dashboard">
-            <div className="container">
-                <div className="header">
-                    <h1>Performance of {attack.name} </h1>
+        <main className="attack-dashboard">
+            <button
+                className='attack-back-button'
+                onClick={() => router.back()}
+                aria-label="Back to security report"
+            >
+                <ArrowLeft size={18}/>
+                <span>Back to report</span>
+            </button>
+            <section className="attack-hero">
+                <div className="attack-hero-icon"><ChartNoAxesCombined size={24}/></div>
+                <div>
+                    <span className="attack-eyebrow">Attack analysis</span>
+                    <h1>{attack.name.toUpperCase()} performance</h1>
                     <p>Comprehensive metrics overview</p>
                 </div>
-                <div className="metrics-container">
-                    {Object.entries(attack).map(([metric, value]) => {
-                        if (!["name", "id", "confusion_matrix", "risk", "num_queries", "power"].includes(metric)) {
-                            return (
-                                <div className='metric-container'>
-                                    <p className='metric-title'>{metric}:</p>
-                                    <p className='metric-value'>{
-                                        ["imagemean", "imagevariance"].includes(metric) ?
-                                            value :
-                                            value.toFixed(2)}</p>
-                                </div>
-                            );
-                        }
-                        return null;
-                    })}
-                </div>
+            </section>
 
-            </div>
-            <div className="container">
-                <div className="header">
-                    <h1>  </h1>
-                    <p>Parameters used</p>
+            <section className="attack-section" aria-labelledby="attack-metrics-title">
+                <div className="attack-section-heading">
+                    <h2 id="attack-metrics-title">Measured performance</h2>
+                    <span>{metricCards.length} metrics</span>
                 </div>
-                <div className="metrics-container">
-                    {usedParams.map((param) => (
-                        <div className='metric-container'>
-                            <p className='metric-title'>{param.id}:</p>
-                            <p className='metric-value'>{param.default.toFixed(4)}</p>
+                <MetricsCard items={metricCards}/>
+            </section>
+
+            {usedParams.length > 0 && (
+                <section className="attack-section attack-parameters" aria-labelledby="attack-parameters-title">
+                    <div className="attack-section-heading">
+                        <div className="attack-parameters-title">
+                            <SlidersHorizontal size={18}/>
+                            <h2 id="attack-parameters-title">Parameters used</h2>
                         </div>
-                    ))}
-                </div>
-
-            </div>
-        </div>
+                        <span>{usedParams.length} configured</span>
+                    </div>
+                    <MetricsCard items={
+                        usedParams.map((param: ParametersProps) => ({
+                            key: param.id,
+                            label: param.name || param.id,
+                            description: param.description,
+                            value: ('value' in param ? param.value : undefined) ?? param.default,
+                        }))}/>
+                </section>
+            )}
+        </main>
     );
 };
+
+const AttackPage = () => (
+    <Suspense fallback={<div className="dashboard-message">Loading...</div>}>
+        <AttackPageContent/>
+    </Suspense>
+);
 
 export default AttackPage;

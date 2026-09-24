@@ -1,73 +1,81 @@
-import { LucideIcon } from "lucide-react";
-import { ReactEventHandler } from "react";
-import { Info } from "./homePageInterface";
+import {LucideIcon} from "lucide-react";
+import {ReactEventHandler} from "react";
+import {Task} from "@/interfaces/homePageInterface";
 
-// Model's information
-export interface ModelInfo extends Info {
-  dataset: string,                  // Dataset where the model had been optimized on 
-  parameters: number | null,        // Number of the models' parameters
-}
-
-export interface DatasetInfo extends Info {
-  num_samples: number,              // Number of the dataset' samples
-}
-
-
-export interface LoadedFile {
-  name: string;
-  file: File;
-  type: 'dataset' | 'model' | 'json';
-}
-
-export interface AppState {
-  currentPage: 'home' | 'report';
-  dataset: LoadedFile | null;
-  model: LoadedFile | null;
-  reportFiles: LoadedFile[];
-}
-
-export type TaskType = 'benchmark' | 'one-image-attack' | 'analysis';
 
 export interface ButtonProps {
-  id: string,
-  name: string
-  Icon: LucideIcon;
-  currentPage: string;
-  onClickHandle: ReactEventHandler
+    id: string,
+    name: string
+    Icon: LucideIcon;
+    currentPage: string;
+    onClickHandle: ReactEventHandler
 }
 
-
-
 export interface ParametersProps {
-  id: string
-  name: string
-  min: number
-  max: number
-  step: number
-  default: number
-  description: string
+    id: string
+    name: string
+    min?: number
+    max?: number
+    step?: number
+    default: number | string | boolean
+    description: string
+    kind?: 'number' | 'enum' | 'boolean'
+    options?: string[]
 }
 
 export interface RegisterObjectProps {
-  id: string,
-  name: string,
-  description: string
-  task?: string
-  knowledge?: string
-  parameters?: ParametersProps[]
+    id: string,
+    name: string,
+    description?: string
+    parameters: ParametersProps[]
+    task: Task[] | Task
+    knowledge?: string
+    objective?: string
+    type?: string
+    nature?: string
+    category?: string
+    attack_type?: string
+    privacy_type?: string
 }
 
-// Settings Modal Component
-export interface ParametersWindowProps {
-  isOpen: boolean,
-  onClose: () => void,
-  parameters: ParametersProps[],
-  handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
+/**
+ * Checks whether a registered object supports the given task.
+ * Handles both a single task and a list of tasks using case-insensitive matching.
+ * @param.registeredObject : this is the object to check whether its task(s) is/are supported
+ * @param.task : Task to check
+ */
+export const supportsTask = (
+    registeredObject: RegisterObjectProps,
+    task: string
+): boolean => {
+    const normalizedTask: string = task.toLowerCase();
+    const supportedTasks: string[] = Array.isArray(registeredObject.task)
+        ? registeredObject.task
+        : [registeredObject.task];
+
+    return supportedTasks.some((supportedTask) => supportedTask.toLowerCase() === normalizedTask);
+};
+
+export const ATTACK_STATUSES = ['pending', 'in progress', 'finished', 'error'] as const;
+
+export type AttackStatus = typeof ATTACK_STATUSES[number];
+
+export interface ParameterLogProps {
+    id: string;
+    name?: string | null;
+    value: unknown;
+    description?: string | null;
 }
 
-export interface AttackManagementProps {
-  id: number;
-  name: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'closed';
-  progress: number
+export interface JobResult {
+    id: string;
+    parameters?: ParameterLogProps[] | null;
+    result?: Record<string, unknown> | null;
+    total?: number | null;
+    progress?: number | null;
+    iteration_time?: number | null;
+    execution_time?: number | null;
+    estimated_execution_time?: number | null;
+    status: AttackStatus;
+    error?: string | null;
 }

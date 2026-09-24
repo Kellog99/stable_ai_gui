@@ -1,184 +1,140 @@
 "use client"
 
-import FileDropZone from '@/components/client/upload/FileDropZone';
+import FileRepository from '@/components/client/repository/FileRepository';
 import styles from '@/styles/HomePage.module.css';
-import { useEffect, useState } from 'react';
+import {useCallback, useEffect} from 'react';
 
-// Configuration file for creating the HomePage Drag and Drop components
-import { getAttacksList, getDatasetsList, getMetricsList, getModelsList } from './functionalities/NNTrustBackendUtils';
+import {getAttacksList, getCoreElements, getMetricsList} from './functionalities/TITANNServices/get_info';
 import useNNTrustStore from '@/store/nnTrustStore';
-import FileRepository from './components/client/repository/FileRepository';
-import { DragDrop } from './components/client/upload/DragDrop';
-import { Brain, Database, DatabaseIcon, HardDrive, Upload } from 'lucide-react';
-import { infoDataset, infoModel } from './components/client/upload/config';
-import { ButtonProps } from './interfaces/homePageInterface';
-import useStore from './store/dsStore';
-import { DatasetInfo, ModelInfo } from './interfaces/NNInterfaces';
-import { dataset_upload, uploadModel } from './properties/urlsNNTrust';
-
-
-export const title = "Stable-AI"
+import {Brain, DatabaseIcon} from 'lucide-react';
+import {infoDataset, infoModel} from './components/client/repository/config';
+import {DatasetInfo, ModelInfo} from './interfaces/homePageInterface';
+import useBackendVariablesStore from './store/globalStore';
+import {title} from './store/title';
 
 export default function HomePage() {
 
-  // At this level It is asked for the list of all the attacks
-  // const setAttacks = useStore((state) => state.setAttacks)
-  const {
-    model,
-    setAttacks,
-    setModel,
-    setMetrics,
-  } = useNNTrustStore()
-  const { dataset, setDataset } = useStore()
+    // Extracting the main variables that are needed for the services.
+    const {
+        hostname,
+        port
+    } = useBackendVariablesStore()
 
-  const [listModels, setListModels] = useState<ModelInfo[]>([])
-  const [listDatasets, setListDataset] = useState<DatasetInfo[]>([])
+    // At this level It is asked for the list of all the attacks
+    const {
+        model,
+        listModels,
+        dataset,
+        listDatasets,
+        setModel,
+        setDataset,
+        setAttacks,
+        setMetrics,
+        setListModels,
+        setListDatasets,
+    } = useNNTrustStore()
 
-  // ################## Attacks' list ##################
-  useEffect(() => {
-    getMetricsList()
-      .then(setMetrics)
-      .catch(err => console.error("Failed to load attacks:", err));
-  }, [setAttacks]);
+    // ################## Attacks' list ##################
+    useEffect(() => {
+        getMetricsList(hostname, port)
+            .then(setMetrics)
+            .catch(err => console.error("Failed to load attacks:", err));
+    }, [setMetrics, hostname, port]);
 
-  useEffect(() => {
-    getAttacksList()
-      .then(setAttacks)
-      .catch(err => console.error("Failed to load attacks:", err));
-  }, [setAttacks]);
+    useEffect(() => {
+        getAttacksList(hostname, port)
+            .then(setAttacks)
+            .catch(err => console.error("Failed to load attacks:", err));
+    }, [setAttacks, hostname, port]);
 
-  // ################## Models' list ################## 
-  useEffect(() => {
-    getModelsList()
-      .then(setListModels)
-      .catch(err => console.error("Failed to load attacks:", err));
-  }, [setListModels]);
+    const handleRefresh = useCallback((repositoryType: "model" | "dataset") => {
+        const repository = repositoryType === "model"
+            ? "path_model_repo"
+            : "path_ds_repo";
 
-  // ################## Datasets' list ################## 
-  useEffect(() => {
-    getDatasetsList()
-      .then(setListDataset)
-      .catch(err => console.error("Failed to load attacks:", err));
-  }, [setListDataset]);
+        getCoreElements(
+            hostname,
+            port,
+            repository,
+            repositoryType
+        )
+            .then((elements) => {
+                if (repositoryType === "model") {
+                    setListModels(elements as ModelInfo[]);
+                } else {
+                    setListDatasets(elements as DatasetInfo[]);
+                }
+            })
+            .catch(err => console.error(`Failed to refresh ${repositoryType}s:`, err));
+    }, [hostname, port, setListDatasets, setListModels]);
 
+    // ################## Models' list ##################
+    useEffect(() => {
+        if (listModels !== null) return;
+        handleRefresh("model");
+    }, [hostname, port, listModels, setListModels, handleRefresh]);
 
-
-  // Model selection's buttons
-  const btnModel: ButtonProps[] = [
-    {
-      id: "model",
-      name: "Upload model",
-      Icon: Upload,
-      child: <DragDrop
-        name={"Load your Model"}
-        Icon={Brain}
-        acceptedType={"zip"}
-        description={'Make sure your zip contains raw data and a json config file.'}
-        onFileSelect={(file) => { uploadZip(file, "model") }} />,
-    },
-    {
-      id: "repository",
-      name: "Model Repository",
-      Icon: HardDrive,
-      child: <FileRepository
-        elements={listModels}
-        selectHandle={(selectedModel: ModelInfo | null) => {
-          if (selectedModel) {
-            if (!model) { setModel(selectedModel) }
-            else { setModel(selectedModel && selectedModel.id === model.id ? null : selectedModel) }
-          }
-        }
-        }
-        activeId={model?.id}
-        handleDelete={(model) => {
-          setListModels(listModels.filter(modelContained => modelContained.id !== (model as ModelInfo).id))
-        }}
-      />,
-    }
-  ]
-
-  async function uploadZip(file: any, mode: String) {
-    const formData = new FormData();
-    formData.append("file", file);
-    const body = formData;
-    const url = mode === "model" ? uploadModel : dataset_upload
-    const response = await fetch(url, {
-      method: 'POST',
-      body,
-    });
-    if (response.ok) {
-      console.log("Uploaded zip correctly.")
-    }
-  }
-
-  // Dataset selection's buttons
-  const btnDataset: ButtonProps[] = [
-    {
-      id: "dataset",
-      name: "Upload dataset",
-      Icon: Upload,
-      child: <DragDrop
-        name={"Load your Dataset"}
-        Icon={Database}
-        acceptedType={"zip"}
-        description={'Make sure your zip contains raw data and a json config file.'}
-        onFileSelect={(file) => { uploadZip(file, "dataset") }}
-      />,
-    },
-    {
-      id: "repository",
-      Icon: HardDrive,
-      name: "Dataset Repository",
-      child: <FileRepository
-        elements={listDatasets}
-        selectHandle={(selectDataset: DatasetInfo | null) => {
-          if (selectDataset) {
-            if (!dataset) setDataset(selectDataset)
-            else { setDataset(selectDataset && selectDataset.id === dataset.id ? null : selectDataset) }
-          }
-        }}
-        activeId={dataset?.id}
-        handleDelete={(dataset) => {
-          setListDataset(listDatasets.filter(datasetContained => datasetContained.id !== (dataset as DatasetInfo).id))
-        }} />,
-    }
-  ]
+    // ################## Datasets' list ##################
+    useEffect(() => {
+        if (listDatasets !== null) return;
+        handleRefresh("dataset");
+    }, [hostname, port, listDatasets, setListDatasets, handleRefresh]);
 
 
+    // ################## Selection handler ##################
+    // this handler works fine for both model and dataset
+    const createToggleHandler = <T extends ModelInfo | DatasetInfo>(
+        setter: (value: T | null) => void,
+        currentValue: T | null
+    ) => {
+        return (selected: T | null) => {
+            if (selected === null) {
+                setter(null);
+                return;
+            }
 
-  return (
-    <div className={styles.home_page}>
-      <div className={styles.home_header}>
-        <h1 className={styles.home_title}>
-          Welcome to {title}
-        </h1>
-        <p className={styles.home_subtitle}>
-          Upload the <b>Dataset</b> or the <b>Model</b> in the space below or upload them from the appropriate <b>Repository</b> to conduct a quality and vulnerability analysis.
-        </p>
-      </div>
+            setter(selected.id === currentValue?.id ? null : selected);
+        };
+    };
 
-      <div className={styles.upload_container}>
-        {/* Model selection */}
-        <FileDropZone
-          key={"model_loader"}
-          id={'model_loader'}
-          title="Model"
-          description="Drag and drop your model or choose an existing model."
-          Icon={Brain}
-          fileDropInformation={infoModel}
-          buttons={btnModel}
-        />
+    return (
+        <div className={styles.home_page}>
+            <div className={styles.home_header}>
+                <h1 className={styles.home_title}>
+                    Welcome to {title}
+                </h1>
+                <p className={styles.home_subtitle}>
+                    Upload the <b>Dataset</b> or the <b>Model</b> in the space below or upload them from the
+                    appropriate <b>Repository</b> to conduct a quality and vulnerability analysis.
+                </p>
+            </div>
 
-        {/* Dataset selection */}
-        <FileDropZone
-          id="dataset_loader"
-          title="Dataset"
-          description="Load your dataset or choose an existing dataset."
-          Icon={DatabaseIcon}
-          fileDropInformation={infoDataset}
-          buttons={btnDataset}
-        />
-      </div>
-    </div>
-  );
+            <div className={styles.upload_container}>
+                {/* Model selection */}
+                <FileRepository
+                    key="model_loader"
+                    title="Model"
+                    description="Select the model to test."
+                    elements={listModels ?? []}
+                    Icon={Brain}
+                    fileDropInformation={infoModel}
+                    handleSelection={createToggleHandler(setModel, model)}
+                    handleRefresh={() => handleRefresh("model")}
+                    repositoryType="model"
+                />
+
+                <FileRepository
+                    key="dataset_loader"
+                    title="Dataset"
+                    description="Select the dataset to use for the benchmarking."
+                    elements={listDatasets ?? []}
+                    Icon={DatabaseIcon}
+                    fileDropInformation={infoDataset}
+                    handleSelection={createToggleHandler(setDataset, dataset)}
+                    handleRefresh={() => handleRefresh("dataset")}
+                    repositoryType="dataset"
+                />
+            </div>
+        </div>
+    );
 }

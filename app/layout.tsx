@@ -4,8 +4,11 @@ import { AppShell, createTheme, MantineProvider } from "@mantine/core";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./components/client/Header";
 import Navbar from './components/layout/Navbar';
+import useNNTrustStore from './store/nnTrustStore';
 import "./globals.css";
 import "@mantine/core/styles.css";
+import '@mantine/charts/styles.css';
+import {useEffect} from 'react';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +52,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  useEffect(() => {
+    void useNNTrustStore.persist.rehydrate();
+  }, []);
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

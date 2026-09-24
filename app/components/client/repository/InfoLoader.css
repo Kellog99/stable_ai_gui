@@ -1,0 +1,18 @@
+.info-container {
+  background-color: transparent;
+  border-radius: 8px;
+  height: 25px;
+  aspect-ratio: 1;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.2s ease;
+
+}
+
+.info-container:hover {
+  transform: scale(1.2);
+}

@@ -1,0 +1,130 @@
+.info_table__section {
+    width: 100%;
+    margin: 0;
+}
+
+.info_table__heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    margin-bottom: 20px;
+    color: #72d6e6;
+}
+
+.info_table__heading svg {
+    flex: 0 0 auto;
+}
+
+.info_table__heading h2 {
+    margin: 0 0 4px;
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    font-weight: 650;
+}
+
+.info_table__content {
+    display: grid;
+    gap: 15px;
+}
+
+.info_table__grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+}
+
+.info_table__item {
+    box-sizing: border-box;
+    flex: 0 0 220px;
+    width: 220px;
+    max-width: 100%;
+    min-height: 78px;
+    min-width: 0;
+    background-color: color-mix(in srgb, var(--bg-light) 24%, transparent);
+    padding: 14px 16px;
+    border: 1px solid color-mix(in srgb, var(--bg-light) 20%, transparent);
+    border-radius: 10px;
+}
+
+.info_table__grid dt {
+    margin-bottom: 5px;
+    color: var(--text-tertiary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+}
+
+.info_table__grid dd {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.92rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.info_table__path_value {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem !important;
+}
+
+.info_table__preprocessing {
+    max-width: 760px;
+    border: 1px solid color-mix(in srgb, var(--bg-light) 30%, transparent);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.info_table__preprocessing_title {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 16px;
+    color: #72d6e6;
+    background: color-mix(in srgb, #1b9aaa 8%, transparent);
+}
+
+.info_table__preprocessing_title h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.info_table__preprocessing dl {
+    margin: 0;
+}
+
+.info_table__preprocessing dl > div {
+    display: grid;
+    grid-template-columns: minmax(130px, 0.35fr) minmax(0, 1fr);
+    gap: 16px;
+    padding: 11px 16px;
+    border-top: 1px solid color-mix(in srgb, var(--bg-light) 20%, transparent);
+}
+
+.info_table__preprocessing dt {
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.info_table__preprocessing dd {
+    margin: 0;
+    color: var(--text-secondary);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+    .info_table__item {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .info_table__preprocessing dl > div {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+}

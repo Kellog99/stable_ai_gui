@@ -1,0 +1,84 @@
+.image-wrapper {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    gap: 0.5rem;
+}
+
+.image-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    margin: 0;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.image-area {
+    display: grid;
+    place-items: center;
+    container-type: size;
+    height: 100%;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.image-container {
+    position: relative;
+    /* Fit the largest 1.16:1 frame inside the image area's grid cell. */
+    width: min(100cqw, 116cqh);
+    height: auto;
+    min-width: 0;
+    aspect-ratio: 1.16 / 1;
+    border-radius: 0.8rem;
+    border: 2px dashed #d1d5db;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: darkgray;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Upload area: only add interactive styles when uploads are enabled */
+.upload-area--interactive {
+    cursor: pointer;
+}
+
+.upload-area--interactive:hover {
+    background-color: var(--bg, #1a1a1a);
+    color: white;
+}
+
+.upload-area--interactive:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+.image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 70px;
+    font-size: 0.6rem;
+    text-align: center;
+    margin: 0;
+}

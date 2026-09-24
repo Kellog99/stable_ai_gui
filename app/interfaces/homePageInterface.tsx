@@ -1,16 +1,54 @@
-import { LucideIcon } from "lucide-react";
+// Backward-compatible alias; TaskType is the canonical backend task type.
+export type Task =
+    | 'classification'
+    | 'segmentation'
+    | 'detection'
+    | 'language';
 
-export interface Info {
+export interface InfoProps {
     id: string                        // id for the file identification.
     name: string,                     // File's name, ex. "Resnet50" or "Imagenette".
+    date?: string,                    // Date when the file has been generated 
     image?: string | null,            // an image that represents the file.
-    task: string,                     // task associated with, i.e. classification, detection, etc.
+    task: Task,                       // task associated with, i.e. classification, detection, etc.
     domain: string,                   // Domain of the file, i.e. RGB, ultraviolet, etc.
     num_classes?: number,             // number of classes in the output.
     weights?: number,                 // Size of the file.
     description?: string,             // description of the file.
     input_dimensionality: number[]    // dimensionality of each input or domain's dimensionality.
 }
+
+export interface Transformation {
+    mean: number[]
+    std: number[]
+    crop?: number
+    size?: number
+}
+
+export type ModelType =
+    | "Ollama"
+    | "Gemini"
+    | "OpenRouter"
+    | "HuggingFace"
+    | "plain"
+    | "timm"
+    | "torch_script"
+    | "torch_dynamo"
+    | "onnx"
+    | "api";
+
+// Model's information
+export interface ModelInfo extends InfoProps {
+    dataset: string,                  // Dataset where the model had been optimized on 
+    parameters: number | null,        // Number of the models' parameters
+    model_type?: ModelType,           // Model implementation or provider type
+    transformation: Transformation
+}
+
+export interface DatasetInfo extends InfoProps {
+    num_samples: number,              // Number of the dataset' samples
+}
+
 
 interface field {
     field: string,
@@ -25,20 +63,4 @@ export interface InfoUploader {
     scaffholding: { [key: string]: string[] },
     fields: field[],
     example: { [key: string]: any }
-}
-
-export interface ButtonProps {
-    id: string,
-    name: string,
-    child: React.ReactNode,
-    Icon: LucideIcon
-}
-
-export interface FileDropZoneProps {
-    id: string,
-    title: string,
-    description: string,
-    Icon: LucideIcon,
-    fileDropInformation: InfoUploader,        // This is the configuration file for the info
-    buttons: ButtonProps[],
 }
