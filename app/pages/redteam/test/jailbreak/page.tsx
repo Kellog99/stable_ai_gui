@@ -1,22 +1,22 @@
 "use client";
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import { RegisterObjectProps } from '@/interfaces/NNInterfaces'
+import {RegisterObjectProps} from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
 import useJailbreakStore from '@/store/jailbreakStore'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 import styles from '@/styles/jailbreak.module.css'
-import { Send, Shield, Target, Unlink } from 'lucide-react';
+import {Send, Target, Unlink} from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import MessageThread from '@/components/client/jailbreaking/MessageThread';
 import ModelSelector from '@/components/client/jailbreaking/ModelSelector';
 import SavedAttacksBoard from '@/components/client/jailbreaking/SavedAttacksBoard';
-import { BubbleInterface, JailbreakAttackOutput } from '@/interfaces/testInterfaces';
+import {BubbleInterface, JailbreakAttackOutput} from '@/interfaces/testInterfaces';
 
 const Jailbreaking = () => {
     // ######################## stored Variables ########################
-    const { hostname, port } = useBackendVariablesStore()
-    const { attacks, model } = useNNTrustStore()
+    const {hostname, port} = useBackendVariablesStore()
+    const {attacks, model} = useNNTrustStore()
 
     const {
         prompt,
@@ -74,7 +74,7 @@ const Jailbreaking = () => {
 
     // Helper: create a selectedAttack with saved params merged in
     const buildSelectedAttack = (attackId: string): RegisterObjectProps => {
-        const atk = { ...attacks[attackId] };
+        const atk = {...attacks[attackId]};
         const saved = savedParams[attackId];
         if (saved && atk.parameters && saved.length === atk.parameters.length) {
             atk.parameters = atk.parameters.map((param, i) => ({
@@ -109,7 +109,7 @@ const Jailbreaking = () => {
                         ...param,
                         default: saved[i] ?? param.default,
                     }));
-                    return [id, { ...atk, parameters: updatedParams }];
+                    return [id, {...atk, parameters: updatedParams}];
                 }
                 return [id, atk];
             })
@@ -269,7 +269,7 @@ const Jailbreaking = () => {
             });
         };
 
-        scroller.addEventListener('scroll', onScroll, { passive: true });
+        scroller.addEventListener('scroll', onScroll, {passive: true});
         onScroll();
         const ro = new ResizeObserver(() => {
             if (topSectionRef.current) setTopSectionH(topSectionRef.current.offsetHeight);
@@ -303,77 +303,77 @@ const Jailbreaking = () => {
                 title="Jailbreaking"
                 descrition="Test on the loaded model, single attacks for a specific prompt."
             />
-            <div className={styles.body}>
-                {/* Top section shrinks & fades while scrolling down. */}
-                <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
+            {/* Top section shrinks & fades while scrolling down. */}
+            <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
                 {/* <div className={styles.top_section}> */}
-                    <VulnerabilitySelection
-                        stretch
-                        attacks={attacksWithSavedParams}
-                        selectedAttack={selectedAttack}
-                        handleSelection={(attackId) => {
-                            setSelectedAttackId(attackId)
-                        }}
-                        handleChange={(value: (string | number)[]) => handleChange(value as number[])}
-                    />
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                            <ModelSelector
-                                attackerModel={attackerModel}
-                                judgeModel={judgeModel}
-                                onAttackerChange={setAttackerModel}
-                                onJudgeChange={setJudgeModel}
-                            />
-                        </div>
-                        {/* Offset to align with the model dropdowns' row, below the "Attacker/Judge Model" labels. */}
-                        <div style={{ marginTop: '22px' }}>
-                            <SavedAttacksBoard
-                                attackId={selectedAttack?.id ?? null}
-                                attackName={selectedAttack?.name}
-                                onSelect={handleLoadSavedAttack}
-                            />
-                        </div>
+                <VulnerabilitySelection
+                    stretch
+                    attacks={attacksWithSavedParams}
+                    selectedAttack={selectedAttack}
+                    handleSelection={(attackId) => {
+                        setSelectedAttackId(attackId)
+                    }}
+                    handleChange={(value: (string | number)[]) => handleChange(value as number[])}
+                />
+                <div style={{display: 'flex', alignItems: 'flex-start', gap: '12px'}}>
+                    <div style={{flex: 1, minWidth: 0}}>
+                        <ModelSelector
+                            attackerModel={attackerModel}
+                            judgeModel={judgeModel}
+                            onAttackerChange={setAttackerModel}
+                            onJudgeChange={setJudgeModel}
+                        />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px' }}>
-                        <label className={styles.goal_label}>
-                            <Target size={16} color="rgb(187, 58, 58)" />
-                            Goal
-                        </label>
-                        <div className={styles.prompt_container}>
-                            <input
-                                type="text"
-                                value={prompt}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && isActive) {
-                                        handleSubmit();
-                                    }
-                                }}
-                                onChange={(e) => { setPrompt(e.target.value) }}
-                                className={styles.input_style}
-                                placeholder="Insert the goal of the attack."
-                            />
-                            <button
-                                className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
-                                disabled={isClicked && !isActive}
-                                onClick={handleSubmit}
-                            >
-                                <Send size={24} />
-                            </button>
-                        </div>
+                    {/* Offset to align with the model dropdowns' row, below the "Attacker/Judge Model" labels. */}
+                    <div style={{marginTop: '22px'}}>
+                        <SavedAttacksBoard
+                            attackId={selectedAttack?.id ?? null}
+                            attackName={selectedAttack?.name}
+                            onSelect={handleLoadSavedAttack}
+                        />
                     </div>
                 </div>
-                <MessageThread
-                    goal={goal}
-                    adversarialPrompt={adversarialPrompt}
-                    conversationChat={conversationChat}
-                    modelResponse={modelResponse}
-                    fullHistory={fullHistory}
-                    success={attackSuccess}
-                    bestScore={bestScore}
-                    metadata={attackMetadata}
-                    attackId={resultAttackId}
-                />
+                <div style={{display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px'}}>
+                    <label className={styles.goal_label}>
+                        <Target size={16} color="rgb(187, 58, 58)"/>
+                        Goal
+                    </label>
+                    <div className={styles.prompt_container}>
+                        <input
+                            type="text"
+                            value={prompt}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && isActive) {
+                                    handleSubmit();
+                                }
+                            }}
+                            onChange={(e) => {
+                                setPrompt(e.target.value)
+                            }}
+                            className={styles.input_style}
+                            placeholder="Insert the goal of the attack."
+                        />
+                        <button
+                            className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
+                            disabled={isClicked && !isActive}
+                            onClick={handleSubmit}
+                        >
+                            <Send size={24}/>
+                        </button>
+                    </div>
+                </div>
             </div>
+            <MessageThread
+                goal={goal}
+                adversarialPrompt={adversarialPrompt}
+                conversationChat={conversationChat}
+                modelResponse={modelResponse}
+                fullHistory={fullHistory}
+                success={attackSuccess}
+                bestScore={bestScore}
+                metadata={attackMetadata}
+                attackId={resultAttackId}
+            />
         </div>
     )
 }
