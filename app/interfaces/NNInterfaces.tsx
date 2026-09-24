@@ -1,20 +1,7 @@
 import {LucideIcon} from "lucide-react";
 import {ReactEventHandler} from "react";
+import {Task} from "@/interfaces/homePageInterface";
 
-export interface LoadedFile {
-    name: string;
-    file: File;
-    type: 'dataset' | 'model' | 'json';
-}
-
-export interface AppState {
-    currentPage: 'home' | 'report';
-    dataset: LoadedFile | null;
-    model: LoadedFile | null;
-    reportFiles: LoadedFile[];
-}
-
-export type TaskType = 'benchmark' | 'one-image-attack' | 'analysis';
 
 export interface ButtonProps {
     id: string,
@@ -32,32 +19,42 @@ export interface ParametersProps {
     step?: number
     default: number | string | boolean
     description: string
-    kind?: 'number' | 'enum' | 'boolean'|"string"
+    kind?: 'number' | 'enum' | 'boolean'
     options?: string[]
 }
 
 export interface RegisterObjectProps {
     id: string,
     name: string,
-    description: string
-    task?: string
+    description?: string
+    parameters: ParametersProps[]
+    task: Task[] | Task
+    knowledge?: string
     objective?: string
     type?: string
     nature?: string
     category?: string
     attack_type?: string
     privacy_type?: string
-    knowledge?: string
-    parameters?: ParametersProps[]
 }
 
-// Settings Modal Component
-export interface ParametersWindowProps {
-    isOpen: boolean,
-    onClose: () => void,
-    parameters: ParametersProps[],
-    handleParametersSaving: (id: string, parameters: ParametersProps[]) => void;
-}
+/**
+ * Checks whether a registered object supports the given task.
+ * Handles both a single task and a list of tasks using case-insensitive matching.
+ * @param.registeredObject : this is the object to check whether its task(s) is/are supported
+ * @param.task : Task to check
+ */
+export const supportsTask = (
+    registeredObject: RegisterObjectProps,
+    task: string
+): boolean => {
+    const normalizedTask: string = task.toLowerCase();
+    const supportedTasks: string[] = Array.isArray(registeredObject.task)
+        ? registeredObject.task
+        : [registeredObject.task];
+
+    return supportedTasks.some((supportedTask) => supportedTask.toLowerCase() === normalizedTask);
+};
 
 export const ATTACK_STATUSES = ['pending', 'in progress', 'finished', 'error'] as const;
 
@@ -76,14 +73,9 @@ export interface JobResult {
     result?: Record<string, unknown> | null;
     total?: number | null;
     progress?: number | null;
+    iteration_time?: number | null;
+    execution_time?: number | null;
+    estimated_execution_time?: number | null;
     status: AttackStatus;
     error?: string | null;
-}
-
-export interface ModelSpecs {
-    name: string;
-    task?: string;
-    num_classes?: number;
-    pretrained?: boolean;
-    type?: string;
 }

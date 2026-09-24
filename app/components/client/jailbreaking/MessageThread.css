@@ -310,3 +310,42 @@
   width: 60%;
   justify-content: center;
 }
+/* ── History view switcher (Tree / Conversations) ──
+   Shown above the expanded history for tree-shaped attacks. */
+.history-view-switch {
+  align-self: center;
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  margin-bottom: 4px;
+  background: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
+  border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
+  border-radius: 999px;
+  opacity: 0;
+  animation: resultsReveal 0.45s ease-out 0.15s forwards;
+}
+
+.history-view-switch__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.history-view-switch__option:hover {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.history-view-switch__option.active {
+  color: #fff;
+  background: color-mix(in hsl, var(--bg) 40%, var(--bg-light) 60%);
+}

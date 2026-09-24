@@ -1,7 +1,7 @@
 import React from 'react';
 import './HeaderPageTask.css';
-import { HoverCard } from '@mantine/core';
-import { CircleArrowRight, LucideIcon } from 'lucide-react';
+import {HoverCard} from '@mantine/core';
+import {CircleArrowRight, LucideIcon} from 'lucide-react';
 
 export interface ButtonsProps {
     description: string,
@@ -17,6 +17,7 @@ export interface HeaderPageTaskProps {
     description?: string,
     button_props?: ButtonsProps
 }
+
 /**
  * Renders the title area shared by task pages, optionally with an action
  * button and a tooltip explaining why that action is unavailable.
@@ -27,17 +28,19 @@ export interface HeaderPageTaskProps {
  * @param props.description - Optional text displayed below the title.
  * @param props.button_props - Optional configuration for the action button.
  */
-const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
-    Icon,
-    title,
-    description,
-    button_props
-}) => {
+const HeaderPageTask: React.FC<HeaderPageTaskProps> = (
+    {
+        Icon,
+        title,
+        description,
+        button_props
+    }
+) => {
 
     return (
         <div className='container-header'>
             <div className='container-title'>
-                <Icon className="page-task-icon" size={"calc(var(--icon-size) * 2)"} />
+                <Icon className="page-task-icon" size={"calc(var(--icon-size) * 3)"}/>
                 <div>
                     <h1 className="page-task-title">{title}</h1>
                     {description && (<p className="page-task-description">{description}</p>)}
@@ -55,7 +58,8 @@ const HeaderPageTask: React.FC<HeaderPageTaskProps> = ({
                                     disabled={button_props.isDisabled}
                                     onClick={button_props.handleClick}
                                     className={`header-button ${button_props.isDisabled ? 'disabled' : ''}`}>
-                                    {button_props.description} {button_props.Icon ? <button_props.Icon size={25} /> : <CircleArrowRight size={25} />}
+                                    {button_props.description} {button_props.Icon ? <button_props.Icon size={25}/> :
+                                    <CircleArrowRight size={25}/>}
                                 </button>
                             </div>
                         </HoverCard.Target>

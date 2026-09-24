@@ -10,6 +10,7 @@ import {Send, Target, Unlink} from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import MessageThread from '@/components/client/jailbreaking/MessageThread';
 import ModelSelector from '@/components/client/jailbreaking/ModelSelector';
+import SavedAttacksBoard from '@/components/client/jailbreaking/SavedAttacksBoard';
 import {BubbleInterface, JailbreakAttackOutput} from '@/interfaces/testInterfaces';
 
 const Jailbreaking = () => {
@@ -36,9 +37,11 @@ const Jailbreaking = () => {
         conversationChat,
         modelResponse,
         adversarialPrompt,
+        setAdversarialPrompt,
         attackSuccess,
         bestScore,
         attackMetadata,
+        resultAttackId,
         isClicked,
         setIsClicked,
         setResults,
@@ -124,8 +127,13 @@ const Jailbreaking = () => {
         return !!(model && prompt && prompt !== "" && selectedAttack)
     }, [model, prompt, selectedAttack])
 
-    const handleChange = (value: (number | string)[]) => {
+    const handleChange = (value: number[]) => {
         if (!selectedAttack || !selectedAttack.parameters) return;
+
+        const newParameters = selectedAttack.parameters.map((param, i) => ({
+            ...param,
+            default: value[i]
+        }));
 
         // Persist the new parameter values to store
         setSavedParams(prevSaved => ({
@@ -133,6 +141,52 @@ const Jailbreaking = () => {
             [selectedAttack.id]: value,
         }));
     }
+
+    // Maps a JailbreakAttackOutput (fresh or replayed from a saved state) onto the store's result shape.
+    const applyJailbreakOutput = (data: JailbreakAttackOutput, attackId?: string) => {
+        // Flat history for the "View Full Iteration History" expanded view
+        const historyBubbles: BubbleInterface[] = data.history.map(turn => ({
+            sender: turn.role === "attacker" ? "user" : "model",
+            msg: turn.content,
+            score: turn.score,
+            improvement: turn.improvement,
+            depth: turn.depth,
+        }));
+
+        // Grouped conversations for the chat switcher. For tree attacks each
+        // entry is one root→leaf path, which is what the tree view rebuilds
+        // the escalation tree from — hence `improvement` and `depth` are kept.
+        const convBubbles: BubbleInterface[][] = data.conversations.map(chat =>
+            chat.map(turn => ({
+                sender: turn.role === "attacker" ? "user" : "model",
+                msg: turn.content,
+                score: turn.score,
+                improvement: turn.improvement,
+                depth: turn.depth,
+            }))
+        );
+
+        setResults({
+            goal: data.goal,
+            resultAttackId: attackId,
+            fullHistory: historyBubbles,
+            conversationChat: convBubbles,
+            modelResponse: data.best_response,
+            adversarialPrompt: data.best_prompt,
+            attackSuccess: data.success,
+            bestScore: data.best_score,
+            attackMetadata: data.metadata,
+        });
+    };
+
+    // Loads a previously saved attack state and shows it as if it had just been run.
+    const handleLoadSavedAttack = (data: JailbreakAttackOutput) => {
+        setPrompt(data.goal);
+        setGoal(data.goal);
+        // The board only lists runs of the currently selected attack, so that
+        // is the attack the replayed results come from.
+        applyJailbreakOutput(data, selectedAttack?.id);
+    };
 
     //  this function handles the submission of the prompt and sets the goal and adversarial prompt
     const handleSubmit = async () => {
@@ -144,6 +198,7 @@ const Jailbreaking = () => {
             // Clear previous states before starting
             setResults({
                 goal: currentGoal,
+                resultAttackId: selectedAttack.id,
                 fullHistory: [],
                 conversationChat: [],
                 modelResponse: "",
@@ -176,33 +231,7 @@ const Jailbreaking = () => {
                 }
 
                 const data: JailbreakAttackOutput = await response.json();
-
-                // Flat history for the "View Full Iteration History" expanded view
-                const historyBubbles: BubbleInterface[] = data.history.map(turn => ({
-                    sender: turn.role === "attacker" ? "user" : "model",
-                    msg: turn.content,
-                    score: turn.score
-                }));
-
-                // Grouped conversations for the chat switcher
-                const convBubbles: BubbleInterface[][] = data.conversations.map(chat =>
-                    chat.map(turn => ({
-                        sender: turn.role === "attacker" ? "user" : "model",
-                        msg: turn.content,
-                        score: turn.score,
-                    }))
-                );
-
-                setResults({
-                    goal: currentGoal,
-                    fullHistory: historyBubbles,
-                    conversationChat: convBubbles,
-                    modelResponse: data.best_response,
-                    adversarialPrompt: data.best_prompt,
-                    attackSuccess: data.success,
-                    bestScore: data.best_score,
-                    attackMetadata: data.metadata,
-                });
+                applyJailbreakOutput(data, selectedAttack.id);
             } catch (err) {
                 console.error('Jailbreaking attack failed:', err)
                 setGoal(undefined)
@@ -274,64 +303,77 @@ const Jailbreaking = () => {
                 title="Jailbreaking"
                 descrition="Test on the loaded model, single attacks for a specific prompt."
             />
-            <div className={styles.body}>
-                {/* Top section shrinks & fades while scrolling down. */}
-                <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
+            {/* Top section shrinks & fades while scrolling down. */}
+            <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
                 {/* <div className={styles.top_section}> */}
-                    <VulnerabilitySelection
-                        stretch
-                        attacks={attacksWithSavedParams}
-                        selectedAttack={selectedAttack ?? undefined}
-                        handleSelection={setSelectedAttackId}
-                        handleChange={handleChange}
-                    />
-                    <ModelSelector
-                        attackerModel={attackerModel}
-                        judgeModel={judgeModel}
-                        onAttackerChange={setAttackerModel}
-                        onJudgeChange={setJudgeModel}
-                    />
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px'}}>
-                        <label className={styles.goal_label}>
-                            <Target size={16} color="rgb(187, 58, 58)"/>
-                            Goal
-                        </label>
-                        <div className={styles.prompt_container}>
-                            <input
-                                type="text"
-                                value={prompt}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && isActive) {
-                                        handleSubmit();
-                                    }
-                                }}
-                                onChange={(e) => {
-                                    setPrompt(e.target.value)
-                                }}
-                                className={styles.input_style}
-                                placeholder="Insert the goal of the attack."
-                            />
-                            <button
-                                className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
-                                disabled={isClicked && !isActive}
-                                onClick={handleSubmit}
-                            >
-                                <Send size={24}/>
-                            </button>
-                        </div>
+                <VulnerabilitySelection
+                    stretch
+                    attacks={attacksWithSavedParams}
+                    selectedAttack={selectedAttack}
+                    handleSelection={(attackId) => {
+                        setSelectedAttackId(attackId)
+                    }}
+                    handleChange={(value: (string | number)[]) => handleChange(value as number[])}
+                />
+                <div style={{display: 'flex', alignItems: 'flex-start', gap: '12px'}}>
+                    <div style={{flex: 1, minWidth: 0}}>
+                        <ModelSelector
+                            attackerModel={attackerModel}
+                            judgeModel={judgeModel}
+                            onAttackerChange={setAttackerModel}
+                            onJudgeChange={setJudgeModel}
+                        />
+                    </div>
+                    {/* Offset to align with the model dropdowns' row, below the "Attacker/Judge Model" labels. */}
+                    <div style={{marginTop: '22px'}}>
+                        <SavedAttacksBoard
+                            attackId={selectedAttack?.id ?? null}
+                            attackName={selectedAttack?.name}
+                            onSelect={handleLoadSavedAttack}
+                        />
                     </div>
                 </div>
-                <MessageThread
-                    goal={goal}
-                    adversarialPrompt={adversarialPrompt}
-                    conversationChat={conversationChat}
-                    modelResponse={modelResponse}
-                    fullHistory={fullHistory}
-                    success={attackSuccess}
-                    bestScore={bestScore}
-                    metadata={attackMetadata}
-                />
+                <div style={{display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px'}}>
+                    <label className={styles.goal_label}>
+                        <Target size={16} color="rgb(187, 58, 58)"/>
+                        Goal
+                    </label>
+                    <div className={styles.prompt_container}>
+                        <input
+                            type="text"
+                            value={prompt}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && isActive) {
+                                    handleSubmit();
+                                }
+                            }}
+                            onChange={(e) => {
+                                setPrompt(e.target.value)
+                            }}
+                            className={styles.input_style}
+                            placeholder="Insert the goal of the attack."
+                        />
+                        <button
+                            className={`${styles.execute_button} ${isActive ? styles.active : styles.inactive}`}
+                            disabled={isClicked && !isActive}
+                            onClick={handleSubmit}
+                        >
+                            <Send size={24}/>
+                        </button>
+                    </div>
+                </div>
             </div>
+            <MessageThread
+                goal={goal}
+                adversarialPrompt={adversarialPrompt}
+                conversationChat={conversationChat}
+                modelResponse={modelResponse}
+                fullHistory={fullHistory}
+                success={attackSuccess}
+                bestScore={bestScore}
+                metadata={attackMetadata}
+                attackId={resultAttackId}
+            />
         </div>
     )
 }

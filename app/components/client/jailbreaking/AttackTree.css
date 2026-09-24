@@ -1,0 +1,402 @@
+/* Tree-Crescendo escalation tree — same card/palette language as the
+   results card and the conversation view. */
+
+.attack-tree {
+    --tree-line: color-mix(in hsl, var(--bg-light) 55%, transparent);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: var(--thread-height);
+    background: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
+    border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: treeReveal 0.35s ease-out both;
+}
+
+@keyframes treeReveal {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Header ── */
+.attack-tree__header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding: 12px 16px;
+    flex-shrink: 0;
+    border-bottom: 1px solid color-mix(in hsl, var(--bg-light) 50%, transparent 50%);
+}
+
+.attack-tree__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.attack-tree__meta {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+}
+
+.attack-tree__hint {
+    margin-left: auto;
+    font-size: 0.68rem;
+    color: var(--text-tertiary);
+    opacity: 0.8;
+}
+
+.attack-tree__empty {
+    display: flex;
+    height: 100px;
+    align-items: center;
+    padding-left: 20px;
+    color: darkgray;
+    font-size: 0.825rem;
+    font-weight: bold;
+}
+
+/* ── Canvas ── */
+.attack-tree__canvas {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    padding: 14px;
+}
+
+/* margin:auto on a flex item centres it on both axes *and*, unlike
+   justify-content:center, keeps the overflow reachable by scrolling. */
+.attack-tree__fit {
+    margin: auto;
+    flex: none;
+}
+
+.attack-tree__scale {
+    width: max-content;
+    transition: transform 0.2s ease;
+}
+
+/* ── Graph: nested lists with CSS connectors ── */
+.attack-tree__graph,
+.attack-tree__graph ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.attack-tree__graph {
+    width: max-content;
+}
+
+.attack-tree__graph ul {
+    padding-top: 26px;
+}
+
+.attack-tree__graph li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 26px 9px 0 9px;
+}
+
+/* The two halves of the horizontal bar joining a node to its siblings. */
+.attack-tree__graph li::before,
+.attack-tree__graph li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    width: 50%;
+    height: 26px;
+    border-top: 1.5px solid var(--tree-line);
+}
+
+.attack-tree__graph li::after {
+    right: auto;
+    left: 50%;
+    border-left: 1.5px solid var(--tree-line);
+}
+
+/* An only child needs no horizontal bar, just the parent's vertical drop. */
+.attack-tree__graph li:only-child {
+    padding-top: 0;
+}
+
+.attack-tree__graph li:only-child::before,
+.attack-tree__graph li:only-child::after {
+    display: none;
+}
+
+/* The bar must stop at the outermost siblings instead of overshooting. */
+.attack-tree__graph li:first-child::before,
+.attack-tree__graph li:last-child::after {
+    border: 0 none;
+}
+
+.attack-tree__graph li:last-child::before {
+    border-right: 1.5px solid var(--tree-line);
+    border-radius: 0 6px 0 0;
+}
+
+.attack-tree__graph li:first-child::after {
+    border-radius: 6px 0 0 0;
+}
+
+/* Vertical drop from a node down to its children row. */
+.attack-tree__graph ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 0;
+    height: 26px;
+    border-left: 1.5px solid var(--tree-line);
+}
+
+/* The branch that reached the best score is drawn brighter. */
+.attack-tree__graph li.tree-branch--best::before,
+.attack-tree__graph li.tree-branch--best::after {
+    border-color: color-mix(in hsl, var(--text-primary) 55%, transparent);
+}
+
+/* ── Goal (synthetic root) ── */
+.tree-goal,
+.tree-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 152px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+}
+
+.tree-goal__circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: color-mix(in hsl, var(--bg-dark) 45%, var(--bg) 55%);
+    border: 1px dashed color-mix(in hsl, var(--bg-light) 70%, transparent);
+}
+
+.tree-goal__label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+.tree-goal__preview,
+.tree-node__preview {
+    font-size: 0.66rem;
+    line-height: 1.35;
+    text-align: center;
+    color: var(--text-tertiary);
+    /* Two lines at most, so every node keeps the same footprint and the rows
+       stay aligned however long the prompt is. */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── Node: score circle plus a two-line gist of the attacker prompt.
+   The whole turn is in the modal. ── */
+.tree-node {
+    cursor: pointer;
+}
+
+.tree-node__circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tree-node:hover .tree-node__circle {
+    transform: scale(1.12);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.tree-node:hover .tree-node__preview {
+    color: var(--text-secondary);
+}
+
+.tree-node:focus-visible {
+    outline: none;
+}
+
+.tree-node:focus-visible .tree-node__circle {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+/* Highest-scoring node — same emphasis as an active chat circle. */
+.tree-node--best .tree-node__circle {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* ── Turn modal ── */
+.tree-turn {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.tree-turn__summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 22px;
+}
+
+.tree-turn__score {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+}
+
+.tree-turn__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 54px;
+}
+
+.tree-turn__stat-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+}
+
+.tree-turn__stat-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-tertiary);
+}
+
+.tree-turn__path {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tree-turn__path-label {
+    margin-right: 2px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+.tree-turn__path-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.tree-turn__path-step:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.tree-turn__path-step.active {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}
+
+.tree-turn__path-sep {
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+}
+
+.tree-turn__section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tree-turn__improvement {
+    margin: 0;
+    padding: 9px 13px;
+    background: color-mix(in hsl, var(--bg) 60%, var(--bg-light) 40%);
+    border: 1px solid color-mix(in hsl, var(--bg-light) 25%, transparent);
+    border-radius: 10px;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+}
+
+.tree-turn__empty {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--text-tertiary);
+}
+
+/* The modal is narrow, so the shared Bubble takes the full width here
+   instead of the 55% it uses inside the chat views. */
+.tree-turn .bubble {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+}

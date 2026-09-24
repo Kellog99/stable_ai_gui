@@ -1,8 +1,53 @@
+.repository-panel {
+    display: flex;
+    gap: 10px;
+    width: 500px;
+    aspect-ratio: 1.16;
+    flex-direction: column;
+    background-color: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
+    padding: 20px;
+    border-radius: calc(2 * var(--border-radius));
+}
+
+.repository-panel-header {
+    display: flex;
+    align-items: center;
+    color: white;
+    padding: 0;
+    margin: 0;
+    gap: 8px;
+}
+
+.repository-panel-title {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+
+}
+
+.repository-panel-title p {
+    margin: 0;
+    padding: 0;
+}
+
+.repository-panel-description {
+    font-size: 0.725rem;
+    color: darkgrey;
+    padding: 0;
+    margin: 0;
+}
+
 .file_repository_container {
     display: flex;
     width: 100%;
     flex-direction: column;
-    height: 100%;
+    flex: 1 1 0;
+    min-height: 0;
 }
 
 .repository-filters {

@@ -4,7 +4,6 @@ import {
     FileText,
     HatGlasses,
     Home,
-    Info,
     LockKeyholeOpenIcon,
     LucideIcon,
     TestTube
@@ -155,12 +154,6 @@ export const sections: { [key: string]: NavigationSection[] } = {
             href: '/pages/redteam/benchmark',
             Icon: ChartLine,
         },
-        {
-            id: 'management',
-            title: 'Jobs Info',
-            href: '/pages/redteam/management',
-            Icon: Info,
-        },
     ],
     "Report": [
         {
@@ -171,5 +164,4 @@ export const sections: { [key: string]: NavigationSection[] } = {
         }
     ]
 };
-
 

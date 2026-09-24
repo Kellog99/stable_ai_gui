@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { BenchmarkDataProps, MetricsProps } from '@/interfaces/reportInterfaces';
+import React, {useMemo, useState} from 'react';
+import {BenchmarkDataProps, MetricsProps} from '@/interfaces/reportInterfaces';
 
-import { Trophy } from 'lucide-react';
+import {Trophy} from 'lucide-react';
 import './BenchmarkTable.css';
-import { Table, TableData } from '@mantine/core';
-import { ScatterChart } from '@mantine/charts';
+import {Table, TableData} from '@mantine/core';
+import {ScatterChart} from '@mantine/charts';
 
 
 export const formatMetricLabel = (key: string): string => key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
@@ -23,10 +23,10 @@ interface BenchmarkTableProps {
 const EXCLUDED_KEYS = new Set(['params', 'name', 'confusion_matrix', 'total benchmarks']);
 
 const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
-    modelName,
-    benchmark,
-    data
-}) => {
+                                                           modelName,
+                                                           benchmark,
+                                                           data
+                                                       }) => {
     // These are all the metrics that have been computed for the selected model
     const availableBenchmarkingMetrics: string[] = useMemo(
         () =>
@@ -40,27 +40,27 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
 
     const sortedData = useMemo(() => {
-        if (!selectedMetric) {
-            return [];
-        }
+            if (!selectedMetric) {
+                return [];
+            }
 
-        const scored = benchmark
-            .map((b: BenchmarkDataProps) => ({
-                name: b.name,
-                params: b.param,
-                value: getMetricValue(b.metrics, selectedMetric)
-            }))
-            .filter((entry): entry is {
-                name: string;
-                params: number;
-                value: number
-            } => entry.value !== undefined);
+            const scored = benchmark
+                .map((b: BenchmarkDataProps) => ({
+                    name: b.name,
+                    params: b.param,
+                    value: getMetricValue(b.metrics, selectedMetric)
+                }))
+                .filter((entry): entry is {
+                    name: string;
+                    params: number;
+                    value: number
+                } => entry.value !== undefined);
 
-        const sortedData: { name: string; params: number; value: number }[] = scored
-            .sort((a, b) => b.value - a.value);
+            const sortedData: { name: string; params: number; value: number }[] = scored
+                .sort((a, b) => b.value - a.value);
 
-        return sortedData
-    },
+            return sortedData
+        },
         [selectedMetric, benchmark, data, modelName]
     );
 
@@ -80,7 +80,7 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
     return (
         <div className="benchmark-controls">
             <div className='benchmark_header'>
-                <p style={{ margin: "0px" }}>Metric selected:</p>
+                <p className="benchmark-label">Metric selected:</p>
                 <select
                     id="benchmark-metric-select"
                     value={selectedMetric}
@@ -108,8 +108,8 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
                         ]}
                         xAxisLabel='Parameters'
                         yAxisLabel='Value'
-                        yAxisProps={{ domain: [0, 1] }}
-                        dataKey={{ x: 'params', y: 'metric' }}
+                        yAxisProps={{domain: [0, 1]}}
+                        dataKey={{x: 'params', y: 'metric'}}
                         referenceLines={[
                             {
                                 y: data[selectedMetric as keyof MetricsProps] as number,
@@ -122,14 +122,14 @@ const BenchmarkTable: React.FC<BenchmarkTableProps> = ({
 
                 <div className="leaderboard">
                     <div className="leaderboard-title">
-                        <Trophy size={20} color="yellow" />
+                        <Trophy size={20} color="yellow"/>
                         <p>
                             Leaderboard:{" "}
                             {selectedMetric ? formatMetricLabel(selectedMetric) : "—"}
                         </p>
                     </div>
 
-                    <Table data={tableData} />
+                    <Table data={tableData}/>
                 </div>
             </div>
         </div>

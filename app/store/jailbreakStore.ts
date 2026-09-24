@@ -14,6 +14,9 @@ interface JailbreakState {
   backendStartupId: string | null;
 
   // Results & Execution State
+  /** Id of the attack that produced the results currently on screen (it may
+   *  differ from `selectedAttackId` once the user changes the selection). */
+  resultAttackId: string | undefined;
   fullHistory: BubbleInterface[];
   conversationChat: BubbleInterface[][] | undefined;
   modelResponse: string | undefined;
@@ -34,6 +37,7 @@ interface JailbreakState {
   setBackendStartupId: (startupId: string | null) => void;
   setResults: (results: {
     goal: string;
+    resultAttackId: string | undefined;
     fullHistory: BubbleInterface[];
     conversationChat: BubbleInterface[][];
     modelResponse: string;
@@ -56,6 +60,7 @@ export const useJailbreakStore = create<JailbreakState>()(
       attackerModel: null,
       judgeModel: null,
       backendStartupId: null,
+      resultAttackId: undefined,
       fullHistory: [],
       conversationChat: undefined,
       modelResponse: undefined,
@@ -77,6 +82,7 @@ export const useJailbreakStore = create<JailbreakState>()(
       setIsClicked: (isClicked) => set({ isClicked }),
       clearResults: () => set({
         goal: undefined,
+        resultAttackId: undefined,
         fullHistory: [],
         conversationChat: undefined,
         modelResponse: undefined,

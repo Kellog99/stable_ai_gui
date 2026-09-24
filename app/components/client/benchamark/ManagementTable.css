@@ -1,3 +1,49 @@
+.job-monitoring {
+    padding-bottom: 1rem;
+}
+
+.job-monitoring-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 14px;
+}
+
+.job-monitoring-heading h2 {
+    margin: 3px 0 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.job-monitoring-heading p {
+    margin: 8px 0 0;
+    color: var(--text-tertiary);
+    font-size: 0.84rem;
+}
+
+.job-monitoring-id code {
+    padding: 3px 7px;
+    color: var(--text-primary);
+    background: color-mix(in hsl, var(--bg-light) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bg-light) 42%, transparent);
+    border-radius: 5px;
+}
+
+.job-monitoring-cards {
+    display: flex;
+    gap: 12px;
+}
+
+.job-monitoring-card {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 54px;
+    color: darkgrey;
+    font-size: 0.825rem;
+}
+
 .table-container{
     padding: 18px;
     background: linear-gradient(145deg, color-mix(in hsl, var(--bg-dark) 45%, var(--bg) 55%), color-mix(in hsl, var(--bg-dark) 72%, var(--bg) 28%));
@@ -6,8 +52,9 @@
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
 }
 .selectionButton {
-    background-color: color-mix(in hsl, var(--bg-dark) 45%, var(--bg-light) 55%);
-    border: 1px solid color-mix(in srgb, var(--bg-light) 80%, white 20%);
+    height: 36px;
+    background: rgba(15, 23, 42, 0.42);
+    border: 1px solid rgba(148, 163, 184, 0.28);
     color: var(--text-primary);
 }
 
@@ -36,7 +83,7 @@
 
 .management-search-icon {
     position: absolute;
-    left: 0.75rem;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: #9ca3af;
@@ -46,27 +93,29 @@
 
 .management-search-wrapper input[type="text"] {
     width: 100%;
-    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    height: 36px;
+    padding: 0 1rem 0 40px;
     box-sizing: border-box;
-    border: 1px solid color-mix(in srgb, var(--bg-light) 65%, transparent);
+    border: 1px solid rgba(148, 163, 184, 0.28);
     border-radius: 8px;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     color: var(--text-primary);
-    background: color-mix(in hsl, var(--bg-dark) 72%, var(--bg) 28%);
-    transition: all 0.2s;
+    background: rgba(15, 23, 42, 0.42);
+    outline: none;
+    transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .management-search-wrapper input[type="text"]:focus {
     outline: none;
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
 }
 
 .management-filter select {
-    padding: 0.5rem 1rem;
+    padding: 0 0.65rem;
     border-radius: 8px;
     font-size: 0.875rem;
-    background: white;
+    background: rgba(15, 23, 42, 0.42);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -75,6 +124,39 @@
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.management-report-button {
+    height: 36px;
+    padding: 0 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    color: white;
+    background: #2563eb;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.management-report-button:hover:not(:disabled) {
+    background: #1d4ed8;
+    border-color: #60a5fa;
+}
+
+.management-report-button:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+}
+
+.management-report-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .management-table-wrapper {
@@ -115,6 +197,32 @@
 .management-table-wrapper tbody tr:hover {
     background-color: color-mix(in hsl, var(--bg) 50%, var(--bg-light) 50%);
     transition: background-color 0.15s;
+}
+
+.job-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 150px;
+}
+
+.job-progress-bar {
+    flex: 1;
+}
+
+.job-progress-value {
+    min-width: 3ch;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.job-remaining-time {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .management-table-wrapper th button {

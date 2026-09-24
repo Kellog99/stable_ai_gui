@@ -3,6 +3,12 @@
     flex-direction: column;
     height: auto;
     min-height: 100%;
+    padding: 0.75rem 1.25rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .body {
@@ -45,20 +51,20 @@
     display: flex;
     flex-direction: column;
     background-color: color-mix(in hsl,
-            var(--bg-dark) 20%,
-            var(--bg) 80%);
-    ;
+    var(--bg-dark) 20%,
+    var(--bg) 80%);;
     padding: 15px;
     border-radius: 20px;
 }
+
 .input_style {
     width: 100%;
     box-sizing: border-box;
     border-radius: 10px;
     border: 1px solid #444;
     background-color: color-mix(in hsl,
-            var(--bg-dark) 50%,
-            var(--bg) 50%);
+    var(--bg-dark) 50%,
+    var(--bg) 50%);
     color: lightgray;
     font-size: 0.85rem;
     padding: 8px 10px;
