@@ -115,8 +115,8 @@ const MetricsCard: React.FC<{ items: MetricCardItem[] }> = ({items}) => {
 
     return (
         <div className="metrics-cards-grid">
-            {values.map(item => <ValueCard {...item}/>)}
-            {charts.map(item => <ChartCard {...item}/>)}
+            {values.map(({key, ...props}: MetricCardItem) => <ValueCard key={key} {...props}/>)}
+            {charts.map(({key, ...props}: ChartItem) => <ChartCard key={key} {...props}/>)}
         </div>
     );
 };
