@@ -12,7 +12,7 @@ import useNNTrustStore from '@/store/nnTrustStore';
 import {BrickWallFireIcon} from 'lucide-react';
 import React, {useMemo, useState} from 'react';
 import {handleClick} from './handle_execution';
-import styles from './page.module.css';
+import styles from '@/styles/benchmark.module.css';
 
 const Benchmark: React.FC = () => {
     const {
