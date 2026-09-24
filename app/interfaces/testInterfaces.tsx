@@ -25,6 +25,20 @@ export interface BubbleInterface {
     sender: "user" | "model";
     msg: string;
     score?: number;
+    /** Attacker's stated escalation rationale for this step (tree attacks). */
+    improvement?: string;
+    /** Escalation round the turn belongs to, 1-based (tree attacks). */
+    depth?: number;
+}
+
+/** A single turn as emitted by the backend. `improvement` and `depth` are only
+ *  produced by tree-shaped attacks (e.g. Tree-Crescendo). */
+export interface JailbreakTurn {
+    role: string;
+    content: string;
+    score?: number;
+    improvement?: string;
+    depth?: number;
 }
 
 export interface JailbreakAttackOutput {
@@ -33,7 +47,16 @@ export interface JailbreakAttackOutput {
     best_prompt: string;
     best_response: string;
     best_score: number;
-    history: { role: string; content: string; score?: number }[];
-    conversations: { role: string; content: string; score?: number }[][];
+    history: JailbreakTurn[];
+    conversations: JailbreakTurn[][];
     metadata: { [key: string]: any };
+}
+
+export interface JailbreakHistoryEntry {
+    id: string;
+    goal: string;
+    success: boolean;
+    best_score?: number;
+    n_attempts: number;
+    saved_at: string;
 }

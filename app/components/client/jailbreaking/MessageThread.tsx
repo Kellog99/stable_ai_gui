@@ -3,7 +3,9 @@ import Bubble from "./Bubble";
 import { BubbleInterface } from "@/interfaces/testInterfaces";
 import './MessageThread.css'
 import Conversations from "./Conversations";
-import { Bot, Check, Flame, X } from "lucide-react";
+import AttackTree from "./AttackTree";
+import { isTreeAttack } from "./attackTree";
+import { Bot, Check, Flame, GitBranch, MessagesSquare, X } from "lucide-react";
 
 interface MessageThreadProps {
     goal?: string;
@@ -14,6 +16,9 @@ interface MessageThreadProps {
     success?: boolean;
     bestScore?: number;
     metadata?: Record<string, unknown>;
+    /** Attack that produced these results; decides whether the escalation
+     *  tree view is offered (Tree-Crescendo). */
+    attackId?: string;
 }
 
 /** Number of attempts = number of conversations (each chat is one attempt). */
@@ -48,10 +53,13 @@ export default function MessageThread({
     fullHistory,
     success,
     bestScore,
-    metadata
+    metadata,
+    attackId
 }: MessageThreadProps) {
     const [expanded, setExpanded] = useState<boolean>(false);
     const [isMounted, setIsMounted] = useState(false);
+    // Tree-shaped attacks open on the tree; the flat chat list stays available.
+    const [historyView, setHistoryView] = useState<"tree" | "chats">("tree");
 
     useEffect(() => {
         setIsMounted(true);
@@ -61,6 +69,7 @@ export default function MessageThread({
     const loading = !!(goal && !adversarialPrompt && !modelResponse);
     const attempts = extractAttempts(conversationChat);
     const duration = extractDuration(metadata);
+    const treeAvailable = isTreeAttack(attackId) && (conversationChat?.length ?? 0) > 0;
 
     if (!isMounted) return <div className="screen" />;
     if (!goal) return <div className="screen" />
@@ -111,10 +120,40 @@ export default function MessageThread({
                         </button>
                     )}
 
+                    {expanded && treeAvailable && (
+                        <div className="history-view-switch" role="tablist">
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={historyView === "tree"}
+                                className={`history-view-switch__option ${historyView === "tree" ? "active" : ""}`}
+                                onClick={() => setHistoryView("tree")}
+                            >
+                                <GitBranch size={13} /> Tree
+                            </button>
+                            <button
+                                type="button"
+                                role="tab"
+                                aria-selected={historyView === "chats"}
+                                className={`history-view-switch__option ${historyView === "chats" ? "active" : ""}`}
+                                onClick={() => setHistoryView("chats")}
+                            >
+                                <MessagesSquare size={13} /> Conversations
+                            </button>
+                        </div>
+                    )}
+
                     {expanded ? (
-                        <Conversations
-                            conversationChat={conversationChat ?? []}
-                        />
+                        treeAvailable && historyView === "tree" ? (
+                            <AttackTree
+                                conversationChat={conversationChat ?? []}
+                                goal={goal}
+                            />
+                        ) : (
+                            <Conversations
+                                conversationChat={conversationChat ?? []}
+                            />
+                        )
                     ) : (
                         <div className="results-card">
                             <div className="results-card__body">
