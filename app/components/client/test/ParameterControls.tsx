@@ -1,8 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef } from 'react';
 import { ParametersProps } from '@/interfaces/NNInterfaces';
 import './test.css';
+
+// Range inputs and the numeric callback require bounded numeric parameters.
+type NumericParameter = ParametersProps & {
+  default: number;
+  min: number;
+  max: number;
+  kind?: 'number';
+};
+
 interface ParameterControlsProps {
-  parameters?: ParametersProps[],
+  parameters?: NumericParameter[],
   handleChange: (index: number, value: number) => void;
 }
 
@@ -10,18 +19,18 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
   parameters,
   handleChange,
 }) => {
-  console.log(typeof parameters)
+  const defaultValues = useRef<number[] | null>(null);
+  if (defaultValues.current === null && parameters?.length) {
+    defaultValues.current = parameters.map((parameter) => parameter.default);
+  }
+
   if (!parameters) {
     return <>No Parameters to manually set.</>
   }
-  const [defaultValues, setDefaultValues] = useState<number[]>([])
-  useEffect(() => {
-    setDefaultValues(parameters.length > 0 ? parameters.map((parameter) => parameter.default) : [])
-  }, [])
 
 
   const handleReset = () => {
-    defaultValues.map((val, index) => {
+    defaultValues.current?.forEach((val, index) => {
       handleChange(index, val)
     })
   }
@@ -66,4 +75,3 @@ export const ParameterControls: React.FC<ParameterControlsProps> = ({
     </div>
   );
 };
-

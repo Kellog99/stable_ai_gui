@@ -48,6 +48,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                 if (p.default !== undefined && p.default !== null) return p.default;
                 if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
                 if (p.kind === 'enum') return p.options?.[0] ?? '';
+                if (p.kind === 'string') return '';
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
                 return 0;
@@ -56,6 +57,7 @@ const ParametersWindow: React.FC<ParametersWindowProps> = ({
                 if (p.default !== undefined && p.default !== null) return p.default;
                 if (p.kind === 'boolean' || typeof p.default === 'boolean') return false;
                 if (p.kind === 'enum') return p.options?.[0] ?? '';
+                if (p.kind === 'string') return '';
                 if (p.max != null && p.min != null) return (p.max + p.min) / 2;
                 if (p.min != null) return p.min;
                 return 0;

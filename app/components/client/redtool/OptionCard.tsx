@@ -29,8 +29,7 @@ export function OptionCard({
 
   const [openSettings, setIsExpanded] = useState(false);
 
-  const model = useNNStore((state) => state.models);
-  const numClasses = model?.filter((m) => m.name === useNNStore((state) => state.modelName))[0].num_classes as number
+  const numClasses = useNNStore((state) => state.model?.num_classes) ?? 0;
 
   let isCM = false;
   if (numClasses > 100 && name == "confusionmatrix") {
