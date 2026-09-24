@@ -1,74 +1,139 @@
-# Trustworty GUI
-This repository represent the Application for testing the worthyness of a dataset and a Deep Learning model.
+# Stable-AI GUI
 
-## Initialization 
-If this is the first time this project is run, then run the following code for installing all the `npm` modules:
+A Next.js, React, and TypeScript frontend for selecting models and datasets, running red-team tests and benchmarks, and
+viewing security reports. Shared state is managed with Zustand.
+
+## Table of contents
+
+- [Getting started](#getting-started)
+- [Pages](#pages)
+- [Main models](#main-models)
+- [Zustand stores](#zustand-stores)
+- [Backend calls](#backend-calls)
+
+## Getting started
+
 ```bash
+# Install all the modules that are needed
 npm install
+
+# eventually, if something goes wrong
+npm audit fix --force
+
+# run the application
+npm run dev
 ```
 
-## Organization
-The files' organization for this application follows this organization:
+Open `http://localhost:3000`. Run the backend separately; its default address is `http://localhost:8000`. Host, port,
+and execution device can be changed through the global settings modal. For production, run `npm run build`, then
+`npm start`.
 
-* **Tasks**: this folder container all the possible actions that can be done with a model and a dataset.
-  * **Red Tool**: Contains all the element for testing an AI model.
-      * **Benchmark**: it executes the benchmark for a specified *(dataset, model)* by executing a series of indepedent jobs. The output is a `JSON` file that is automatically shown in the `Report` page.
-      * **Test**: it executes a vulnerability on a given model previously loaded and input image which is loaded by the user in that page.
-  * **Data Analysis**: it tests all the metrics for analyzing a dataset.
-    * **actions**
-    * **dataset**
-    * **embeddings**
-    * **metrics**
-    * **prototypes**
-* **Report**: this page is dedicated to handle all the reports that have been produced by the application and all the reports that have been stored. Moreover, it has the possibility to print the model's report in a pdf.
-  * **TITANNReport**: this pages is dedicated to the creation of the web page of the titann's report.
-  *  **DataQualityReport**: this pages is dedicated to the creation of the web page of the dq's report.
+## Pages
 
-## Information
-All the application is based on the following 3 interfaces that describe all the files that are stored and the model and the dataset that could be loaded in the application.
+Routes follow the Next.js App Router structure under [app](app).
 
-```javascript
-interface Info{
-  id: string                        // id for the file identification.
-  name: string,                     // File's name, ex. "Resnet50" or "Imagenette".
-  image?: string | null,            // an image that represents the file.
-  task: string,                     // task associated with, i.e. classification, detection, etc.
-  domain: string,                   // Domain of the file, i.e. RGB, ultraviolet, etc.
-  classes?: number,                 // number of classes in the output.
-  weights?: number,                 // Size of the file.
-  description?: string,             // description of the file.
-  input_dimensionality: number[]    // dimensionality of each input or domain's dimensionality.
-}
+| Page            | Route                                              | Description                                                                                       |
+|-----------------|----------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| Home            | `/`                                                | Browse, filter, refresh, and select models and datasets from backend repositories.                |
+| Testing lab     | `/pages/redteam/test`                              | Placeholder introduction to attack testing.                                                       |
+| Evasion         | `/pages/redteam/test/evasion`                      | Attack an uploaded image; compare predictions, confidence, and perturbations.                     |
+| Privacy         | `/pages/redteam/test/privacy`                      | Membership inference, property inference, reconstruction, and model inversion tests.              |
+| Privacy alias   | `/tasks/redteam/test/privacy`                      | Renders the same Privacy page.                                                                    |
+| Jailbreak       | `/pages/redteam/test/jailbreak`                    | Configure language-model attacks and attacker/judge models; inspect conversations and saved runs. |
+| Benchmark       | `/pages/redteam/benchmark`                         | Run selected attacks on a model/dataset pair and monitor job progress.                            |
+| Reports         | `/pages/report`                                    | Browse stored model reports and open a security report.                                           |
+| Security report | `/pages/report/reportTITANN`                       | View metrics, benchmark comparisons, vulnerabilities, and export a PDF.                           |
+| Attack details  | `/pages/report/reportTITANN/AttackPage?atkId=<id>` | Inspect metrics and parameters for an attack in the selected report.                              |
 
-// Model's information
-interface ModelInfo extends Info{
-  dataset: string,                  // Dataset where the model had been optimized on 
-  parameters: string | null,        // Number of the models' parameters
-}
+Report detail pages require a report selected in the current app state. Global settings is a modal. Data Quality
+navigation is commented out and has no page implementation.
 
-// Dataset's information
-interface DatasetInfo extends Info{
-  num_sample: number,               // Number of samples, i.e. length of the dataset
-}
-```
+## Main models
 
-## Report
-This page is dedicated to show the report of the two modules present here:
-1. `TITANN`
-2. `Data Quality`
+The main TypeScript data models live in [app/interfaces](app/interfaces).
 
-### TITANN Report
-The part dedicated to show the report. The functionalities that are executed is based on two steps:
-1. The **leaderboard**: execute a backend call with the following parameters:`(metric_name, task, dataset)`. Where:
-   * `metric_name`: it is a unique string identifying the metric that creates the leaderboard. 
-     * **Type** = string
-     * **Default** = the first metric that can be extracted.
+| Model                                                                                 | Purpose                                                                                             | Definition                                                                |
+|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| `InfoProps`                                                                           | Shared ID, name, task, domain, input dimensions, and optional metadata.                             | [homePageInterface.tsx](app/interfaces/homePageInterface.tsx)             |
+| `ModelInfo`, `Transformation`                                                         | Model metadata, training dataset, parameter count, provider/type, and preprocessing.                | [homePageInterface.tsx](app/interfaces/homePageInterface.tsx)             |
+| `DatasetInfo`                                                                         | Shared metadata plus the dataset's `num_samples`.                                                   | [homePageInterface.tsx](app/interfaces/homePageInterface.tsx)             |
+| `RegisterObjectProps`, `ParametersProps`                                              | Registered attacks/metrics, supported tasks, and configurable parameters.                           | [NNInterfaces.tsx](app/interfaces/NNInterfaces.tsx)                       |
+| `JobResult`, `AttackStatus`                                                           | Benchmark progress, results, timings, errors, and status: pending, in progress, finished, or error. | [NNInterfaces.tsx](app/interfaces/NNInterfaces.tsx)                       |
+| `ModelReportProps`, `ReportAttackProps`, `BenchmarkDataProps`                         | Model reports, per-attack metrics/parameters, and benchmark comparisons.                            | [reportInterfaces.tsx](app/interfaces/reportInterfaces.tsx)               |
+| `SingleAttackInput`, `SingleAttackProps`                                              | Evasion requests and results: adversarial images, predictions, and confidence.                      | [testInterfaces.tsx](app/interfaces/testInterfaces.tsx)                   |
+| `JailbreakAttackOutput`, `JailbreakTurn`, `BubbleInterface`, `JailbreakHistoryEntry`  | Jailbreak results, conversation turns, displayed messages, and saved-run summaries.                 | [testInterfaces.tsx](app/interfaces/testInterfaces.tsx)                   |
+| `PrivacyDatasetInfo`, `PrivacyModelInfo`, `PrivacyAttackOutput`, `PrivacyArtifactRef` | Privacy targets, datasets, metrics, reconstructions, and artifacts.                                 | [privacyInterfaces.tsx](app/interfaces/privacyInterfaces.tsx)             |
+| `ServerConfig`                                                                        | Backend connection, repository paths, upload limits, and worker settings.                           | [globalVariableInterface.tsx](app/interfaces/globalVariableInterface.tsx) |
 
-   * `task`: this is a list of strings (perhaps there is a better choice) representing a combination of the following strings: ‘classification’, ‘object-detection’, “segmentation”, ‘regression’. [I am also including regression because we may do this in the future. If you want to add other tasks, feel free to do so].
-     * **Type** = list
-     * **Default** = task belonging to the tested model.
+AI models come from the backend repository. The frontend's `ModelType` supports :
 
-   * `Dataset`: as with task, it represents a combination of all the various datasets on which the tool has been used. [Let's also consider the case where (task, dataset) is selected but the dataset makes no sense for that task? E.g. (segmentation, MNIST)]. 
-     * **Type** = list
-     * **Default** = all the available dataset.
-2. Il **backend** it return a dictionary that comes from the filtering of the results by task and dataset, in the following form:
+* `Ollama`
+* `Gemini`
+* `OpenRouter`
+* `HuggingFace`
+* `plain`
+* `timm`
+* `torch_script`
+* `torch_dynamo`
+* `onnx`
+* `api`
+
+Tasks are:
+
+1. `classification`,
+2. `segmentation`
+3. `detection`
+4. `language`
+
+jailbreak tests use a target model and optional attacker/judge models.
+
+## Zustand stores
+
+Components read shared state through store hooks and update it through setter actions. Persistence uses Zustand's
+`persist` middleware.
+
+| Store                                                   | State and actions                                                                                                                                                                 | Persistence                                                                                                                                                |
+|---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`useBackendVariablesStore`](app/store/globalStore.tsx) | Hostname, port, and device with individual setters. Defaults: `localhost`, `8000`, `gpu`.                                                                                         | `sessionStorage`, key `app-storage-global`; only hostname and port persist.                                                                                |
+| [`useNNTrustStore`](app/store/nnTrustStore.tsx)         | Selected model/dataset, repository lists, attack/metric registries, selected attacks, benchmark state, and selected report.                                                       | `localStorage`, key `app-storage-models`; persists selections, lists, and registries. Benchmark execution state and the selected report are not persisted. |
+| [`useJailbreakStore`](app/store/jailbreakStore.ts)      | Prompt, goal, attack parameters, attacker/judge models, conversations, results, execution flag, and backend startup ID. `setResults` updates results; `clearResults` resets them. | `localStorage`, key `app-storage-jailbreak-v6`; all serializable state persists.                                                                           |
+
+The NNTrust store is explicitly rehydrated after the root layout mounts. The Jailbreak page clears stored results when
+it detects a backend restart or fails to connect.
+
+## Backend calls
+
+Paths are relative to `http://{hostname}:{port}`. Calls are implemented
+in [TITANNServices](app/functionalities/TITANNServices) and relevant pages/components. POST bodies use JSON.
+
+| Method | Endpoint                                                         | Brief description                                                                    |
+|--------|------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| GET    | `/`                                                              | Read the backend startup ID to detect restarts.                                      |
+| GET    | `/info/variables`                                                | Load server configuration.                                                           |
+| GET    | `/info/devices`                                                  | List execution devices.                                                              |
+| GET    | `/info/path?path=<path>`                                         | Check whether a server path exists.                                                  |
+| POST   | `/info/saveConfiguration`                                        | Save settings using a `new_config` object.                                           |
+| GET    | `/repository/getList?model_type=<type>&repo_path=<repository>`   | List models, datasets, or reports.                                                   |
+| POST   | `/repository/upload`                                             | Upload report JSON; helper is not called by current pages.                           |
+| GET    | `/info/attacks`                                                  | Load registered attacks and parameters.                                              |
+| GET    | `/info/metrics`                                                  | Load evaluation metrics.                                                             |
+| POST   | `/test/single_attack`                                            | Run an evasion attack on an image.                                                   |
+| POST   | `/test/jailbreaking`                                             | Run a jailbreak with configured models, prompt, and attack.                          |
+| GET    | `/test/jailbreaking/history?attack_id=<id>`                      | List saved runs for an attack.                                                       |
+| GET    | `/test/jailbreaking/history/<attackId>/<entryId>`                | Load a saved jailbreak run.                                                          |
+| GET    | `/info/privacy/datasets`                                         | List privacy datasets.                                                               |
+| GET    | `/info/privacy/models`                                           | List privacy models.                                                                 |
+| POST   | `/privacy/run?device=<device>`                                   | Start a privacy job; device is `cpu` or `cuda`.                                      |
+| GET    | `/privacy/status/<jobId>`                                        | Poll privacy job status.                                                             |
+| GET    | `/privacy/result/<jobId>`                                        | Retrieve privacy metrics, metadata, and artifact references.                         |
+| GET    | `/privacy/artifact/<jobId>/<artifactId>`                         | Fetch a generated artifact for display.                                              |
+| POST   | `/job/start_benchmark`                                           | Start a benchmark for a model, dataset, and attacks.                                 |
+| GET    | `/job/getJobs?benchmark_id=<id>`                                 | Poll jobs; optional filters: `model_id`, `dataset_id`, comma-separated `attacks_id`. |
+| GET    | `/job/getReport?benchmark_id=<id>&model_id=<id>&dataset_id=<id>` | Retrieve a benchmark's model report.                                                 |
+| GET    | `/job/getJobsId`                                                 | List job IDs; helper is not called by current pages.                                 |
+| GET    | `/report/benchmarks`                                             | Retrieve benchmark comparisons; optional `id` filter.                                |
+| POST   | `/report/benchmarks`                                             | Submit job configuration through the unused `startNewJob` helper.                    |
+| POST   | `/report/generate_pdf`                                           | Generate a PDF from the selected report.                                             |
+
+Saved jailbreak runs also support `DELETE /test/jailbreaking/history/<attackId>/<entryId>`. Legacy URL constants
+in [urls.ts](app/properties/urls.ts) have no current call sites and are excluded from this table.
