@@ -40,12 +40,12 @@ function Test() {
     const [attackResults, setAttackResults] = useState<AttackResults>({});
     const [showResults, setShowResults] = useState<boolean>(false);
 
-    const evasionAttacks = useMemo(() => Object.fromEntries(
-        Object.entries(attacks).filter(([, attack]) =>
-            attack.objective?.toLowerCase() === 'evasion' &&
-            (!model?.task || (attack.task && supportsTask(attack, model.task)))
-        )
-    ), [attacks, model?.task])
+    const evasionAttacks = useMemo(
+        () => Object.fromEntries(
+            Object.entries(attacks).filter(([, attack]) =>
+                attack.objective?.toLowerCase() === 'evasion'
+            )
+        ), [attacks, model?.task])
 
     useEffect(() => {
         setSelectedAttackId((currentId) =>
@@ -107,7 +107,9 @@ function Test() {
 
     // This variable tells whether the post call could be done or not
     const isReady = useMemo(() => {
-        return !!(uploadedFile && model && selectedAttack) && !isAttacking
+        return !!(uploadedFile && model && selectedAttack)
+            && (model?.task === 'classification' || model?.task === 'detection')
+            && !isAttacking
     }, [uploadedFile, model, selectedAttack, isAttacking])
 
     const handleDownloadAdversarialImage = () => {
@@ -132,106 +134,112 @@ function Test() {
                 description="Test on the loaded model single attack for a specific image."
 
             />
-            <div className={styles.grid_container}>
-                {/* Selection of the attacks */}
-                <ImageDisplay
-                    title="Select the target image"
-                    placeholder='Load an PNG or a JPG file.'
-                    imageSrc={uploadedFile}
-                    handleUpload={handleUploadFile}
-                    actionButton={
-                        <button
-                            onClick={() => {
-                                setUploadedFile(undefined)
-                            }}
-                            className={styles.action_button}
-                        >
-                            <X
-                                size={20}
-                                color="white"
-                            />
-                        </button>
-                    }
-                />
-                {/* Results */}
-                <ImageDisplay
-                    title="Original Prediction"
-                    placeholder="No image loaded"
-                    isLoading={isAttacking}
-                    imageSrc={isAttacking ? undefined : toImageDataUrl(displayedOriginalImage)}
-                />
-
-                <ImageDisplay
-                    title="Adversarial Example"
-                    placeholder="No image loaded"
-                    isLoading={isAttacking}
-                    imageSrc={isAttacking ? undefined : toImageDataUrl(displayedAdversarialImage)}
-                    actionButton={
-                        <button
-                            onClick={handleDownloadAdversarialImage}
-                            className={styles.action_button}
-                        >
-                            <Download
-                                size={20}
-                                color="white"
-                            />
-                        </button>
-                    }
-
-                />
-
-
-                <div className={styles.bottom_item}>
-                    <VulnerabilitySelection
-                        attacks={displayedAttacks}
-                        selectedAttack={selectedAttack}
-                        handleSelection={setSelectedAttackId}
-                        handleChange={handleChange}
+            <div className={styles.content_container}>
+                <div className={styles.grid_container}>
+                    {/* Selection of the attacks */}
+                    <ImageDisplay
+                        title="Select the target image"
+                        placeholder='Load an PNG or a JPG file.'
+                        imageSrc={uploadedFile}
+                        handleUpload={handleUploadFile}
+                        actionButton={
+                            <button
+                                onClick={() => {
+                                    setUploadedFile(undefined)
+                                }}
+                                className={styles.action_button}
+                            >
+                                <X
+                                    size={20}
+                                    color="white"
+                                />
+                            </button>
+                        }
                     />
-                </div>
-                <div className={styles.exec_container}>
-                    {/* Execute button */}
-                    <button
-                        className={`${styles.vulnerability_button} ${styles.execution_button} ${!isReady ? styles.inactive : ""}`}
-                        onClick={() => {
-                            handlePostRequest({
-                                url: `http://${hostname}:${port}/test/single_attack`,
-                                file: uploadedFile,
-                                model: model,
-                                attack: selectedAttack,
-                                device: device,
-                                isAttacking: isAttacking,
-                                setAdvImg: setAdvImg,
-                                setAdvPert: setAdvPert,
-                                setAttackResults: setAttackResults,
-                                setIsAttacking: setIsAttacking
-                            })
-                        }}
-                        disabled={!isReady}
-                    >
-                        <Play color='white'/>
-                    </button>
+                    {/* Results */}
+                    <ImageDisplay
+                        title="Original Prediction"
+                        placeholder="No image loaded"
+                        isLoading={isAttacking}
+                        imageSrc={isAttacking ? undefined : toImageDataUrl(displayedOriginalImage)}
+                    />
 
-                    <button
-                        className={`${styles.vulnerability_button} ${styles.results_button} ${Object.keys(attackResults).length > 0 ? "" : styles.inactive}`}
-                        disabled={Object.keys(attackResults).length === 0}
-                        onClick={() => {
-                            setShowResults(!showResults)
-                        }}
-                    >
-                        <ChartColumn color='white'/>
-                    </button>
+                    <ImageDisplay
+                        title="Adversarial Example"
+                        placeholder="No image loaded"
+                        isLoading={isAttacking}
+                        imageSrc={isAttacking ? undefined : toImageDataUrl(displayedAdversarialImage)}
+                        actionButton={
+                            <button
+                                onClick={handleDownloadAdversarialImage}
+                                className={styles.action_button}
+                            >
+                                <Download
+                                    size={20}
+                                    color="white"
+                                />
+                            </button>
+                        }
+
+                    />
+
+
+                    <div className={styles.bottom_item}>
+                        <VulnerabilitySelection
+                            attacks={displayedAttacks}
+                            selectedAttack={selectedAttack}
+                            handleSelection={setSelectedAttackId}
+                            handleChange={handleChange}
+                        />
+                    </div>
+                    <div className={styles.exec_container}>
+                        {/* Execute button */}
+                        <button
+                            aria-label="Run attack"
+                            className={`${styles.vulnerability_button} ${styles.execution_button} ${!isReady ? styles.inactive : ""}`}
+                            disabled={!isReady}
+                            onClick={() => {
+                                handlePostRequest({
+                                    url: `http://${hostname}:${port}/test/single_attack`,
+                                    file: uploadedFile,
+                                    model: model,
+                                    attack: selectedAttack,
+                                    device: device,
+                                    isAttacking: isAttacking,
+                                    setAdvImg: setAdvImg,
+                                    setAdvPert: setAdvPert,
+                                    setAttackResults: setAttackResults,
+                                    setIsAttacking: setIsAttacking
+                                })
+                            }}
+                        >
+                            <Play color='white'/>
+                        </button>
+
+                        <button
+                            aria-label={showResults ? 'Hide attack details' : 'Show attack details'}
+                            aria-expanded={showResults}
+                            aria-controls="evasion-attack-details"
+                            className={`${styles.vulnerability_button} ${styles.results_button} ${Object.keys(attackResults).length > 0 ? "" : styles.inactive}`}
+                            disabled={Object.keys(attackResults).length === 0}
+                            onClick={() => {
+                                setShowResults((visible) => !visible)
+                            }}
+                        >
+                            <ChartColumn color='white'/>
+                        </button>
+                    </div>
                 </div>
+                {showResults ? (
+                    <div id="evasion-attack-details" role="region" aria-label="Attack details" className={styles.results_container}>
+                        <AttackVisualization
+                            prediction={isObjectDetection ? undefined : attackResults.prediction}
+                            confidence={attackResults.confidence}
+                            results={attackResults.metrics}
+                            parameters={attackResults.parameters}/>
+                    </div>
+                ) : null}
             </div>
-            {showResults ? (
-                <div className={styles.results_container}>
-                    <AttackVisualization
-                        prediction={isObjectDetection ? undefined : attackResults.prediction}
-                        confidence={attackResults.confidence}
-                        results={attackResults.metrics}
-                        parameters={attackResults.parameters}/>
-                </div>
-            ) : null}
         </div>
     );
 }

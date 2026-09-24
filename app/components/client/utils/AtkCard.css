@@ -4,9 +4,8 @@
     box-sizing: border-box;
     min-width: 0;
     overflow: hidden;
-    height: 100%;
-    min-height: 80px;
-    max-height: 90px;
+    height: 80px;
+    aspect-ratio: 3.14;
     padding: 0.7rem 0.75rem;
     align-content: center;
     align-items: center;
@@ -23,6 +22,10 @@
     border-color: rgba(6, 182, 212, 0.48);
     background-color: rgba(51, 65, 85, 0.5);
     transform: translateY(-1px);
+}
+
+.atk-card--objective {
+    max-height: none;
 }
 
 .atk-card.active {
@@ -86,6 +89,19 @@
 .category_privacy {
     background-color: rgba(168, 85, 247, 0.18);
     color: rgb(216, 180, 254);
+}
+
+.objective_badge {
+    max-width: 100%;
+    padding: 0.16rem 0.4rem;
+    border-radius: 999px;
+    background-color: rgba(59, 130, 246, 0.18);
+    color: rgb(147, 197, 253);
+    font-size: 0.62rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .category_evasion {

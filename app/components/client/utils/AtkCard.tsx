@@ -12,6 +12,7 @@ export interface AttackCardProps {
     description: string,
     knowledge?: string,
     category?: string,
+    objective?: string,
     isActive: boolean,
     parameters: ParametersProps[],
     handleClick: () => void;
@@ -28,6 +29,7 @@ export interface AttackCardProps {
  * @param props.description - Description shown in the information tooltip.
  * @param props.knowledge - Optional attack knowledge level.
  * @param props.category - Optional attack category.
+ * @param props.objective - Optional attack objective.
  * @param props.isActive - Whether this attack is currently selected.
  * @param props.parameters - Parameter definitions passed to the settings dialog.
  * @param props.handleClick - Selects this attack.
@@ -41,6 +43,7 @@ const AttackCard: React.FC<AttackCardProps> = (
         description,
         knowledge,
         category,
+        objective,
         parameters,
         handleClick,
         handleParametersChange
@@ -50,7 +53,7 @@ const AttackCard: React.FC<AttackCardProps> = (
 
     const handleSettingsClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        handleClick();
+        if (!isActive) handleClick();
         setIsClicked(true);
     }
     return (
@@ -58,16 +61,19 @@ const AttackCard: React.FC<AttackCardProps> = (
             key={id}
             role='button'
             onClick={handleClick}
-            className={`atk-card ${isActive ? 'active' : ''}`}
+            className={`atk-card ${isActive ? 'active' : ''} ${objective ? 'atk-card--objective' : ''}`}
         >
             <div
-                className={`title_container ${category || knowledge ? 'has_metadata' : 'no_metadata'}`}
+                className={`title_container ${category || knowledge || objective ? 'has_metadata' : 'no_metadata'}`}
             >
                 <span className="attack_title">{title}</span>
-                {(category || knowledge) && <div className="attack_metadata">
+                {(category || knowledge || objective) && <div className="attack_metadata">
                     {category && <span
                         className={`category_badge category_${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{category}</span>}
                     {knowledge && (<div className='knowledge_container'>{knowledge}</div>)}
+                    {objective && <span className="objective_badge" title={`Objective: ${objective}`}>
+                        {objective.replace(/_/g, ' ')}
+                    </span>}
                 </div>}
             </div>
             <div className="icons_container">

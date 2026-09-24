@@ -129,12 +129,13 @@ export const AttackVisualization: React.FC<AttackVisualizationProps> = (
         parameters
     }) => {
     if (!prediction && !results && !confidence && !parameters?.length) return <EmptyState/>;
+    //{confidence ? <ConfidenceChart confidence={confidence}/> : null}
     return (
         <div className="statistics-container">
             {parameters?.length ? <AttackParameters parameters={parameters}/> : null}
             {prediction ? <PredictionSummary prediction={prediction}/> : null}
             {results ? <MetricsTable results={results}/> : null}
-            {confidence ? <ConfidenceChart confidence={confidence}/> : null}
+
         </div>
     );
 };

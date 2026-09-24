@@ -70,7 +70,12 @@ const Benchmark: React.FC = () => {
                 <VulnerabilitySelection
                     attacks={compatibleAttacks}
                     showAttackCategories
+                    showObjectives
                     selectedAttacks={selectedAttacks}
+                    onSelectDisplayed={(displayedAttacks) => {
+                        setSelectedAttacks(current => ({...displayedAttacks, ...current}));
+                    }}
+                    onClearSelection={() => setSelectedAttacks({})}
                     handleSelection={
                         (
                             id: string,
