@@ -2,7 +2,7 @@
 
 import FileSelectionPanel from '@/components/client/repository/FileSelectionPanel';
 import styles from '@/styles/HomePage.module.css';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import {getAttacksList, getCoreElements, getMetricsList} from './functionalities/TITANNServices/get_info';
 import useNNTrustStore from '@/store/nnTrustStore';
@@ -47,33 +47,38 @@ export default function HomePage() {
             .catch(err => console.error("Failed to load attacks:", err));
     }, [setAttacks, hostname, port]);
 
-    // ################## Models' list ##################
-    useEffect(() => {
-        if (listModels !== null) return;
+    const handleRefresh = useCallback((repositoryType: "model" | "dataset") => {
+        const repository = repositoryType === "model"
+            ? "path_model_repo"
+            : "path_ds_repo";
 
         getCoreElements(
             hostname,
             port,
-            "path_model_repo",
-            "model"
+            repository,
+            repositoryType
         )
-            .then((listModels) => setListModels(listModels as ModelInfo[]))
-            .catch(err => console.error("Failed to load models:", err));
-    }, [hostname, port, listModels, setListModels]);
+            .then((elements) => {
+                if (repositoryType === "model") {
+                    setListModels(elements as ModelInfo[]);
+                } else {
+                    setListDatasets(elements as DatasetInfo[]);
+                }
+            })
+            .catch(err => console.error(`Failed to refresh ${repositoryType}s:`, err));
+    }, [hostname, port, setListDatasets, setListModels]);
+
+    // ################## Models' list ##################
+    useEffect(() => {
+        if (listModels !== null) return;
+        handleRefresh("model");
+    }, [hostname, port, listModels, setListModels, handleRefresh]);
 
     // ################## Datasets' list ##################
     useEffect(() => {
         if (listDatasets !== null) return;
-
-        getCoreElements(
-            hostname,
-            port,
-            "path_ds_repo",
-            "dataset"
-        )
-            .then((listDatasets) => setListDatasets(listDatasets as DatasetInfo[]))
-            .catch(err => console.error("Failed to load datasets:", err));
-    }, [hostname, port, listDatasets, setListDatasets]);
+        handleRefresh("dataset");
+    }, [hostname, port, listDatasets, setListDatasets, handleRefresh]);
 
 
     // ################## Selection handler ##################
@@ -106,29 +111,29 @@ export default function HomePage() {
 
             <div className={styles.upload_container}>
                 {/* Model selection */}
-                    <FileSelectionPanel
-                        key="model_loader"
-                        title="Model"
-                        description="Drag and drop your model or choose an existing model."
-                        elements={listModels ?? []}
-                        Icon={Brain}
-                        fileDropInformation={infoModel}
-                        handleSelection={createToggleHandler(setModel, model)}
-                        handleRefresh={() => setListModels(null)}
-                        repositoryType="model"
-                    />
+                <FileSelectionPanel
+                    key="model_loader"
+                    title="Model"
+                    description="Drag and drop your model or choose an existing model."
+                    elements={listModels ?? []}
+                    Icon={Brain}
+                    fileDropInformation={infoModel}
+                    handleSelection={createToggleHandler(setModel, model)}
+                    handleRefresh={() => handleRefresh("model")}
+                    repositoryType="model"
+                />
 
-                    <FileSelectionPanel
-                        key="dataset_loader"
-                        title="Dataset"
-                        description="Load your dataset or choose an existing dataset."
-                        elements={listDatasets ?? []}
-                        Icon={DatabaseIcon}
-                        fileDropInformation={infoDataset}
-                        handleSelection={createToggleHandler(setDataset, dataset)}
-                        handleRefresh={() => setListDatasets(null)}
-                        repositoryType="dataset"
-                    />
+                <FileSelectionPanel
+                    key="dataset_loader"
+                    title="Dataset"
+                    description="Load your dataset or choose an existing dataset."
+                    elements={listDatasets ?? []}
+                    Icon={DatabaseIcon}
+                    fileDropInformation={infoDataset}
+                    handleSelection={createToggleHandler(setDataset, dataset)}
+                    handleRefresh={() => handleRefresh("dataset")}
+                    repositoryType="dataset"
+                />
             </div>
         </div>
     );

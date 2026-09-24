@@ -11,7 +11,7 @@ import useBackendVariablesStore from '@/store/globalStore';
 import useNNTrustStore from '@/store/nnTrustStore';
 import styles from '@/styles/Benchmark.module.css';
 import {handleClick} from './handle_execution';
-
+import {updateParameterDefaults, updateSelectedObjects} from '@/lib/utils';
 
 const Benchmark: React.FC = () => {
     // ######################## stored Variables ########################
@@ -40,32 +40,7 @@ const Benchmark: React.FC = () => {
     if (numClasses > 100 && "confusionmatrix" in modifiedSelectedElement) {
         delete modifiedSelectedElement.confusionmatrix;
     }
-
-    // Handler for the element's
-    const handleSelectionClick = (
-        id: string,
-        map: { [key: string]: RegisterObjectProps },
-        setMap: (map: { [key: string]: RegisterObjectProps }) => void,
-        completeList: { [key: string]: RegisterObjectProps },
-        visibleList: { [key: string]: RegisterObjectProps } = completeList
-    ) => {
-
-        if (id === 'all') {
-            setMap({...map, ...visibleList})
-        } else if (id === 'none') {
-            const visibleIds = new Set(Object.keys(visibleList));
-            setMap(Object.fromEntries(Object.entries(map).filter(([visibleId]) => !visibleIds.has(visibleId))))
-        } else {
-            const copiedMap = {...map};
-
-            if (id in copiedMap) {
-                delete copiedMap[id]
-            } else {
-                copiedMap[id] = completeList[id]
-            }
-            setMap(copiedMap)
-        }
-    };
+    const selectedMetricCount = Object.keys(modifiedSelectedElement).length;
 
     // handler for changing the parameters
     const handleParametersChange = (
@@ -75,15 +50,15 @@ const Benchmark: React.FC = () => {
         registeredObject: { [key: string]: RegisterObjectProps },
     ) => {
 
-        const currentMap: { [key: string]: RegisterObjectProps } = {...registeredObject};
-        const currentObject = currentMap[id];
+        const currentObject = registeredObject[id];
         if (currentObject && currentObject.parameters) {
-            currentObject.parameters.map((param, index) => {
-                param.default = parameters[index]
-            })
-
-            currentMap[id] = currentObject;
-            setMap(currentMap);
+            setMap({
+                ...registeredObject,
+                [id]: {
+                    ...currentObject,
+                    parameters: updateParameterDefaults(currentObject.parameters, parameters),
+                },
+            });
         }
     }
 
@@ -100,6 +75,9 @@ const Benchmark: React.FC = () => {
         } else if (Object.keys(attacks).length === 0) {
             setExecuteBenchmark(false)
             setDescription("No attacks are available for the execution.")
+        } else if (selectedMetricCount === 0) {
+            setExecuteBenchmark(false)
+            setDescription("At least one benchmark metric must be selected.")
         } else {
             setExecuteBenchmark(Object.keys(selectedAttacks).length > 0)
 
@@ -110,7 +88,7 @@ const Benchmark: React.FC = () => {
             }
         }
 
-    }, [attacks, dataset, selectedAttacks])
+    }, [attacks, dataset, selectedAttacks, selectedMetricCount])
 
     // Click Execution Attack Handle
     const [isClicked, setIsClicked] = useState<boolean>(false)
@@ -176,7 +154,7 @@ const Benchmark: React.FC = () => {
                 Visit the management page for checking the advancement of the experiments.
 
                 <button
-                    onClick={() => window.location.href = "/pages/tasks/redteam/management"}
+                    onClick={() => window.location.href = "/pages/redteam/management"}
                     className={styles.allert_button}
                 >
                     Go to Management Table <ChevronRight size={"var(--icon-size)"}/>
@@ -189,12 +167,8 @@ const Benchmark: React.FC = () => {
                 elements={attacks}
                 showAttackCategories
                 selectedElement={selectedAttacks}
-                handleSelection={(id: string, visibleElements) => handleSelectionClick(
-                    id,
-                    selectedAttacks,
-                    setSelectedAttacks,
-                    attacks,
-                    visibleElements
+                handleSelection={(id: string, visibleElements) => setSelectedAttacks(
+                    updateSelectedObjects(id, selectedAttacks, attacks, visibleElements)
                 )}
                 handleParametersChange={(id: string, parameters: (number | string)[]) => {
                     handleParametersChange(
@@ -211,12 +185,8 @@ const Benchmark: React.FC = () => {
                 title='Metric Selection'
                 elements={metrics}
                 selectedElement={selectedMetrics}
-                handleSelection={(id: string, visibleElements) => handleSelectionClick(
-                    id,
-                    selectedMetrics,
-                    setSelectedMetrics,
-                    metrics,
-                    visibleElements
+                handleSelection={(id: string, visibleElements) => setSelectedMetrics(
+                    updateSelectedObjects(id, selectedMetrics, metrics, visibleElements)
                 )}
                 handleParametersChange={(id: string, parameters: (number | string)[]) => {
                     handleParametersChange(id,

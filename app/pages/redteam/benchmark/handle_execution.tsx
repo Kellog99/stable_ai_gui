@@ -11,7 +11,7 @@ interface HandleBenchmarkRequestParams {
     setIsExecuting: (isExecuting: boolean) => void;
     setSelectedAttackList: (attacks: { [key: string]: RegisterObjectProps }) => void;
     selectedAttacks: { [key: string]: RegisterObjectProps };
-    setBenchmarkId: (benchmarkId: string | number) => void;
+    setBenchmarkId: (benchmarkId: string | number | null) => void;
     setIsClicked: (isClicked: boolean) => void;
 }
 
@@ -25,20 +25,6 @@ function getErrorMessage(body: string, status: number): string {
     } catch {
         return `HTTP error! status: ${status}: ${body}`;
     }
-}
-
-function getBenchmarkId(responseBody: unknown): string | number | undefined {
-    if (typeof responseBody === 'string' || typeof responseBody === 'number') {
-        return responseBody;
-    }
-
-    if (responseBody && typeof responseBody === 'object') {
-        const body = responseBody as Record<string, unknown>;
-        const id = body.id ?? body.benchmark_id ?? body.job_id;
-        if (typeof id === 'string' || typeof id === 'number') return id;
-    }
-
-    return undefined;
 }
 
 export function saveBodyToJson(
@@ -71,8 +57,9 @@ export async function handleClick(
         setBenchmarkId,
         setIsClicked,
     }: HandleBenchmarkRequestParams) {
-    if (isExecuting || !model || !dataset || attacks.length === 0) return;
+    if (isExecuting || !model || !dataset || attacks.length === 0 || metrics.length === 0) return;
 
+    setBenchmarkId(null);
     setIsExecuting(true);
     try {
         if (model || dataset) {
@@ -84,7 +71,7 @@ export async function handleClick(
             };
             console.log("model = ", model)
             console.log("dataset = ", dataset)
-            saveBodyToJson(requestBody);
+            //saveBodyToJson(requestBody);
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -96,19 +83,8 @@ export async function handleClick(
             if (!response.ok) {
                 throw new Error(getErrorMessage(responseBody, response.status));
             }
-
-            let parsedBody: unknown;
-            try {
-                parsedBody = responseBody ? JSON.parse(responseBody) : undefined;
-            } catch {
-                throw new Error('The benchmark service returned an invalid JSON response.');
-            }
-
-            const benchmarkId = getBenchmarkId(parsedBody);
-            if (benchmarkId === undefined) {
-                throw new Error('The benchmark service response did not contain a benchmark ID.');
-            }
-
+            const benchmarkId: string = JSON.parse(responseBody);
+            console.log("id = ", benchmarkId)
             setSelectedAttackList(selectedAttacks);
             setBenchmarkId(benchmarkId);
             setIsClicked(true);

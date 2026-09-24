@@ -1,3 +1,28 @@
+.settings-modal-content {
+    min-height: 400px !important;
+    border-radius: 16px !important;
+    padding: 10px !important;
+    background-color: var(--bg) !important;
+    color: white !important;
+}
+
+.settings-modal-title {
+    margin: 0 !important;
+    color: white !important;
+    font-size: 1.7rem !important;
+    font-weight: bold !important;
+}
+
+.settings-modal-header {
+    background: none !important;
+}
+
+.settings-modal-body {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+
 .settings-container {
     display: flex;
     flex-direction: column;
@@ -8,6 +33,39 @@
     width: 100%;
     padding: 10px;
     gap: 13px;
+}
+
+.settings-actions {
+    margin-top: var(--mantine-spacing-lg);
+}
+
+.settings-folder-input {
+    display: none;
+}
+
+.settings-folder-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: 0;
+    border-radius: var(--border-radius);
+    color: inherit;
+    background: transparent;
+    cursor: pointer;
+}
+
+.settings-folder-button:hover {
+    background: color-mix(in srgb, white 12%, transparent);
+}
+
+.settings-folder-button:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+.settings-input-invalid input {
+    color: var(--error) !important;
 }
 
 .settings-text {

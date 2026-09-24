@@ -1,36 +1,39 @@
-import {
-    Clock,
-    Loader,
-    CheckCircle2,
-    XCircle
-} from 'lucide-react';
+import {CheckCircle2, Clock, Loader, XCircle} from 'lucide-react';
+import type {AttackStatus} from '@/interfaces/NNInterfaces';
 
-export const statuses = ["Completed", "In Progress", "Pending", "Closed"];
+export const statusLabels = {
+    pending: 'Pending',
+    'in progress': 'In progress',
+    finished: 'Finished',
+    error: 'Error',
+} as const satisfies Record<AttackStatus, string>;
 
-export const getStatusIcon = (status: string) => {
+export const getStatusLabel = (status: AttackStatus): string => statusLabels[status];
+
+export const getStatusIcon = (status: AttackStatus) => {
     switch (status) {
-        case 'Completed':
-            return <CheckCircle2 size={20} className="status-icon completed" />;
-        case 'In Progress':
-            return <Loader size={20} className="status-icon in-progress" />;
-        case 'Pending':
-            return <Clock size={20} className="status-icon pending" />;
-        case 'Closed':
-            return <XCircle size={20} className="status-icon closed" />;
+        case 'finished':
+            return <CheckCircle2 size={20} className="status-icon completed"/>;
+        case 'in progress':
+            return <Loader size={20} className="status-icon in-progress"/>;
+        case 'pending':
+            return <Clock size={20} className="status-icon pending"/>;
+        case 'error':
+            return <XCircle size={20} className="status-icon closed"/>;
         default:
-            return <Clock size={20} className="status-icon" />;
+            return <Clock size={20} className="status-icon"/>;
     }
 };
 
-export const getStatusColor = (status: string) => {
+export const getStatusColor: (status: AttackStatus) => string = (status: AttackStatus) => {
     switch (status) {
-        case 'Completed':
+        case 'finished':
             return 'status-completed';
-        case 'In Progress':
+        case 'in progress':
             return 'status-in-progress';
-        case 'Pending':
+        case 'pending':
             return 'status-pending';
-        case 'Closed':
+        case 'error':
             return 'status-closed';
         default:
             return '';

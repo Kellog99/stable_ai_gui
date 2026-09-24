@@ -6,7 +6,10 @@ import {ConfidenceData} from '@/interfaces/testInterfaces';
 import ConfidenceChart from './ConfidenceChart';
 import './AttackVisualization.css';
 
-interface Prediction { adversarial: string; original: string; }
+interface Prediction {
+    adversarial: string;
+    original: string;
+}
 
 interface AttackVisualizationProps {
     confidence?: ConfidenceData;
@@ -41,7 +44,7 @@ const EmptyState = () => (
     </div>
 );
 
-const AttackParameters = ({parameters}: {parameters: ParametersProps[]}) => (
+const AttackParameters = ({parameters}: { parameters: ParametersProps[] }) => (
     <section className="parameters-card" aria-labelledby="attack-parameters-title">
         <div className="parameters-card-header">
             <div>
@@ -64,7 +67,7 @@ const AttackParameters = ({parameters}: {parameters: ParametersProps[]}) => (
     </section>
 );
 
-const PredictionSummary = ({prediction}: {prediction: Prediction}) => {
+const PredictionSummary = ({prediction}: { prediction: Prediction }) => {
     const succeeded = prediction.original !== prediction.adversarial;
     return (
         <section className="result-card" aria-labelledby="prediction-title">
@@ -85,7 +88,7 @@ const PredictionSummary = ({prediction}: {prediction: Prediction}) => {
     );
 };
 
-const MetricsTable = ({results}: {results: Record<string, unknown>}) => {
+const MetricsTable = ({results}: { results: Record<string, unknown> }) => {
     const metrics = Object.entries(results);
     return (
         <section className="statistics_container" aria-labelledby="statistics-title">
@@ -97,10 +100,18 @@ const MetricsTable = ({results}: {results: Record<string, unknown>}) => {
                 <div className="table-wrapper">
                     <table className="metric_table">
                         <caption className="table_caption">Computed metrics</caption>
-                        <thead><tr><th scope="col">Metric</th><th scope="col">Value</th></tr></thead>
+                        <thead>
+                        <tr>
+                            <th scope="col">Metric</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                        </thead>
                         <tbody>
                         {metrics.map(([key, value]) => (
-                            <tr key={key}><th scope="row">{formatMetricLabel(key)}</th><td>{formatMetric(key, value)}</td></tr>
+                            <tr key={key}>
+                                <th scope="row">{formatMetricLabel(key)}</th>
+                                <td>{formatMetric(key, value)}</td>
+                            </tr>
                         ))}
                         </tbody>
                     </table>
@@ -110,7 +121,13 @@ const MetricsTable = ({results}: {results: Record<string, unknown>}) => {
     );
 };
 
-export const AttackVisualization: React.FC<AttackVisualizationProps> = ({confidence, results, prediction, parameters}) => {
+export const AttackVisualization: React.FC<AttackVisualizationProps> = (
+    {
+        confidence,
+        results,
+        prediction,
+        parameters
+    }) => {
     if (!prediction && !results && !confidence && !parameters?.length) return <EmptyState/>;
     return (
         <div className="statistics-container">

@@ -18,19 +18,21 @@ interface HandlePostRequestParams {
 /*
 This function is responsible for handling the post request for the single attack.
 */
-export async function handlePostRequest({
-                                            url,
-                                            file,
-                                            model,
-                                            attack,
-                                            isAttacking,
-                                            setAdvImg,
-                                            setAdvPert,
-                                            setIsAttacking,
-                                            setAttackResults
-                                        }: HandlePostRequestParams) {
+export async function handlePostRequest(
+    {
+        url,
+        file,
+        model,
+        attack,
+        isAttacking,
+        setAdvImg,
+        setAdvPert,
+        setIsAttacking,
+        setAttackResults
+    }: HandlePostRequestParams
+): Promise<void> {
     // At this moment there could be one click at the time
-    // If an attack has been executed then the button will not be available untill the attack finishes its process. 
+    // If an attack has been executed then the button will not be available until the attack finishes its process.
     if (!!(file && model && attack && !isAttacking)) {
         setAdvImg(null)
         setAdvPert(null)

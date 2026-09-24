@@ -10,7 +10,7 @@ import { RegisterObjectProps } from '@/interfaces/NNInterfaces';
 import { PrivacyAttackOutput, PrivacyDatasetInfo, PrivacyModelInfo } from '@/interfaces/privacyInterfaces';
 import { getPrivacyJobResult, getPrivacyJobStatus, startPrivacyJob } from '@/functionalities/TITANNServices/get_info';
 import VulnerabilitySelection from '../utils/VulnerabilitySelection';
-import ModalButton from '../test/ModalButton';
+import ModalButton from '@/components/client/evasion/ModalButton';
 import PrivacyContext from './PrivacyContext';
 import PrivacyVisualization from './PrivacyVisualization';
 import './MembershipInference.css';

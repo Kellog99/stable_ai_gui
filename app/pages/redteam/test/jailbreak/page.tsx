@@ -1,21 +1,21 @@
 "use client";
 import HeaderPageTask from '@/components/client/utils/HeaderPageTask';
-import { RegisterObjectProps } from '@/interfaces/NNInterfaces'
+import {RegisterObjectProps} from '@/interfaces/NNInterfaces'
 import useBackendVariablesStore from '@/store/globalStore'
 import useNNTrustStore from '@/store/nnTrustStore'
 import useJailbreakStore from '@/store/jailbreakStore'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 import styles from '@/styles/jailbreak.module.css'
-import { Send, Shield, Target, Unlink } from 'lucide-react';
+import {Send, Target, Unlink} from 'lucide-react';
 import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelection';
 import MessageThread from '@/components/client/jailbreaking/MessageThread';
 import ModelSelector from '@/components/client/jailbreaking/ModelSelector';
-import { BubbleInterface, JailbreakAttackOutput } from '@/interfaces/testInterfaces';
+import {BubbleInterface, JailbreakAttackOutput} from '@/interfaces/testInterfaces';
 
 const Jailbreaking = () => {
     // ######################## stored Variables ########################
-    const { hostname, port } = useBackendVariablesStore()
-    const { attacks, model } = useNNTrustStore()
+    const {hostname, port} = useBackendVariablesStore()
+    const {attacks, model} = useNNTrustStore()
 
     const {
         prompt,
@@ -36,7 +36,6 @@ const Jailbreaking = () => {
         conversationChat,
         modelResponse,
         adversarialPrompt,
-        setAdversarialPrompt,
         attackSuccess,
         bestScore,
         attackMetadata,
@@ -72,7 +71,7 @@ const Jailbreaking = () => {
 
     // Helper: create a selectedAttack with saved params merged in
     const buildSelectedAttack = (attackId: string): RegisterObjectProps => {
-        const atk = { ...attacks[attackId] };
+        const atk = {...attacks[attackId]};
         const saved = savedParams[attackId];
         if (saved && atk.parameters && saved.length === atk.parameters.length) {
             atk.parameters = atk.parameters.map((param, i) => ({
@@ -107,7 +106,7 @@ const Jailbreaking = () => {
                         ...param,
                         default: saved[i] ?? param.default,
                     }));
-                    return [id, { ...atk, parameters: updatedParams }];
+                    return [id, {...atk, parameters: updatedParams}];
                 }
                 return [id, atk];
             })
@@ -125,13 +124,8 @@ const Jailbreaking = () => {
         return !!(model && prompt && prompt !== "" && selectedAttack)
     }, [model, prompt, selectedAttack])
 
-    const handleChange = (value: number[]) => {
+    const handleChange = (value: (number | string)[]) => {
         if (!selectedAttack || !selectedAttack.parameters) return;
-
-        const newParameters = selectedAttack.parameters.map((param, i) => ({
-            ...param,
-            default: value[i]
-        }));
 
         // Persist the new parameter values to store
         setSavedParams(prevSaved => ({
@@ -246,7 +240,7 @@ const Jailbreaking = () => {
             });
         };
 
-        scroller.addEventListener('scroll', onScroll, { passive: true });
+        scroller.addEventListener('scroll', onScroll, {passive: true});
         onScroll();
         const ro = new ResizeObserver(() => {
             if (topSectionRef.current) setTopSectionH(topSectionRef.current.offsetHeight);
@@ -287,11 +281,9 @@ const Jailbreaking = () => {
                     <VulnerabilitySelection
                         stretch
                         attacks={attacksWithSavedParams}
-                        selectedAttack={selectedAttack}
-                        handleSelection={(attackId) => {
-                            setSelectedAttackId(attackId)
-                        }}
-                        handleChange={(value: (string | number)[]) => handleChange(value as number[])}
+                        selectedAttack={selectedAttack ?? undefined}
+                        handleSelection={setSelectedAttackId}
+                        handleChange={handleChange}
                     />
                     <ModelSelector
                         attackerModel={attackerModel}
@@ -299,9 +291,9 @@ const Jailbreaking = () => {
                         onAttackerChange={setAttackerModel}
                         onJudgeChange={setJudgeModel}
                     />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px' }}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '6px', padding: '0 4px'}}>
                         <label className={styles.goal_label}>
-                            <Target size={16} color="rgb(187, 58, 58)" />
+                            <Target size={16} color="rgb(187, 58, 58)"/>
                             Goal
                         </label>
                         <div className={styles.prompt_container}>
@@ -313,7 +305,9 @@ const Jailbreaking = () => {
                                         handleSubmit();
                                     }
                                 }}
-                                onChange={(e) => { setPrompt(e.target.value) }}
+                                onChange={(e) => {
+                                    setPrompt(e.target.value)
+                                }}
                                 className={styles.input_style}
                                 placeholder="Insert the goal of the attack."
                             />
@@ -322,7 +316,7 @@ const Jailbreaking = () => {
                                 disabled={isClicked && !isActive}
                                 onClick={handleSubmit}
                             >
-                                <Send size={24} />
+                                <Send size={24}/>
                             </button>
                         </div>
                     </div>

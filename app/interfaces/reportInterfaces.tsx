@@ -1,4 +1,3 @@
-import Dataset from "./genericInterface";
 import { ModelInfo } from "./homePageInterface";
 import { ParametersProps } from "./NNInterfaces";
 
@@ -42,11 +41,4 @@ export interface BenchmarkDataProps {
     param: number
     task: string
     metrics: MetricsProps
-}
-
-export interface DQReportProps {
-    id: string;
-    tool: string
-    dataset: Dataset;
-    metrics: Object[];
 }

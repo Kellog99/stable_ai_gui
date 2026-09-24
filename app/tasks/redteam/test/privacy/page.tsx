@@ -1,1 +1,1 @@
-export { default } from '@/pages/tasks/redteam/test/privacy/page';
+export { default } from '@/pages/redteam/test/privacy/page';

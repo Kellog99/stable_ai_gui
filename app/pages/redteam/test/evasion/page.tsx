@@ -2,7 +2,7 @@
 
 import React, {useEffect, useMemo, useState} from 'react';
 import {ChartColumn, Download, Play, Shield, X} from 'lucide-react';
-import {ImageDisplay} from '@/components/client/test/ImageDisplay';
+import {ImageDisplay} from '@/components/client/evasion/ImageDisplay';
 import {ParametersProps, RegisterObjectProps} from '@/interfaces/NNInterfaces';
 import {ConfidenceData} from '@/interfaces/testInterfaces';
 import useNNTrustStore from '@/store/nnTrustStore';
@@ -12,7 +12,8 @@ import VulnerabilitySelection from '@/components/client/utils/VulnerabilitySelec
 import '@mantine/charts/styles.css';
 import styles from '@/styles/Evasion.module.css';
 import {handlePostRequest} from './handle_execution';
-import {AttackVisualization} from '@/components/client/test/AttackVisualization';
+import {AttackVisualization} from '@/components/client/evasion/AttackVisualization';
+import {updateParameterDefaults} from '@/lib/utils';
 
 export interface AttackResults {
     prediction?: { original: string; adversarial: string };
@@ -42,9 +43,6 @@ function Test() {
         }
     }, [attacks])
 
-    // Keep edited parameters local to this page and associate them with the
-    // attack they belong to. This prevents switching attacks from discarding
-    // unsaved-in-the-global-store edits.
     const displayedAttacks = useMemo(() => {
         return Object.fromEntries(
             Object.entries(attacks).map(([id, attack]) => [
@@ -80,10 +78,7 @@ function Test() {
     const handleChange = (value: (number | string)[]) => {
         if (!selectedAttackId || !selectedAttack?.parameters) return
 
-        const newParameters = selectedAttack.parameters.map((param, i) => ({
-            ...param,
-            default: value[i] ?? param.default
-        }))
+        const newParameters = updateParameterDefaults(selectedAttack.parameters, value)
 
         setAttackParameterOverrides((previous) => ({
             ...previous,
@@ -123,60 +118,58 @@ function Test() {
             <div className={styles.content_container}>
                 <div className={styles.grid_container}>
                     {/* Selection of the attacks */}
-                        <ImageDisplay
-                            title="Select the target image"
-                            placeholder='Load an PNG or a JPG file.'
-                            imageSrc={uploadedFile}
-                            handleUpload={handleUploadFile}
-                            actionButton={
-                                <button
-                                    onClick={() => {
-                                        setUploadedFile(undefined)
-                                    }}
-                                    className={styles.action_button}
-                                >
-                                    <X
-                                        size={20}
-                                        color="white"
-                                    />
-                                </button>
-                            }
-                        />
+                    <ImageDisplay
+                        title="Select the target image"
+                        placeholder='Load an PNG or a JPG file.'
+                        imageSrc={uploadedFile}
+                        handleUpload={handleUploadFile}
+                        actionButton={
+                            <button
+                                onClick={() => {
+                                    setUploadedFile(undefined)
+                                }}
+                                className={styles.action_button}
+                            >
+                                <X
+                                    size={20}
+                                    color="white"
+                                />
+                            </button>
+                        }
+                    />
                     {/* Results */}
-                        <ImageDisplay
-                            title="Adversarial Perturbation"
-                            placeholder="No image loaded"
-                            isLoading={isAttacking}
-                            imageSrc={advPert ? "data:image/jpeg;base64," + advPert : undefined}
-                        />
+                    <ImageDisplay
+                        title="Adversarial Perturbation"
+                        placeholder="No image loaded"
+                        isLoading={isAttacking}
+                        imageSrc={advPert ? "data:image/jpeg;base64," + advPert : undefined}
+                    />
 
-                        <ImageDisplay
-                            title="Adversarial Example"
-                            placeholder="No image loaded"
-                            isLoading={isAttacking}
-                            imageSrc={advImg ? "data:image/jpeg;base64," + advImg : undefined}
-                            actionButton={
-                                <button
-                                    onClick={handleDownloadAdversarialImage}
-                                    className={styles.action_button}
-                                >
-                                    <Download
-                                        size={20}
-                                        color="white"
-                                    />
-                                </button>
-                            }
+                    <ImageDisplay
+                        title="Adversarial Example"
+                        placeholder="No image loaded"
+                        isLoading={isAttacking}
+                        imageSrc={advImg ? "data:image/jpeg;base64," + advImg : undefined}
+                        actionButton={
+                            <button
+                                onClick={handleDownloadAdversarialImage}
+                                className={styles.action_button}
+                            >
+                                <Download
+                                    size={20}
+                                    color="white"
+                                />
+                            </button>
+                        }
 
-                        />
+                    />
 
 
                     <div className={styles.bottom_item}>
                         <VulnerabilitySelection
                             attacks={displayedAttacks}
                             selectedAttack={selectedAttack}
-                            handleSelection={(attackId) => {
-                                setSelectedAttackId(attackId)
-                            }}
+                            handleSelection={setSelectedAttackId}
                             handleChange={handleChange}
                         />
                     </div>

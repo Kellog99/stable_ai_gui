@@ -1,24 +1,13 @@
 import {
     ChartLine,
-    TestTube,
-    LucideIcon,
-    Info,
+    Fence,
     FileText,
     HatGlasses,
-    LockKeyholeOpenIcon,
     Home,
-    Fence,
-    BookCopy,
-    Bot,
-    ChartScatter,
-    CircleCheck,
-    Crop,
-    Database,
-    Eraser,
-    Ruler,
-    ShieldX,
-    SquareActivity,
-    Camera
+    Info,
+    LockKeyholeOpenIcon,
+    LucideIcon,
+    TestTube
 } from "lucide-react";
 
 
@@ -47,7 +36,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
     //             id: "dataset",
     //             title: "Dataset",
     //             Icon: Database,
-    //             href: "/pages/tasks/dataquality/datasets"
+    //             href: "/pages/dataquality/datasets"
     //         },
     //         {
     //             id: 'visualization',
@@ -57,7 +46,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
     //                 {
     //                     id: 'embeddings',
     //                     title: 'Embeddings',
-    //                     href: '/pages/tasks/dataquality/embeddings',
+    //                     href: '/pages/dataquality/embeddings',
     //                     Icon: ChartScatter,
     //                     requiresEmbeddings: true,
 
@@ -65,7 +54,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
     //                 {
     //                     id: 'prototypes',
     //                     title: 'Prototypes',
-    //                     href: '/pages/tasks/dataquality/prototypes',
+    //                     href: '/pages/dataquality/prototypes',
     //                     Icon: Bot,
     //                     requiresEmbeddings: true,
 
@@ -80,7 +69,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
     //                 {
     //                     id: 'duplicates',
     //                     title: 'Duplicates',
-    //                     href: '/pages/tasks/dataquality/metrics/duplicates',
+    //                     href: '/pages/dataquality/metrics/duplicates',
     //                     Icon: BookCopy,
     //                     requiresEmbeddings: true,
 
@@ -88,7 +77,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
     //                 {
     //                     id: 'outliers',
     //                     title: 'Outliers',
-    //                     href: '/pages/tasks/dataquality/metrics/outliers',
+    //                     href: '/pages/dataquality/metrics/outliers',
     //                     Icon: ShieldX,
     //                     requiresEmbeddings: true,
 
@@ -96,7 +85,7 @@ export const sections: { [key: string]: NavigationSection[] } = {
     //                 {
     //                     id: 'completeness',
     //                     title: 'Completeness',
-    //                     href: '/pages/tasks/dataquality/metrics/completeness',
+    //                     href: '/pages/dataquality/metrics/completeness',
     //                     Icon: CircleCheck,
     //                     requiresEmbeddings: true,
 
@@ -111,20 +100,20 @@ export const sections: { [key: string]: NavigationSection[] } = {
     //                 {
     //                     id: 'embedder',
     //                     title: 'Embedder',
-    //                     href: '/pages/tasks/dataquality/actions/embeddings',
+    //                     href: '/pages/dataquality/actions/embeddings',
     //                     Icon: ChartScatter,
     //                 },
     //                 {
     //                     id: 'cleanDuplicates',
     //                     title: 'Cleaninig',
-    //                     href: '/pages/tasks/dataquality/actions/cleanDuplicates',
+    //                     href: '/pages/dataquality/actions/cleanDuplicates',
     //                     Icon: Eraser,
     //                     requiresEmbeddings: true,
     //                 },
     //                 {
     //                     id: 'cropping',
     //                     title: 'Cropping',
-    //                     href: '/pages/tasks/dataquality/actions/cropping',
+    //                     href: '/pages/dataquality/actions/cropping',
     //                     Icon: Crop
     //                 },
     //             ],
@@ -135,25 +124,25 @@ export const sections: { [key: string]: NavigationSection[] } = {
         {
             id: 'test',
             title: 'Test',
-            href: '/pages/tasks/redteam/test',
+            href: '/pages/redteam/test',
             Icon: TestTube,
             items: [
                 {
                     id: 'evasion',
                     title: 'Evasion',
-                    href: '/pages/tasks/redteam/test/evasion',
+                    href: '/pages/redteam/test/evasion',
                     Icon: LockKeyholeOpenIcon,
                 },
                 {
                     id: 'privacy',
                     title: 'Privacy',
-                    href: '/pages/tasks/redteam/test/privacy',
+                    href: '/pages/redteam/test/privacy',
                     Icon: HatGlasses,
                 },
                 {
                     id: 'jailbreaking',
                     title: 'Jailbreak',
-                    href: '/pages/tasks/redteam/test/jailbreak',
+                    href: '/pages/redteam/test/jailbreak',
                     Icon: Fence,
                 },
 
@@ -163,13 +152,13 @@ export const sections: { [key: string]: NavigationSection[] } = {
         {
             id: 'bench',
             title: 'Benchmark',
-            href: '/pages/tasks/redteam/benchmark',
+            href: '/pages/redteam/benchmark',
             Icon: ChartLine,
         },
         {
             id: 'management',
             title: 'Jobs Info',
-            href: '/pages/tasks/redteam/management',
+            href: '/pages/redteam/management',
             Icon: Info,
         },
     ],

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { Bot, Scale, ExternalLink } from 'lucide-react';
-import { ModelInfo } from '@/interfaces/homePageInterface';
-import { getCoreElements } from '@/functionalities/TITANNServices/get_info';
+import React, {useEffect, useMemo, useState} from 'react';
+import {Bot, ExternalLink, Scale} from 'lucide-react';
+import {ModelInfo} from '@/interfaces/homePageInterface';
+import {getCoreElements} from '@/functionalities/TITANNServices/get_info';
 import useBackendVariablesStore from '@/store/globalStore';
 import './ModelSelector.css';
 
@@ -67,7 +67,7 @@ interface OllamaInputProps {
     icon: React.ReactNode;
 }
 
-const OllamaInput: React.FC<OllamaInputProps> = ({ value, onChange, label, icon }) => {
+const OllamaInput: React.FC<OllamaInputProps> = ({value, onChange, label, icon}) => {
     const [modelName, setModelName] = useState(
         value && isOllamaModel(value) ? value.id : ''
     );
@@ -85,15 +85,15 @@ const OllamaInput: React.FC<OllamaInputProps> = ({ value, onChange, label, icon 
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <div style={{display: 'flex', flexDirection: 'column', gap: '6px'}}>
+            <div style={{display: 'flex', gap: '6px', alignItems: 'center'}}>
                 <input
                     type="text"
                     className="model-selector-dropdown"
                     placeholder="e.g. llama3:8b-instruct"
                     value={modelName}
                     onChange={(e) => setModelName(e.target.value)}
-                    style={{ flex: 1 }}
+                    style={{flex: 1}}
                 />
                 <button
                     onClick={handleApply}
@@ -111,20 +111,20 @@ const OllamaInput: React.FC<OllamaInputProps> = ({ value, onChange, label, icon 
                     Apply
                 </button>
             </div>
-            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.7rem', color: '#888', minWidth: '60px' }}>Base URL:</span>
+            <div style={{display: 'flex', gap: '6px', alignItems: 'center'}}>
+                <span style={{fontSize: '0.7rem', color: '#888', minWidth: '60px'}}>Base URL:</span>
                 <input
                     type="text"
                     className="model-selector-dropdown"
                     placeholder="http://localhost:11434"
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
-                    style={{ flex: 1 }}
+                    style={{flex: 1}}
                 />
             </div>
-            {isOllamaModel(value) && (
-                <span className="model-selector-info" style={{ color: 'rgb(187, 58, 58)' }}>
-                    <ExternalLink size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+            {value && isOllamaModel(value) && (
+                <span className="model-selector-info" style={{color: 'rgb(187, 58, 58)'}}>
+                    <ExternalLink size={12} style={{verticalAlign: 'middle', marginRight: 4}}/>
                     Using Ollama: {value.id}
                 </span>
             )}
@@ -133,12 +133,12 @@ const OllamaInput: React.FC<OllamaInputProps> = ({ value, onChange, label, icon 
 };
 
 const ModelSelector: React.FC<ModelSelectorProps> = ({
-    attackerModel,
-    judgeModel,
-    onAttackerChange,
-    onJudgeChange,
-}) => {
-    const { hostname, port } = useBackendVariablesStore();
+                                                         attackerModel,
+                                                         judgeModel,
+                                                         onAttackerChange,
+                                                         onJudgeChange,
+                                                     }) => {
+    const {hostname, port} = useBackendVariablesStore();
     const [listModels, setListModels] = useState<ModelInfo[]>([]);
 
     useEffect(() => {
@@ -151,7 +151,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
     const [judgeMode, setJudgeMode] = useState<'repo' | 'ollama' | 'attacker'>('repo');
 
     useEffect(() => {
-        if (judgeMode === 'attacker') {
+        if (judgeMode === 'attacker' && attackerModel) {
             onJudgeChange(attackerModel);
         }
     }, [attackerModel, judgeMode, onJudgeChange]);
@@ -205,7 +205,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                 {/* ── Attacker ── */}
                 <div className="model-selector-group">
                     <label className="model-selector-label">
-                        <Bot size={16} color="rgb(187, 58, 58)" />
+                        <Bot size={16} color="rgb(187, 58, 58)"/>
                         Attacker Model
                     </label>
                     <select
@@ -235,11 +235,12 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                                 if (m && isOllamaModel(m)) setAttackerMode('repo');
                             }}
                             label="Attacker"
-                            icon={<Bot size={14} />}
+                            icon={<Bot size={14}/>}
                         />
                     )}
                     {attackerMode === 'repo' && attackerModel && (
-                        <span className="model-selector-info" style={{ color: isOllamaModel(attackerModel) ? 'rgb(187, 58, 58)' : undefined }}>
+                        <span className="model-selector-info"
+                              style={{color: isOllamaModel(attackerModel) ? 'rgb(187, 58, 58)' : undefined}}>
                             {attackerModel.name} &middot; {isOllamaModel(attackerModel) ? `Ollama (${(attackerModel as any).api || 'http://localhost:11434'})` : (attackerModel.model_type ?? attackerModel.task)}
                         </span>
                     )}
@@ -248,7 +249,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                 {/* ── Judge ── */}
                 <div className="model-selector-group">
                     <label className="model-selector-label">
-                        <Scale size={16} color="rgb(187, 58, 58)" />
+                        <Scale size={16} color="rgb(187, 58, 58)"/>
                         Judge Model
                     </label>
                     <select
@@ -279,11 +280,12 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                                 if (m && isOllamaModel(m)) setJudgeMode('repo');
                             }}
                             label="Judge"
-                            icon={<Scale size={14} />}
+                            icon={<Scale size={14}/>}
                         />
                     )}
                     {judgeMode === 'repo' && judgeModel && (
-                        <span className="model-selector-info" style={{ color: isOllamaModel(judgeModel) ? 'rgb(187, 58, 58)' : undefined }}>
+                        <span className="model-selector-info"
+                              style={{color: isOllamaModel(judgeModel) ? 'rgb(187, 58, 58)' : undefined}}>
                             {judgeModel.name} &middot; {isOllamaModel(judgeModel) ? `Ollama (${(judgeModel as any).api || 'http://localhost:11434'})` : (judgeModel.model_type ?? judgeModel.task)}
                         </span>
                     )}

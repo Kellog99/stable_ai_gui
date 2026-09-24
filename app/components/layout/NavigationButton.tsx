@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { NavigationSection } from "./config";
+import React, {useEffect, useMemo, useState} from "react";
+import {ChevronDown, ChevronUp} from "lucide-react";
+import {NavigationSection} from "./config";
 import "./NavigationButton.css";
-import { Tooltip } from "@mantine/core";
 
 interface NavigationButtonProps extends NavigationSection {
     isClosed: boolean;   // Whether the NavBar is collapsed
@@ -12,9 +11,10 @@ interface NavigationButtonProps extends NavigationSection {
     isActive: (id: string) => boolean;   // Given the id, it tells whether this button is active or not
     handleClick: (href?: string, id?: string) => void; // Function to handle button click
 }
+
 /**
- * 
- * @param id: the id of the button, used to identify it and to tell whether it's active or not 
+ *
+ * @param id: the id of the button, used to identify it and to tell whether it's active or not
  * @param title: the title of the button
  * @param Icon: the icon of the button
  * @param href: the link to navigate to when the button is clicked, if it exists
@@ -24,17 +24,19 @@ interface NavigationButtonProps extends NavigationSection {
  * @param isClosed: a boolean that tells whether the lateral navbar is collapsed or not, used to decide whether to show the title of the button or not
  * @param isDisabled: a boolean that tells whether the button is disabled or not, used to disable the button when the user doesn't have the necessary permissions to access the page
  */
-const NavigationButton: React.FC<NavigationButtonProps> = ({
-    id,
-    title,
-    Icon,
-    href,
-    items,
-    isActive,
-    handleClick,
-    isClosed,
-    isDisabled = false,
-}) => {
+const NavigationButton: React.FC<NavigationButtonProps> = (
+    {
+        id,
+        title,
+        Icon,
+        href,
+        items,
+        isActive,
+        handleClick,
+        isClosed,
+        isDisabled = false,
+    }
+) => {
 
     const [expanded, setExpanded] = useState<boolean>(true); // all visible by default
 
@@ -48,20 +50,12 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
         setExpanded(!isClosed)
     }, [isClosed])
 
-    const wrapChild = (child: React.ReactNode, title: string) => {
-        return (
-            expanded ? child :
-                <Tooltip label={title} withArrow>
-                    {child}
-                </Tooltip>
-        )
-    }
     return (
         <div className="nav-button-container">
             <div
                 onClick={() => !isDisabled && handleClick(href, id)}
                 className={`nav-item ${isActive(id) ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
-                style={{ cursor: isDisabled ? "not-allowed" : "pointer" }}
+                style={{cursor: isDisabled ? "not-allowed" : "pointer"}}
                 role="button"
                 tabIndex={isDisabled ? -1 : 0}
                 onKeyDown={(e) => {
@@ -90,7 +84,7 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
                         className="expand-button"
                         type="button"
                     >
-                        {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                        {expanded ? <ChevronUp size={18}/> : <ChevronDown size={18}/>}
                     </button>
                 )}
             </div>
