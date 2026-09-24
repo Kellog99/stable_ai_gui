@@ -57,23 +57,13 @@ const AttackCard: React.FC<AttackCardProps> = (
         <div
             key={id}
             role='button'
-            tabIndex={0}
-            aria-pressed={isActive}
             onClick={handleClick}
-            onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    handleClick();
-                }
-            }}
             className={`atk-card ${isActive ? 'active' : ''}`}
         >
             <div
                 className={`title_container ${category || knowledge ? 'has_metadata' : 'no_metadata'}`}
             >
-                <Tooltip label={title} withArrow openDelay={450}>
-                    <span className="attack_title">{title}</span>
-                </Tooltip>
+                <span className="attack_title">{title}</span>
                 {(category || knowledge) && <div className="attack_metadata">
                     {category && <span
                         className={`category_badge category_${category.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{category}</span>}

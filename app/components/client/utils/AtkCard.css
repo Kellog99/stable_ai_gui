@@ -2,10 +2,11 @@
     display: flex;
     flex-direction: row;
     box-sizing: border-box;
-    width: 250px;
-    aspect-ratio: 3.14;
+    min-width: 0;
     overflow: hidden;
-    min-height: 96px;
+    height: 100%;
+    min-height: 80px;
+    max-height: 90px;
     padding: 0.7rem 0.75rem;
     align-content: center;
     align-items: center;
@@ -25,9 +26,9 @@
 }
 
 .atk-card.active {
-    border: 2px solid rgb(6, 182, 212);
-    background-color: rgba(6, 182, 212, 0.16);
-    box-shadow: inset 4px 0 0 rgb(6, 182, 212), 0 0 0 2px rgba(6, 182, 212, 0.08);
+    border-color: rgba(6, 182, 212, 0.75);
+    background-color: rgba(6, 182, 212, 0.12);
+    box-shadow: inset 3px 0 0 rgb(6, 182, 212);
     color: rgb(224, 242, 254);
 }
 
@@ -52,17 +53,14 @@
 }
 
 .attack_title {
-    display: -webkit-box;
+    display: block;
     min-width: 0;
     font-weight: 650;
     margin: 0;
     padding: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: normal;
-    line-height: 1.3;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    white-space: nowrap;
 }
 
 .attack_metadata {
