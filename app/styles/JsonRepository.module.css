@@ -1,0 +1,138 @@
+.card {
+  background-color: var(--navy-700);;
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 10px -3px rgba(0, 0, 0, 0.1),
+              0 2px 4px -4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #374151;
+  display: flex;
+  flex-direction:column;
+  width: 15rem; 
+  transition: transform 0.2s ease, box-shadow 0.2s ease; 
+  margin: 0.2rem;
+}
+
+.card:hover{
+  transform: scale(1.02);
+  box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.2),
+              0 6px 10px -4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.cardSides{
+  display: flex;
+}
+
+
+.cardsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  max-height: 50vh;
+  overflow: auto;
+}
+
+
+.left {
+  flex: 2;
+  padding-left: 0.8rem;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.networkName {
+  border-radius: 0.5rem;
+  padding-left: 0.25rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.networkImage {
+  background-color: #e5e7eb; 
+  border-radius: 0.75rem;
+  border: 4px solid #e5e7eb;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  flex-shrink: 0;
+  height: 8rem; 
+  
+}
+
+.networkImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; 
+}
+
+.right {
+  flex: 2;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.cardFooter {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.panel {
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  max-height: 15vh;
+  overflow: auto;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;       
+  margin-bottom: 0.25rem; 
+}
+
+.panelHeader h4 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;           
+  padding: 0;         
+  line-height: 1;     
+}
+
+.panelHeader svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: #d1d5db;
+  margin-right: 0.25rem;
+}
+
+.panelBody {
+  font-size: 0.7rem;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+
+.infoPanel {
+  flex: none;
+  width: 100%;
+  
+}
+
+.infoPanel p {
+  font-size: 0.7rem;
+  color: #d1d5db;
+  line-height: 1.25;
+}
+
+.subtitlePanel {
+  font-weight: 600;
+}
