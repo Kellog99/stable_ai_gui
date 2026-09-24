@@ -5,6 +5,65 @@
   flex-direction: column;
   gap: 10px;
   overflow-y: visible;
+  --thread-height: 76vh;
+}
+
+/* Enhanced loading indicator card shown while the attack runs */
+.attack-loading-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  margin: 40px auto;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: fadeInCard 0.4s ease-out;
+}
+
+@keyframes fadeInCard {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.attack-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(187, 58, 58, 0.2);
+  border-top-color: rgb(187, 58, 58);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.attack-loading-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.attack-loading__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.attack-loading__step {
+  font-size: 0.85rem;
+  color: #aaa;
+  animation: stepFade 2.8s ease-in-out infinite;
+}
+
+@keyframes stepFade {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
 /* Minimal loading indicator shown while the attack runs */
@@ -68,6 +127,9 @@
 /* ── Result summary bar ── */
 .history-toggle {
   align-self: center;
+  margin-top: 0px;    /* space above the button */
+  margin-bottom: 10px; /* space below the button */
+  margin-left: 20px; /* space below the button */
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -162,13 +224,32 @@
 .results-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 14px;
+  height: var(--thread-height);
   background: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
   border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
   border-radius: 12px;
+  overflow: hidden;
   opacity: 0;
   animation: resultsReveal 0.5s ease-out 0.12s forwards;
+}
+
+.results-card__body {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  flex: 1;
+  min-height: 0;
+}
+
+.results-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .bubble-row {

@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
+    height: var(--thread-height);
     background-color: color-mix(in hsl, var(--bg) 70%, var(--bg-dark) 30%);
     border: 1px solid color-mix(in hsl, var(--bg-light) 28%, transparent);
     border-radius: 12px;
@@ -29,6 +29,7 @@
     flex-wrap: wrap;
     gap: 14px;
     padding: 14px 16px;
+    flex-shrink: 0;
     border-bottom: 1px solid color-mix(in hsl,
             var(--bg-light) 50%,
             transparent 50%);
@@ -82,7 +83,8 @@
     display: flex;
     flex-direction: column;
     background-color: transparent;
-    height: 40vh;
+    flex: 1;
+    min-height: 0;
 }
 
 .conversation_chat_container {

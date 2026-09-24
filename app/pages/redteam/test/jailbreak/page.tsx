@@ -272,11 +272,12 @@ const Jailbreaking = () => {
             <HeaderPageTask
                 Icon={Unlink}
                 title="Jailbreaking"
-                description="Test on the loaded model, single attacks for a specific prompt."
+                descrition="Test on the loaded model, single attacks for a specific prompt."
             />
             <div className={styles.body}>
                 {/* Top section shrinks & fades while scrolling down. */}
                 <div ref={topSectionRef} className={styles.top_section} style={topShrinkStyle}>
+                {/* <div className={styles.top_section}> */}
                     <VulnerabilitySelection
                         stretch
                         attacks={attacksWithSavedParams}
